@@ -1,0 +1,21 @@
+name = "omnivium-api-proxy"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+[[kv_namespaces]]
+binding = "KV"
+id = "71d7587d4fb245a5a5e0f5f1ee5591d1"
+
+# Set ALL secrets via: wrangler secret put <KEY>
+# wrangler secret put PROXY_TOKEN
+# wrangler secret put OPENAI_API_KEY
+# wrangler secret put ANTHROPIC_API_KEY
+# wrangler secret put GEMINI_API_KEY
+# wrangler secret put KIMI_API_KEY
+# wrangler secret put DEEPSEEK_API_KEY
+# wrangler secret put ZHIPU_API_KEY
+# wrangler secret put MINIMAX_API_KEY
+# wrangler secret put JWT_PUBLIC_KEY
+#
+# Multiple keys for rotation (comma-separated):
+# wrangler secret put OPENAI_API_KEY  → "sk-xxx1,sk-xxx2,sk-xxx3"

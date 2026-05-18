@@ -1,0 +1,59 @@
+﻿Running Gradle task 'assembleDebug'...                          
+[=========                              ] 25%                                   
+[=========                              ] 25% Fetch remote repository...        
+[=======================================] 100% Fetch remote repository...       
+
+Checking the license for package Android SDK Platform-Tools in D:\android-sdk\licenses
+License for package Android SDK Platform-Tools accepted.
+Preparing "Install Android SDK Platform-Tools v.37.0.0".
+Warning: Failed to read or create install properties file.
+[=========                              ] 25%                                   
+[=========                              ] 25% Fetch remote repository...        
+[=======================================] 100% Fetch remote repository...       
+
+Checking the license for package Android SDK Platform-Tools in D:\android-sdk\licenses
+License for package Android SDK Platform-Tools accepted.
+Preparing "Install Android SDK Platform-Tools v.37.0.0".
+Warning: Failed to read or create install properties file.
+[=========                              ] 25%                                   
+[=========                              ] 25% Fetch remote repository...        
+[=======================================] 100% Fetch remote repository...       
+
+Checking the license for package Android SDK Platform-Tools in D:\android-sdk\licenses
+License for package Android SDK Platform-Tools accepted.
+Preparing "Install Android SDK Platform-Tools v.37.0.0".
+Warning: Failed to read or create install properties file.
+[=========                              ] 25%                                   
+[=========                              ] 25% Fetch remote repository...        
+[=======================================] 100% Fetch remote repository...       
+
+Checking the license for package Android SDK Platform-Tools in D:\android-sdk\licenses
+License for package Android SDK Platform-Tools accepted.
+Preparing "Install Android SDK Platform-Tools v.37.0.0".
+Warning: Failed to read or create install properties file.
+flutter : 
+所在位置 行:1 字符: 114
++ ... 19468\Desktop\Omnivium\mobile; flutter build apk --debug 2>&1 | Out-S ...
++                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], Remo    teException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+FAILURE: Build failed with an exception.
+
+* Where:
+Script 'C:\pub_cache\hosted\pub.dev\flutter_vodozemac-0.5.0\cargokit\gradle\plugin.gradle' line: 68
+
+* What went wrong:
+Execution failed for task ':flutter_vodozemac:cargokitCargoBuildFlutter_vodozemacDebug'.
+> Process 'command 'C:\pub_cache\hosted\pub.dev\flutter_vodozemac-0.5.0\cargokit\gradle\..\run_build_tool.cmd'' finished with non-zero exit value 268435659
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 15s
+Running Gradle task 'assembleDebug'...                             17.5s
+Gradle task assembleDebug failed with exit code 1
+

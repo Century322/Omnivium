@@ -1,0 +1,30 @@
+﻿Running Gradle task 'assembleDebug'...                          
+flutter : 
+所在位置 行:1 字符: 44
++ ... 19468\Desktop\Omnivium\mobile; flutter build apk --debug 
+2>&1 | Out-F ...
++                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], Remo 
+   teException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+FAILURE: Build failed with an exception.
+
+* Where:
+Build file 'C:\Users\19468\Desktop\Omnivium\mobile\android\buil
+d.gradle.kts' line: 26
+
+* What went wrong:
+Cannot run Project.afterEvaluate(Action) when the project is al
+ready evaluated.
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 4s
+Running Gradle task 'assembleDebug'...                              5.0s
+Gradle task assembleDebug failed with exit code 1

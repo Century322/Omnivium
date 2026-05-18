@@ -1,0 +1,57 @@
+# Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+build/
+*.lock
+!pubspec.lock
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env*
+
+# Rust
+.cargo/
+.rustup/
+
+# Gradle
+.gradle/
+
+# Android SDK
+android_sdk/
+cmdline-tools.zip
+cmdline-tools/
+
+# Misc
+*.log
+debug.log
+stdin_pipe
+
+# Secrets - NEVER commit these
+deploy/synapse-data/*.signing.key
+deploy/synapse-data/homeserver.db*
+deploy/synapse-data/homeserver.yaml
+mobile/android/key.properties
+mobile/android/*.jks
+mobile/android/*.keystore
+mobile/keystore/
+*firebase-adminsdk*.json
+
+# Cloudflare
+.wrangler-config/
+.wrangler/
+
+# Node
+node_modules/
+
+# Trae
+.trae/

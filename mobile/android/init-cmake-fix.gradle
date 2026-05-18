@@ -1,0 +1,9 @@
+allprojects {
+    afterEvaluate { project ->
+        if (project.hasProperty('android') && project.android.hasProperty('externalNativeBuild')) {
+            project.android.externalNativeBuild.cmake {
+                buildStagingDirectory = project.layout.buildDirectory.dir("native-cxx").get().asFile
+            }
+        }
+    }
+}

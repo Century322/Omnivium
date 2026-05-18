@@ -1,0 +1,43 @@
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  exclude:
+    - build/**
+  errors:
+    avoid_print: warning
+    avoid_empty_else: error
+    avoid_relative_lib_imports: warning
+    prefer_single_quotes: ignore
+    always_declare_return_types: warning
+    require_trailing_commas: ignore
+    unnecessary_string_escapes: warning
+    unnecessary_const: warning
+    unnecessary_new: warning
+    unnecessary_null_in_if_null_operators: warning
+    prefer_const_constructors: ignore
+    prefer_const_declarations: ignore
+    prefer_final_locals: ignore
+
+linter:
+  rules:
+    avoid_print: true
+    prefer_single_quotes: true
+    always_declare_return_types: true
+    require_trailing_commas: true
+    avoid_empty_else: true
+    avoid_relative_lib_imports: true
+    unnecessary_const: true
+    unnecessary_new: true
+    unnecessary_null_in_if_null_operators: true
+    unnecessary_string_escapes: true
+    prefer_const_constructors: true
+    prefer_const_declarations: true
+    prefer_final_fields: true
+    prefer_final_locals: true
+    prefer_is_empty: true
+    prefer_is_not_empty: true
+    prefer_is_not_operator: true
+    type_init_formals: true
+    use_key_in_widget_constructors: true
+    sized_box_for_whitespace: true
+    use_full_hex_values_for_flutter_colors: true

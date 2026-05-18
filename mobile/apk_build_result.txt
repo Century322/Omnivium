@@ -1,0 +1,261 @@
+﻿Running Gradle task 'assembleDebug'...                          
+[=========                              ] 25%                                   
+[=========                              ] 25% Fetch remote repository...        
+[=======================================] 100% Fetch remote repository...       
+
+Checking the license for package Android SDK Platform-Tools in D:\android-sdk\licenses
+License for package Android SDK Platform-Tools accepted.
+Preparing "Install Android SDK Platform-Tools v.37.0.0".
+Warning: Failed to read or create install properties file.
+[=========                              ] 25%                                   
+[=========                              ] 25% Fetch remote repository...        
+[=======================================] 100% Fetch remote repository...       
+
+Checking the license for package Android SDK Platform-Tools in D:\android-sdk\licenses
+License for package Android SDK Platform-Tools accepted.
+Preparing "Install Android SDK Platform-Tools v.37.0.0".
+Warning: Failed to read or create install properties file.
+[=========                              ] 25%                                   
+[=========                              ] 25% Fetch remote repository...        
+[=======================================] 100% Fetch remote repository...       
+
+Checking the license for package Android SDK Platform-Tools in D:\android-sdk\licenses
+License for package Android SDK Platform-Tools accepted.
+Preparing "Install Android SDK Platform-Tools v.37.0.0".
+Warning: Failed to read or create install properties file.
+[=========                              ] 25%                                   
+[=========                              ] 25% Fetch remote repository...        
+[=======================================] 100% Fetch remote repository...       
+
+Checking the license for package Android SDK Platform-Tools in D:\android-sdk\licenses
+License for package Android SDK Platform-Tools accepted.
+Preparing "Install Android SDK Platform-Tools v.37.0.0".
+Warning: Failed to read or create install properties file.
+flutter : e: Daemon compilation failed: null
+所在位置 行:1 字符: 44
++ ... 19468\Desktop\Omnivium\mobile; flutter build apk --debug 
+2>&1 | Out-F ...
++                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~
+    + CategoryInfo          : NotSpecified: (e: Daemon compila 
+   tion failed: null:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+java.lang.Exception
+	at org.jetbrains.kotlin.daemon.common.CompileService$CallResul
+t$Error.get(CompileService.kt:69)
+	at org.jetbrains.kotlin.daemon.common.CompileService$CallResul
+t$Error.get(CompileService.kt:65)
+	at org.jetbrains.kotlin.compilerRunner.GradleKotlinCompilerWor
+k.compileWithDaemon(GradleKotlinCompilerWork.kt:240)
+	at org.jetbrains.kotlin.compilerRunner.GradleKotlinCompilerWor
+k.compileWithDaemonOrFallbackImpl(GradleKotlinCompilerWork.kt:1
+59)
+	at org.jetbrains.kotlin.compilerRunner.GradleKotlinCompilerWor
+k.run(GradleKotlinCompilerWork.kt:111)
+	at org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWit
+hWorkers$GradleKotlinCompilerWorkAction.execute(GradleCompilerR
+unnerWithWorkers.kt:74)
+	at org.gradle.workers.internal.DefaultWorkerServer.execute(Def
+aultWorkerServer.java:63)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1$1.cr
+eate(NoIsolationWorkerFactory.java:66)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1$1.cr
+eate(NoIsolationWorkerFactory.java:62)
+	at org.gradle.internal.classloader.ClassLoaderUtils.executeInC
+lassloader(ClassLoaderUtils.java:100)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1.lamb
+da$execute$0(NoIsolationWorkerFactory.java:62)
+	at org.gradle.workers.internal.AbstractWorker$1.call(AbstractW
+orker.java:44)
+	at org.gradle.workers.internal.AbstractWorker$1.call(AbstractW
+orker.java:41)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$
+CallableBuildOperationWorker.execute(DefaultBuildOperationRunne
+r.java:210)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$
+CallableBuildOperationWorker.execute(DefaultBuildOperationRunne
+r.java:205)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$
+2.execute(DefaultBuildOperationRunner.java:67)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$
+2.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.
+execute(DefaultBuildOperationRunner.java:167)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.
+execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.
+call(DefaultBuildOperationRunner.java:54)
+	at org.gradle.workers.internal.AbstractWorker.executeWrappedIn
+BuildOperation(AbstractWorker.java:41)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1.exec
+ute(NoIsolationWorkerFactory.java:59)
+	at org.gradle.workers.internal.DefaultWorkerExecutor.lambda$su
+bmitWork$0(DefaultWorkerExecutor.java:174)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.ja
+va:317)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$E
+xecutionRunner.runExecution(DefaultConditionalExecutionQueue.ja
+va:194)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$E
+xecutionRunner.access$700(DefaultConditionalExecutionQueue.java
+:127)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$E
+xecutionRunner$1.run(DefaultConditionalExecutionQueue.java:169)
+	at org.gradle.internal.Factories$1.create(Factories.java:31)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withLock
+s(DefaultWorkerLeaseService.java:263)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWor
+kerThread(DefaultWorkerLeaseService.java:127)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWor
+kerThread(DefaultWorkerLeaseService.java:132)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$E
+xecutionRunner.runBatch(DefaultConditionalExecutionQueue.java:1
+64)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$E
+xecutionRunner.run(DefaultConditionalExecutionQueue.java:133)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.ca
+ll(Executors.java:572)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.ja
+va:317)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecor
+dFailures.onExecute(ExecutorPolicy.java:64)
+	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.ru
+n(AbstractManagedExecutor.java:48)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker
+(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.ru
+n(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: java.nio.file.NoSuchFileException: C:\Users\19468\De
+sktop\Omnivium\mobile\build\app\kotlin\compileDebugKotlin\cache
+able\dirty-sources.txt
+	at java.base/sun.nio.fs.WindowsException.translateToIOExceptio
+n(WindowsException.java:85)
+	at java.base/sun.nio.fs.WindowsException.rethrowAsIOException(
+WindowsException.java:103)
+	at java.base/sun.nio.fs.WindowsException.rethrowAsIOException(
+WindowsException.java:108)
+	at java.base/sun.nio.fs.WindowsFileSystemProvider.newByteChann
+el(WindowsFileSystemProvider.java:234)
+	at java.base/java.nio.file.spi.FileSystemProvider.newOutputStr
+eam(FileSystemProvider.java:482)
+	at java.base/java.nio.file.Files.newOutputStream(Files.java:22
+8)
+	at java.base/java.nio.file.Files.write(Files.java:3505)
+	at org.jetbrains.kotlin.incremental.CompilationTransactionKt.w
+riteBytes$lambda$0(CompilationTransaction.kt:68)
+	at org.jetbrains.kotlin.incremental.CompilationTransactionKt.w
+rite(CompilationTransaction.kt:56)
+	at org.jetbrains.kotlin.incremental.CompilationTransactionKt.w
+riteBytes(CompilationTransaction.kt:64)
+	at org.jetbrains.kotlin.incremental.CompilationTransactionKt.w
+riteText(CompilationTransaction.kt:60)
+	at org.jetbrains.kotlin.incremental.dirtyFiles.DirtyFilesCache
+dHistory.store(DirtyFilesProvider.kt:27)
+	at org.jetbrains.kotlin.incremental.IncrementalCompilerRunner.
+doCompile(IncrementalCompilerRunner.kt:510)
+	at org.jetbrains.kotlin.incremental.IncrementalCompilerRunner.
+compileImpl(IncrementalCompilerRunner.kt:416)
+	at org.jetbrains.kotlin.incremental.IncrementalCompilerRunner.
+compileNonIncrementally(IncrementalCompilerRunner.kt:301)
+	at org.jetbrains.kotlin.incremental.IncrementalCompilerRunner.
+compile(IncrementalCompilerRunner.kt:128)
+	at org.jetbrains.kotlin.daemon.CompileServiceImplBase.execIncr
+ementalCompiler(CompileServiceImpl.kt:684)
+	at org.jetbrains.kotlin.daemon.CompileServiceImplBase.access$e
+xecIncrementalCompiler(CompileServiceImpl.kt:94)
+	at org.jetbrains.kotlin.daemon.CompileServiceImpl.compile(Comp
+ileServiceImpl.kt:1810)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.i
+nvoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.rmi/sun.rmi.server.UnicastServerRef.dispatch(UnicastSe
+rverRef.java:360)
+	at java.rmi/sun.rmi.transport.Transport$1.run(Transport.java:2
+00)
+	at java.rmi/sun.rmi.transport.Transport$1.run(Transport.java:1
+97)
+	at java.base/java.security.AccessController.doPrivileged(Acces
+sController.java:714)
+	at java.rmi/sun.rmi.transport.Transport.serviceCall(Transport.
+java:196)
+	at java.rmi/sun.rmi.transport.tcp.TCPTransport.handleMessages(
+TCPTransport.java:598)
+	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandl
+er.run0(TCPTransport.java:844)
+	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandl
+er.lambda$run$0(TCPTransport.java:721)
+	at java.base/java.security.AccessController.doPrivileged(Acces
+sController.java:400)
+	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandl
+er.run(TCPTransport.java:720)
+	... 3 more
+
+系统锟揭诧拷锟斤拷指锟斤拷锟斤拷路锟斤拷锟斤拷
+系统锟揭诧拷锟斤拷指锟斤拷锟斤拷路锟斤拷锟斤拷
+系统锟揭诧拷锟斤拷指锟斤拷锟斤拷锟侥硷拷锟斤拷
+系统锟揭诧拷锟斤拷指锟斤拷锟斤拷锟侥硷拷锟斤拷
+Running pub get in "C:\Users\19468\Desktop\Omnivium\mobile\build\flutter_vodozemac\build\build_tool"
+Resolving dependencies...
+Got socket error trying to find package convert at https://pub.
+dev.
+Compiling bin/build_tool_runner.dart to kernel file bin/build_tool_runner.dill.
+Error: Couldn't resolve the package 'build_tool' in 'package:bu
+ild_tool/build_tool.dart'.
+bin/build_tool_runner.dart:1:8: Error: Not found: 'package:buil
+d_tool/build_tool.dart'
+import 'package:build_tool/build_tool.dart' as build_tool;
+       ^
+bin/build_tool_runner.dart:3:15: Error: Method not found: 'runM
+ain'.
+   build_tool.runMain(args);
+              ^^^^^^^
+Bad state: Generating kernel failed!
+Could not find a command named "bin\build_tool_runner.dill".
+
+Usage: dart <command|dart-file> [arguments]
+
+Global options:
+-v, --verbose               Show additional command output.
+    --version               Print the Dart SDK version.
+    --enable-analytics      Enable analytics.
+    --disable-analytics     Disable analytics.
+    --suppress-analytics    Disallow analytics for this `dart *
+` run without changing the analytics configuration.
+-h, --help                  Print this usage information.
+
+Available commands:
+
+Global
+  install     Install or upgrade a Dart CLI tool for global use
+.
+  installed   List globally installed Dart CLI tools.
+  uninstall   Remove a globally installed Dart CLI tool.
+
+Project
+  build       Build a Dart application including code assets.
+  compile     Compile Dart to various formats.
+  create      Create a new Dart project.
+  pub         Work with packages.
+  run         Run a Dart program from a file or a local package
+.
+  test        Run tests for a project.
+
+Source code
+  analyze     Analyze Dart code in a directory.
+  doc         Generate API documentation for Dart projects.
+  fix         Apply automated fixes to Dart source code.
+  format      Idiomatically format Dart source code.
+
+Tools
+  devtools    Open DevTools (optionally connecting to an existi
+ng application).
+  info        Show diagnostic information about the installed t
+ooling.
+
+Run "dart help <command>" for more information about a command.
+See https://dart.dev/tools/dart-tool for detailed documentation
+.
+Running Gradle task 'assembleDebug'...                            309.5s
+鈭?Built build\app\outputs\flutter-apk\app-debug.apk
