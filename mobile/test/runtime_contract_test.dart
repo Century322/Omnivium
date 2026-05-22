@@ -47,8 +47,9 @@ class TestPluginHandler implements PluginHandler {
     dynamic params,
     CapabilityContext context,
   ) async {
-    if (onCapability != null)
+    if (onCapability != null) {
       return onCapability!(capabilityId, params, context);
+    }
     return CapabilityResult.ok();
   }
 }

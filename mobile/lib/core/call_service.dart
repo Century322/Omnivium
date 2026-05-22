@@ -157,7 +157,7 @@ class CallService {
   void _handleTimelineEvent(matrix.Event event) {
     try {
       final type = event.type;
-      if (type == null || !type.startsWith('m.call.')) return;
+      if (!type.startsWith('m.call.')) return;
 
       final callContent = event.content;
       if (callContent.isEmpty) return;

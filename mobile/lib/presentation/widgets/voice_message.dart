@@ -216,19 +216,21 @@ class _VoiceMessagePlayerState extends State<VoiceMessagePlayer> {
     );
     _subs.add(
       _player.onPlayerStateChanged.listen((s) {
-        if (mounted)
+        if (mounted) {
           setState(() {
             _isPlaying = s == PlayerState.playing;
           });
+        }
       }),
     );
     _subs.add(
       _player.onPlayerComplete.listen((_) {
-        if (mounted)
+        if (mounted) {
           setState(() {
             _position = Duration.zero;
             _isPlaying = false;
           });
+        }
       }),
     );
   }

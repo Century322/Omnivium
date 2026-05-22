@@ -160,11 +160,12 @@ class ChatSearchSheet extends StatelessWidget {
     int start,
     int length,
   ) {
-    if (start < 0)
+    if (start < 0) {
       return Text(
         text,
         style: TextStyle(color: AppColors.textSecondary(context), fontSize: 14),
       );
+    }
     final before = text.substring(0, start);
     final match = text.substring(start, start + length);
     final after = text.substring(start + length);

@@ -108,8 +108,7 @@ class _AppErrorBoundaryState extends State<AppErrorBoundary> {
 class _ErrorCatcher extends StatelessWidget {
   final Widget child;
   final void Function(Object, StackTrace) onCaught;
-  const _ErrorCatcher({required this.child, required this.onCaught, Key? key})
-    : super(key: key);
+  const _ErrorCatcher({required this.child, required this.onCaught, super.key});
 
   @override
   Widget build(BuildContext context) {

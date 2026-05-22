@@ -68,10 +68,11 @@ class _FriendChatPanelState extends State<FriendChatPanel>
     widget.provider.matrix.addListener(_onMatrixChanged);
     _presenceFuture = _getPresence();
     _presenceTimer = Timer.periodic(const Duration(seconds: 30), (_) {
-      if (mounted)
+      if (mounted) {
         setState(() {
           _presenceFuture = _getPresence();
         });
+      }
     });
     _loadMatrixMessages(widget.chatTargetId);
     _markRoomAsRead(widget.chatTargetId);
@@ -1020,11 +1021,12 @@ class _FriendChatPanelState extends State<FriendChatPanel>
   }
 
   Widget _buildHighlightedText(String text, int start, int length) {
-    if (start < 0)
+    if (start < 0) {
       return Text(
         text,
         style: TextStyle(color: AppColors.textSecondary(context), fontSize: 14),
       );
+    }
     final before = text.substring(0, start);
     final match = text.substring(start, start + length);
     final after = text.substring(start + length);
@@ -1158,7 +1160,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                         future: _presenceFuture,
                         builder: (context, snap) {
                           final presence = snap.data;
-                          if (presence == null)
+                          if (presence == null) {
                             return Text(
                               '@${widget.chatTargetId}',
                               style: TextStyle(
@@ -1166,6 +1168,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                                 fontSize: 11,
                               ),
                             );
+                          }
                           final isOnline = presence.currentlyActive == true;
                           final status = isOnline
                               ? localeProvider.t('online')
@@ -1354,11 +1357,12 @@ class _FriendChatPanelState extends State<FriendChatPanel>
 
   Widget _buildImageBubble(FriendMessageData msg) {
     final mxcUrl = msg.url;
-    if (mxcUrl == null)
+    if (mxcUrl == null) {
       return Text(
         msg.content,
         style: TextStyle(color: AppColors.textPrimary(context), fontSize: 14),
       );
+    }
     final httpUrl = widget.provider.matrix.getMediaUrl(mxcUrl);
     return ClipRRect(
       borderRadius: BorderRadius.circular(18),

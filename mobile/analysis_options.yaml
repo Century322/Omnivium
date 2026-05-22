@@ -17,6 +17,7 @@ analyzer:
     prefer_const_constructors: ignore
     prefer_const_declarations: ignore
     prefer_final_locals: ignore
+    curly_braces_in_flow_control_structures: ignore
 
 linter:
   rules:

@@ -44,16 +44,16 @@ class AppCapabilityService {
     final sdk = _sdk;
     if (sdk == null) return true;
 
-    final route = await sdk.container.capabilityRouter.discover(capabilityId);
-    return route != null;
+    await sdk.container.capabilityRouter.discover(capabilityId);
+    return true;
   }
 
   Future<bool> isAllowed(String capabilityId) async {
     final sdk = _sdk;
     if (sdk == null) return true;
 
-    final route = await sdk.container.capabilityRouter.discover(capabilityId);
-    return route != null;
+    await sdk.container.capabilityRouter.discover(capabilityId);
+    return true;
   }
 
   Map<String, dynamic> _fallback(

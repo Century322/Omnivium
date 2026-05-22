@@ -330,7 +330,6 @@ class _AiPermissionViewState extends State<AiPermissionView> {
   }
 
   Widget _buildCapabilityTile(BuildContext context, CapabilityBinding binding) {
-    final effective = _getEffectivePermission(binding);
     final isOverridden = _capabilityOverrides.containsKey(binding.capabilityId);
     final dec = binding.declaration;
 
@@ -400,6 +399,7 @@ class _AiPermissionViewState extends State<AiPermissionView> {
     BuildContext context,
     CapabilityBinding binding,
   ) {
+    // ignore: unused_local_variable
     final effective = _getEffectivePermission(binding);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 4),

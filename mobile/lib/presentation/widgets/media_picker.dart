@@ -114,8 +114,9 @@ class MediaPicker {
   ) async {
     final granted = await _perm.requestCamera();
     if (!granted) {
-      if (context.mounted)
+      if (context.mounted) {
         _showPermissionDenied(context, localeProvider.t('camera_permission'));
+      }
       return;
     }
     try {
@@ -144,8 +145,9 @@ class MediaPicker {
   ) async {
     final granted = await _perm.requestPhotos();
     if (!granted) {
-      if (context.mounted)
+      if (context.mounted) {
         _showPermissionDenied(context, localeProvider.t('photos_permission'));
+      }
       return;
     }
     try {
@@ -174,8 +176,9 @@ class MediaPicker {
   ) async {
     final granted = await _perm.requestPhotos();
     if (!granted) {
-      if (context.mounted)
+      if (context.mounted) {
         _showPermissionDenied(context, localeProvider.t('photos_permission'));
+      }
       return;
     }
     try {

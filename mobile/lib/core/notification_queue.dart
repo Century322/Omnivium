@@ -14,7 +14,6 @@ class NotificationQueue {
   Timer? _delayTimer;
   final List<_PendingNotification> _pending = [];
 
-  static const int _maxNotificationsPerDialog = 5;
   static const Duration _delayDuration = Duration(seconds: 2);
 
   void markDialogActive(String dialogId) {

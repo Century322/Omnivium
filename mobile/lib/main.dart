@@ -246,22 +246,6 @@ Future<bool> _safeInit(
   }
 }
 
-bool _safeInitSync(void Function() init, String name, {bool critical = false}) {
-  try {
-    init();
-    return true;
-  } catch (e) {
-    _initFailures.add(name);
-    if (critical) {
-      _criticalInitFailed = true;
-      AppLogger.instance.fatal('Critical service $name init failed', error: e);
-    } else {
-      AppLogger.instance.error('$name init failed', error: e);
-    }
-    return false;
-  }
-}
-
 class _AppLockDialog extends StatefulWidget {
   final AppLockService lock;
   final VoidCallback onUnlocked;

@@ -848,8 +848,9 @@ void main() {
         wasRoutedThroughRouter: false,
         hasTraceSpan: true,
       );
-      if (!result.allowed && result.violatedLaw != null)
+      if (!result.allowed && result.violatedLaw != null) {
         violations.add(result.violatedLaw!);
+      }
 
       result = guard.checkCapabilityInvocation(
         sandboxId: 'sb-2',
@@ -860,8 +861,9 @@ void main() {
         wasRoutedThroughRouter: true,
         hasTraceSpan: false,
       );
-      if (!result.allowed && result.violatedLaw != null)
+      if (!result.allowed && result.violatedLaw != null) {
         violations.add(result.violatedLaw!);
+      }
 
       var taskResult = guard.checkTaskCreation(
         sandboxId: 'sb-3',
@@ -869,8 +871,9 @@ void main() {
         budgetApproved: true,
         hasTraceSpan: true,
       );
-      if (!taskResult.allowed && taskResult.violatedLaw != null)
+      if (!taskResult.allowed && taskResult.violatedLaw != null) {
         violations.add(taskResult.violatedLaw!);
+      }
 
       taskResult = guard.checkTaskCreation(
         sandboxId: 'sb-4',
@@ -878,8 +881,9 @@ void main() {
         budgetApproved: false,
         hasTraceSpan: true,
       );
-      if (!taskResult.allowed && taskResult.violatedLaw != null)
+      if (!taskResult.allowed && taskResult.violatedLaw != null) {
         violations.add(taskResult.violatedLaw!);
+      }
 
       var stateResult = guard.checkStateAccess(
         sandboxId: 'sb-5',
@@ -887,8 +891,9 @@ void main() {
         usedSideChannel: false,
         hasTraceSpan: true,
       );
-      if (!stateResult.allowed && stateResult.violatedLaw != null)
+      if (!stateResult.allowed && stateResult.violatedLaw != null) {
         violations.add(stateResult.violatedLaw!);
+      }
 
       stateResult = guard.checkStateAccess(
         sandboxId: 'sb-6',
@@ -896,8 +901,9 @@ void main() {
         usedSideChannel: true,
         hasTraceSpan: true,
       );
-      if (!stateResult.allowed && stateResult.violatedLaw != null)
+      if (!stateResult.allowed && stateResult.violatedLaw != null) {
         violations.add(stateResult.violatedLaw!);
+      }
 
       result = guard.checkCapabilityInvocation(
         sandboxId: 'sb-7',
@@ -908,8 +914,9 @@ void main() {
         wasRoutedThroughRouter: true,
         hasTraceSpan: true,
       );
-      if (!result.allowed && result.violatedLaw != null)
+      if (!result.allowed && result.violatedLaw != null) {
         violations.add(result.violatedLaw!);
+      }
 
       expect(violations.length, 7);
       expect(

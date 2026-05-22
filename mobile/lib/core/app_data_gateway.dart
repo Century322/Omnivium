@@ -9,7 +9,6 @@ class AppDataGateway {
   AppDataGateway._();
 
   PersistenceBackend? _persistence;
-  bool _initialized = false;
 
   PersistenceBackend get persistence {
     _persistence ??= DatabasePersistenceBackend();
@@ -18,7 +17,6 @@ class AppDataGateway {
 
   void init({PersistenceBackend? backend}) {
     _persistence = backend ?? DatabasePersistenceBackend();
-    _initialized = true;
   }
 
   Future<void> write(String key, Map<String, dynamic> value) async {

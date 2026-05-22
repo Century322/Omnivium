@@ -396,35 +396,39 @@ class _SearchViewState extends State<SearchView> {
       if (messages.isNotEmpty) ...['_header_msg', ...messages],
       if (users.isNotEmpty) ...['_header_user', ...users],
     ];
-    if (items.isEmpty)
+    if (items.isEmpty) {
       return Center(
         child: Text(
           localeProvider.t('no_results'),
           style: TextStyle(color: AppColors.textTertiary(context)),
         ),
       );
+    }
     return ListView.builder(
       itemCount: items.length,
       itemBuilder: (context, index) {
         final item = items[index];
-        if (item == '_header_conv')
+        if (item == '_header_conv') {
           return _buildSectionHeader(
             context,
             localeProvider.t('conversations'),
             conversations.length,
           );
-        if (item == '_header_msg')
+        }
+        if (item == '_header_msg') {
           return _buildSectionHeader(
             context,
             localeProvider.t('messages'),
             messages.length,
           );
-        if (item == '_header_user')
+        }
+        if (item == '_header_user') {
           return _buildSectionHeader(
             context,
             localeProvider.t('contacts'),
             users.length,
           );
+        }
         return _buildResultTile(context, item as _SearchResult);
       },
     );
