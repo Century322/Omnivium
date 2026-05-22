@@ -435,19 +435,6 @@ class _SettingsViewState extends State<SettingsView>
     );
   }
 
-  String get _agentPermissionLabel {
-    switch (_agentPermission) {
-      case 'auto':
-        return t('permission_auto');
-      case 'confirm':
-        return t('permission_confirm');
-      case 'deny':
-        return t('permission_deny');
-      default:
-        return t('permission_confirm');
-    }
-  }
-
   String get _assistantLangLabel {
     switch (_assistantLang) {
       case 'auto':
@@ -525,46 +512,6 @@ class _SettingsViewState extends State<SettingsView>
               t('clear'),
               style: TextStyle(color: AppColors.dng(context)),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showPermissionDialog() {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: AppColors.sf(context),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          t('assistant_permissions'),
-          style: TextStyle(color: AppColors.textPrimary(context)),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _permissionOption(
-              'auto',
-              t('permission_auto'),
-              t('permission_auto_desc'),
-            ),
-            _permissionOption(
-              'confirm',
-              t('permission_confirm'),
-              t('permission_confirm_desc'),
-            ),
-            _permissionOption(
-              'deny',
-              t('permission_deny'),
-              t('permission_deny_desc'),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(t('ok'), style: TextStyle(color: AppColors.accent)),
           ),
         ],
       ),

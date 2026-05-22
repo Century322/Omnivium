@@ -376,11 +376,9 @@ void main() {
 
   group('CivilizationNetwork — Full Network Stack', () {
     late CivilizationNetwork netA;
-    late CivilizationNetwork netB;
 
     setUp(() {
       netA = CivilizationNetwork(localNodeId: 'node-A');
-      netB = CivilizationNetwork(localNodeId: 'node-B');
     });
 
     test('addNode and connectNode', () {

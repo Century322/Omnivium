@@ -1258,7 +1258,6 @@ class _FriendChatPanelState extends State<FriendChatPanel>
       itemCount: _friendMessages.length,
       itemBuilder: (_, i) {
         final msg = _friendMessages[i];
-        final isLast = i == _friendMessages.length - 1;
         return Padding(
           padding: const EdgeInsets.only(bottom: 4),
           child: Align(

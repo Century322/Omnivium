@@ -576,9 +576,12 @@ class MyIdView extends StatelessWidget {
             t('share_via_link'),
             t('share_via_link_desc'),
             onTap: () {
-              Share.share(
-                'https://omnivium.app/i/${Uri.encodeComponent(shareId)}',
-                subject: t('add_me_omnivium'),
+              SharePlus.instance.share(
+                ShareParams(
+                  text:
+                      'https://omnivium.app/i/${Uri.encodeComponent(shareId)}',
+                  subject: t('add_me_omnivium'),
+                ),
               );
             },
           ),

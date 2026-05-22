@@ -199,7 +199,6 @@ class _VoiceViewState extends State<VoiceView> with TickerProviderStateMixin {
         lastMsg.role == 'assistant' &&
         lastMsg.content.isNotEmpty &&
         !_isMuted) {
-      final voice = _selectedVoice;
       VoiceService.instance.speak(lastMsg.content).then((_) {
         if (_continuousMode && mounted) {
           _toggleListening();

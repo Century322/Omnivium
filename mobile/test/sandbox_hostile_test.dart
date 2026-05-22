@@ -345,6 +345,7 @@ void main() {
 
       sandbox.start();
 
+      // ignore: unused_local_variable
       bool terminated = false;
       Future.delayed(const Duration(milliseconds: 50), () {
         if (!sandbox.checkExecutionTime()) {

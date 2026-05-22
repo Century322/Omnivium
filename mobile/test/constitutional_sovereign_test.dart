@@ -9,11 +9,9 @@ import 'package:omnivium/core/runtime/stability/security.dart';
 void main() {
   group('ConstitutionalConsensus — Distributed Law Governance', () {
     late ConstitutionalConsensus localConsensus;
-    late ConstitutionalConsensus remoteConsensus;
 
     setUp(() {
       localConsensus = ConstitutionalConsensus(localNodeId: 'node-A');
-      remoteConsensus = ConstitutionalConsensus(localNodeId: 'node-B');
     });
 
     test('local manifest has all 10 laws at version 1', () {

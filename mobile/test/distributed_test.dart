@@ -652,7 +652,7 @@ void main() {
         clock: clock,
       );
 
-      final trace = service.startTrace(traceId: 'trace-1');
+      service.startTrace(traceId: 'trace-1');
 
       final remoteSpans = [
         DistributedSpan(

@@ -74,6 +74,7 @@ class AppErrorBoundary extends StatefulWidget {
 
 class _AppErrorBoundaryState extends State<AppErrorBoundary> {
   Object? _error;
+  // ignore: unused_field
   StackTrace? _stackTrace;
   int _key = 0;
 
