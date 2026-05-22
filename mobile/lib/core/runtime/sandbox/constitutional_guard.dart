@@ -332,6 +332,7 @@ class ConstitutionalGuard {
   final RuntimeJudiciary _judiciary;
   final ConstitutionalConsensus? _consensus;
   final FederatedReputation? _federatedReputation;
+  // ignore: unused_field
   final AutonomousLegislature? _legislatureInit;
   AutonomousLegislature? _legislature;
   final CivilizationTransport? _transport;

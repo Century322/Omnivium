@@ -160,6 +160,7 @@ class ConstitutionalConsensus {
   final Map<String, ConsensusResult> _results = {};
   final List<LawFork> _forks = [];
   final double _passThreshold;
+  // ignore: unused_field
   final ConstitutionalTraceGraph? _traceGraph;
   int _forkSeq = 0;
 
@@ -354,6 +355,7 @@ class TrustPassport {
 
 class FederatedReputation {
   final String localRuntimeId;
+  // ignore: unused_field
   final ConstitutionalTraceGraph? _traceGraph;
   final Map<String, TrustPassport> _passports = {};
   final Map<String, double> _federatedScores = {};
@@ -514,6 +516,7 @@ class AutonomousLegislature {
   final ConstitutionalConsensus _consensus;
   final ConstitutionalTraceGraph _traceGraph;
   final ReputationEconomy _reputationEconomy;
+  // ignore: unused_field
   final RuntimeJudiciary _judiciary;
   final List<LegislativeProposal> _proposals = [];
   int _proposalSeq = 0;

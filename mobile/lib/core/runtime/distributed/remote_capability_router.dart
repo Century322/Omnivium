@@ -63,6 +63,7 @@ class RemoteCapabilityRouter {
   final Map<String, RemoteCapabilityBinding> _remoteCapabilities = {};
   final Map<String, CapabilityAdvertisement> _advertisements = {};
   final HybridLogicalClock _clock;
+  // ignore: unused_field
   RuntimeTransport? _transport;
 
   RemoteCapabilityRouter({

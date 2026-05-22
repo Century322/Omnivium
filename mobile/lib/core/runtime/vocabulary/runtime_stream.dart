@@ -31,6 +31,7 @@ class RuntimeStream {
 
   RuntimeStream._({
     required this.id,
+    // ignore: unused_element_parameter
     this.version = 1,
     required this.type,
     required this.source,

@@ -4,7 +4,6 @@ import '../stability/security.dart';
 import 'constitutional_civilization.dart';
 import 'constitutional_sovereign.dart';
 import 'constitutional_trace.dart';
-import 'runtime_law.dart';
 
 enum DiplomacyMessageType {
   constitutionSync,
@@ -79,6 +78,7 @@ class DiplomacyChannel {
 
 class CivilizationTransport {
   final String localNodeId;
+  // ignore: unused_field
   final ConstitutionalTraceGraph? _traceGraph;
   final List<DiplomacyMessage> _outbox = [];
   final List<DiplomacyMessage> _inbox = [];
@@ -631,6 +631,7 @@ class ResourceEconomy {
   final double _executionCreditRate;
   final Map<String, ExecutionCredits> _accounts = {};
   final FederationTreasury _treasury;
+  // ignore: unused_field
   final ImmutableAuditLedger? _ledger;
 
   ResourceEconomy({

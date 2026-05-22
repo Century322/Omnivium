@@ -58,6 +58,7 @@ class CivilizationKernel {
   final SovereignIdentity _identity;
   final List<KernelCall> _callLog = [];
   final Map<KernelCall, int> _callCounts = {};
+  // ignore: unused_field
   int _kernelSeq = 0;
 
   CivilizationKernel._internal({
@@ -266,10 +267,6 @@ class CivilizationKernel {
     if (sandboxId == null || violationType == null) {
       return KernelResult.fail('sandboxId and violationType required');
     }
-    final type = SandboxViolationType.values.firstWhere(
-      (t) => t.name == violationType,
-      orElse: () => SandboxViolationType.bypassAttempt,
-    );
     final sanction = _judiciary.imposeSanction(
       sandboxId: sandboxId,
       type: SanctionType.restriction,
@@ -434,6 +431,7 @@ class CivilizationKernel {
   KernelResult _syscallFederationJoin(Map<String, dynamic> params) {
     final federationId = params['federationId'] as String?;
     if (federationId == null) return KernelResult.fail('federationId required');
+    // ignore: unused_local_variable
     final msg = _transport.sendFederationAccept(
       federationId,
       federationId,
@@ -467,7 +465,6 @@ class CivilizationKernel {
   KernelResult _syscallByzantineReport(Map<String, dynamic> params) {
     if (_network == null) return KernelResult.fail('network not enabled');
     final accusedId = params['accusedId'] as String?;
-    final reason = params['reason'] as String?;
     if (accusedId == null) return KernelResult.fail('accusedId required');
     _network.byzantine.reportInconsistentMessage(
       accusedId,

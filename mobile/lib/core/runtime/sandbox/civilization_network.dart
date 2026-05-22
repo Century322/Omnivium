@@ -430,6 +430,7 @@ enum NodeStatus { connecting, connected, disconnected, banned }
 
 class CivilizationNetwork {
   final String localNodeId;
+  // ignore: unused_field
   final ConstitutionalTraceGraph? _traceGraph;
   final Map<String, NetworkNode> _nodes = {};
   final ConstitutionalReplication _replication;
@@ -438,6 +439,7 @@ class CivilizationNetwork {
   final List<WireMessage> _sendQueue = [];
   final List<WireMessage> _receiveQueue = [];
   int _messageSeq = 0;
+  // ignore: unused_field
   final int _heartbeatInterval;
   RuntimeTransport? _transport;
 
