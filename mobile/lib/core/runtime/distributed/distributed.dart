@@ -11,4 +11,4 @@ export 'protocol/wire_protocol.dart';
 export 'protocol/protocol_handler.dart';
 export 'recovery/recovery_manager.dart';
 export 'persistence/write_ahead_log.dart';
-export 'lease/unified_lease.dart';
+export 'lease/unified_lease.dart' hide LeaseState;

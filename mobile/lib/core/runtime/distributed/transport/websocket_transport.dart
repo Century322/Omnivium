@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'runtime_transport.dart';
 
 class WebSocketTransport implements RuntimeTransport {
@@ -15,7 +16,7 @@ class WebSocketTransport implements RuntimeTransport {
       [];
   final Map<String, Completer<TransportMessage>> _pendingRequests = {};
 
-  WebSocketChannel? _channel;
+  _IOWebSocketChannel? _channel;
   StreamSubscription? _subscription;
   Timer? _reconnectTimer;
   int _reconnectAttempts = 0;
@@ -51,7 +52,8 @@ class WebSocketTransport implements RuntimeTransport {
 
     try {
       final uri = Uri.parse('$_serverUrl?nodeId=$_localNodeId');
-      _channel = WebSocketChannel.connect(uri);
+      final socket = await WebSocket.connect(uri.toString());
+      _channel = _IOWebSocketChannel(socket);
 
       _subscription = _channel!.stream.listen(
         _onData,
@@ -59,7 +61,6 @@ class WebSocketTransport implements RuntimeTransport {
         onDone: _onDone,
       );
 
-      await _channel!.ready;
       _reconnectAttempts = 0;
       _setState(TransportState.connected);
     } catch (e) {
@@ -213,23 +214,26 @@ class WebSocketTransport implements RuntimeTransport {
   }
 }
 
-abstract class WebSocketChannel {
-  Stream get stream;
-  WebSocketSink get sink;
-  Future<void> get ready;
-  Future<void> close([int? closeCode, String? closeReason]);
+class _IOWebSocketChannel {
+  final WebSocket _socket;
+
+  _IOWebSocketChannel(this._socket);
+
+  Stream get stream => _socket;
+
+  _IOWebSocketSink get sink => _IOWebSocketSink(_socket);
+
+  Future<void> close([int? closeCode, String? closeReason]) =>
+      _socket.close(closeCode, closeReason);
 }
 
-abstract class WebSocketSink {
-  void add(dynamic data);
-  Future<void> close([int? closeCode, String? closeReason]);
-}
+class _IOWebSocketSink {
+  final WebSocket _socket;
 
-class WebSocketChannelConnect {
-  static WebSocketChannel connect(Uri uri) {
-    throw UnsupportedError(
-      'WebSocketChannel.connect requires a real WebSocket implementation. '
-      'Use package:web_socket_channel in production.',
-    );
-  }
+  _IOWebSocketSink(this._socket);
+
+  void add(dynamic data) => _socket.add(data);
+
+  Future<void> close([int? closeCode, String? closeReason]) =>
+      _socket.close(closeCode, closeReason);
 }
