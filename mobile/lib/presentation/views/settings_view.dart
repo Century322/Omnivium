@@ -518,65 +518,6 @@ class _SettingsViewState extends State<SettingsView>
     );
   }
 
-  Widget _permissionOption(String value, String title, String desc) {
-    final selected = _agentPermission == value;
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: () {
-        setState(() => _agentPermission = value);
-        _savePref('omnivium_agent_permission', value);
-        Navigator.pop(context);
-      },
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 8),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: selected
-              ? AppColors.accent.withValues(alpha: 0.1)
-              : AppColors.sfAlt(context),
-          borderRadius: BorderRadius.circular(10),
-          border: selected
-              ? Border.all(color: AppColors.accent.withValues(alpha: 0.3))
-              : null,
-        ),
-        child: Row(
-          children: [
-            Icon(
-              selected ? LucideIcons.checkCircle2 : LucideIcons.circle,
-              size: 18,
-              color: selected ? AppColors.accent : AppColors.iconGray(context),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      color: selected
-                          ? AppColors.accent
-                          : AppColors.textPrimary(context),
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  Text(
-                    desc,
-                    style: TextStyle(
-                      color: AppColors.textTertiary(context),
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   void _showLanguageDialog() {
     final langs = [
       ('auto', t('auto')),

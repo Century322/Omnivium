@@ -209,8 +209,6 @@ class _VoiceViewState extends State<VoiceView> with TickerProviderStateMixin {
     }
   }
 
-  final String _selectedVoice = VoiceService.instance.ttsVoice.name;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
