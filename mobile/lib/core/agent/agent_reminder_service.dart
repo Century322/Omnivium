@@ -2,7 +2,6 @@ import 'dart:async';
 import '../app_logger.dart';
 import '../push_notification_service.dart';
 import '../database_service.dart';
-import 'agent_memory_service.dart';
 
 enum ReminderType { messageNotification, recurring, scheduled, aiSmart }
 

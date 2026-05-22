@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:matrix/matrix.dart' as matrix;
-import '../app_logger.dart';
+import 'app_logger.dart';
 
 enum CallState { idle, inviting, ringing, connecting, connected, ended }
 
@@ -16,8 +16,6 @@ class VoIPCall {
   RTCPeerConnection? _peerConnection;
   MediaStream? _localStream;
   MediaStream? _remoteStream;
-  String? _sdpMid;
-  int? _sdpMLineIndex;
   final List<RTCIceCandidate> _pendingCandidates = [];
 
   VoIPCall({
@@ -43,13 +41,10 @@ class VoIPCall {
 
     _peerConnection = await createPeerConnection(config);
 
-    _peerConnection!.onIceCandidate = (candidate) {
-      _sdpMid = candidate.sdpMid;
-      _sdpMLineIndex = candidate.sdpMLineIndex;
-    };
+    _peerConnection!.onIceCandidate = (candidate) {};
 
-    _peerConnection!.onIceConnectionState = (state) {
-      AppLogger.instance.info('ICE state: $state');
+    _peerConnection!.onIceConnectionState = (iceState) {
+      AppLogger.instance.info('ICE state: $iceState');
     };
 
     _peerConnection!.onTrack = (event) {
@@ -63,9 +58,9 @@ class VoIPCall {
       'video': false,
     });
 
-    _localStream!.getTracks().forEach((track) {
+    for (final track in _localStream!.getTracks()) {
       _peerConnection!.addTrack(track, _localStream!);
-    });
+    }
   }
 
   Future<String?> createOffer() async {
@@ -110,8 +105,12 @@ class VoIPCall {
     int? sdpMLineIndex,
   ) async {
     final rtcCandidate = RTCIceCandidate(candidate, sdpMid, sdpMLineIndex);
-    if (_peerConnection?.remoteDescription != null) {
-      await _peerConnection!.addCandidate(rtcCandidate);
+    if (_peerConnection != null) {
+      try {
+        await _peerConnection!.addCandidate(rtcCandidate);
+      } catch (_) {
+        _pendingCandidates.add(rtcCandidate);
+      }
     } else {
       _pendingCandidates.add(rtcCandidate);
     }
@@ -119,7 +118,9 @@ class VoIPCall {
 
   void end() {
     state = CallState.ended;
-    _localStream?.getTracks().forEach((track) => track.stop());
+    for (final track in _localStream?.getTracks() ?? <MediaStreamTrack>[]) {
+      track.stop();
+    }
     _localStream?.dispose();
     _localStream = null;
     _remoteStream?.dispose();
@@ -147,11 +148,13 @@ class CallService {
 
   void init(matrix.Client client) {
     _matrixClient = client;
-    _eventSubscription = client.onEvent.stream.listen(_handleEvent);
+    _eventSubscription = client.onTimelineEvent.stream.listen(
+      _handleTimelineEvent,
+    );
     AppLogger.instance.info('CallService initialized');
   }
 
-  void _handleEvent(matrix.EventUpdate update) {
+  void _handleTimelineEvent(matrix.EventUpdate update) {
     try {
       final content = update.content;
       if (content is! Map<String, dynamic>) return;
@@ -169,16 +172,12 @@ class CallService {
       switch (type) {
         case 'm.call.invite':
           _handleIncomingCall(callId, roomId, callContent);
-          break;
         case 'm.call.candidates':
           _handleCandidates(callContent);
-          break;
         case 'm.call.answer':
           _handleCallAnswer(callContent);
-          break;
         case 'm.call.hangup':
           _handleHangup(callContent);
-          break;
       }
     } catch (e) {
       AppLogger.instance.error('CallService event handling error', error: e);
@@ -245,16 +244,14 @@ class CallService {
       state: CallState.ringing,
     );
 
-    _currentCall!._sdpMid = null;
-    _currentCall!._sdpMLineIndex = null;
-
     _notifyState();
     AppLogger.instance.info('Incoming call: $callId from $senderId');
   }
 
   Future<void> answerCall() async {
-    if (_currentCall == null || _currentCall!.state != CallState.ringing)
+    if (_currentCall == null || _currentCall!.state != CallState.ringing) {
       return;
+    }
 
     final call = _currentCall!;
     final client = _matrixClient;
@@ -263,25 +260,31 @@ class CallService {
     final room = client.getRoomById(call.roomId);
     if (room == null) return;
 
-    final events = await room.getEventList();
-    matrix.Event? inviteEvent;
-    for (final event in events.reversed) {
-      if (event.type == 'm.call.invite' &&
-          (event.content['call_id'] as String?) == call.callId) {
-        inviteEvent = event;
-        break;
+    String? offerSdp;
+    try {
+      final timeline = await room.getTimeline();
+      for (final event in timeline.events.reversed) {
+        if (event.type == 'm.call.invite') {
+          final eventId = event.content['call_id'] as String?;
+          if (eventId == call.callId) {
+            offerSdp =
+                (event.content['offer'] as Map<String, dynamic>?)?['sdp']
+                    as String?;
+            break;
+          }
+        }
       }
+    } catch (e) {
+      AppLogger.instance.error(
+        'Failed to get timeline for call invite',
+        error: e,
+      );
     }
 
-    if (inviteEvent == null) {
+    if (offerSdp == null) {
       AppLogger.instance.error('Could not find call invite event');
       return;
     }
-
-    final offerSdp =
-        (inviteEvent.content['offer'] as Map<String, dynamic>?)?['sdp']
-            as String?;
-    if (offerSdp == null) return;
 
     final answerSdp = await call.createAnswer(offerSdp);
     if (answerSdp == null) {
