@@ -22,6 +22,7 @@ defaults:
 
 env:
   FLUTTER_VERSION: '3.41.9'
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   analyze:
@@ -89,6 +90,12 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: '21'
+
+      - name: Fix Java SSL
+        run: |
+          sudo apt-get update && sudo apt-get install -y ca-certificates
+          sudo update-ca-certificates
+          keytool -importcert -noprompt -trustcacerts -alias custom-ca -file /etc/ssl/certs/ca-certificates.crt -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit || true
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
