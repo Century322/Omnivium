@@ -1138,6 +1138,198 @@ class SKo extends S {
   String get agent_replay => '에이전트 리플레이';
 
   @override
+  String get ai_operation_log => 'AI 작업 로그';
+
+  @override
+  String get ai_operation_log_desc => 'AI 작업 기록, 권한 확인 및 감사 추적 보기';
+
+  @override
+  String get all => '전체';
+
+  @override
+  String get violations => '위반';
+
+  @override
+  String get total_ops => '총 작업';
+
+  @override
+  String get allowed => '허용됨';
+
+  @override
+  String get denied => '거부됨';
+
+  @override
+  String get no_operation_logs => '작업 로그가 없습니다';
+
+  @override
+  String get type => '유형';
+
+  @override
+  String get actor => '실행자';
+
+  @override
+  String get target => '대상';
+
+  @override
+  String get status => '상태';
+
+  @override
+  String get details => '상세';
+
+  @override
+  String get ai_permission_management => 'AI 권한 관리';
+
+  @override
+  String get ai_permission_management_desc => 'AI 기능 및 권한 관리';
+
+  @override
+  String get global_permission_mode => '전역 권한 모드';
+
+  @override
+  String get global_permission_desc =>
+      '모든 AI 기능의 기본 권한입니다. 아래에서 개별적으로 재정의할 수 있습니다.';
+
+  @override
+  String get auto_execute => '자동 실행';
+
+  @override
+  String get need_confirm => '확인 필요';
+
+  @override
+  String get always_deny => '항상 거부';
+
+  @override
+  String get custom => '사용자 정의';
+
+  @override
+  String get sovereign_identity => '주권 신원';
+
+  @override
+  String get did => 'DID';
+
+  @override
+  String get node_id => '노드 ID';
+
+  @override
+  String get public_key => '공개 키';
+
+  @override
+  String get civilization_epoch => '에포크';
+
+  @override
+  String get federation_id => '연합 ID';
+
+  @override
+  String get created_at => '생성일';
+
+  @override
+  String get copy_did => 'DID 복사';
+
+  @override
+  String get did_copied => 'DID가 복사되었습니다';
+
+  @override
+  String get trust_level => '신뢰 수준';
+
+  @override
+  String get trust_system => '시스템';
+
+  @override
+  String get trust_signed => '서명됨';
+
+  @override
+  String get trust_verified => '검증됨';
+
+  @override
+  String get trust_untrusted => '미신뢰';
+
+  @override
+  String get trust_blocked => '차단됨';
+
+  @override
+  String get ancestry => '계보';
+
+  @override
+  String get credentials => '자격 증명';
+
+  @override
+  String get no_credentials => '자격 증명이 없습니다';
+
+  @override
+  String get no_sovereign_identity => '주권 신원 없음';
+
+  @override
+  String get no_sovereign_identity_desc => '로그인하여 주권 디지털 신원을 생성하세요';
+
+  @override
+  String get capability_confirm_title => '기능 확인';
+
+  @override
+  String capability_confirm_msg(Object capability) {
+    return 'AI가 실행을 요청: $capability. 허용하시겠습니까?';
+  }
+
+  @override
+  String get allow => '허용';
+
+  @override
+  String get report_confirm_msg => '이 사용자를 신고하시겠습니까?';
+
+  @override
+  String get report_submitted => '신고가 접수되었습니다';
+
+  @override
+  String get block_confirm_msg => '이 사용자를 차단하시겠습니까? 차단 후 메시지를 받을 수 없습니다.';
+
+  @override
+  String get user_blocked => '사용자가 차단되었습니다';
+
+  @override
+  String get delete_chat_confirm => '이 채팅을 삭제하시겠습니까? 복구할 수 없습니다.';
+
+  @override
+  String get delete_session => '세션 삭제';
+
+  @override
+  String get delete_session_confirm => '이 세션을 삭제하시겠습니까? 모든 메시지가 손실됩니다.';
+
+  @override
+  String get open_chat => '채팅 열기';
+
+  @override
+  String get leave_group_confirm => '이 그룹에서 나가시겠습니까?';
+
+  @override
+  String get remove_friend => '친구 삭제';
+
+  @override
+  String get remove_friend_confirm => '이 친구를 삭제하시겠습니까? 채팅이 닫힙니다.';
+
+  @override
+  String get remove => '삭제';
+
+  @override
+  String get select_date => '날짜 선택';
+
+  @override
+  String get clear_all => '전체 삭제';
+
+  @override
+  String get clear_all_confirm => '모든 알림을 삭제하시겠습니까?';
+
+  @override
+  String get add_me_omnivium => 'Omnivium에서 나를 추가';
+
+  @override
+  String get something_went_wrong => '문제가 발생했습니다';
+
+  @override
+  String get error_boundary_desc => '예기치 않은 오류가 발생했습니다. 다시 시도해 주세요.';
+
+  @override
+  String get retry => '재시도';
+
+  @override
   String get ai_request_confirm => 'AI 요청 확인';
 
   @override
@@ -1217,9 +1409,6 @@ class SKo extends S {
 
   @override
   String get leave_group => '그룹 나가기';
-
-  @override
-  String get leave_group_confirm => '이 그룹에서 나가시겠습니까?';
 
   @override
   String get listening => '듣고 있습니다';
@@ -1379,9 +1568,6 @@ class SKo extends S {
   String get content_hint => '내용 입력...';
 
   @override
-  String get select_date => '날짜 선택';
-
-  @override
   String get select_time => '시간 선택';
 
   @override
@@ -1446,9 +1632,6 @@ class SKo extends S {
 
   @override
   String get deny => '거부';
-
-  @override
-  String get allow => '허용';
 
   @override
   String get delete_message_pair => '메시지 쌍 삭제';

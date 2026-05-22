@@ -648,7 +648,7 @@ class SZh extends S {
   String get chat_messages_desc => '包括文字、表情和系统消息';
 
   @override
-  String get clear => '清除';
+  String get clear => '清空';
 
   @override
   String get settings => '设置';
@@ -1136,6 +1136,197 @@ class SZh extends S {
   String get agent_replay => '智能体回放';
 
   @override
+  String get ai_operation_log => 'AI 操作日志';
+
+  @override
+  String get ai_operation_log_desc => '查看 AI 操作记录、权限检查和审计追踪';
+
+  @override
+  String get all => '全部';
+
+  @override
+  String get violations => '违规';
+
+  @override
+  String get total_ops => '总操作';
+
+  @override
+  String get allowed => '已允许';
+
+  @override
+  String get denied => '已拒绝';
+
+  @override
+  String get no_operation_logs => '暂无操作日志';
+
+  @override
+  String get type => '类型';
+
+  @override
+  String get actor => '操作者';
+
+  @override
+  String get target => '目标';
+
+  @override
+  String get status => '状态';
+
+  @override
+  String get details => '详情';
+
+  @override
+  String get ai_permission_management => 'AI 权限管理';
+
+  @override
+  String get ai_permission_management_desc => '管理 AI 能力与权限';
+
+  @override
+  String get global_permission_mode => '全局权限模式';
+
+  @override
+  String get global_permission_desc => '所有 AI 能力的默认权限。可在下方单独覆盖。';
+
+  @override
+  String get auto_execute => '自动执行';
+
+  @override
+  String get need_confirm => '需要确认';
+
+  @override
+  String get always_deny => '始终拒绝';
+
+  @override
+  String get custom => '自定义';
+
+  @override
+  String get sovereign_identity => '主权身份';
+
+  @override
+  String get did => 'DID';
+
+  @override
+  String get node_id => '节点 ID';
+
+  @override
+  String get public_key => '公钥';
+
+  @override
+  String get civilization_epoch => '文明纪元';
+
+  @override
+  String get federation_id => '联邦 ID';
+
+  @override
+  String get created_at => '创建时间';
+
+  @override
+  String get copy_did => '复制 DID';
+
+  @override
+  String get did_copied => 'DID 已复制';
+
+  @override
+  String get trust_level => '信任等级';
+
+  @override
+  String get trust_system => '系统级';
+
+  @override
+  String get trust_signed => '已签名';
+
+  @override
+  String get trust_verified => '已验证';
+
+  @override
+  String get trust_untrusted => '未受信';
+
+  @override
+  String get trust_blocked => '已封禁';
+
+  @override
+  String get ancestry => '血统';
+
+  @override
+  String get credentials => '凭证';
+
+  @override
+  String get no_credentials => '暂无凭证';
+
+  @override
+  String get no_sovereign_identity => '无主权身份';
+
+  @override
+  String get no_sovereign_identity_desc => '登录后自动生成您的主权数字身份';
+
+  @override
+  String get capability_confirm_title => '能力确认';
+
+  @override
+  String capability_confirm_msg(Object capability) {
+    return 'AI 请求执行: $capability。是否允许？';
+  }
+
+  @override
+  String get allow => '允许';
+
+  @override
+  String get report_confirm_msg => '确定要举报此用户吗？';
+
+  @override
+  String get report_submitted => '举报已提交';
+
+  @override
+  String get block_confirm_msg => '确定要屏蔽此用户吗？屏蔽后对方将无法给您发送消息。';
+
+  @override
+  String get user_blocked => '用户已屏蔽';
+
+  @override
+  String get delete_chat_confirm => '确定要删除此聊天吗？此操作不可撤销。';
+
+  @override
+  String get delete_session => '删除会话';
+
+  @override
+  String get delete_session_confirm => '确定要删除此会话吗？所有消息将丢失。';
+
+  @override
+  String get open_chat => '打开聊天';
+
+  @override
+  String get leave_group_confirm => '确认退出群聊？';
+
+  @override
+  String get remove_friend => '删除好友';
+
+  @override
+  String get remove_friend_confirm => '确定要删除此好友吗？聊天将被关闭。';
+
+  @override
+  String get remove => '删除';
+
+  @override
+  String get select_date => '选择日期';
+
+  @override
+  String get clear_all => '清空全部';
+
+  @override
+  String get clear_all_confirm => '确定要清空所有通知吗？';
+
+  @override
+  String get add_me_omnivium => '在 Omnivium 上添加我';
+
+  @override
+  String get something_went_wrong => '出了点问题';
+
+  @override
+  String get error_boundary_desc => '发生了意外错误，请重试。';
+
+  @override
+  String get retry => '重试';
+
+  @override
   String get ai_request_confirm => 'AI 请求确认';
 
   @override
@@ -1215,9 +1406,6 @@ class SZh extends S {
 
   @override
   String get leave_group => '退出群聊';
-
-  @override
-  String get leave_group_confirm => '确认退出群聊？';
 
   @override
   String get listening => '正在聆听';
@@ -1376,9 +1564,6 @@ class SZh extends S {
   String get content_hint => '输入内容...';
 
   @override
-  String get select_date => '选择日期';
-
-  @override
   String get select_time => '选择时间';
 
   @override
@@ -1443,9 +1628,6 @@ class SZh extends S {
 
   @override
   String get deny => '拒绝';
-
-  @override
-  String get allow => '允许';
 
   @override
   String get delete_message_pair => '删除消息对';

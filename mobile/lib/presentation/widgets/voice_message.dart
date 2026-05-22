@@ -1,4 +1,4 @@
-﻿import '../../core/app_logger.dart';
+import '../../core/app_logger.dart';
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -86,6 +86,8 @@ class _VoiceRecorderButtonState extends State<VoiceRecorderButton> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Semantics(label: localeProvider.t('cancel_recording'), child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
               onTap: () => _stopRecording(false),
               child: Container(
                 width: 32, height: 32,
@@ -102,6 +104,8 @@ class _VoiceRecorderButtonState extends State<VoiceRecorderButton> {
             Text(_formatDuration(_duration), style: TextStyle(color: AppColors.textPrimary(context), fontSize: 14, fontWeight: FontWeight.w600, fontFeatures: [FontFeature.tabularFigures()])),
             const SizedBox(width: 10),
             Semantics(label: localeProvider.t('send_recording'), child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
               onTap: () => _stopRecording(true),
               child: Container(
                 width: 32, height: 32,
@@ -118,6 +122,8 @@ class _VoiceRecorderButtonState extends State<VoiceRecorderButton> {
     }
 
     return Semantics(label: localeProvider.t('voice_message_record'), child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
       onLongPress: _startRecording,
       child: Container(
         width: 36, height: 36,
@@ -199,6 +205,8 @@ class _VoiceMessagePlayerState extends State<VoiceMessagePlayer> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Semantics(label: _isPlaying ? 'Pause voice message' : 'Play voice message', child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
             onTap: _togglePlay,
             child: Container(
               width: 32, height: 32,

@@ -52,6 +52,8 @@ class ChatSearchSheet extends StatelessWidget {
                                 filled: true,
                                 fillColor: AppColors.sf(context),
                                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
                                 contentPadding: const EdgeInsets.symmetric(vertical: 10),
                               ),
                               onChanged: (_) => setModalState(() {}),

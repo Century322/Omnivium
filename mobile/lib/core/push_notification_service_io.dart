@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'push_notification_service.dart';
+import 'notification_queue.dart';
 
 final List<StreamSubscription> _firebaseSubs = [];
 
@@ -40,9 +41,11 @@ Future<void> initFirebaseMessaging(PushNotificationService service) async {
       _firebaseSubs.add(FirebaseMessaging.onMessage.listen((RemoteMessage message) {
         final notification = message.notification;
         if (notification != null) {
-          service.showLocalNotification(
-            title: notification.title ?? 'Omnivium',
-            body: notification.body ?? '',
+          final dialogId = message.data['dialog_id'] as String? ?? '';
+          NotificationQueue.instance.enqueue(
+            dialogId: dialogId,
+            sender: notification.title ?? 'Omnivium',
+            message: notification.body ?? '',
             data: message.data,
           );
         }

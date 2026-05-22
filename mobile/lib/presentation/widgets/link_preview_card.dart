@@ -1,4 +1,4 @@
-﻿import '../../core/app_logger.dart';
+import '../../core/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -18,6 +18,8 @@ class LinkPreviewCard extends StatelessWidget {
       return _buildFallback(context);
     }
     return Semantics(label: localeProvider.t('open_link'), child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
       onTap: () => _launchUrl(url),
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 4),
@@ -74,6 +76,8 @@ class LinkPreviewCard extends StatelessWidget {
 
   Widget _buildFallback(BuildContext context) {
     return GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
       onTap: () => _launchUrl(url),
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 4),

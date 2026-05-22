@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:async';
 import 'dart:ui' show PlatformDispatcher;
 import 'package:flutter/foundation.dart' show kIsWeb, kDebugMode;
@@ -9,13 +10,26 @@ import 'presentation/theme/app_colors.dart';
 import 'presentation/theme/theme_provider.dart';
 import 'presentation/theme/locale_provider.dart';
 import 'core/app_provider.dart';
+import 'core/app_navigator.dart';
+import 'core/app_config.dart';
+import 'core/agent/agent_reminder_service.dart' show ReminderService;
 import 'core/navigation_provider.dart';
+import 'presentation/widgets/app_error_boundary.dart';
 import 'core/secure_storage_service.dart';
 import 'core/privacy_consent_service.dart';
 import 'core/voice_service.dart';
 import 'core/database_service.dart';
 import 'core/deep_link_service.dart';
 import 'core/network_security_service.dart';
+import 'core/encryption_service.dart';
+import 'core/lite_mode.dart';
+import 'core/file_log.dart';
+import 'core/database_migration.dart';
+import 'core/app_lock_service.dart';
+import 'core/biometric_service.dart';
+import 'core/secure_flag_service.dart';
+import 'core/encrypted_file_storage.dart';
+import 'core/srp_service.dart';
 import 'core/api_proxy_service.dart';
 import 'core/providers/ai_provider.dart';
 import 'core/security_check_service.dart';
@@ -30,18 +44,16 @@ import 'core/auth_service.dart';
 import 'core/supabase_sync_service.dart';
 import 'core/app_logger.dart';
 import 'core/connectivity_service.dart';
-import 'core/offline_service.dart';
 import 'core/service_locator.dart';
-import 'core/ab_test_service.dart';
-import 'core/crash_recovery_service.dart';
-import 'core/performance_monitor_service.dart';
+import 'core/runtime/sdk/omnivium_sdk.dart';
+import 'core/database_persistence_backend.dart';
+import 'core/app_data_gateway.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:media_kit/media_kit.dart';
 import 'presentation/views/home_view.dart';
 import 'presentation/views/voice_view.dart';
 import 'presentation/views/discover_view.dart';
 import 'presentation/views/search_view.dart';
-import 'presentation/views/library_view.dart';
 import 'presentation/views/settings_view.dart';
 import 'presentation/views/matrix_login_view.dart';
 
@@ -49,16 +61,17 @@ final navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  AppErrorHandler.init();
   MediaKit.ensureInitialized();
+
+  AppLogger.instance.info('Omnivium starting: ${AppConfig.toDiagnosticMap()}');
 
   FlutterError.onError = (FlutterErrorDetails details) {
     FlutterError.presentError(details);
     AppLogger.instance.error('Flutter error', error: details.exception, stackTrace: details.stack);
-    CrashRecoveryService.instance.reportUnhandledError(details.exception, details.stack ?? StackTrace.empty);
   };
   PlatformDispatcher.instance.onError = (error, stack) {
     AppLogger.instance.error('Uncaught platform error', error: error, stackTrace: stack);
-    CrashRecoveryService.instance.reportUnhandledError(error, stack);
     return true;
   };
 
@@ -83,7 +96,7 @@ void main() async {
     try {
       await initVodozemac();
     } catch (e) {
-      if (kDebugMode) debugPrint('Vodozemac init failed: $e');
+      AppLogger.instance.warning('Vodozemac init failed', error: e);
     }
   }
   try {
@@ -100,25 +113,28 @@ void main() async {
           options.attachThreads = true;
         },
         appRunner: () async {
-          await _initApp();
+          await _initCritical();
           runApp(const OmniviumApp());
+          _initDeferred();
         },
       );
     } else {
-      await _initApp();
+      await _initCritical();
       runApp(const OmniviumApp());
+      _initDeferred();
     }
   } catch (e) {
-    if (kDebugMode) debugPrint('Sentry init failed: $e');
-    await _initApp();
+    AppLogger.instance.warning('Sentry init failed', error: e);
+    await _initCritical();
     runApp(const OmniviumApp());
+    _initDeferred();
   }
 }
 
 final Set<String> _initFailures = {};
 bool _criticalInitFailed = false;
 
-Future<void> _initApp() async {
+Future<void> _initCritical() async {
   await _safeInit(() => SecureStorageService.instance.init(), 'SecureStorage', critical: true);
   if (_criticalInitFailed) return;
 
@@ -142,27 +158,34 @@ Future<void> _initApp() async {
   }, 'DeviceInfo');
 
   await setupLocator();
+  await _safeInit(() => OmniviumSDK.init(persistence: DatabasePersistenceBackend()), 'RuntimeSDK');
+  AppDataGateway.instance.init();
+}
 
-  await _safeInit(() => CrashRecoveryService.instance.init(), 'CrashRecovery');
-  await _safeInit(() => CrashRecoveryService.instance.markAppStart(), 'CrashFlag');
-  await _safeInit(() => PerformanceMonitorService.instance.init(), 'PerformanceMonitor');
-
-  await _safeInit(() => VoiceService.instance.init(), 'Voice');
-  await _safeInit(() => ApiProxyService.instance.init(), 'ApiProxy');
-  await _safeInit(() => NetworkSecurityService.instance.initWithDynamicPins(), 'NetworkSecurity');
-  await _safeInit(() => ConnectivityService.instance.init(), 'Connectivity');
-  _safeInitSync(() => OfflineService.instance.init(), 'Offline');
-  await _safeInit(() => PushNotificationService.instance.init(), 'PushNotification');
-  await _safeInit(() => AgentMemoryService.instance.init(), 'AgentMemory');
-  await _safeInit(() => EmbeddingService.instance.init(), 'Embedding');
-  await _safeInit(() => RemoteConfigService.instance.init(), 'RemoteConfig');
-  await _safeInit(() => ABTestService.instance.init(), 'ABTest');
-  await _safeInit(() => AuthService.instance.initFromBackend(), 'Auth');
-  await _safeInit(() => SupabaseSyncService.instance.init(), 'SupabaseSync');
-
-  if (CrashRecoveryService.instance.crashDetected) {
-    await CrashRecoveryService.instance.attemptRecovery();
-  }
+void _initDeferred() {
+  Future.wait([
+    _safeInit(() => VoiceService.instance.init(), 'Voice'),
+    _safeInit(() => ReminderService.instance.init(), 'Reminder'),
+    _safeInit(() => ApiProxyService.instance.init(), 'ApiProxy'),
+    _safeInit(() => NetworkSecurityService.instance.initWithDynamicPins(), 'NetworkSecurity'),
+    _safeInit(() => EncryptionService.instance.init(), 'Encryption'),
+    _safeInit(() => LiteMode.instance.init(), 'LiteMode'),
+    _safeInit(() => FileLog.instance.init(), 'FileLog'),
+    _safeInit(() => DatabaseMigration.instance.run(), 'DBMigration'),
+    _safeInit(() => AppLockService.instance.init(), 'AppLock'),
+    _safeInit(() => BiometricService.instance.init(), 'Biometric'),
+    _safeInit(() => SecureFlagService.instance.init(), 'SecureFlag'),
+    _safeInit(() => EncryptedFileStorage.instance.init(), 'EncryptedFileStorage'),
+    _safeInit(() => SrpService.instance.init(), 'SRP'),
+    _safeInit(() => ConnectivityService.instance.init(), 'Connectivity'),
+    _safeInit(() => PushNotificationService.instance.init(), 'PushNotification'),
+    _safeInit(() => AgentMemoryService.instance.init(), 'AgentMemory'),
+    _safeInit(() => EmbeddingService.instance.init(), 'Embedding'),
+    _safeInit(() => RemoteConfigService.instance.init(), 'RemoteConfig'),
+    _safeInit(() => AuthService.instance.initFromBackend(), 'Auth'),
+    _safeInit(() => SupabaseSyncService.instance.init(), 'SupabaseSync'),
+  ]).then((_) {
+  });
 }
 
 Future<bool> _safeInit(Future<void> Function() init, String name, {bool critical = false}) async {
@@ -197,6 +220,52 @@ bool _safeInitSync(void Function() init, String name, {bool critical = false}) {
   }
 }
 
+class _AppLockDialog extends StatefulWidget {
+  final AppLockService lock;
+  final VoidCallback onUnlocked;
+  const _AppLockDialog({required this.lock, required this.onUnlocked});
+
+  @override
+  State<_AppLockDialog> createState() => _AppLockDialogState();
+}
+
+class _AppLockDialogState extends State<_AppLockDialog> {
+  final _controller = TextEditingController();
+  String? _error;
+
+  @override
+  void dispose() { _controller.dispose(); super.dispose(); }
+
+  void _submit() async {
+    final input = _controller.text;
+    final ok = await widget.lock.verify(input);
+    if (ok) {
+      widget.lock.recordUnlock();
+      widget.onUnlocked();
+    } else {
+      setState(() { _error = 'Incorrect PIN'; _controller.clear(); });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return PopScope(
+      canPop: false,
+      child: AlertDialog(
+        backgroundColor: AppColors.sf(context),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text('🔒', style: TextStyle(color: AppColors.textPrimary(context)), textAlign: TextAlign.center),
+        content: Column(mainAxisSize: MainAxisSize.min, children: [
+          TextField(controller: _controller, obscureText: true, keyboardType: TextInputType.number,
+            autofocus: true, onSubmitted: (_) => _submit(),
+            decoration: InputDecoration(hintText: 'Enter PIN', errorText: _error)),
+        ]),
+        actions: [FilledButton(onPressed: _submit, child: Text('Unlock'))],
+      ),
+    );
+  }
+}
+
 class OmniviumApp extends StatelessWidget {
   const OmniviumApp({super.key});
 
@@ -220,6 +289,7 @@ class OmniviumApp extends StatelessWidget {
             GlobalCupertinoLocalizations.delegate,
           ],
           supportedLocales: const [Locale('zh'), Locale('en'), Locale('ja'), Locale('ko')],
+          onGenerateRoute: AppNavigator.onGenerateRoute,
           home: const _AppShell(),
         );
       },
@@ -284,12 +354,8 @@ class _AppShellState extends State<_AppShell> with TickerProviderStateMixin, Wid
     _provider.session.saveCurrentSession();
     _provider.dispose();
     ConnectivityService.instance.dispose();
-    DeepLinkService.instance.dispose();
-    OfflineService.instance.dispose();
     PushNotificationService.instance.dispose();
     VoiceService.instance.dispose();
-    PerformanceMonitorService.instance.dispose();
-    CrashRecoveryService.instance.markAppCleanExit();
     disposeFirebaseMessaging();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
@@ -298,8 +364,13 @@ class _AppShellState extends State<_AppShell> with TickerProviderStateMixin, Wid
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
+      _checkAppLock();
       if (!_provider.matrix.isLoggedIn) {
-        _provider.matrix.tryRestoreSession();
+        _provider.matrix.tryRestoreSession().then((restored) {
+          if (restored && mounted) {
+            setState(() { _showLogin = false; });
+          }
+        });
       }
       SupabaseSyncService.instance.init();
     } else if (state == AppLifecycleState.paused) {
@@ -307,38 +378,49 @@ class _AppShellState extends State<_AppShell> with TickerProviderStateMixin, Wid
     }
   }
 
+  void _checkAppLock() {
+    final lock = AppLockService.instance;
+    if (!lock.isEnabled || !lock.isLocked) return;
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => _AppLockDialog(lock: lock, onUnlocked: () => Navigator.pop(context)),
+    );
+  }
+
   Future<void> _init() async {
     try {
       await SecurityCheckService.instance.check();
     } catch (e) {
-      if (kDebugMode) debugPrint('SecurityCheck init failed: $e');
+      AppLogger.instance.warning('SecurityCheck init failed', error: e);
     }
     try {
       NetworkSecurityService.instance.enablePinning();
     } catch (e) {
-      if (kDebugMode) debugPrint('NetworkSecurity enablePinning failed: $e');
+      AppLogger.instance.warning('NetworkSecurity enablePinning failed', error: e);
     }
     bool restored = false;
     try {
       restored = await _provider.matrix.tryRestoreSession();
     } catch (e) {
-      if (kDebugMode) debugPrint('Matrix session restore failed: $e');
+      AppLogger.instance.warning('Matrix session restore failed', error: e);
     }
     try {
       await ApiProxyService.instance.init();
     } catch (e) {
-      if (kDebugMode) debugPrint('ApiProxy init failed: $e');
+      AppLogger.instance.warning('ApiProxy init failed', error: e);
     }
     try {
       await _provider.initSubProviders();
     } catch (e) {
-      if (kDebugMode) debugPrint('Provider init failed: $e');
+      AppLogger.instance.warning('Provider init failed', error: e);
     }
     bool hasConsented = false;
     try {
       hasConsented = await _privacyService.hasConsented();
     } catch (e) {
-      if (kDebugMode) debugPrint('PrivacyConsent check failed: $e');
+      AppLogger.instance.warning('PrivacyConsent check failed', error: e);
     }
     try {
       await DeepLinkService.instance.init();
@@ -353,7 +435,7 @@ class _AppShellState extends State<_AppShell> with TickerProviderStateMixin, Wid
         DeepLinkService.instance.onDeepLink?.call(initialLink);
       }
     } catch (e) {
-      if (kDebugMode) debugPrint('DeepLink init failed: $e');
+      AppLogger.instance.warning('DeepLink init failed', error: e);
     }
     if (mounted) {
       _provider.session.startAutoSave();
@@ -366,6 +448,7 @@ class _AppShellState extends State<_AppShell> with TickerProviderStateMixin, Wid
       });
       setState(() {
         _initialized = true;
+        AppNavigator.init(_provider);
         _showPrivacyConsent = !hasConsented;
         _showLogin = !restored && !_provider.matrix.isLoggedIn;
       });
@@ -443,7 +526,19 @@ class _AppShellState extends State<_AppShell> with TickerProviderStateMixin, Wid
           _showLogin = true;
         }
 
-        return Stack(
+        return AnnotatedRegion<SystemUiOverlayStyle>(
+          value: themeProvider.overlayStyle,
+          child: PopScope(
+          canPop: !_provider.navigation.isSettingsOpen && _provider.navigation.currentView == ViewState.home,
+          onPopInvokedWithResult: (didPop, _) {
+            if (didPop) return;
+            if (_provider.navigation.isSettingsOpen) {
+              _provider.navigation.closeSettingsAndReturnToDrawer();
+            } else if (_provider.navigation.currentView != ViewState.home) {
+              _provider.navigation.goBack();
+            }
+          },
+          child: AppErrorBoundary(child: Stack(
           children: [
             HomeView(provider: _provider),
             if (_showLogin && !isLoggedIn)
@@ -464,6 +559,9 @@ class _AppShellState extends State<_AppShell> with TickerProviderStateMixin, Wid
               child: _buildCurrentOverlay(),
             ),
           ],
+        ),
+        ),
+        ),
         );
       },
     );
@@ -480,8 +578,6 @@ class _AppShellState extends State<_AppShell> with TickerProviderStateMixin, Wid
         return DiscoverView(key: const ValueKey('discover'), provider: _provider);
       case ViewState.search:
         return SearchView(key: const ValueKey('search'), provider: _provider);
-      case ViewState.library:
-        return LibraryView(key: const ValueKey('library'), provider: _provider);
       default:
         return null;
     }

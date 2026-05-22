@@ -650,7 +650,7 @@ class SJa extends S {
   String get chat_messages_desc => 'テキスト、絵文字、システムメッセージ';
 
   @override
-  String get clear => 'クリア';
+  String get clear => '消去';
 
   @override
   String get settings => '設定';
@@ -1139,6 +1139,197 @@ class SJa extends S {
   String get agent_replay => 'エージェントリプレイ';
 
   @override
+  String get ai_operation_log => 'AI操作ログ';
+
+  @override
+  String get ai_operation_log_desc => 'AI操作記録、権限チェック、監査証跡を表示';
+
+  @override
+  String get all => 'すべて';
+
+  @override
+  String get violations => '違反';
+
+  @override
+  String get total_ops => '合計';
+
+  @override
+  String get allowed => '許可';
+
+  @override
+  String get denied => '拒否';
+
+  @override
+  String get no_operation_logs => '操作ログはまだありません';
+
+  @override
+  String get type => 'タイプ';
+
+  @override
+  String get actor => '実行者';
+
+  @override
+  String get target => '対象';
+
+  @override
+  String get status => 'ステータス';
+
+  @override
+  String get details => '詳細';
+
+  @override
+  String get ai_permission_management => 'AI権限管理';
+
+  @override
+  String get ai_permission_management_desc => 'AIの機能と権限を管理';
+
+  @override
+  String get global_permission_mode => 'グローバル権限モード';
+
+  @override
+  String get global_permission_desc => 'すべてのAI機能のデフォルト権限。下で個別に上書きできます。';
+
+  @override
+  String get auto_execute => '自動実行';
+
+  @override
+  String get need_confirm => '確認が必要';
+
+  @override
+  String get always_deny => '常に拒否';
+
+  @override
+  String get custom => 'カスタム';
+
+  @override
+  String get sovereign_identity => '主権アイデンティティ';
+
+  @override
+  String get did => 'DID';
+
+  @override
+  String get node_id => 'ノードID';
+
+  @override
+  String get public_key => '公開鍵';
+
+  @override
+  String get civilization_epoch => 'エポック';
+
+  @override
+  String get federation_id => 'フェデレーションID';
+
+  @override
+  String get created_at => '作成日';
+
+  @override
+  String get copy_did => 'DIDをコピー';
+
+  @override
+  String get did_copied => 'DIDをコピーしました';
+
+  @override
+  String get trust_level => '信頼レベル';
+
+  @override
+  String get trust_system => 'システム';
+
+  @override
+  String get trust_signed => '署名済み';
+
+  @override
+  String get trust_verified => '検証済み';
+
+  @override
+  String get trust_untrusted => '未信頼';
+
+  @override
+  String get trust_blocked => 'ブロック済み';
+
+  @override
+  String get ancestry => '系譜';
+
+  @override
+  String get credentials => 'クレデンシャル';
+
+  @override
+  String get no_credentials => 'クレデンシャルはまだありません';
+
+  @override
+  String get no_sovereign_identity => '主権アイデンティティなし';
+
+  @override
+  String get no_sovereign_identity_desc => 'ログインして主権デジタルアイデンティティを生成';
+
+  @override
+  String get capability_confirm_title => '機能確認';
+
+  @override
+  String capability_confirm_msg(Object capability) {
+    return 'AIが実行を要求: $capability。許可しますか？';
+  }
+
+  @override
+  String get allow => '許可';
+
+  @override
+  String get report_confirm_msg => 'このユーザーを報告しますか？';
+
+  @override
+  String get report_submitted => '報告が送信されました';
+
+  @override
+  String get block_confirm_msg => 'このユーザーをブロックしますか？ブロック後、メッセージを受信できなくなります。';
+
+  @override
+  String get user_blocked => 'ユーザーをブロックしました';
+
+  @override
+  String get delete_chat_confirm => 'このチャットを削除しますか？元に戻せません。';
+
+  @override
+  String get delete_session => 'セッション削除';
+
+  @override
+  String get delete_session_confirm => 'このセッションを削除しますか？すべてのメッセージが失われます。';
+
+  @override
+  String get open_chat => 'チャットを開く';
+
+  @override
+  String get leave_group_confirm => 'このグループを退出しますか？';
+
+  @override
+  String get remove_friend => '友達を削除';
+
+  @override
+  String get remove_friend_confirm => 'この友達を削除しますか？チャットが閉じられます。';
+
+  @override
+  String get remove => '削除';
+
+  @override
+  String get select_date => '日付選択';
+
+  @override
+  String get clear_all => 'すべて消去';
+
+  @override
+  String get clear_all_confirm => 'すべての通知を消去しますか？';
+
+  @override
+  String get add_me_omnivium => 'Omniviumで追加';
+
+  @override
+  String get something_went_wrong => '問題が発生しました';
+
+  @override
+  String get error_boundary_desc => '予期しないエラーが発生しました。もう一度お試しください。';
+
+  @override
+  String get retry => '再試行';
+
+  @override
   String get ai_request_confirm => 'AIリクエスト確認';
 
   @override
@@ -1218,9 +1409,6 @@ class SJa extends S {
 
   @override
   String get leave_group => 'グループを退出';
-
-  @override
-  String get leave_group_confirm => 'このグループを退出しますか？';
 
   @override
   String get listening => '聞いています';
@@ -1380,9 +1568,6 @@ class SJa extends S {
   String get content_hint => '内容を入力...';
 
   @override
-  String get select_date => '日付選択';
-
-  @override
   String get select_time => '時間選択';
 
   @override
@@ -1447,9 +1632,6 @@ class SJa extends S {
 
   @override
   String get deny => '拒否';
-
-  @override
-  String get allow => '許可';
 
   @override
   String get delete_message_pair => 'メッセージペアを削除';

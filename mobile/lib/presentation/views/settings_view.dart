@@ -1,4 +1,5 @@
 import '../../core/app_logger.dart';
+import '../../core/app_navigator.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
@@ -15,16 +16,12 @@ import '../widgets/section_header.dart';
 import '../widgets/setting_item.dart';
 import '../widgets/animated_toggle.dart';
 import 'matrix_login_view.dart';
-import 'storage_view.dart';
-import 'about_view.dart';
 import 'faq_view.dart';
 import 'privacy_policy_view.dart';
 import 'terms_of_service_view.dart';
-import 'quick_commands_view.dart';
-import 'ai_workbench_view.dart';
-import 'productivity_view.dart';
 import '../../core/secure_storage_service.dart';
-import 'agent_replay_view.dart';
+import '../../core/voice_service.dart';
+import '../../core/push_notification_service.dart';
 
 class SettingsView extends StatefulWidget {
   final AppProvider provider;
@@ -111,6 +108,8 @@ class _SettingsViewState extends State<SettingsView> with SingleTickerProviderSt
       position: _slideAnimation,
       child: Scaffold(
         body: Semantics(label: localeProvider.t('go_back'), child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
           onHorizontalDragEnd: (details) {
             if (details.primaryVelocity != null && details.primaryVelocity! > 500) {
               widget.provider.navigation.closeSettingsAndReturnToDrawer();
@@ -129,6 +128,8 @@ class _SettingsViewState extends State<SettingsView> with SingleTickerProviderSt
                     child: Row(
                       children: [
                         Semantics(label: localeProvider.t('go_back'), child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
                           onTap: () => widget.provider.navigation.closeSettingsAndReturnToDrawer(),
                           child: Icon(LucideIcons.arrowLeft, color: AppColors.textPrimary(context), size: 24),
                         )),
@@ -204,6 +205,9 @@ class _SettingsViewState extends State<SettingsView> with SingleTickerProviderSt
                           onChanged: (v) {
                             setState(() => _notifications = v);
                             _savePref('omnivium_notifications', v);
+                              try {
+                                PushNotificationService.instance.requestPermissions();
+                              } catch (_) {}
                           },
                         ),
                       ),
@@ -234,13 +238,16 @@ class _SettingsViewState extends State<SettingsView> with SingleTickerProviderSt
                           onChanged: (v) {
                             setState(() => _agentEnabled = v);
                             _savePref('omnivium_agent_enabled', v);
+                            widget.provider.orchestrator.setEnabled(v);
                           },
                         ),
                       ),
                       SettingItem(
                         title: t('permissions'),
-                        subtitle: _agentPermissionLabel,
-                        onTap: _showPermissionDialog,
+                        subtitle: t('ai_permission_management_desc'),
+                        onTap: () {
+                          AppNavigator.go(context, '/permissions');
+                        },
                       ),
                       SettingItem(
                         title: t('assistant_language'),
@@ -256,28 +263,35 @@ class _SettingsViewState extends State<SettingsView> with SingleTickerProviderSt
                         title: t('quick_commands'),
                         subtitle: '${widget.provider.quickCommands.commands.length} ${t('quick_commands')}',
                         onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (_) => QuickCommandsView(provider: widget.provider.quickCommands)));
+                          AppNavigator.go(context, '/commands');
                         },
                       ),
                       SettingItem(
                         title: t('ai_workbench'),
                         subtitle: t('ai_workbench_desc'),
                         onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (_) => AIWorkbenchView(provider: widget.provider)));
+                          AppNavigator.go(context, '/workbench');
                         },
                       ),
                       SettingItem(
                         title: t('productivity'),
                         subtitle: t('productivity_desc'),
                         onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (_) => ProductivityView(provider: widget.provider.notes)));
+                          AppNavigator.go(context, '/productivity');
                         },
                       ),
                       SettingItem(
                         title: t('agent_replay'),
                         subtitle: t('agent_replay_desc'),
                         onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (_) => AgentReplayView(orchestrator: widget.provider.orchestrator)));
+                          AppNavigator.go(context, '/replay');
+                        },
+                      ),
+                      SettingItem(
+                        title: t('ai_operation_log'),
+                        subtitle: t('ai_operation_log_desc'),
+                        onTap: () {
+                          AppNavigator.go(context, '/operation-log');
                         },
                       ),
                       SectionHeader(title: t('profile')),
@@ -325,7 +339,7 @@ class _SettingsViewState extends State<SettingsView> with SingleTickerProviderSt
                         title: t('storage'),
                         subtitle: t('storage_desc'),
                         onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (_) => StorageView(provider: widget.provider)));
+                          AppNavigator.go(context, '/storage');
                         },
                       ),
                       SettingItem(
@@ -344,7 +358,7 @@ class _SettingsViewState extends State<SettingsView> with SingleTickerProviderSt
                         title: t('about'),
                         subtitle: 'v${_SettingsViewState._appVersion}',
                         onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (_) => AboutView(provider: widget.provider)));
+                          AppNavigator.go(context, '/about');
                         },
                       ),
                       SettingItem(
@@ -454,6 +468,8 @@ class _SettingsViewState extends State<SettingsView> with SingleTickerProviderSt
   Widget _permissionOption(String value, String title, String desc) {
     final selected = _agentPermission == value;
     return GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
       onTap: () {
         setState(() => _agentPermission = value);
         _savePref('omnivium_agent_permission', value);
@@ -503,6 +519,7 @@ class _SettingsViewState extends State<SettingsView> with SingleTickerProviderSt
               onTap: () {
                 setState(() => _assistantLang = value);
                 _savePref('omnivium_assistant_lang', value);
+                widget.provider.orchestrator.setAgentLanguage(value == 'auto' ? '' : value);
                 Navigator.pop(context);
               },
             );
@@ -647,7 +664,7 @@ class _SettingsViewState extends State<SettingsView> with SingleTickerProviderSt
             return ListTile(
               title: Text(label, style: TextStyle(color: _sttEngine == key ? AppColors.accent : AppColors.textPrimary(context), fontSize: 14)),
               trailing: _sttEngine == key ? Icon(LucideIcons.check, color: AppColors.accent, size: 18) : null,
-              onTap: () { setState(() => _sttEngine = key); _savePref('omnivium_stt_engine', key); Navigator.pop(context); },
+              onTap: () { setState(() => _sttEngine = key); _savePref('omnivium_stt_engine', key); try { VoiceService.instance.setSttEngine(key); } catch (_) {} Navigator.pop(context); },
             );
           }).toList(),
         ),
@@ -657,7 +674,11 @@ class _SettingsViewState extends State<SettingsView> with SingleTickerProviderSt
 
   void _showTtsDialog() {
     final voices = ['Kyrin', 'Alloy', 'Echo', 'Fable', 'Onyx', 'Nova', 'Shimmer'];
-    _showChoiceDialog(t('narration'), voices, _ttsVoice, (v) => setState(() => _ttsVoice = v));
+    _showChoiceDialog(t('narration'), voices, _ttsVoice, (v) {
+      setState(() => _ttsVoice = v);
+      _savePref('omnivium_tts_voice', v);
+      try { VoiceService.instance.setTTSVoice(TTSVoice.values.firstWhere((e) => e.name == v, orElse: () => TTSVoice.alloy)); } catch (_) {}
+    });
   }
 
   void _showVoiceModeDialog() {
@@ -677,7 +698,7 @@ class _SettingsViewState extends State<SettingsView> with SingleTickerProviderSt
             return ListTile(
               title: Text(label, style: TextStyle(color: _voiceMode == key ? AppColors.accent : AppColors.textPrimary(context), fontSize: 14)),
               trailing: _voiceMode == key ? Icon(LucideIcons.check, color: AppColors.accent, size: 18) : null,
-              onTap: () { setState(() => _voiceMode = key); _savePref('omnivium_voice_mode', key); Navigator.pop(context); },
+              onTap: () { setState(() => _voiceMode = key); _savePref('omnivium_voice_mode', key); try { VoiceService.instance.setVoiceModeByName(key); } catch (_) {} Navigator.pop(context); },
             );
           }).toList(),
         ),

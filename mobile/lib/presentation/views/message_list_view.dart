@@ -1,10 +1,10 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:matrix/matrix.dart';
 import '../theme/app_colors.dart';
 import '../theme/locale_provider.dart';
 import '../../core/app_provider.dart';
-import 'add_friend_view.dart';
+import '../../core/app_navigator.dart';
 import 'friend_profile_view.dart';
 
 class MessageListView extends StatefulWidget {
@@ -100,6 +100,8 @@ class _MessageListViewState extends State<MessageListView> {
                   labelText:  localeProvider.t('search_messages'),
                   hintStyle: TextStyle(color: AppColors.textDisabled(context), fontSize: 14),
                   border: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                enabledBorder: InputBorder.none,
                 ),
                 onChanged: (v) => setState(() => _searchQuery = v),
               ),
@@ -225,7 +227,7 @@ class _MessageListViewState extends State<MessageListView> {
               title: Text(localeProvider.t('add_contact'), style: TextStyle(color: AppColors.textPrimary(context))),
               onTap: () {
                 Navigator.pop(ctx);
-                Navigator.push(context, MaterialPageRoute(builder: (_) => AddFriendView(provider: widget.provider)));
+                AppNavigator.go(context, '/add-friend');
               },
             ),
             ListTile(
@@ -273,7 +275,7 @@ class _MessageListViewState extends State<MessageListView> {
                 widget.provider.matrix.setActiveRoom(roomId);
               } catch (e) {
                 if (mounted && context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e'), backgroundColor: AppColors.dng(context)));
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e'.isEmpty ? localeProvider.t('error') : '$e'), backgroundColor: AppColors.dng(context)));
                 }
               }
             },
@@ -298,12 +300,18 @@ class _MessageListViewState extends State<MessageListView> {
             ListTile(
               leading: Icon(LucideIcons.pin, color: AppColors.textSecondary(context)),
               title: Text(localeProvider.t('pin_chat'), style: TextStyle(color: AppColors.textPrimary(context))),
-              onTap: () => Navigator.pop(ctx),
+              onTap: () {
+                Navigator.pop(ctx);
+                widget.provider.session.togglePinSession(widget.provider.session.activeSessionId ?? '');
+              },
             ),
             ListTile(
               leading: Icon(LucideIcons.bellOff, color: AppColors.textSecondary(context)),
               title: Text(localeProvider.t('mute'), style: TextStyle(color: AppColors.textPrimary(context))),
-              onTap: () => Navigator.pop(ctx),
+              onTap: () {
+                Navigator.pop(ctx);
+                widget.provider.session.toggleMuteSession(widget.provider.session.activeSessionId ?? '');
+              },
             ),
             ListTile(
               leading: Icon(LucideIcons.archive, color: AppColors.textSecondary(context)),
@@ -315,7 +323,19 @@ class _MessageListViewState extends State<MessageListView> {
               title: Text(localeProvider.t('delete_chat'), style: TextStyle(color: AppColors.dng(context))),
               onTap: () {
                 Navigator.pop(ctx);
-                room.leave();
+                showDialog(context: context, builder: (_) => AlertDialog(
+                  backgroundColor: AppColors.sf(context), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  title: Text(localeProvider.t('delete_chat'), style: TextStyle(color: AppColors.textPrimary(context))),
+                  content: Text(localeProvider.t('delete_chat_confirm'), style: TextStyle(color: AppColors.textSecondary(context))),
+                  actions: [
+                    TextButton(onPressed: () => Navigator.pop(context), child: Text(localeProvider.t('cancel'))),
+                    FilledButton(
+                      style: FilledButton.styleFrom(backgroundColor: AppColors.dng(context)),
+                      onPressed: () { Navigator.pop(context); room.leave(); },
+                      child: Text(localeProvider.t('delete')),
+                    ),
+                  ],
+                ));
               },
             ),
             const SizedBox(height: 16),

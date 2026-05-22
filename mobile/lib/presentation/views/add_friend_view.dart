@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:matrix/matrix.dart';
 import '../widgets/skeleton_loader.dart';
@@ -17,6 +17,8 @@ class AddFriendView extends StatefulWidget {
 class _AddFriendViewState extends State<AddFriendView> {
   final _searchController = TextEditingController();
   final _idController = TextEditingController();
+  final _idFocus = FocusNode();
+  final _searchFocus = FocusNode();
   List<Profile> _searchResults = [];
   bool _isSearching = false;
   bool _isAdding = false;
@@ -26,6 +28,8 @@ class _AddFriendViewState extends State<AddFriendView> {
   void dispose() {
     _searchController.dispose();
     _idController.dispose();
+    _idFocus.dispose();
+    _searchFocus.dispose();
     super.dispose();
   }
 
@@ -158,23 +162,32 @@ class _AddFriendViewState extends State<AddFriendView> {
           Row(
             children: [
               Expanded(
-                child: Container(
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: AppColors.bg(context),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: AppColors.divider(context)),
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: TextField(
-                    controller: _idController,
-                    style: TextStyle(color: AppColors.textPrimary(context), fontSize: 14),
-                    decoration: InputDecoration(
-                      labelText:  '@user:server.com',
-                      hintStyle: TextStyle(color: AppColors.textDisabled(context), fontSize: 14),
-                      border: InputBorder.none,
-                    ),
-                  ),
+                child: AnimatedBuilder(
+                  animation: Listenable.merge([_idFocus]),
+                  builder: (context, _) {
+                    final isFocused = _idFocus.hasFocus;
+                    return Container(
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: AppColors.bg(context),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: isFocused ? AppColors.accent : AppColors.divider(context)),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: TextField(
+                        controller: _idController,
+                        focusNode: _idFocus,
+                        style: TextStyle(color: AppColors.textPrimary(context), fontSize: 14),
+                        decoration: InputDecoration(
+                          labelText:  '@user:server.com',
+                          hintStyle: TextStyle(color: AppColors.textDisabled(context), fontSize: 14),
+                          border: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
               const SizedBox(width: 8),
@@ -211,39 +224,51 @@ class _AddFriendViewState extends State<AddFriendView> {
         children: [
           Text(localeProvider.t('search_users'), style: TextStyle(color: AppColors.textPrimary(context), fontSize: 15, fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
-          Container(
-            height: 44,
-            decoration: BoxDecoration(
-              color: AppColors.bg(context),
-              borderRadius: BorderRadius.circular(22),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                Icon(LucideIcons.search, size: 18, color: AppColors.textHint(context)),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: TextField(
-                    controller: _searchController,
-                    style: TextStyle(color: AppColors.textPrimary(context), fontSize: 15),
-                    decoration: InputDecoration(
-                      labelText:  localeProvider.t('search_users_hint'),
-                      hintStyle: TextStyle(color: AppColors.textDisabled(context)),
-                      border: InputBorder.none,
-                    ),
-                    onSubmitted: (_) => _doSearch(),
-                  ),
+          AnimatedBuilder(
+            animation: Listenable.merge([_searchFocus]),
+            builder: (context, _) {
+              final isFocused = _searchFocus.hasFocus;
+              return Container(
+                height: 44,
+                decoration: BoxDecoration(
+                  color: AppColors.bg(context),
+                  borderRadius: BorderRadius.circular(22),
+                  border: isFocused ? Border.all(color: AppColors.accent) : null,
                 ),
-                if (_searchController.text.isNotEmpty)
-                  Semantics(label: localeProvider.t('clear_search'), child: GestureDetector(
-                    onTap: () {
-                      _searchController.clear();
-                      setState(() => _searchResults = []);
-                    },
-                    child: Icon(LucideIcons.x, size: 16, color: AppColors.textHint(context)),
-                  )),
-              ],
-            ),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  children: [
+                    Icon(LucideIcons.search, size: 18, color: isFocused ? AppColors.accent : AppColors.textHint(context)),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: TextField(
+                        controller: _searchController,
+                        focusNode: _searchFocus,
+                        style: TextStyle(color: AppColors.textPrimary(context), fontSize: 15),
+                        decoration: InputDecoration(
+                          labelText:  localeProvider.t('search_users_hint'),
+                          hintStyle: TextStyle(color: AppColors.textDisabled(context)),
+                          border: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                        ),
+                        onSubmitted: (_) => _doSearch(),
+                      ),
+                    ),
+                    if (_searchController.text.isNotEmpty)
+                      Semantics(label: localeProvider.t('clear_search'), child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
+                        onTap: () {
+                          _searchController.clear();
+                          setState(() => _searchResults = []);
+                        },
+                        child: Icon(LucideIcons.x, size: 16, color: AppColors.textHint(context)),
+                      )),
+                  ],
+                ),
+              );
+            },
           ),
           const SizedBox(height: 8),
           SizedBox(

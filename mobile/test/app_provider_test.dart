@@ -7,6 +7,7 @@ void main() {
     late AppProvider provider;
 
     setUp(() {
+      TestWidgetsFlutterBinding.ensureInitialized();
       provider = AppProvider();
     });
 

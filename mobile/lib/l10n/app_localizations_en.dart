@@ -1165,6 +1165,207 @@ class SEn extends S {
   String get agent_replay => 'Agent Replay';
 
   @override
+  String get ai_operation_log => 'AI Operation Log';
+
+  @override
+  String get ai_operation_log_desc =>
+      'View AI operations, permissions and audit trail';
+
+  @override
+  String get all => 'All';
+
+  @override
+  String get violations => 'Violations';
+
+  @override
+  String get total_ops => 'Total';
+
+  @override
+  String get allowed => 'Allowed';
+
+  @override
+  String get denied => 'Denied';
+
+  @override
+  String get no_operation_logs => 'No operation logs yet';
+
+  @override
+  String get type => 'Type';
+
+  @override
+  String get actor => 'Actor';
+
+  @override
+  String get target => 'Target';
+
+  @override
+  String get status => 'Status';
+
+  @override
+  String get details => 'Details';
+
+  @override
+  String get ai_permission_management => 'AI Permission Management';
+
+  @override
+  String get ai_permission_management_desc =>
+      'Manage AI capabilities and permissions';
+
+  @override
+  String get global_permission_mode => 'Global Permission Mode';
+
+  @override
+  String get global_permission_desc =>
+      'Default permission for all AI capabilities. Override individual capabilities below.';
+
+  @override
+  String get auto_execute => 'Auto Execute';
+
+  @override
+  String get need_confirm => 'Needs Confirmation';
+
+  @override
+  String get always_deny => 'Always Denied';
+
+  @override
+  String get custom => 'Custom';
+
+  @override
+  String get sovereign_identity => 'Sovereign Identity';
+
+  @override
+  String get did => 'DID';
+
+  @override
+  String get node_id => 'Node ID';
+
+  @override
+  String get public_key => 'Public Key';
+
+  @override
+  String get civilization_epoch => 'Epoch';
+
+  @override
+  String get federation_id => 'Federation ID';
+
+  @override
+  String get created_at => 'Created';
+
+  @override
+  String get copy_did => 'Copy DID';
+
+  @override
+  String get did_copied => 'DID copied';
+
+  @override
+  String get trust_level => 'Trust Level';
+
+  @override
+  String get trust_system => 'System';
+
+  @override
+  String get trust_signed => 'Signed';
+
+  @override
+  String get trust_verified => 'Verified';
+
+  @override
+  String get trust_untrusted => 'Untrusted';
+
+  @override
+  String get trust_blocked => 'Blocked';
+
+  @override
+  String get ancestry => 'Ancestry';
+
+  @override
+  String get credentials => 'Credentials';
+
+  @override
+  String get no_credentials => 'No credentials yet';
+
+  @override
+  String get no_sovereign_identity => 'No Sovereign Identity';
+
+  @override
+  String get no_sovereign_identity_desc =>
+      'Log in to generate your sovereign digital identity';
+
+  @override
+  String get capability_confirm_title => 'Capability Confirmation';
+
+  @override
+  String capability_confirm_msg(Object capability) {
+    return 'AI wants to execute: $capability. Allow?';
+  }
+
+  @override
+  String get allow => 'Allow';
+
+  @override
+  String get report_confirm_msg => 'Are you sure you want to report this user?';
+
+  @override
+  String get report_submitted => 'Report submitted';
+
+  @override
+  String get block_confirm_msg =>
+      'Are you sure you want to block this user? They will not be able to send you messages.';
+
+  @override
+  String get user_blocked => 'User blocked';
+
+  @override
+  String get delete_chat_confirm =>
+      'Are you sure you want to delete this chat? This cannot be undone.';
+
+  @override
+  String get delete_session => 'Delete Session';
+
+  @override
+  String get delete_session_confirm =>
+      'Are you sure you want to delete this session? All messages will be lost.';
+
+  @override
+  String get open_chat => 'Open Chat';
+
+  @override
+  String get leave_group_confirm => 'Leave this group?';
+
+  @override
+  String get remove_friend => 'Remove Friend';
+
+  @override
+  String get remove_friend_confirm =>
+      'Are you sure you want to remove this friend? The chat will be closed.';
+
+  @override
+  String get remove => 'Remove';
+
+  @override
+  String get select_date => 'Select date';
+
+  @override
+  String get clear_all => 'Clear All';
+
+  @override
+  String get clear_all_confirm =>
+      'Are you sure you want to clear all notifications?';
+
+  @override
+  String get add_me_omnivium => 'Add me on Omnivium';
+
+  @override
+  String get something_went_wrong => 'Something went wrong';
+
+  @override
+  String get error_boundary_desc =>
+      'An unexpected error occurred. Please try again.';
+
+  @override
+  String get retry => 'Retry';
+
+  @override
   String get ai_request_confirm => 'AI Request Confirmation';
 
   @override
@@ -1244,9 +1445,6 @@ class SEn extends S {
 
   @override
   String get leave_group => 'Leave Group';
-
-  @override
-  String get leave_group_confirm => 'Leave this group?';
 
   @override
   String get listening => 'Listening';
@@ -1407,9 +1605,6 @@ class SEn extends S {
   String get content_hint => 'Enter content...';
 
   @override
-  String get select_date => 'Select date';
-
-  @override
   String get select_time => 'Select time';
 
   @override
@@ -1474,9 +1669,6 @@ class SEn extends S {
 
   @override
   String get deny => 'Deny';
-
-  @override
-  String get allow => 'Allow';
 
   @override
   String get delete_message_pair => 'Delete Message Pair';

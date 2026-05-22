@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../theme/app_colors.dart';
 import '../theme/locale_provider.dart';
@@ -7,20 +8,24 @@ import 'image_viewer.dart';
 
 class UserBubble extends StatelessWidget {
   final String content;
-  const UserBubble({super.key, required this.content});
+  final VoidCallback? onLongPress;
+  const UserBubble({super.key, required this.content, this.onLongPress});
 
   @override
   Widget build(BuildContext context) {
     return Align(
       alignment: Alignment.centerRight,
-      child: Container(
-        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        decoration: BoxDecoration(
-          color: AppColors.sfHover(context),
-          borderRadius: BorderRadius.circular(18),
+      child: GestureDetector(
+        onLongPress: onLongPress,
+        child: Container(
+          constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(
+            color: AppColors.sfHover(context),
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: Text(content, style: TextStyle(color: AppColors.textPrimary(context), fontSize: 15, fontWeight: FontWeight.w500)),
         ),
-        child: Text(content, style: TextStyle(color: AppColors.textPrimary(context), fontSize: 15, fontWeight: FontWeight.w500)),
       ),
     );
   }
@@ -29,7 +34,8 @@ class UserBubble extends StatelessWidget {
 class AiTextBubble extends StatelessWidget {
   final String content;
   final bool isStreaming;
-  const AiTextBubble({super.key, required this.content, this.isStreaming = false});
+  final VoidCallback? onLongPress;
+  const AiTextBubble({super.key, required this.content, this.isStreaming = false, this.onLongPress});
 
   static List<String> extractImageUrls(String text) {
     final regex = RegExp(r'https?://\S+\.(jpg|jpeg|png|gif|webp|bmp)(\?\S*)?', caseSensitive: false);
@@ -48,7 +54,9 @@ class AiTextBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     final imageUrls = extractImageUrls(content);
     final textContent = imageUrls.isEmpty ? content : removeImageUrls(content, imageUrls);
-    return Align(
+    return GestureDetector(
+      onLongPress: onLongPress,
+      child: Align(
       alignment: Alignment.centerLeft,
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -62,16 +70,12 @@ class AiTextBubble extends StatelessWidget {
               for (final url in imageUrls) ...[
                 const SizedBox(height: 8),
                 GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
                   onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ImageViewer(imageUrl: url))),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(12),
-                    child: Image.network(url, semanticLabel: localeProvider.t('ai_generated_image'), width: 200, fit: BoxFit.cover,
-                      errorBuilder: (_, _, _) => Container(
-                        width: 200, height: 120,
-                        color: AppColors.sfAlt(context),
-                        child: Center(child: Icon(LucideIcons.imageOff, color: AppColors.iconGray(context))),
-                      ),
-                    ),
+                    child: CachedNetworkImage(imageUrl: url, width: 200, fit: BoxFit.cover, placeholder: (_, _) => Container(width: 200, height: 150, color: AppColors.sfAlt(context), child: Center(child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.accent)))), errorWidget: (_, _, _) => Container(width: 200, height: 80, color: AppColors.sfAlt(context), child: Icon(LucideIcons.imageOff, color: AppColors.iconGray(context)))),
                   ),
                 ),
               ],
@@ -85,6 +89,7 @@ class AiTextBubble extends StatelessWidget {
             ),
         ],
       ),
+    ),
     );
   }
 }
@@ -167,6 +172,8 @@ class AiActionRow extends StatelessWidget {
 
   static Widget _actionIcon(BuildContext context, IconData icon, String label, {required VoidCallback onTap}) {
     return GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: Row(children: [
         Icon(icon, size: 14, color: AppColors.sec(context)),

@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:matrix/matrix.dart';
 import '../widgets/skeleton_loader.dart';
@@ -108,6 +109,8 @@ class _FileManagerViewState extends State<FileManagerView> with SingleTickerProv
         final thumbnailUrl = file.thumbnailMxcUrl != null && client != null
             ? Uri.parse(file.thumbnailMxcUrl!).getThumbnailUri(client, width: 200, height: 200).toString() : null;
         return GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
           onTap: () {
             if (file.type == FileType.image && client != null) {
               final httpUrl = Uri.parse(file.mxcUrl).getThumbnailUri(client, width: 2000, height: 2000).toString();
@@ -117,7 +120,7 @@ class _FileManagerViewState extends State<FileManagerView> with SingleTickerProv
           child: Container(decoration: BoxDecoration(color: AppColors.sf(context), borderRadius: BorderRadius.circular(12)),
             child: ClipRRect(borderRadius: BorderRadius.circular(12),
               child: thumbnailUrl != null
-                  ? Image.network(thumbnailUrl, semanticLabel: localeProvider.t('file_thumbnail'), fit: BoxFit.cover, errorBuilder: (_, _, _) => _buildFilePlaceholder(file))
+                  ? CachedNetworkImage(imageUrl: thumbnailUrl, fit: BoxFit.cover, errorWidget: (_, _, _) => _buildFilePlaceholder(file))
                   : _buildFilePlaceholder(file))),
         );
       },

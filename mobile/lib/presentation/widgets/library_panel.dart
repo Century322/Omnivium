@@ -4,9 +4,8 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../theme/app_colors.dart';
 import '../theme/locale_provider.dart';
 import '../../core/app_provider.dart';
+import '../../core/app_navigator.dart';
 import 'home_components.dart';
-import '../views/contacts_view.dart';
-import '../views/matrix_login_view.dart';
 
 class LibraryPanel extends StatefulWidget {
   final AppProvider provider;
@@ -32,11 +31,12 @@ class LibraryPanel extends StatefulWidget {
 
 class _LibraryPanelState extends State<LibraryPanel> {
   final _searchController = TextEditingController();
-
+  final _searchFocus = FocusNode();
 
   @override
   void dispose() {
     _searchController.dispose();
+    _searchFocus.dispose();
     super.dispose();
   }
 
@@ -50,6 +50,8 @@ class _LibraryPanelState extends State<LibraryPanel> {
             children: [
               Expanded(
                 child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
                   onTap: widget.onCreateGroupChat,
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
@@ -72,6 +74,8 @@ class _LibraryPanelState extends State<LibraryPanel> {
               const SizedBox(width: 8),
               Expanded(
                 child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
                   onTap: widget.onAddContact,
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
@@ -94,8 +98,10 @@ class _LibraryPanelState extends State<LibraryPanel> {
               const SizedBox(width: 8),
               Expanded(
                 child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => ContactsView(provider: widget.provider)));
+                    AppNavigator.go(context, '/contacts');
                   },
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
@@ -119,27 +125,36 @@ class _LibraryPanelState extends State<LibraryPanel> {
           ),
         ),
         if (widget.showSearchBar)
-          Container(
-            margin: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            decoration: BoxDecoration(
-              color: AppColors.sf(context),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppColors.divider(context)),
-            ),
-            child: TextField(
-              controller: _searchController,
-              autofocus: true,
-              style: TextStyle(color: AppColors.textPrimary(context), fontSize: 14),
-              decoration: InputDecoration(
-                labelText:  localeProvider.t('search_id'),
-                hintStyle: TextStyle(color: AppColors.textTertiary(context), fontSize: 14),
-                border: InputBorder.none,
-                contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                isDense: true,
-              ),
-              onChanged: (_) => setState(() {}),
-            ),
+          AnimatedBuilder(
+            animation: Listenable.merge([_searchFocus]),
+            builder: (context, _) {
+              final isFocused = _searchFocus.hasFocus;
+              return Container(
+                margin: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  color: AppColors.sf(context),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: isFocused ? AppColors.accent : AppColors.divider(context)),
+                ),
+                child: TextField(
+                  controller: _searchController,
+                  focusNode: _searchFocus,
+                  autofocus: true,
+                  style: TextStyle(color: AppColors.textPrimary(context), fontSize: 14),
+                  decoration: InputDecoration(
+                    labelText:  localeProvider.t('search_id'),
+                    hintStyle: TextStyle(color: AppColors.textTertiary(context), fontSize: 14),
+                    border: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                    isDense: true,
+                  ),
+                  onChanged: (_) => setState(() {}),
+                ),
+              );
+            },
           ),
         Expanded(
           child: _buildChatList(),
@@ -160,8 +175,10 @@ class _LibraryPanelState extends State<LibraryPanel> {
             Text(localeProvider.t('not_logged_in'), style: TextStyle(color: AppColors.textTertiary(context), fontSize: 15)),
             const SizedBox(height: 8),
             GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
               onTap: () async {
-                await Navigator.push(context, MaterialPageRoute(builder: (_) => MatrixLoginView(provider: widget.provider)));
+                await AppNavigator.go(context, '/login');
               },
               child: Text(localeProvider.t('go_login'), style: TextStyle(color: AppColors.accent, fontSize: 15, fontWeight: FontWeight.w500)),
             ),
@@ -201,6 +218,8 @@ class _LibraryPanelState extends State<LibraryPanel> {
 
   Widget _buildChatItem(ChatItemData data) {
     return GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
       onTap: () {
         final room = widget.provider.matrix.client?.getRoomById(data.id);
         if (room != null && room.isDirectChat) {

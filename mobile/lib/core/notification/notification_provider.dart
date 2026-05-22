@@ -1,4 +1,5 @@
 import '../app_logger.dart';
+import '../notification_center.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -33,6 +34,23 @@ class NotificationProvider extends ChangeNotifier {
         if (!_disposed) notifyListeners();
       } catch (e, stackTrace) { AppLogger.instance.error('Operation failed', error: e, stackTrace: stackTrace); }
     }
+    NotificationCenter.observe(Event.pushNotification, _onPushNotification);
+  }
+
+  void _onPushNotification(Map<String, dynamic>? data) {
+    if (data == null) return;
+    _notifications.insert(0, AppNotification(
+      id: 'push_${DateTime.now().millisecondsSinceEpoch}',
+      title: data['title'] as String? ?? '',
+      body: data['body'] as String? ?? '',
+      type: NotificationType.system,
+      timestamp: DateTime.now(),
+    ));
+    if (_notifications.length > _maxNotifications) {
+      _notifications.removeRange(_maxNotifications, _notifications.length);
+    }
+    _persist();
+    if (!_disposed) notifyListeners();
   }
 
   Future<void> _persist() async {

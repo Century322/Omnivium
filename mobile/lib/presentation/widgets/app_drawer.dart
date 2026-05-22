@@ -1,11 +1,11 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import '../utils/format_utils.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../theme/app_colors.dart';
 import '../theme/locale_provider.dart';
 import '../../core/app_provider.dart';
+import '../../core/app_navigator.dart';
 import '../../core/session_provider.dart';
-import '../views/my_id_view.dart';
 import 'incognito_icon.dart';
 
 class AppDrawer extends StatefulWidget {
@@ -62,7 +62,7 @@ class AppDrawerState extends State<AppDrawer> with SingleTickerProviderStateMixi
 
   void _showProfile() {
     close();
-    Navigator.push(context, MaterialPageRoute(builder: (_) => MyIdView(provider: widget.provider)));
+    AppNavigator.go(context, '/my-id');
   }
 
   void _showSessionContextMenu(ConversationSession session) {
@@ -110,8 +110,20 @@ class AppDrawerState extends State<AppDrawer> with SingleTickerProviderStateMixi
               leading: Icon(LucideIcons.trash2, color: AppColors.dng(context), size: 18),
               title: Text(localeProvider.t('delete'), style: TextStyle(color: AppColors.dng(context), fontSize: 15)),
               onTap: () {
-                widget.provider.session.deleteSession(session.id);
                 Navigator.pop(context);
+                showDialog(context: context, builder: (_) => AlertDialog(
+                  backgroundColor: AppColors.sf(context), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  title: Text(localeProvider.t('delete_session'), style: TextStyle(color: AppColors.textPrimary(context))),
+                  content: Text(localeProvider.t('delete_session_confirm'), style: TextStyle(color: AppColors.textSecondary(context))),
+                  actions: [
+                    TextButton(onPressed: () => Navigator.pop(context), child: Text(localeProvider.t('cancel'))),
+                    FilledButton(
+                      style: FilledButton.styleFrom(backgroundColor: AppColors.dng(context)),
+                      onPressed: () { Navigator.pop(context); widget.provider.session.deleteSession(session.id); },
+                      child: Text(localeProvider.t('delete')),
+                    ),
+                  ],
+                ));
               },
             ),
             const SizedBox(height: 8),
@@ -186,6 +198,8 @@ class AppDrawerState extends State<AppDrawer> with SingleTickerProviderStateMixi
       FadeTransition(
           opacity: _fade,
           child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
               onTap: close,
               child: Container(color: AppColors.bg(context).withValues(alpha: 0.6)))),
       SlideTransition(
@@ -199,13 +213,29 @@ class AppDrawerState extends State<AppDrawer> with SingleTickerProviderStateMixi
             child: SafeArea(
               right: false,
               child: Column(children: [
+                if (widget.provider.navigation.isIncognito)
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: AppColors.accent.withValues(alpha: 0.15),
+                      borderRadius: const BorderRadius.horizontal(right: Radius.circular(24)),
+                    ),
+                    child: Row(children: [
+                      IncognitoIcon(size: 14, color: AppColors.accent),
+                      const SizedBox(width: 8),
+                      Text(localeProvider.t('incognito_mode'), style: TextStyle(color: AppColors.accent, fontSize: 12, fontWeight: FontWeight.w600)),
+                    ]),
+                  ),
                 Padding(
                   padding: const EdgeInsets.all(16),
                   child: Row(children: [
                     Semantics(
                       button: true,
-                      label: localeProvider.t('my_profile'),
+                      label: widget.provider.navigation.isIncognito ? localeProvider.t('incognito_mode') : localeProvider.t('my_profile'),
                       child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
                       onTap: _showProfile,
                       child: Container(
                         width: 32, height: 32,
@@ -217,6 +247,8 @@ class AppDrawerState extends State<AppDrawer> with SingleTickerProviderStateMixi
                     )),
                     const SizedBox(width: 12),
                     Semantics(label: localeProvider.t('user_profile'), child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
                       onTap: _showProfile,
                       child: Text(
                           widget.provider.matrix.isLoggedIn
@@ -230,6 +262,8 @@ class AppDrawerState extends State<AppDrawer> with SingleTickerProviderStateMixi
                       builder: (context, _) {
                         final unread = widget.provider.notification.unreadCount;
                         return Semantics(label: localeProvider.t('notifications'), child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
                           onTap: widget.onOpenNotifications,
                           child: Container(
                             width: 32, height: 32,
@@ -256,19 +290,13 @@ class AppDrawerState extends State<AppDrawer> with SingleTickerProviderStateMixi
                     ),
                     const SizedBox(width: 8),
                     Semantics(label: localeProvider.t('settings'), child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
                         onTap: widget.onOpenSettings,
                         child: Container(
                           width: 32, height: 32,
                           decoration: BoxDecoration(color: AppColors.sfAlt(context), borderRadius: BorderRadius.circular(16)),
                           child: Icon(LucideIcons.settings, size: 18, color: AppColors.sec(context)),
-                        ))),
-                    const SizedBox(width: 12),
-                    Semantics(label: localeProvider.t('close_drawer'), child: GestureDetector(
-                        onTap: close,
-                        child: Container(
-                          width: 32, height: 32,
-                          decoration: BoxDecoration(color: AppColors.sfAlt(context), borderRadius: BorderRadius.circular(16)),
-                          child: Icon(LucideIcons.arrowLeft, size: 18, color: AppColors.sec(context)),
                         ))),
                   ])),
                 Expanded(
@@ -298,6 +326,8 @@ class AppDrawerState extends State<AppDrawer> with SingleTickerProviderStateMixi
                                       final s = list[idx];
                                       final isActive = s.id == activeId;
                                       return GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
                                         onLongPress: () => _showSessionContextMenu(s),
                                         child: Container(
                                           margin: const EdgeInsets.only(bottom: 4),
@@ -308,9 +338,15 @@ class AppDrawerState extends State<AppDrawer> with SingleTickerProviderStateMixi
                                           child: ListTile(
                                             dense: true,
                                             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-                                            title: Text(s.title,
-                                                style: TextStyle(color: isActive ? AppColors.textPrimary(context) : AppColors.textSecondary(context), fontSize: 14, fontWeight: FontWeight.w500),
-                                                maxLines: 1, overflow: TextOverflow.ellipsis),
+                                            title: Row(
+                                              children: [
+                                                Expanded(child: Text(s.title,
+                                                    style: TextStyle(color: isActive ? AppColors.textPrimary(context) : AppColors.textSecondary(context), fontSize: 14, fontWeight: FontWeight.w500),
+                                                    maxLines: 1, overflow: TextOverflow.ellipsis)),
+                                                if (s.isPinned) Padding(padding: const EdgeInsets.only(left: 4), child: Icon(LucideIcons.pin, size: 12, color: AppColors.acc(context))),
+                                                if (s.isMuted) Padding(padding: const EdgeInsets.only(left: 4), child: Icon(LucideIcons.bellOff, size: 12, color: AppColors.textDisabled(context))),
+                                              ],
+                                            ),
                                             subtitle: Text(formatRelativeTime(s.lastActiveAt), style: TextStyle(color: AppColors.textDisabled(context), fontSize: 11)),
                                             onTap: () {
                                               if (s.isArchived) {

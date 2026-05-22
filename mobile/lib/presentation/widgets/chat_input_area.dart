@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../theme/app_colors.dart';
 import '../theme/locale_provider.dart';
@@ -11,9 +11,9 @@ class ChatInputArea extends StatelessWidget {
   final bool hasSentMessage;
   final bool isListening;
   final bool isEditing;
-  final bool showCopied;
   final bool isIncognito;
   final bool isFriendChat;
+  final bool isGenerating;
   final double maxWidth;
   final VoidCallback onSend;
   final VoidCallback onToggleListening;
@@ -23,6 +23,7 @@ class ChatInputArea extends StatelessWidget {
   final VoidCallback onShowModels;
   final VoidCallback onOpenVoice;
   final VoidCallback onChanged;
+  final VoidCallback? onStopGeneration;
 
   const ChatInputArea({
     super.key,
@@ -32,9 +33,9 @@ class ChatInputArea extends StatelessWidget {
     required this.hasSentMessage,
     required this.isListening,
     required this.isEditing,
-    required this.showCopied,
     required this.isIncognito,
     required this.isFriendChat,
+    this.isGenerating = false,
     required this.maxWidth,
     required this.onSend,
     required this.onToggleListening,
@@ -44,6 +45,7 @@ class ChatInputArea extends StatelessWidget {
     required this.onShowModels,
     required this.onOpenVoice,
     required this.onChanged,
+    this.onStopGeneration,
   });
 
   String t(String key) => localeProvider.t(key);
@@ -61,87 +63,75 @@ class ChatInputArea extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (showQuickCmds) const SizedBox.shrink(),
-              AnimatedOpacity(
-                opacity: showCopied ? 1.0 : 0.0,
-                duration: const Duration(milliseconds: 200),
-                child: showCopied
-                    ? Container(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: AppColors.sf(context),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: AppColors.divider(context)),
-                        ),
-                        child: Text(t('copied'), style: TextStyle(color: AppColors.sec(context), fontSize: 13, fontWeight: FontWeight.w500)),
-                      )
-                    : const SizedBox.shrink(),
-              ),
               AnimatedBuilder(
                 animation: listeningGlow,
                 builder: (context, _) {
                   final g = listeningGlow.value;
                   final hasText = textController.text.trim().isNotEmpty;
                   final glowShadows = _buildGlowShadows(g);
-                  final borderColor = g > 0.5 ? AppColors.accent : AppColors.divider(context);
+                  final isFocused = focusNode.hasFocus;
+                  final borderColor = isFocused
+                      ? AppColors.accent
+                      : g > 0.5
+                          ? AppColors.accent.withValues(alpha: 0.3)
+                          : AppColors.divider(context);
                   return Container(
                     decoration: BoxDecoration(
+                      color: AppColors.sf(context),
                       borderRadius: BorderRadius.circular(28),
+                      border: Border.all(color: borderColor),
                       boxShadow: glowShadows,
                     ),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.sf(context),
-                        borderRadius: BorderRadius.circular(28),
-                        border: Border.all(color: borderColor),
-                      ),
-                      padding: const EdgeInsets.all(8),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          if (isEditing)
-                            Container(
-                              margin: const EdgeInsets.only(bottom: 4),
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: AppColors.sfAlt(context),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(LucideIcons.pencil, size: 13, color: AppColors.sec(context)),
-                                  const SizedBox(width: 6),
-                                  Expanded(child: Text(t('edit_query'), style: TextStyle(color: AppColors.sec(context), fontSize: 12, fontWeight: FontWeight.w500))),
-                                  GestureDetector(
-                                    onTap: onCancelEdit,
-                                    child: Icon(LucideIcons.x, size: 14, color: AppColors.textHint(context)),
-                                  ),
-                                ],
-                              ),
+                    padding: const EdgeInsets.all(8),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (isEditing)
+                          Container(
+                            margin: const EdgeInsets.only(bottom: 4),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: AppColors.sfAlt(context),
+                              borderRadius: BorderRadius.circular(12),
                             ),
-                          ConstrainedBox(
-                            constraints: const BoxConstraints(maxHeight: 120),
-                            child: TextField(
-                              controller: textController,
-                              focusNode: focusNode,
-                              style: TextStyle(color: AppColors.textPrimary(context), fontSize: 16, fontWeight: FontWeight.w500),
-                              onSubmitted: (_) => onSend(),
-                              onChanged: (_) => onChanged(),
-                              decoration: InputDecoration(
-                                labelText: hasSentMessage ? t('follow_up') : t('ask_anything'),
-                                hintStyle: TextStyle(color: AppColors.textHint(context), fontWeight: FontWeight.w500),
-                                border: InputBorder.none,
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                              ),
-                              maxLines: null,
+                            child: Row(
+                              children: [
+                                Icon(LucideIcons.pencil, size: 13, color: AppColors.sec(context)),
+                                const SizedBox(width: 6),
+                                Expanded(child: Text(t('edit_query'), style: TextStyle(color: AppColors.sec(context), fontSize: 12, fontWeight: FontWeight.w500))),
+                                GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
+                                  onTap: onCancelEdit,
+                                  child: Icon(LucideIcons.x, size: 14, color: AppColors.textHint(context)),
+                                ),
+                              ],
                             ),
                           ),
+                        ConstrainedBox(
+                          constraints: const BoxConstraints(maxHeight: 120),
+                          child: TextField(
+                            controller: textController,
+                            focusNode: focusNode,
+                            style: TextStyle(color: AppColors.textPrimary(context), fontSize: 16, fontWeight: FontWeight.w500),
+                            onSubmitted: (_) => onSend(),
+                            onChanged: (_) => onChanged(),
+                            decoration: InputDecoration(
+                              labelText: hasSentMessage ? t('follow_up') : t('ask_anything'),
+                              hintStyle: TextStyle(color: AppColors.textHint(context), fontWeight: FontWeight.w500),
+                              border: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                            ),
+                            maxLines: null,
+                          ),
+                        ),
                           _buildInputButtons(context, hasText),
                         ],
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
               ),
             ],
           ),
@@ -167,19 +157,26 @@ class ChatInputArea extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           AnimatedSwitcher(
-            duration: const Duration(milliseconds: 200),
-            transitionBuilder: (child, anim) => ScaleTransition(scale: anim, child: FadeTransition(opacity: anim, child: child)),
+            duration: const Duration(milliseconds: 300),
+            transitionBuilder: (child, anim) => SlideTransition(
+              position: Tween<Offset>(begin: const Offset(-0.3, 0), end: Offset.zero).animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic)),
+              child: FadeTransition(opacity: anim, child: child),
+            ),
             child: isListening
                 ? GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
                     key: const ValueKey('stop'),
                     onTap: onToggleListening,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 6),
-                      child: Container(
+                    child: Container(
+                      width: 34,
+                      height: 34,
+                      decoration: BoxDecoration(color: AppColors.sfHover(context), borderRadius: BorderRadius.circular(17)),
+                      child: Center(child: Container(
                         width: 12,
                         height: 12,
                         decoration: BoxDecoration(color: AppColors.textPrimary(context), borderRadius: BorderRadius.circular(2)),
-                      ),
+                      )),
                     ),
                   )
                 : Row(key: const ValueKey('normal-left'), children: [
@@ -202,6 +199,8 @@ class ChatInputArea extends StatelessWidget {
             },
             child: isListening
                 ? GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
                     key: const ValueKey('confirm'),
                     onTap: onToggleListening,
                     child: Container(
@@ -213,6 +212,8 @@ class ChatInputArea extends StatelessWidget {
                   )
                 : Row(key: const ValueKey('normal-right'), children: [
                     GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
                       onTap: onToggleIncognito,
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 300),
@@ -226,21 +227,33 @@ class ChatInputArea extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 6),
-                    GestureDetector(
+                    Semantics(
+                      button: true,
+                      label: isListening ? t('stop_listening') : t('voice_input'),
+                      child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
                       onTap: onToggleListening,
                       child: SizedBox(width: 34, height: 34, child: Center(child: Icon(LucideIcons.mic, size: 20, color: AppColors.sec(context)))),
+                      ),
                     ),
                     const SizedBox(width: 6),
                     GestureDetector(
-                      onTap: hasText ? onSend : onOpenVoice,
+
+      behavior: HitTestBehavior.opaque,
+                      onTap: isGenerating
+                          ? (onStopGeneration ?? () {})
+                          : (hasText ? onSend : onOpenVoice),
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
                         width: 34,
                         height: 34,
                         decoration: BoxDecoration(color: AppColors.accent, borderRadius: BorderRadius.circular(17)),
-                        child: hasText
-                            ? Icon(LucideIcons.arrowUp, size: 18, color: AppColors.textPrimary(context))
-                            : const VoiceBarsIcon(),
+                        child: isGenerating
+                            ? Icon(LucideIcons.square, size: 16, color: AppColors.textPrimary(context))
+                            : hasText
+                                ? Icon(LucideIcons.arrowUp, size: 18, color: AppColors.textPrimary(context))
+                                : const VoiceBarsIcon(),
                       ),
                     ),
                   ]),
@@ -252,6 +265,8 @@ class ChatInputArea extends StatelessWidget {
 
   Widget _circleBtn(BuildContext context, IconData icon, {VoidCallback? onTap}) {
     return GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: Container(
         width: 32,
@@ -264,6 +279,8 @@ class ChatInputArea extends StatelessWidget {
 
   Widget _pillBtn(BuildContext context, String text, {VoidCallback? onTap}) {
     return GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: Container(
         height: 32,

@@ -1,4 +1,4 @@
-﻿import '../../core/app_logger.dart';
+import '../../core/app_logger.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -160,6 +160,8 @@ class MediaThumbnail extends StatelessWidget {
     return Stack(
       children: [
         GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
           onTap: onTap,
           child: Container(
             width: 80,
@@ -183,6 +185,8 @@ class MediaThumbnail extends StatelessWidget {
             right: 4,
             top: 4,
             child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
               onTap: onRemove,
               child: Container(
                 width: 20,

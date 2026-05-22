@@ -1,11 +1,14 @@
 import 'app_logger.dart';
+import 'app_config.dart';
 import 'dart:convert';
 import 'dart:math';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:crypto/crypto.dart';
 import 'network_security_service.dart';
 import 'matrix/matrix_service.dart';
+import 'encryption_service.dart';
 
 class ApiProxyService {
   static final ApiProxyService _instance = ApiProxyService._();
@@ -13,8 +16,39 @@ class ApiProxyService {
   ApiProxyService._();
 
   static const defaultBackendUrl = 'https://omnivium-api-proxy.so1946875590.workers.dev';
+  static const _fallbackUrls = [
+    'https://omnivium-api-proxy.so1946875590.workers.dev',
+  ];
 
-  String get backendUrl => defaultBackendUrl;
+  String get _effectiveBaseUrl {
+    final envUrl = AppConfig.apiBaseUrl;
+    if (envUrl.isNotEmpty && envUrl != 'http://10.0.2.2:8787') return envUrl;
+    return _fallbackUrls[_activeUrlIndex];
+  }
+
+  int _activeUrlIndex = 0;
+  final Map<String, int> _failureCounts = {};
+
+  String get backendUrl {
+    final remote = _remoteConfig?['backend_url'] as String?;
+    if (remote != null && remote.isNotEmpty) return remote;
+    return _effectiveBaseUrl;
+  }
+
+  void _reportFailure(String url) {
+    _failureCounts[url] = (_failureCounts[url] ?? 0) + 1;
+    if (_failureCounts[url]! >= 3 && _fallbackUrls.length > 1) {
+      final nextIndex = (_activeUrlIndex + 1) % _fallbackUrls.length;
+      if (nextIndex != _activeUrlIndex) {
+        _activeUrlIndex = nextIndex;
+        _circuitBreaker.reset();
+      }
+    }
+  }
+
+  void _reportSuccess(String url) {
+    _failureCounts.remove(url);
+  }
   Map<String, dynamic>? _remoteConfig;
   Map<String, List<String>>? _availableModels;
 
@@ -53,16 +87,22 @@ class ApiProxyService {
     return Uri.parse('$backendUrl/ai/classify');
   }
 
-  Map<String, String> buildAuthHeaders() {
+  Map<String, String> buildAuthHeaders({String? body}) {
     final headers = <String, String>{};
     final matrix = MatrixService.instance;
-    if (matrix.isLoggedIn) {
-      final token = matrix.client?.accessToken;
-      if (token != null) {
-        headers['Authorization'] = 'Bearer $token';
-        headers['X-Auth-Source'] = 'matrix';
-        headers['X-User-Id'] = matrix.userId ?? '';
-      }
+    final token = matrix.client?.accessToken;
+    if (matrix.isLoggedIn && token != null) {
+      headers['Authorization'] = 'Bearer $token';
+      headers['X-Auth-Source'] = 'matrix';
+      headers['X-User-Id'] = matrix.userId ?? '';
+    }
+    final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+    headers['X-Timestamp'] = timestamp;
+    if (body != null && body.isNotEmpty && token != null) {
+      final signingInput = '$timestamp:${sha256.convert(utf8.encode(body))}';
+      final key = utf8.encode(token);
+      final hmacSig = Hmac(sha256, key).convert(utf8.encode(signingInput));
+      headers['X-Request-Signature'] = base64.encode(hmacSig.bytes);
     }
     return headers;
   }
@@ -160,14 +200,13 @@ class ApiProxyService {
       final response = await secureClient.post(uri, headers: {
         ...buildAuthHeaders(),
         ...buildDeviceHeaders(),
-        'Content-Type': 'application/json',
       }, body: jsonEncode({
         'device_id': deviceId,
         'platform': platform,
         'fcm_token': fcmToken,
         'app_version': appVersion,
         'user_id': userId,
-      }));
+      })).timeout(const Duration(seconds: 10));
       return response.statusCode == 200;
     } catch (e, stackTrace) {
       AppLogger.instance.warning('Operation failed', error: e, stackTrace: stackTrace);
@@ -181,28 +220,30 @@ class ApiProxyService {
     String method = 'POST',
   }) async {
     final uri = Uri.parse('$backendUrl$path');
+    final encodedBody = jsonEncode(body);
+    final enc = EncryptionService.instance;
+    final payload = enc.isReady ? enc.encrypt(encodedBody) : encodedBody;
     final headers = <String, String>{
       'Content-Type': 'application/json',
-      ...buildAuthHeaders(),
+      ...buildAuthHeaders(body: encodedBody),
       ...buildDeviceHeaders(),
     };
-
-    final encodedBody = jsonEncode(body);
+    if (enc.isReady) headers['X-Encrypted'] = '1';
 
     http.Response response;
     try {
       switch (method.toUpperCase()) {
         case 'POST':
-          response = await secureClient.post(uri, headers: headers, body: encodedBody).timeout(const Duration(seconds: 30));
+          response = await secureClient.post(uri, headers: headers, body: payload).timeout(const Duration(seconds: 30));
           break;
         case 'PUT':
-          response = await secureClient.put(uri, headers: headers, body: encodedBody).timeout(const Duration(seconds: 30));
+          response = await secureClient.put(uri, headers: headers, body: payload).timeout(const Duration(seconds: 30));
           break;
         case 'DELETE':
-          response = await secureClient.delete(uri, headers: headers, body: encodedBody).timeout(const Duration(seconds: 30));
+          response = await secureClient.delete(uri, headers: headers, body: payload).timeout(const Duration(seconds: 30));
           break;
         default:
-          response = await secureClient.post(uri, headers: headers, body: encodedBody).timeout(const Duration(seconds: 30));
+          response = await secureClient.post(uri, headers: headers, body: payload).timeout(const Duration(seconds: 30));
       }
     } catch (e) {
       AppLogger.instance.error('Proxy request timeout or network error', error: e);
@@ -210,8 +251,13 @@ class ApiProxyService {
     }
 
     if (response.statusCode >= 200 && response.statusCode < 300) {
-      return jsonDecode(response.body) as Map<String, dynamic>;
+      _reportSuccess(uri.toString());
+      final responseBody = response.headers['x-encrypted'] == '1' && enc.isReady
+          ? enc.decrypt(response.body) ?? response.body
+          : response.body;
+      return jsonDecode(responseBody) as Map<String, dynamic>;
     } else {
+      _reportFailure(uri.toString());
       throw Exception('Proxy request failed: ${response.statusCode} ${response.body}');
     }
   }

@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -7,7 +7,6 @@ import '../theme/locale_provider.dart';
 import '../../core/app_provider.dart';
 import '../../core/navigation_provider.dart';
 import '../../core/voice_service.dart';
-import '../../core/agent/speech_service.dart';
 
 class VoiceView extends StatefulWidget {
   final AppProvider provider;
@@ -78,9 +77,6 @@ class _VoiceViewState extends State<VoiceView> with TickerProviderStateMixin {
             _isProcessing = false;
             _statusText = last.content;
           });
-          if (!_isMuted) {
-            _voice.speak(last.content);
-          }
         }
       }
     }
@@ -194,14 +190,15 @@ class _VoiceViewState extends State<VoiceView> with TickerProviderStateMixin {
   void _onResponseComplete() {
     final messages = widget.provider.orchestrator.messages;
     final lastMsg = messages.isNotEmpty ? messages.last : null;
-    if (lastMsg != null && lastMsg.role == 'assistant' && lastMsg.content.isNotEmpty) {
-      final speech = SpeechService.instance;
+    if (lastMsg != null && lastMsg.role == 'assistant' && lastMsg.content.isNotEmpty && !_isMuted) {
       final voice = _selectedVoice;
-      speech.speakWithOpenAI(lastMsg.content, voice: voice).then((_) {
+      VoiceService.instance.speak(lastMsg.content).then((_) {
         if (_continuousMode && mounted) {
           _toggleListening();
         }
       });
+    } else if (_continuousMode && mounted) {
+      _toggleListening();
     }
   }
 
@@ -244,6 +241,8 @@ class _VoiceViewState extends State<VoiceView> with TickerProviderStateMixin {
           children: [
             if (_aiResponse.isNotEmpty || _recognizedText.isNotEmpty)
               GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
                 onTap: _clearConversation,
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -256,6 +255,8 @@ class _VoiceViewState extends State<VoiceView> with TickerProviderStateMixin {
               ),
             const SizedBox(width: 8),
             GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
               onTap: () => widget.provider.navigation.setIsSettingsOpen(true),
               child: Icon(LucideIcons.settings, color: AppColors.textHint(context), size: 24),
             ),
@@ -268,6 +269,8 @@ class _VoiceViewState extends State<VoiceView> with TickerProviderStateMixin {
   Widget _buildConversationArea() {
     return Center(
       child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
         onTap: _toggleListening,
         child: SizedBox(
           width: 288,
@@ -426,6 +429,8 @@ class _VoiceViewState extends State<VoiceView> with TickerProviderStateMixin {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
             onTap: () {
               _voice.stopListening();
               _voice.stopSpeaking();
@@ -446,6 +451,8 @@ class _VoiceViewState extends State<VoiceView> with TickerProviderStateMixin {
             ),
           ),
           GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
             onTap: _toggleListening,
             onLongPress: _isListening ? null : _toggleListening,
             child: Semantics(
@@ -474,6 +481,8 @@ class _VoiceViewState extends State<VoiceView> with TickerProviderStateMixin {
             ),
           ),
           GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
             onTap: () {
               setState(() => _isMuted = !_isMuted);
               if (_isMuted) {

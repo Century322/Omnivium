@@ -53,7 +53,7 @@ void main() {
       expect(json['id'], 'n1');
       expect(json['title'], 'Title');
       expect(json['content'], 'Content');
-      expect(json['type'], NoteType.schedule.index);
+      expect(json['type'], NoteType.schedule.name);
       expect(json['isDone'], false);
       expect(json['dueDate'], isNull);
     });
@@ -64,7 +64,7 @@ void main() {
         'id': 'n2',
         'title': 'Restored',
         'content': 'From JSON',
-        'type': 1,
+        'type': 'todo',
         'isDone': true,
         'dueDate': now.toIso8601String(),
         'createdAt': now.toIso8601String(),

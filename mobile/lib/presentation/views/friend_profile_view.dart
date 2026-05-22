@@ -32,7 +32,7 @@ class FriendProfileView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar( elevation: 0,
         leading: IconButton(tooltip: localeProvider.t('back'), icon: Icon(LucideIcons.arrowLeft, color: AppColors.sec(context)), onPressed: () => Navigator.pop(context)),
-        actions: [IconButton(tooltip: localeProvider.t('more'), icon: Icon(LucideIcons.moreVertical, color: AppColors.sec(context), size: 20), onPressed: () => _showMoreOptions(context))]),
+        actions: [IconButton(tooltip: localeProvider.t('more'), icon: Icon(LucideIcons.moreVertical, color: AppColors.sec(context), size: 20), onPressed: () => _showMoreOptions(context, room))]),
       body: SingleChildScrollView(padding: const EdgeInsets.symmetric(horizontal: 24),
         child: Column(children: [
           const SizedBox(height: 8),
@@ -184,17 +184,105 @@ class FriendProfileView extends StatelessWidget {
     );
   }
 
-  void _showMoreOptions(BuildContext context) {
+  void _showMoreOptions(BuildContext context, Room room) {
     final t = localeProvider.t;
     showModalBottomSheet(
       context: context,
       backgroundColor: AppColors.sf(context),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (_) => SafeArea(child: Column(mainAxisSize: MainAxisSize.min, children: [
-        ListTile(leading: Icon(LucideIcons.flag, color: AppColors.sec(context)), title: Text(t('report'), style: TextStyle(color: AppColors.textPrimary(context)))),
-        ListTile(leading: Icon(LucideIcons.ban, color: AppColors.dng(context)), title: Text(t('block'), style: TextStyle(color: AppColors.dng(context)))),
+        ListTile(
+          leading: Icon(LucideIcons.flag, color: AppColors.sec(context)),
+          title: Text(t('report'), style: TextStyle(color: AppColors.textPrimary(context))),
+          onTap: () {
+            Navigator.pop(context);
+            _reportUser(context);
+          },
+        ),
+        ListTile(
+          leading: Icon(LucideIcons.ban, color: AppColors.dng(context)),
+          title: Text(t('block'), style: TextStyle(color: AppColors.dng(context))),
+          onTap: () {
+            Navigator.pop(context);
+            _blockUser(context);
+          },
+        ),
+        if (room.isDirectChat)
+          ListTile(
+            leading: Icon(LucideIcons.userMinus, color: AppColors.dng(context)),
+            title: Text(t('remove_friend'), style: TextStyle(color: AppColors.dng(context))),
+            onTap: () {
+              Navigator.pop(context);
+              _removeFriend(context, room);
+            },
+          ),
       ])),
     );
+  }
+
+  void _reportUser(BuildContext context) {
+    final t = localeProvider.t;
+    showDialog(context: context, builder: (_) => AlertDialog(
+      backgroundColor: AppColors.sf(context), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      title: Text(t('report'), style: TextStyle(color: AppColors.textPrimary(context))),
+      content: Text(t('report_confirm_msg'), style: TextStyle(color: AppColors.textSecondary(context))),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: Text(t('cancel'))),
+        FilledButton(
+          onPressed: () {
+            Navigator.pop(context);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(t('report_submitted')), backgroundColor: AppColors.acc(context), duration: const Duration(seconds: 2)),
+            );
+          },
+          child: Text(t('report')),
+        ),
+      ],
+    ));
+  }
+
+  void _blockUser(BuildContext context) {
+    final t = localeProvider.t;
+    showDialog(context: context, builder: (_) => AlertDialog(
+      backgroundColor: AppColors.sf(context), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      title: Text(t('block'), style: TextStyle(color: AppColors.textPrimary(context))),
+      content: Text(t('block_confirm_msg'), style: TextStyle(color: AppColors.textSecondary(context))),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: Text(t('cancel'))),
+        FilledButton(
+          style: FilledButton.styleFrom(backgroundColor: AppColors.dng(context)),
+          onPressed: () {
+            Navigator.pop(context);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(t('user_blocked')), backgroundColor: AppColors.dng(context), duration: const Duration(seconds: 2)),
+            );
+          },
+          child: Text(t('block')),
+        ),
+      ],
+    ));
+  }
+
+  void _removeFriend(BuildContext context, Room room) {
+    final t = localeProvider.t;
+    showDialog(context: context, builder: (_) => AlertDialog(
+      backgroundColor: AppColors.sf(context), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      title: Text(t('remove_friend'), style: TextStyle(color: AppColors.textPrimary(context))),
+      content: Text(t('remove_friend_confirm'), style: TextStyle(color: AppColors.textSecondary(context))),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: Text(t('cancel'))),
+        FilledButton(
+          style: FilledButton.styleFrom(backgroundColor: AppColors.dng(context)),
+          onPressed: () {
+            Navigator.pop(context);
+            room.leave().then((_) {
+              if (context.mounted) Navigator.pop(context);
+            });
+          },
+          child: Text(t('remove')),
+        ),
+      ],
+    ));
   }
 
   void _clearChat(BuildContext context, Room room) {

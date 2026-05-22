@@ -1376,7 +1376,7 @@ abstract class S {
   /// No description provided for @clear.
   ///
   /// In zh, this message translates to:
-  /// **'清除'**
+  /// **'清空'**
   String get clear;
 
   /// No description provided for @settings.
@@ -2339,6 +2339,384 @@ abstract class S {
   /// **'智能体回放'**
   String get agent_replay;
 
+  /// No description provided for @ai_operation_log.
+  ///
+  /// In zh, this message translates to:
+  /// **'AI 操作日志'**
+  String get ai_operation_log;
+
+  /// No description provided for @ai_operation_log_desc.
+  ///
+  /// In zh, this message translates to:
+  /// **'查看 AI 操作记录、权限检查和审计追踪'**
+  String get ai_operation_log_desc;
+
+  /// No description provided for @all.
+  ///
+  /// In zh, this message translates to:
+  /// **'全部'**
+  String get all;
+
+  /// No description provided for @violations.
+  ///
+  /// In zh, this message translates to:
+  /// **'违规'**
+  String get violations;
+
+  /// No description provided for @total_ops.
+  ///
+  /// In zh, this message translates to:
+  /// **'总操作'**
+  String get total_ops;
+
+  /// No description provided for @allowed.
+  ///
+  /// In zh, this message translates to:
+  /// **'已允许'**
+  String get allowed;
+
+  /// No description provided for @denied.
+  ///
+  /// In zh, this message translates to:
+  /// **'已拒绝'**
+  String get denied;
+
+  /// No description provided for @no_operation_logs.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无操作日志'**
+  String get no_operation_logs;
+
+  /// No description provided for @type.
+  ///
+  /// In zh, this message translates to:
+  /// **'类型'**
+  String get type;
+
+  /// No description provided for @actor.
+  ///
+  /// In zh, this message translates to:
+  /// **'操作者'**
+  String get actor;
+
+  /// No description provided for @target.
+  ///
+  /// In zh, this message translates to:
+  /// **'目标'**
+  String get target;
+
+  /// No description provided for @status.
+  ///
+  /// In zh, this message translates to:
+  /// **'状态'**
+  String get status;
+
+  /// No description provided for @details.
+  ///
+  /// In zh, this message translates to:
+  /// **'详情'**
+  String get details;
+
+  /// No description provided for @ai_permission_management.
+  ///
+  /// In zh, this message translates to:
+  /// **'AI 权限管理'**
+  String get ai_permission_management;
+
+  /// No description provided for @ai_permission_management_desc.
+  ///
+  /// In zh, this message translates to:
+  /// **'管理 AI 能力与权限'**
+  String get ai_permission_management_desc;
+
+  /// No description provided for @global_permission_mode.
+  ///
+  /// In zh, this message translates to:
+  /// **'全局权限模式'**
+  String get global_permission_mode;
+
+  /// No description provided for @global_permission_desc.
+  ///
+  /// In zh, this message translates to:
+  /// **'所有 AI 能力的默认权限。可在下方单独覆盖。'**
+  String get global_permission_desc;
+
+  /// No description provided for @auto_execute.
+  ///
+  /// In zh, this message translates to:
+  /// **'自动执行'**
+  String get auto_execute;
+
+  /// No description provided for @need_confirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'需要确认'**
+  String get need_confirm;
+
+  /// No description provided for @always_deny.
+  ///
+  /// In zh, this message translates to:
+  /// **'始终拒绝'**
+  String get always_deny;
+
+  /// No description provided for @custom.
+  ///
+  /// In zh, this message translates to:
+  /// **'自定义'**
+  String get custom;
+
+  /// No description provided for @sovereign_identity.
+  ///
+  /// In zh, this message translates to:
+  /// **'主权身份'**
+  String get sovereign_identity;
+
+  /// No description provided for @did.
+  ///
+  /// In zh, this message translates to:
+  /// **'DID'**
+  String get did;
+
+  /// No description provided for @node_id.
+  ///
+  /// In zh, this message translates to:
+  /// **'节点 ID'**
+  String get node_id;
+
+  /// No description provided for @public_key.
+  ///
+  /// In zh, this message translates to:
+  /// **'公钥'**
+  String get public_key;
+
+  /// No description provided for @civilization_epoch.
+  ///
+  /// In zh, this message translates to:
+  /// **'文明纪元'**
+  String get civilization_epoch;
+
+  /// No description provided for @federation_id.
+  ///
+  /// In zh, this message translates to:
+  /// **'联邦 ID'**
+  String get federation_id;
+
+  /// No description provided for @created_at.
+  ///
+  /// In zh, this message translates to:
+  /// **'创建时间'**
+  String get created_at;
+
+  /// No description provided for @copy_did.
+  ///
+  /// In zh, this message translates to:
+  /// **'复制 DID'**
+  String get copy_did;
+
+  /// No description provided for @did_copied.
+  ///
+  /// In zh, this message translates to:
+  /// **'DID 已复制'**
+  String get did_copied;
+
+  /// No description provided for @trust_level.
+  ///
+  /// In zh, this message translates to:
+  /// **'信任等级'**
+  String get trust_level;
+
+  /// No description provided for @trust_system.
+  ///
+  /// In zh, this message translates to:
+  /// **'系统级'**
+  String get trust_system;
+
+  /// No description provided for @trust_signed.
+  ///
+  /// In zh, this message translates to:
+  /// **'已签名'**
+  String get trust_signed;
+
+  /// No description provided for @trust_verified.
+  ///
+  /// In zh, this message translates to:
+  /// **'已验证'**
+  String get trust_verified;
+
+  /// No description provided for @trust_untrusted.
+  ///
+  /// In zh, this message translates to:
+  /// **'未受信'**
+  String get trust_untrusted;
+
+  /// No description provided for @trust_blocked.
+  ///
+  /// In zh, this message translates to:
+  /// **'已封禁'**
+  String get trust_blocked;
+
+  /// No description provided for @ancestry.
+  ///
+  /// In zh, this message translates to:
+  /// **'血统'**
+  String get ancestry;
+
+  /// No description provided for @credentials.
+  ///
+  /// In zh, this message translates to:
+  /// **'凭证'**
+  String get credentials;
+
+  /// No description provided for @no_credentials.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无凭证'**
+  String get no_credentials;
+
+  /// No description provided for @no_sovereign_identity.
+  ///
+  /// In zh, this message translates to:
+  /// **'无主权身份'**
+  String get no_sovereign_identity;
+
+  /// No description provided for @no_sovereign_identity_desc.
+  ///
+  /// In zh, this message translates to:
+  /// **'登录后自动生成您的主权数字身份'**
+  String get no_sovereign_identity_desc;
+
+  /// No description provided for @capability_confirm_title.
+  ///
+  /// In zh, this message translates to:
+  /// **'能力确认'**
+  String get capability_confirm_title;
+
+  /// No description provided for @capability_confirm_msg.
+  ///
+  /// In zh, this message translates to:
+  /// **'AI 请求执行: {capability}。是否允许？'**
+  String capability_confirm_msg(Object capability);
+
+  /// No description provided for @allow.
+  ///
+  /// In zh, this message translates to:
+  /// **'允许'**
+  String get allow;
+
+  /// No description provided for @report_confirm_msg.
+  ///
+  /// In zh, this message translates to:
+  /// **'确定要举报此用户吗？'**
+  String get report_confirm_msg;
+
+  /// No description provided for @report_submitted.
+  ///
+  /// In zh, this message translates to:
+  /// **'举报已提交'**
+  String get report_submitted;
+
+  /// No description provided for @block_confirm_msg.
+  ///
+  /// In zh, this message translates to:
+  /// **'确定要屏蔽此用户吗？屏蔽后对方将无法给您发送消息。'**
+  String get block_confirm_msg;
+
+  /// No description provided for @user_blocked.
+  ///
+  /// In zh, this message translates to:
+  /// **'用户已屏蔽'**
+  String get user_blocked;
+
+  /// No description provided for @delete_chat_confirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'确定要删除此聊天吗？此操作不可撤销。'**
+  String get delete_chat_confirm;
+
+  /// No description provided for @delete_session.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除会话'**
+  String get delete_session;
+
+  /// No description provided for @delete_session_confirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'确定要删除此会话吗？所有消息将丢失。'**
+  String get delete_session_confirm;
+
+  /// No description provided for @open_chat.
+  ///
+  /// In zh, this message translates to:
+  /// **'打开聊天'**
+  String get open_chat;
+
+  /// No description provided for @leave_group_confirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'确认退出群聊？'**
+  String get leave_group_confirm;
+
+  /// No description provided for @remove_friend.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除好友'**
+  String get remove_friend;
+
+  /// No description provided for @remove_friend_confirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'确定要删除此好友吗？聊天将被关闭。'**
+  String get remove_friend_confirm;
+
+  /// No description provided for @remove.
+  ///
+  /// In zh, this message translates to:
+  /// **'删除'**
+  String get remove;
+
+  /// No description provided for @select_date.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择日期'**
+  String get select_date;
+
+  /// No description provided for @clear_all.
+  ///
+  /// In zh, this message translates to:
+  /// **'清空全部'**
+  String get clear_all;
+
+  /// No description provided for @clear_all_confirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'确定要清空所有通知吗？'**
+  String get clear_all_confirm;
+
+  /// No description provided for @add_me_omnivium.
+  ///
+  /// In zh, this message translates to:
+  /// **'在 Omnivium 上添加我'**
+  String get add_me_omnivium;
+
+  /// No description provided for @something_went_wrong.
+  ///
+  /// In zh, this message translates to:
+  /// **'出了点问题'**
+  String get something_went_wrong;
+
+  /// No description provided for @error_boundary_desc.
+  ///
+  /// In zh, this message translates to:
+  /// **'发生了意外错误，请重试。'**
+  String get error_boundary_desc;
+
+  /// No description provided for @retry.
+  ///
+  /// In zh, this message translates to:
+  /// **'重试'**
+  String get retry;
+
   /// No description provided for @ai_request_confirm.
   ///
   /// In zh, this message translates to:
@@ -2500,12 +2878,6 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'退出群聊'**
   String get leave_group;
-
-  /// No description provided for @leave_group_confirm.
-  ///
-  /// In zh, this message translates to:
-  /// **'确认退出群聊？'**
-  String get leave_group_confirm;
 
   /// No description provided for @listening.
   ///
@@ -2819,12 +3191,6 @@ abstract class S {
   /// **'输入内容...'**
   String get content_hint;
 
-  /// No description provided for @select_date.
-  ///
-  /// In zh, this message translates to:
-  /// **'选择日期'**
-  String get select_date;
-
   /// No description provided for @select_time.
   ///
   /// In zh, this message translates to:
@@ -2956,12 +3322,6 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'拒绝'**
   String get deny;
-
-  /// No description provided for @allow.
-  ///
-  /// In zh, this message translates to:
-  /// **'允许'**
-  String get allow;
 
   /// No description provided for @delete_message_pair.
   ///

@@ -51,8 +51,12 @@ class CardRuntime {
 
   Map<String, CardState> get cards => Map.unmodifiable(_cards);
 
-  CardRuntime() {
-    _startExpiryTimer();
+  CardRuntime({bool autoStartTimer = true}) {
+    if (autoStartTimer) _startExpiryTimer();
+  }
+
+  void ensureTimerStarted() {
+    if (_expiryTimer == null) _startExpiryTimer();
   }
 
   void _startExpiryTimer() {

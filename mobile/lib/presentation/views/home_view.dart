@@ -1,4 +1,4 @@
-﻿import '../../core/app_logger.dart';
+import '../../core/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -10,7 +10,8 @@ import '../../core/voice_service.dart';
 import '../../core/runtime/card_runtime.dart';
 import '../utils/responsive.dart';
 import '../theme/locale_provider.dart';
-import 'notification_view.dart';
+import '../../core/notification_center.dart' as nc;
+import '../../core/app_navigator.dart' as nav;
 import '../widgets/home_components.dart';
 import '../widgets/model_sheets.dart';
 import '../widgets/home_header.dart';
@@ -39,7 +40,6 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
   bool _showScrollBtn = false;
   bool _isAutoScrolling = false;
   double _maxScrollOffset = 0;
-  bool _showCopied = false;
   int _editingIndex = -1;
   bool _isLibraryMode = false;
   bool _showContacts = false;
@@ -75,6 +75,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     _listeningGlow = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
     _headerSwitch = AnimationController(duration: const Duration(milliseconds: 250), vsync: this);
     _tabSwitch = AnimationController(duration: const Duration(milliseconds: 250), vsync: this);
+    nc.NotificationCenter.observe(nc.Event.capabilityConfirm, _onCapabilityConfirm);
   }
 
   @override
@@ -88,7 +89,28 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     _searchController.dispose();
     widget.provider.orchestrator.removeListener(_onOrchestratorChanged);
     widget.provider.matrix.removeListener(_onMatrixChanged);
+    nc.NotificationCenter.removeObserver(nc.Event.capabilityConfirm, callback: _onCapabilityConfirm);
     super.dispose();
+  }
+
+  void _onCapabilityConfirm(Map<String, dynamic>? data) {
+    if (!mounted) return;
+    final capId = data?['capabilityId'] as String? ?? '';
+    if (data?['pending'] == true) {
+      showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text(localeProvider.t('capability_confirm_title')),
+          content: Text('${localeProvider.t('capability_confirm_msg')} $capId'),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(localeProvider.t('deny'))),
+            FilledButton(onPressed: () => Navigator.pop(ctx, true), child: Text(localeProvider.t('allow'))),
+          ],
+        ),
+      ).then((granted) {
+        nc.NotificationCenter.post(nc.Event.capabilityConfirm, data: {'granted': granted ?? false});
+      });
+    }
   }
 
   void _onOrchestratorChanged() {
@@ -260,6 +282,8 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
           WidgetsBinding.instance.addPostFrameCallback((_) { if (mounted) _openDrawer(); });
         }
         return GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
           onHorizontalDragStart: (d) => _swipeStartX = d.globalPosition.dx,
           onHorizontalDragEnd: (d) {
             final dx = d.globalPosition.dx - _swipeStartX;
@@ -304,9 +328,9 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                               hasSentMessage: _hasSentMessage,
                               isListening: _isListening,
                               isEditing: _editingIndex >= 0,
-                              showCopied: _showCopied,
                               isIncognito: widget.provider.navigation.isIncognito,
                               isFriendChat: _isFriendChat,
+                              isGenerating: !widget.provider.orchestrator.isIdle,
                               maxWidth: contentWidth,
                               onSend: _sendMessage,
                               onToggleListening: _toggleListening,
@@ -316,6 +340,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                               onShowModels: _showModelsSheet,
                               onOpenVoice: () => widget.provider.navigation.setCurrentView(ViewState.voice),
                               onChanged: () => setState(() {}),
+                              onStopGeneration: () => widget.provider.orchestrator.interrupt(),
                             ),
                         ],
                       ],
@@ -367,6 +392,11 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
           onDelete: () => _deleteMessagePair(index),
           onReport: () => _reportNotHelpful(index),
         ),
+        onMessageLongPress: (index) => HomeDialogs.showMoreMenu(context, _messages[index].content, index,
+          onEdit: () => _editQuery(index),
+          onDelete: () => _deleteMessagePair(index),
+          onReport: () => _reportNotHelpful(index),
+        ),
       );
     }
     if (widget.provider.navigation.isIncognito) {
@@ -401,7 +431,8 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
 
   void _deleteMessagePair(int index) {
     if (index <= 0 || index >= _messages.length) return;
-    setState(() { _messages.removeAt(index); _messages.removeAt(index - 1); _editingIndex = -1; _maxScrollOffset = 0; });
+    widget.provider.orchestrator.deleteMessagePair(index);
+    setState(() { _editingIndex = -1; _maxScrollOffset = 0; });
     widget.provider.session.saveCurrentSession();
   }
 
@@ -419,14 +450,17 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
       if (orchMsgs[i].role == 'user') { lastUserMsg = orchMsgs[i].content; break; }
     }
     if (lastUserMsg == null) return;
-    orchestrator.clearConversation();
+    if (orchMsgs.isNotEmpty && orchMsgs.last.role == 'assistant') {
+      orchestrator.deleteMessagePair(orchMsgs.length - 1);
+    }
     orchestrator.sendMessage(lastUserMsg);
   }
 
   void _copyContent(String content) {
     Clipboard.setData(ClipboardData(text: content));
-    setState(() => _showCopied = true);
-    Future.delayed(const Duration(seconds: 2), () { if (mounted) setState(() => _showCopied = false); });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(t('copied')), backgroundColor: AppColors.accent, duration: const Duration(milliseconds: 1500)),
+    );
   }
 
   void _speakLastResponse() {
@@ -462,7 +496,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
 
   void _openNotifications() {
     _closeDrawer();
-    Navigator.push(context, MaterialPageRoute(builder: (_) => NotificationView(provider: widget.provider)));
+    nav.AppNavigator.go(context, '/notifications');
   }
 
   void _toggleFavorite() {

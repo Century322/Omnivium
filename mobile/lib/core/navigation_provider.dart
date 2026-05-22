@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum ViewState { home, voice, discover, settings, library, search }
+enum ViewState { home, voice, discover, settings, search }
 
 class NavigationProvider extends ChangeNotifier {
   ViewState _currentView = ViewState.home;
@@ -48,6 +48,13 @@ class NavigationProvider extends ChangeNotifier {
   void clearDrawerFlag() {
     _shouldShowDrawerAfterSettings = false;
     if (!_disposed) notifyListeners();
+  }
+
+  void goBack() {
+    if (_currentView != ViewState.home) {
+      _currentView = ViewState.home;
+      if (!_disposed) notifyListeners();
+    }
   }
 
   @override

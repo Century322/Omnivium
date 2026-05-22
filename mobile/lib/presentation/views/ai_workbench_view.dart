@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -338,6 +338,8 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView> with SingleTickerProv
           final tpl = templates[index];
           final isSelected = _selectedTemplate?.id == tpl.id;
           return Semantics(label: t(tpl.nameKey), button: true, child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
             onTap: () {
               setState(() => _selectedTemplate = tpl);
               _inputController.text = tpl.userPromptTemplate;
@@ -415,16 +417,20 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView> with SingleTickerProv
                   const Spacer(),
                   if (!_isGenerating && _generatedContent.isNotEmpty) ...[
                     Semantics(label: localeProvider.t('copy'), child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
                       onTap: () {
                         Clipboard.setData(ClipboardData(text: _generatedContent));
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(t('copied')), backgroundColor: AppColors.accent, duration: const Duration(seconds: 1)),
+                          SnackBar(content: Text(t('copied')), backgroundColor: AppColors.accent, duration: const Duration(milliseconds: 1500)),
                         );
                       },
                       child: Icon(LucideIcons.copy, size: 16, color: AppColors.textSecondary(context)),
                     )),
                     const SizedBox(width: 12),
                     Semantics(label: localeProvider.t('share'), child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
                       onTap: () => SharePlus.instance.share(ShareParams(text: _generatedContent)),
                       child: Icon(LucideIcons.share2, size: 16, color: AppColors.textSecondary(context)),
                     )),
@@ -485,6 +491,8 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView> with SingleTickerProv
                     filled: true,
                     fillColor: AppColors.sf(context),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                    focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   ),
                 ),
@@ -493,6 +501,8 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView> with SingleTickerProv
             const SizedBox(width: 8),
             if (_isGenerating)
               Semantics(label: localeProvider.t('stop_generating'), child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
                 onTap: _stopGeneration,
                 child: Container(
                   width: 44,
@@ -506,6 +516,8 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView> with SingleTickerProv
               ))
             else
               Semantics(label: localeProvider.t('send'), child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
                 onTap: _generate,
                 child: Container(
                   width: 44,

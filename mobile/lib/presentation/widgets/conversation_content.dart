@@ -21,6 +21,7 @@ class ConversationContent extends StatelessWidget {
   final VoidCallback onSpeak;
   final ValueChanged<String> onShare;
   final void Function(String content, int index) onMore;
+  final void Function(int index)? onMessageLongPress;
 
   const ConversationContent({
     super.key,
@@ -37,6 +38,7 @@ class ConversationContent extends StatelessWidget {
     required this.onSpeak,
     required this.onShare,
     required this.onMore,
+    this.onMessageLongPress,
   });
 
   @override
@@ -72,6 +74,8 @@ class ConversationContent extends StatelessWidget {
                 right: 20,
                 bottom: 8,
                 child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
                   onTap: onScrollToLatest,
                   child: Container(
                     width: 36,
@@ -100,7 +104,7 @@ class ConversationContent extends StatelessWidget {
       final msg = messages[i];
       final isLastUser = msg.role == 'user' && i == messages.length - 2;
       if (msg.role == 'user') {
-        items.add(ListItemData(UserBubble(content: msg.content, key: isLastUser ? lastUserBubbleKey : null), 12));
+        items.add(ListItemData(UserBubble(content: msg.content, key: isLastUser ? lastUserBubbleKey : null, onLongPress: onMessageLongPress != null ? () => onMessageLongPress!(i) : null), 12));
       } else {
         if (msg.thoughts.isNotEmpty) {
           items.add(ListItemData(ThoughtChainPanel(
@@ -109,7 +113,7 @@ class ConversationContent extends StatelessWidget {
             onToggle: () => onToggleThought(i),
           ), 4));
         }
-        items.add(ListItemData(AiTextBubble(content: msg.content, isStreaming: msg.isStreaming), 12));
+        items.add(ListItemData(AiTextBubble(content: msg.content, isStreaming: msg.isStreaming, onLongPress: onMessageLongPress != null ? () => onMessageLongPress!(i) : null), 12));
         final isLastAi = i == messages.length - 1 && !msg.isStreaming;
         if (isLastAi) {
           items.add(ListItemData(AiActionRow(

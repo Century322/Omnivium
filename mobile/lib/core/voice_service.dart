@@ -111,6 +111,10 @@ class VoiceService {
     await prefs.setString('omnivium_stt_engine', engine.name);
   }
 
+  void setSttEngine(String name) {
+    _sttEngine = STTEngine.values.where((e) => e.name == name).firstOrNull ?? STTEngine.system;
+  }
+
   Future<void> setTTSVoice(TTSVoice voice) async {
     _ttsVoice = voice;
     final prefs = await SharedPreferences.getInstance();
@@ -121,6 +125,10 @@ class VoiceService {
     _voiceMode = mode;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('omnivium_voice_mode', mode.name);
+  }
+
+  void setVoiceModeByName(String name) {
+    _voiceMode = VoiceMode.values.where((e) => e.name == name).firstOrNull ?? VoiceMode.handsFree;
   }
 
   Future<bool> startListening() async {

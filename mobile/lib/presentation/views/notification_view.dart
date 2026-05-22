@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../theme/app_colors.dart';
 import '../../presentation/utils/format_utils.dart';
@@ -19,9 +19,22 @@ class NotificationView extends StatelessWidget {
         leading: IconButton(tooltip: localeProvider.t('back'), icon: Icon(LucideIcons.arrowLeft, color: AppColors.sec(context)), onPressed: () => Navigator.pop(context)),
         title: Text(t('notification_center'), style: TextStyle(color: AppColors.textPrimary(context), fontSize: 18, fontWeight: FontWeight.w600)),
         actions: [
-          if (provider.notification.notifications.isNotEmpty)
+          if (provider.notification.notifications.isNotEmpty) ...[
             TextButton(onPressed: () => provider.notification.markAllAsRead(),
               child: Text(t('mark_all_read'), style: TextStyle(color: AppColors.accent, fontSize: 13))),
+            TextButton(onPressed: () {
+              showDialog(context: context, builder: (_) => AlertDialog(
+                backgroundColor: AppColors.sf(context), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                title: Text(t('clear_all'), style: TextStyle(color: AppColors.textPrimary(context))),
+                content: Text(t('clear_all_confirm'), style: TextStyle(color: AppColors.textSecondary(context))),
+                actions: [
+                  TextButton(onPressed: () => Navigator.pop(context), child: Text(t('cancel'))),
+                  FilledButton(style: FilledButton.styleFrom(backgroundColor: AppColors.dng(context)),
+                    onPressed: () { provider.notification.clear(); Navigator.pop(context); }, child: Text(t('clear'))),
+                ],
+              ));
+            }, child: Text(t('clear_all'), style: TextStyle(color: AppColors.dng(context), fontSize: 13))),
+          ],
         ],
       ),
       body: _buildBody(context, t),
@@ -48,13 +61,18 @@ class NotificationView extends StatelessWidget {
   Widget _buildNotificationTile(BuildContext context, AppNotification notif) {
     final icon = notif.type == NotificationType.message ? LucideIcons.messageCircle : notif.type == NotificationType.invite ? LucideIcons.userPlus : LucideIcons.bell;
     final iconColor = notif.read ? AppColors.iconGray(context) : AppColors.accent;
-    return Dismissible(
+    return Semantics(
+      button: true,
+      label: '${notif.title}${notif.body.isNotEmpty ? ', ${notif.body}' : ''}${notif.read ? '' : ', unread'}',
+      child: Dismissible(
       key: Key(notif.id), direction: DismissDirection.endToStart,
       onDismissed: (_) => provider.notification.remove(notif.id),
       background: Container(alignment: Alignment.centerRight, padding: const EdgeInsets.only(right: 20),
         decoration: BoxDecoration(color: AppColors.dng(context).withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12)),
         child: Icon(LucideIcons.trash2, color: AppColors.dng(context), size: 20)),
       child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
         onTap: () => provider.notification.markAsRead(notif.id),
         child: Container(padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(color: notif.read ? AppColors.sf(context) : AppColors.sfAlt(context), borderRadius: BorderRadius.circular(12),
@@ -73,6 +91,7 @@ class NotificationView extends StatelessWidget {
             ])),
             if (!notif.read) ...[const SizedBox(width: 8), Container(width: 8, height: 8, decoration: BoxDecoration(color: AppColors.accent, borderRadius: BorderRadius.circular(4)))],
           ])),
+      ),
       ),
     );
   }

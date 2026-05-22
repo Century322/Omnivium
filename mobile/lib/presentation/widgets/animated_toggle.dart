@@ -54,6 +54,8 @@ class _AnimatedToggleState extends State<AnimatedToggle> with SingleTickerProvid
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
       onTap: () { HapticService.toggleSwitch(); widget.onChanged(!widget.enabled); },
       child: Semantics(
         toggled: widget.enabled,

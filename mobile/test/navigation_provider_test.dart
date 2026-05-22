@@ -162,12 +162,12 @@ void main() {
     test('all ViewState values exist', () {
       expect(ViewState.values, containsAll([
         ViewState.home, ViewState.voice, ViewState.discover,
-        ViewState.settings, ViewState.library, ViewState.search,
+        ViewState.settings, ViewState.search,
       ]));
     });
 
-    test('ViewState has exactly 6 values', () {
-      expect(ViewState.values.length, 6);
+    test('ViewState has exactly 5 values', () {
+      expect(ViewState.values.length, 5);
     });
 
     test('all ViewState values are distinct', () {

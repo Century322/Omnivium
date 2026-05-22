@@ -1,6 +1,7 @@
 import 'app_logger.dart';
 import 'dart:convert';
 import 'database_service.dart';
+import 'supabase_sync_service.dart';
 
 enum NoteType { text, todo, schedule }
 
@@ -105,11 +106,60 @@ class NoteService {
       }
     }
     _initialized = true;
+    await _mergeCloudNotes();
+  }
+
+  Future<void> _mergeCloudNotes() async {
+    final sync = SupabaseSyncService.instance;
+    if (!sync.isAvailable) return;
+    try {
+      final cloudNotes = await sync.fetchNotes();
+      final db = DatabaseService.instance;
+      for (final cloud in cloudNotes) {
+        final id = cloud['id'] as String?;
+        if (id == null) continue;
+        final localIdx = _items.indexWhere((n) => n.id == id);
+        if (localIdx < 0) {
+          try {
+            _items.add(NoteItem.fromJson(cloud));
+          } catch (_) {}
+        } else {
+          final cloudUpdated = cloud['updated_at'] as String?;
+          final localUpdated = _items[localIdx].updatedAt.toIso8601String();
+          if (cloudUpdated != null && cloudUpdated.compareTo(localUpdated) > 0) {
+            try {
+              _items[localIdx] = NoteItem.fromJson(cloud);
+            } catch (_) {}
+          }
+        }
+      }
+      await db.data.put(_boxKey, jsonEncode(_items.map((n) => n.toJson()).toList()));
+    } catch (e) {
+      AppLogger.instance.info('Cloud notes merge failed: $e');
+    }
   }
 
   Future<void> _save() async {
     final db = DatabaseService.instance;
     await db.data.put(_boxKey, jsonEncode(_items.map((n) => n.toJson()).toList()));
+    _syncAllToCloud();
+  }
+
+  void _syncAllToCloud() {
+    final sync = SupabaseSyncService.instance;
+    if (!sync.isAvailable) return;
+    for (final item in _items) {
+      sync.upsertNote({
+        'id': item.id,
+        'title': item.title,
+        'content': item.content,
+        'type': item.type.name,
+        'is_done': item.isDone,
+        'due_date': item.dueDate?.toIso8601String(),
+        'created_at': item.createdAt.toIso8601String(),
+        'updated_at': item.updatedAt.toIso8601String(),
+      });
+    }
   }
 
   Future<void> addItem(NoteItem item) async {

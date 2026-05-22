@@ -1,12 +1,12 @@
-﻿import '../../core/app_logger.dart';
+import '../../core/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../theme/app_colors.dart';
 import '../theme/locale_provider.dart';
 import '../widgets/skeleton_loader.dart';
 import '../../core/app_provider.dart';
+import '../../core/app_navigator.dart';
 import '../../core/database_service.dart';
-import 'file_manager_view.dart';
 
 class StorageView extends StatefulWidget {
   final AppProvider provider;
@@ -98,13 +98,13 @@ class _StorageViewState extends State<StorageView> {
                   const SizedBox(height: 24),
                   _buildSection(context, t('chat_data'), [
                     _buildStorageItem(context, LucideIcons.messageCircle, t('chat_messages'), t('chat_messages_desc'), _formatSize(_chatDataSize * 0.6),
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => FileManagerView(provider: widget.provider, initialTab: 2)))),
+                      onTap: () => AppNavigator.go(context, '/files', args: {'tab': 2})),
                     _buildStorageItem(context, LucideIcons.image, t('images'), t('images_desc'), _formatSize(_chatDataSize * 0.25),
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => FileManagerView(provider: widget.provider, initialTab: 0)))),
+                      onTap: () => AppNavigator.go(context, '/files', args: {'tab': 0})),
                     _buildStorageItem(context, LucideIcons.file, t('files'), t('files_desc'), _formatSize(_chatDataSize * 0.15),
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => FileManagerView(provider: widget.provider, initialTab: 2)))),
+                      onTap: () => AppNavigator.go(context, '/files', args: {'tab': 2})),
                     _buildStorageItem(context, LucideIcons.video, t('videos'), t('videos_desc'), '0 MB',
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => FileManagerView(provider: widget.provider, initialTab: 1)))),
+                      onTap: () => AppNavigator.go(context, '/files', args: {'tab': 1})),
                   ]),
                   const SizedBox(height: 20),
                   _buildSection(context, t('ai_data'), [

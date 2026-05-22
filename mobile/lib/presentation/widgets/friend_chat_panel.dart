@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -50,6 +51,7 @@ class _FriendChatPanelState extends State<FriendChatPanel> with TickerProviderSt
   bool _isOtherTyping = false;
   bool _isListening = false;
   Future<CachedPresence?>? _presenceFuture;
+  Timer? _presenceTimer;
 
   late AnimationController _listeningGlow;
 
@@ -62,12 +64,16 @@ class _FriendChatPanelState extends State<FriendChatPanel> with TickerProviderSt
     );
     widget.provider.matrix.addListener(_onMatrixChanged);
     _presenceFuture = _getPresence();
+    _presenceTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+      if (mounted) setState(() { _presenceFuture = _getPresence(); });
+    });
     _loadMatrixMessages(widget.chatTargetId);
     _markRoomAsRead(widget.chatTargetId);
   }
 
   @override
   void dispose() {
+    _presenceTimer?.cancel();
     _textController.dispose();
     _focusNode.dispose();
     _scrollController.dispose();
@@ -254,6 +260,9 @@ class _FriendChatPanelState extends State<FriendChatPanel> with TickerProviderSt
               onTap: () {
                 Navigator.pop(context);
                 Clipboard.setData(ClipboardData(text: msg.content));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(t('copied')), backgroundColor: AppColors.accent, duration: const Duration(milliseconds: 1500)),
+                );
               },
             ),
             if (msg.isMe) ListTile(
@@ -349,6 +358,8 @@ class _FriendChatPanelState extends State<FriendChatPanel> with TickerProviderSt
 
   Widget _plusMenuItem(IconData icon, String label, {VoidCallback? onTap}) {
     return GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
       onTap: onTap ?? () => Navigator.pop(context),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -660,6 +671,8 @@ class _FriendChatPanelState extends State<FriendChatPanel> with TickerProviderSt
                                 filled: true,
                                 fillColor: AppColors.sf(context),
                                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
                                 contentPadding: const EdgeInsets.symmetric(vertical: 10),
                               ),
                               onChanged: (_) => setModalState(() {}),
@@ -787,6 +800,8 @@ class _FriendChatPanelState extends State<FriendChatPanel> with TickerProviderSt
           child: Row(
             children: [
               GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
                 onTap: widget.onClose,
                 child: Container(
                   width: 32,
@@ -831,6 +846,8 @@ class _FriendChatPanelState extends State<FriendChatPanel> with TickerProviderSt
                   final room = widget.chatTargetId.isNotEmpty ? widget.provider.matrix.client?.getRoomById(widget.chatTargetId) : null;
                   final isEncrypted = room?.encrypted ?? false;
                   return GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
                     onTap: _showEncryptionInfo,
                     child: Icon(
                       isEncrypted ? LucideIcons.shieldCheck : LucideIcons.shieldAlert,
@@ -842,6 +859,8 @@ class _FriendChatPanelState extends State<FriendChatPanel> with TickerProviderSt
               ),
               const SizedBox(width: 12),
               GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
                 onTap: () => _showFriendChatMenu(context),
                 child: Container(
                   width: 32,
@@ -873,6 +892,8 @@ class _FriendChatPanelState extends State<FriendChatPanel> with TickerProviderSt
           child: Align(
             alignment: msg.isMe ? Alignment.centerRight : Alignment.centerLeft,
             child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
               onLongPress: msg.isMe ? () => _showMessageActions(i) : null,
               child: Container(
                 constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
@@ -898,19 +919,24 @@ class _FriendChatPanelState extends State<FriendChatPanel> with TickerProviderSt
                       )),
                       _buildLinkPreviews(msg.content),
                     ],
-                    if (msg.isMe && isLast) ...[
+                    if (msg.isMe) ...[
                       const SizedBox(height: 4),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(LucideIcons.checkCheck, size: 14, color: AppColors.accent.withValues(alpha: 0.7)),
-                          const SizedBox(width: 3),
-                          Text(t('read'), style: TextStyle(color: AppColors.accent.withValues(alpha: 0.7), fontSize: 11)),
-                        ],
-                      ),
-                    ] else if (msg.isMe) ...[
-                      const SizedBox(height: 4),
-                      Icon(LucideIcons.check, size: 14, color: AppColors.iconGray(context)),
+                      Builder(builder: (ctx) {
+                        final client = widget.provider.matrix.client;
+                        final room = client?.getRoomById(widget.chatTargetId);
+                        final isRead = room != null && room.notificationCount == 0;
+                        if (isRead) {
+                          return Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(LucideIcons.checkCheck, size: 14, color: AppColors.acc(context).withValues(alpha: 0.7)),
+                              const SizedBox(width: 3),
+                              Text(t('read'), style: TextStyle(color: AppColors.acc(context).withValues(alpha: 0.7), fontSize: 11)),
+                            ],
+                          );
+                        }
+                        return Icon(LucideIcons.check, size: 14, color: AppColors.iconGray(context));
+                      }),
                     ],
                   ],
                 ),
@@ -929,6 +955,8 @@ class _FriendChatPanelState extends State<FriendChatPanel> with TickerProviderSt
     return ClipRRect(
       borderRadius: BorderRadius.circular(18),
       child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
         onTap: () {
           if (httpUrl != null) {
             Navigator.push(context, MaterialPageRoute(builder: (_) => ImageViewer(imageUrl: httpUrl)));
@@ -943,6 +971,8 @@ class _FriendChatPanelState extends State<FriendChatPanel> with TickerProviderSt
 
   Widget _buildFileBubble(FriendMessageData msg) {
     return GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
       onTap: () async {
         HapticService.lightImpact();
         final url = msg.url ?? '';
@@ -991,7 +1021,12 @@ class _FriendChatPanelState extends State<FriendChatPanel> with TickerProviderSt
             builder: (context, _) {
               final g = _listeningGlow.value;
               final glowShadows = _buildGlowShadows(g);
-              final borderColor = g > 0.5 ? AppColors.accent : AppColors.divider(context);
+              final isFocused = _focusNode.hasFocus;
+              final borderColor = isFocused
+                  ? AppColors.accent
+                  : g > 0.5
+                      ? AppColors.accent.withValues(alpha: 0.3)
+                      : AppColors.divider(context);
               return Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(28),
@@ -1022,6 +1057,8 @@ class _FriendChatPanelState extends State<FriendChatPanel> with TickerProviderSt
                             labelText:  t('input_message'),
                             hintStyle: TextStyle(color: AppColors.textHint(context), fontWeight: FontWeight.w500),
                             border: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                enabledBorder: InputBorder.none,
                             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                           ),
                           maxLines: null,
@@ -1051,6 +1088,8 @@ class _FriendChatPanelState extends State<FriendChatPanel> with TickerProviderSt
                 scale: anim, child: FadeTransition(opacity: anim, child: child)),
             child: _isListening
                 ? GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
                     key: const ValueKey('stop'),
                     onTap: _toggleListening,
                     child: Semantics(
@@ -1086,6 +1125,8 @@ class _FriendChatPanelState extends State<FriendChatPanel> with TickerProviderSt
             },
             child: _isListening
                 ? GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
                     key: const ValueKey('confirm'),
                     onTap: _toggleListening,
                     child: Container(
@@ -1104,6 +1145,8 @@ class _FriendChatPanelState extends State<FriendChatPanel> with TickerProviderSt
                     ),
                     const SizedBox(width: 6),
                     GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
                       onTap: hasText ? _sendFriendMessage : () {},
                       child: Semantics(
                         button: true,
@@ -1130,6 +1173,8 @@ class _FriendChatPanelState extends State<FriendChatPanel> with TickerProviderSt
 
   Widget _circleBtn(IconData icon, {VoidCallback? onTap}) {
     return GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: Container(
         width: 32,

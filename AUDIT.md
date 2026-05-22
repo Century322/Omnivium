@@ -1,6 +1,6 @@
 # Omnivium 项目进度与审查报告
 
-> 最后更新：2026-05-16 | 版本：4.0 | 本文档是项目唯一进度追踪源
+> 最后更新：2026-05-21 | 版本：7.0 | 本文档是项目唯一进度追踪源
 
 ---
 
@@ -14,9 +14,10 @@
 | 包名 | com.omnivium.mobile |
 | 规划页面 | 40+ 页面 |
 | 已实现页面 | 26 个视图 |
-| 整体完成度 | ~65%（按上架标准） |
+| 整体完成度 | ~80%（按上架标准） |
 | flutter analyze | ✅ 0 Error |
-| 国际化 | ✅ ARB/l10n 官方方案，417 key，4 语言 |
+| flutter test | ✅ 1031 通过 |
+| 国际化 | ✅ ARB/l10n 官方方案，420+ key，4 语言 |
 
 ### 已实现的核心能力
 
@@ -34,7 +35,6 @@
 - 安全存储（flutter_secure_storage，API Key / Token 加密存储）
 - 运行时权限管理（permission_handler）
 - 隐私同意流程（PrivacyConsentService + 版本化同意机制）
-- 链接预览（OG 标签抓取 + 缓存 + 预览卡片）
 - 视频播放器（media_kit 集成，支持本地/网络视频）
 - 快捷指令管理（自定义添加/编辑/删除/排序/分类，Hive 持久化）
 - AI 生成工作台（8 种模板，流式生成，多模型切换）
@@ -42,10 +42,14 @@
 - 笔记/待办（note_service + productivity_view）
 - Agent Replay（agent_replay_view）
 - 错误上报（Sentry + AppLogger 结构化日志）
-- 推送通知（Firebase FCM + 本地通知）
-- Supabase 集成（Auth + 数据同步）
-- 证书固定框架（NetworkSecurityService + Trust-on-first-use）
-- 魔法数字可配置（RemoteConfigService）
+- 推送通知（Firebase FCM + 本地通知 + 推送载荷加密）
+- Supabase 集成（Auth + 数据同步 + 云端合并）
+- 应用层加密（AES-256-GCM 请求/响应加密）
+- 两步验证（TOTP，Google Authenticator 兼容）
+- 证书固定框架（NetworkSecurityService + 动态远程 pin）
+- HMAC 请求签名 + 时间戳防重放
+- 多端点故障转移（连续3次失败自动切换备用后端）
+- 429 限流友好处理（RateLimitException + 用户提示）
 
 ---
 
@@ -61,11 +65,11 @@
 | 4 | API Key 安全存储 | ✅ 完成 | SecureStorageService |
 | 5 | 启动页品牌化 | ✅ 完成 | Android 深色背景 + 居中图标 |
 | 6 | 引导页 Onboarding | ✅ 完成 | 隐私同意流程 |
-| 7 | 推送通知基础 | ✅ 完成 | Firebase FCM + 本地通知 |
+| 7 | 推送通知基础 | ✅ 完成 | Firebase FCM + 本地通知 + 推送加密 |
 | 8 | 隐私合规 | ✅ 完成 | PrivacyConsentService + 版本化同意 |
 | 9 | permission_handler | ✅ 完成 | PermissionService |
-| 10 | 应用图标 (App Icon) | ⚠️ 默认 | 需品牌 Logo 设计后替换（见 MANUAL_SETUP.md） |
-| 11 | 开发者账号与发布配置 | ❌ 待办 | 需注册（见 MANUAL_SETUP.md） |
+| 10 | 应用图标 (App Icon) | ⚠️ 默认 | 需品牌 Logo 设计后替换 |
+| 11 | 开发者账号与发布配置 | ❌ 待办 | 需注册 |
 
 ### 🟠 P1 — 核心体验（7/10 完成）
 
@@ -95,14 +99,14 @@
 | 7 | 广场/内容模块 | ⏸️ 暂缓 | 依赖后端 API |
 | 8 | 主动提醒系统 | ❌ 缺失 | Agent 主动推送 |
 
-### 🔵 P3 — 工程质量（5/13 完成）
+### 🔵 P3 — 工程质量（6/13 完成）
 
 | # | 任务 | 状态 | 说明 |
 |---|------|------|------|
 | 1 | 测试体系 | ⚠️ 10 个测试文件 | 需要全覆盖 |
 | 2 | HomeView 巨型文件 | ⚠️ 输入区已拆出 | 仍需继续拆分 |
 | 3 | 统一 SessionManager | ⚠️ 已实现未接入 | |
-| 4 | 路由系统 | ❌ 缺失 | 无命名路由/路由守卫 |
+| 4 | 路由系统 | ✅ 完成 | AppNavigator 统一导航 + 深链接 + 路由守卫 |
 | 5 | 状态管理规范化 | ⚠️ 混用 | 全局变量 + ChangeNotifier |
 | 6 | 国际化重构 | ✅ 完成 | 已迁移到 Flutter 官方 gen_l10n + ARB |
 | 7 | 错误上报 | ✅ 完成 | Sentry + AppLogger |
@@ -123,11 +127,26 @@
 | S2 | Matrix Token 明文存储 | 🔴 高 | ✅ 已修复 | SecureStorage |
 | S3 | Synapse 注册共享密钥硬编码 | 🔴 高 | ❌ 待修 | homeserver.yaml |
 | S4 | 开放无验证注册 | 🟠 中 | ❌ 待修 | 无 CAPTCHA |
-| S5 | HTTP 通信 | 🟠 中 | ✅ 已修复 | AndroidManifest 禁止明文 |
-| S6 | 无证书锁定 | 🟡 低 | ⚠️ 框架就绪 | NetworkSecurityService 已实现，需预置哈希 |
+| S5 | HTTP 通信 | 🟠 中 | ✅ 已修复 | AndroidManifest 禁止明文 + 应用层 AES-256-GCM 加密 |
+| S6 | 无证书锁定 | 🟡 低 | ⚠️ 框架就绪 | 假hash已清除，待部署后配置真实hash，后端已有 /config/ssl-pins 端点 |
 | S7 | 无输入验证 | 🟠 中 | ❌ 待修 | XSS / 注入过滤 |
 | S8 | Sentry DSN 硬编码 | 🟡 低 | ⚠️ 可接受 | DSN 是公开的，但可能被滥用 |
 | S9 | workers.dev 开发域名 | 🟠 中 | ❌ 待修 | 需换为 api.omnivium.app |
+
+### 已完成安全加固
+
+| 修复 | 说明 |
+|------|------|
+| Matrix Token 验证 | worker.js 新增 verifyMatrixToken()，向 Matrix 服务器验证 token 有效性，缓存5分钟 |
+| JWT 降级漏洞 | 无公钥时直接拒绝，不再跳过签名验证 |
+| HMAC 请求签名 | 客户端每个请求带 X-Timestamp + X-Request-Signature，服务端验证时间戳±5分钟，无时间戳直接拒绝 |
+| SSL Pinning 假hash | 清除伪造的证书指纹，无有效pin时不启用pinning，后端新增 /config/ssl-pins 端点 |
+| 429 限流处理 | 新增 RateLimitException，读取 Retry-After 头，聊天气泡显示友好等待时间 |
+| 应用层加密 | AES-256-GCM 加密请求/响应体，密钥存 SecureStorage，首次生成同步到后端 |
+| 两步验证 | TOTP（Google Authenticator 兼容），登录后验证码输入 |
+| 数据云端同步 | SupabaseSyncService 接入 SessionProvider/NoteService，Matrix userId 关联，增量合并 |
+| 多端点故障转移 | 连续3次失败自动切换备用后端，成功时重置计数 |
+| 推送加密 | FCM 推送载荷加密，客户端收到后解密再显示 |
 
 ---
 
@@ -165,7 +184,8 @@
 | supabase_flutter | ^2.8.4 | Supabase 认证+数据 |
 | sentry_flutter | ^8.13.0 | 错误上报 |
 | app_links | ^6.3.3 | 深度链接 |
-| crypto | ^3.0.5 | 加密工具 |
+| crypto | ^3.0.5 | HMAC/SHA 加密工具 |
+| encrypt | ^5.0.3 | AES-256-GCM 加密 |
 | sqflite | ^2.4.1 | SQLite 数据库 |
 | flutter_vodozemac | ^0.5.0 | Matrix E2EE 加密 |
 
@@ -185,6 +205,16 @@ session_manager.dart 已实现但未在主流程中使用。
 ### 5.4 测试覆盖不足
 10 个测试文件存在，但核心逻辑（Agent、AI Provider、Matrix）缺少测试。
 
+### 5.5 死代码（已清理）
+- ~~`local_memory_manager.dart` / `memory_manager.dart`~~ — 已删除
+- ~~`ab_test_service.dart`~~ — 已删除
+- ~~`offline_service.dart`~~ — 已删除
+- ~~`performance_monitor_service.dart`~~ — 已删除
+- ~~`crash_recovery_service.dart`~~ — 已删除
+- ~~`speech_service.dart`~~ — 已删除（合并到 VoiceService）
+- `agent_memory_service.dart` / `embedding_service.dart` — 已接入 orchestrator
+- `link_preview_service.dart` — Card 组件已使用
+
 ---
 
 ## 六、统计
@@ -194,12 +224,54 @@ session_manager.dart 已实现但未在主流程中使用。
 | 🔴 P0 上架必需 | 11 | 9 | 2 |
 | 🟠 P1 核心体验 | 10 | 7 | 3 |
 | 🟡 P2 重要功能 | 8 | 7 | 1 |
-| 🔵 P3 工程质量 | 13 | 5 | 8 |
+| 🔵 P3 工程质量 | 13 | 6 | 7 |
 | 🟣 P4 体验优化 | 11 | 0 | 11 |
-| **总计** | **53** | **28** | **25** |
+| **总计** | **53** | **29** | **24** |
 
 | 安全风险 | 总数 | 已修复 | 待修复 |
 |----------|------|--------|--------|
 | 🔴 高 | 3 | 2 | 1 |
 | 🟠 中 | 4 | 1 | 3 |
 | 🟡 低 | 2 | 0 | 2 |
+
+---
+
+## 七、2026-05-21 修复记录
+
+### 已修复的严重 Bug（原 AUDIT_ISSUES.md）
+
+| # | Bug | 修复内容 |
+|---|-----|---------|
+| 1 | SovereignIdentity 签名验证不工作 | signingKey 不再截断为16位；verifyCredential 改用 issuerPublicKey 验证 verificationTag |
+| 2 | VerifiableCredential.verifyCredential 需要签发者私钥 | 改为只需 issuerPublicKey（公开信息） |
+| 3 | ConstitutionalGuard enableLegislature 没赋值 | 已确认代码中有 `_legislature = legislature`，文档描述不准确 |
+| 4 | ConstitutionalGuard 默认构造函数实例不共享 | 所有子系统现在共享 traceGraph 和 ledger |
+| 5 | CapabilityRouter.invoke 不强制超时 | 添加 `.timeout(binding.timeoutMs)` |
+| 6 | AuthService 硬编码 Supabase Anon Key | 保留（开发阶段可接受，上架前需配置环境变量） |
+
+### 已修复的铁律违规
+
+| 铁律 | 修复内容 |
+|------|---------|
+| 2. Everything Is Message | RuntimeContainer.sendMessage() 统一消息入口 + EventBus handler 10s 超时 |
+| 4. Failure Is Normal | CapabilityRouter 强制超时 + EventBus handler 超时 → 死信队列 |
+| 5. Distributed First | RuntimeMessage 加 scope; RuntimeStream 加 version+source+scope; RuntimeTask 加 version+source+scope |
+| 6. Runtime Owns Time | CapabilityRouter.invoke 强制 timeout |
+
+### 已清理的死代码（7 个文件，~1429 行）
+
+- offline_service.dart、ab_test_service.dart、performance_monitor_service.dart、crash_recovery_service.dart、local_memory_manager.dart、memory_manager.dart、speech_service.dart
+
+### 已统一的冗余系统
+
+| 系统 | 旧 | 新 | 处理 |
+|------|-----|-----|------|
+| 语音 | SpeechService（云端） | VoiceService | SpeechService 合并到 VoiceService |
+| 签名 | 5处 DJB2 + 1处 HMAC | 统一 HMAC-SHA256 | 已统一 |
+| 记忆 | LocalMemoryManager | AgentMemoryService | 旧版已删除 |
+
+### 已修复的其他问题
+
+- Runtime 层和应用层连接：AgentOrchestrator 现在通过 AppCapabilityService 走 CapabilityRouter
+- 立法系统装饰性：RuntimeConstitution.laws 改为可变 List，新增 addAmendment/removeAmendment
+- HomeView 行数：已从 3200+ 降到 588 行

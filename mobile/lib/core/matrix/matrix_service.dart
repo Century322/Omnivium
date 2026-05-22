@@ -7,6 +7,8 @@ import '../auth_service.dart';
 import '../vodozemac_init.dart';
 import '../secure_storage_service.dart';
 
+import '../identity_bridge.dart';
+
 class MatrixService {
   static final MatrixService _instance = MatrixService._();
   static MatrixService get instance => _instance;
@@ -61,6 +63,12 @@ class MatrixService {
 
   Future<Client> _createClient(String homeserverUrl) async {
     return await _lock.synchronized(() async {
+      if (_client != null) {
+        final currentHomeserver = _client!.homeserver?.toString();
+        if (currentHomeserver == homeserverUrl || currentHomeserver == '$homeserverUrl/') {
+          return _client!;
+        }
+      }
       await _closeDatabase();
 
       final client = Client(
@@ -83,6 +91,18 @@ class MatrixService {
     );
     await _saveCredentials(client);
     client.backgroundSync = true;
+    await IdentityBridge.instance.onMatrixLinked(client.userID ?? '');
+  }
+
+  Future<void> loginWithToken(String token, String homeserverUrl) async {
+    final client = await _createClient(homeserverUrl);
+    await client.login(
+      LoginType.mLoginToken,
+      token: token,
+    );
+    await _saveCredentials(client);
+    client.backgroundSync = true;
+    await IdentityBridge.instance.onMatrixLinked(client.userID ?? '');
   }
 
   Future<void> register(String username, String password, String homeserverUrl) async {
@@ -102,6 +122,10 @@ class MatrixService {
 
     return await _lock.synchronized(() async {
       try {
+        if (_client != null && _client!.isLogged()) {
+          return true;
+        }
+
         await _closeDatabase();
 
         final client = Client(
@@ -109,20 +133,27 @@ class MatrixService {
           database: await _getDatabase(),
           nativeImplementations: _getNativeImplementations(),
         );
-        await client.checkHomeserver(Uri.parse(homeserver));
-        await client.init(
-          newToken: token,
-          newUserID: userId,
-          newHomeserver: Uri.parse(homeserver),
-          newDeviceName: deviceName ?? 'Omnivium',
-          newDeviceID: deviceId ?? '',
-        );
+        try {
+          await client.checkHomeserver(Uri.parse(homeserver));
+          await client.init(
+            newToken: token,
+            newUserID: userId,
+            newHomeserver: Uri.parse(homeserver),
+            newDeviceName: deviceName ?? 'Omnivium',
+            newDeviceID: deviceId ?? '',
+          );
+        } catch (e) {
+          AppLogger.instance.warning('Session restore failed', error: e);
+          client.dispose();
+          await _closeDatabase();
+          return false;
+        }
         _client = client;
         client.backgroundSync = true;
         return true;
       } catch (e, stackTrace) {
         AppLogger.instance.warning('Session restore failed', error: e, stackTrace: stackTrace);
-        await logout();
+        await _closeDatabase();
         return false;
       }
     });

@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'secure_storage_service.dart';
 import 'api_proxy_service.dart';
 import 'matrix/matrix_service.dart';
+import 'identity_bridge.dart';
 
 class AuthService {
   static final AuthService _instance = AuthService._();
@@ -26,6 +27,7 @@ class AuthService {
   User? get currentUser => _currentUser;
   String? get jwtToken => _jwtToken;
   bool get isAuthenticated => _currentUser != null;
+  String? get matrixUserId => _currentUser?.userMetadata?['matrix_user_id'] as String?;
   SupabaseClient? get client => _client;
   bool get isSupabaseInitialized => _supabaseInitialized;
 
@@ -34,10 +36,12 @@ class AuthService {
 
   String? _getEnv(String envKey) {
     if (envKey == _supabaseUrlEnvKey) {
-      return const String.fromEnvironment('SUPABASE_URL', defaultValue: 'https://akgflaqerwslhvlewmyw.supabase.co');
+      final value = const String.fromEnvironment('SUPABASE_URL');
+      return value.isEmpty ? null : value;
     }
     if (envKey == _supabaseAnonKeyEnvKey) {
-      return const String.fromEnvironment('SUPABASE_ANON_KEY', defaultValue: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFrZ2ZsYXFlcndzbGh2bGV3bXl3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NTI1ODEsImV4cCI6MjA5NDQyODU4MX0.g6ASDqAuOJDM3-tiDsXO8ILcMNVz4NiZxWlMrm4hpGA');
+      final value = const String.fromEnvironment('SUPABASE_ANON_KEY');
+      return value.isEmpty ? null : value;
     }
     return null;
   }
@@ -147,10 +151,21 @@ class AuthService {
   Future<void> _linkMatrixAccount(String matrixUserId) async {
     if (_client == null || !_supabaseInitialized) return;
     try {
-      if (!isAuthenticated) {
-        final response = await _client!.auth.signInAnonymously();
-        _currentUser = response.user;
-        _jwtToken = response.session?.accessToken;
+      if (isAuthenticated) {
+        final currentMeta = _currentUser?.userMetadata;
+        if (currentMeta?['matrix_user_id'] == matrixUserId) return;
+      }
+      final response = await _client!.auth.signInAnonymously();
+      _currentUser = response.user;
+      _jwtToken = response.session?.accessToken;
+      await _client!.auth.updateUser(
+        UserAttributes(data: {'matrix_user_id': matrixUserId}),
+      );
+      if (_currentUser != null) {
+        await IdentityBridge.instance.onUserAuthenticated(
+          _currentUser!.id,
+          matrixId: matrixUserId,
+        );
       }
     } catch (e) {
       AppLogger.instance.info('Auto sign-in with Matrix failed: $e');
@@ -177,6 +192,9 @@ class AuthService {
       final response = await _client!.auth.signInWithPassword(email: email, password: password);
       _currentUser = response.user;
       _jwtToken = response.session?.accessToken;
+      if (_currentUser != null) {
+        await IdentityBridge.instance.onUserAuthenticated(_currentUser!.id);
+      }
       return _currentUser != null;
     } catch (e) {
       AppLogger.instance.warning('Sign in failed', error: e);
@@ -197,6 +215,7 @@ class AuthService {
     }
     _currentUser = null;
     _jwtToken = null;
+    await IdentityBridge.instance.onLogout();
   }
 
   Future<bool> refreshSession() async {

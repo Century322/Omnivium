@@ -1,4 +1,5 @@
 import 'app_logger.dart';
+import 'notification_center.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -6,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'api_proxy_service.dart';
 import 'deep_link_service.dart';
+import 'encryption_service.dart';
 import 'push_notification_service_stub.dart'
     if (dart.library.io) 'push_notification_service_io.dart';
 
@@ -101,6 +103,16 @@ class PushNotificationService {
     Map<String, dynamic>? data,
   }) async {
     try {
+      String displayTitle = title;
+      String displayBody = body;
+      final enc = EncryptionService.instance;
+      if (enc.isReady && data?['encrypted'] == '1') {
+        final decryptedTitle = enc.decrypt(title);
+        final decryptedBody = enc.decrypt(body);
+        if (decryptedTitle != null) displayTitle = decryptedTitle;
+        if (decryptedBody != null) displayBody = decryptedBody;
+      }
+
       final now = DateTime.now();
       final elapsed = now.difference(_lastNotificationTime).inMilliseconds;
       if (elapsed < _notificationThrottleMs && _lastNotificationChannel == channelId) {
@@ -123,11 +135,16 @@ class PushNotificationService {
 
       await _localNotifications.show(
         notificationId,
-        title,
-        body,
+        displayTitle,
+        displayBody,
         details,
         payload: data != null ? jsonEncode(data) : null,
       );
+      NotificationCenter.post(Event.pushNotification, data: {
+        'title': displayTitle,
+        'body': displayBody,
+        'data': data,
+      });
     } catch (e, stackTrace) {
       AppLogger.instance.warning('Show local notification failed', error: e, stackTrace: stackTrace);
     }

@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:media_kit/media_kit.dart';
@@ -85,6 +85,8 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
                       const CircularProgressIndicator(color: AppColors.accent),
                     if (!_isPlaying && !_isBuffering)
                       Semantics(label: localeProvider.t('play_video'), child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
                         onTap: () => _player.play(),
                         child: Container(
                           width: 64,

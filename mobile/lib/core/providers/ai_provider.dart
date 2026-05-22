@@ -16,6 +16,13 @@ class ChatMessage {
   Map<String, dynamic> toJson() => {'role': role, 'content': content};
 }
 
+class RateLimitException implements Exception {
+  final int waitSeconds;
+  RateLimitException(this.waitSeconds);
+  @override
+  String toString() => 'Rate limit exceeded. Please try again in $waitSeconds seconds.';
+}
+
 class AIResponse {
   final String content;
   final String model;
@@ -57,16 +64,15 @@ class ChatService {
           _authEventController.add(AuthEvent.tokenExpired);
         }
       }).catchError((_) {
-        matrix.logout();
         _authEventController.add(AuthEvent.tokenExpired);
       });
     }
   }
 
-  Map<String, String> get _headers {
+  Map<String, String> _headersWithBody(String body) {
     final proxy = ApiProxyService.instance;
     return {
-      ...proxy.buildAuthHeaders(),
+      ...proxy.buildAuthHeaders(body: body),
       ...proxy.buildDeviceHeaders(),
       'Content-Type': 'application/json',
     };
@@ -83,15 +89,16 @@ class ChatService {
     final useModel = model ?? _currentModel;
 
     final request = http.Request('POST', uri);
-    request.headers.addAll(_headers);
-    request.headers['Accept'] = 'text/event-stream';
-    request.body = jsonEncode({
+    final body = jsonEncode({
       'model': useModel,
       'messages': messages.map((m) => m.toJson()).toList(),
       'temperature': temperature,
       'max_tokens': maxTokens,
       'stream': true,
     });
+    request.headers.addAll(_headersWithBody(body));
+    request.headers['Accept'] = 'text/event-stream';
+    request.body = body;
 
     final client = proxy.secureClient;
     final response = await client.send(request).timeout(const Duration(seconds: 60));
@@ -102,7 +109,9 @@ class ChatService {
     }
 
     if (response.statusCode == 429) {
-      throw Exception('Rate limit exceeded. Please try again later.');
+      final retryAfter = response.headers['retry-after'];
+      final waitSeconds = retryAfter != null ? int.tryParse(retryAfter) ?? 30 : 30;
+      throw RateLimitException(waitSeconds);
     }
 
     if (response.statusCode != 200) {
@@ -136,21 +145,28 @@ class ChatService {
     final uri = proxy.resolveChatUrl();
     final useModel = model ?? _currentModel;
 
+    final syncBody = jsonEncode({
+      'model': useModel,
+      'messages': messages.map((m) => m.toJson()).toList(),
+      'temperature': temperature,
+      'max_tokens': maxTokens,
+      'stream': false,
+    });
     final response = await proxy.secureClient.post(
       uri,
-      headers: _headers,
-      body: jsonEncode({
-        'model': useModel,
-        'messages': messages.map((m) => m.toJson()).toList(),
-        'temperature': temperature,
-        'max_tokens': maxTokens,
-        'stream': false,
-      }),
+      headers: _headersWithBody(syncBody),
+      body: syncBody,
     );
 
     if (response.statusCode == 401) {
       _handleAuthFailure();
       throw Exception('Session expired. Please log in again.');
+    }
+
+    if (response.statusCode == 429) {
+      final retryAfter = response.headers['retry-after'];
+      final waitSeconds = retryAfter != null ? int.tryParse(retryAfter) ?? 30 : 30;
+      throw RateLimitException(waitSeconds);
     }
 
     if (response.statusCode != 200) {
@@ -180,9 +196,7 @@ class ChatService {
     final useModel = model ?? _currentModel;
 
     final request = http.Request('POST', uri);
-    request.headers.addAll(_headers);
-    request.headers['Accept'] = 'text/event-stream';
-    request.body = jsonEncode({
+    final agentBody = jsonEncode({
       'model': useModel,
       'messages': messages.map((m) => m.toJson()).toList(),
       'temperature': temperature,
@@ -191,12 +205,22 @@ class ChatService {
       'agent_mode': true,
       'skills': skills ?? [],
     });
+    request.headers.addAll(_headersWithBody(agentBody));
+    request.headers['Accept'] = 'text/event-stream';
+    request.body = agentBody;
 
     final client = proxy.secureClient;
     final response = await client.send(request).timeout(const Duration(seconds: 120));
 
     if (response.statusCode == 401) {
-      throw Exception('Authentication failed');
+      _handleAuthFailure();
+      throw Exception('Session expired. Please log in again.');
+    }
+
+    if (response.statusCode == 429) {
+      final retryAfter = response.headers['retry-after'];
+      final waitSeconds = retryAfter != null ? int.tryParse(retryAfter) ?? 30 : 30;
+      throw RateLimitException(waitSeconds);
     }
 
     if (response.statusCode != 200) {
@@ -241,7 +265,9 @@ class _AgentEventTransformer extends StreamTransformerBase<String, AgentEvent> {
             final eventType = currentEvent ?? 'message';
             currentEvent = null;
             sink.add(AgentEvent(eventType, data));
-          } catch (_) {}
+          } catch (e) {
+            AppLogger.instance.warning('SSE: failed to parse event data', error: e);
+          }
         }
       },
     ));

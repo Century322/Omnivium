@@ -19,20 +19,9 @@ class NetworkSecurityService {
 
   http.Client? _pinnedClient;
 
-  static const _productionPins = <String, List<String>>{
-    'omnivium-api-proxy.so1946875590.workers.dev': [
-      'sha256/Ylh3sS2GoYUjSSDIpEP4sM8XHi4YxhP0FfXJHBKifgE=',
-    ],
-    'omnivium.app': [
-      'sha256/Ylh3sS2GoYUjSSDIpEP4sM8XHi4YxhP0FfXJHBKifgE=',
-    ],
-  };
+  static const _productionPins = <String, List<String>>{};
 
-  static const _fallbackPins = <String, List<String>>{
-    'omnivium-api-proxy.so1946875590.workers.dev': [
-      'sha256/R+OeUMFdmDDYH7p3mQF7Y7J8K6d5s4s7T3vW2x1z9qE=',
-    ],
-  };
+  static const _fallbackPins = <String, List<String>>{};
 
   static const _remotePinsCacheKey = 'remote_ssl_pins';
 
@@ -69,7 +58,11 @@ class NetworkSecurityService {
     await _loadCachedRemotePins();
     await _fetchRemotePins();
 
-    enablePinning();
+    if (_pinnedHashes.isNotEmpty) {
+      enablePinning();
+    } else {
+      AppLogger.instance.info('SSL pinning disabled: no valid pins available');
+    }
   }
 
   Future<void> _loadCachedRemotePins() async {

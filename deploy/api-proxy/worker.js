@@ -106,6 +106,12 @@ async function verifyJwtSignature(token, publicKey) {
 }
 
 async function authenticate(request, env) {
+  const timestamp = request.headers.get('X-Timestamp');
+  if (!timestamp) return null;
+  const now = Date.now();
+  const ts = parseInt(timestamp);
+  if (isNaN(ts) || Math.abs(now - ts) > 300000) return null;
+
   const auth = request.headers.get('Authorization');
   if (!auth || !auth.startsWith('Bearer ')) return null;
   const token = auth.substring(7);
@@ -121,10 +127,7 @@ async function authenticate(request, env) {
         if (!payload) return null;
         return { id: payload.sub || payload.user_id, plan: payload.plan || 'free' };
       }
-      const payload = JSON.parse(base64UrlDecode(parts[1]));
-      if (payload.exp && payload.exp < Date.now() / 1000) return null;
-      if (payload.iss !== 'omnivium.app') return null;
-      return { id: payload.sub || payload.user_id, plan: payload.plan || 'free' };
+      return null;
     }
   } catch {}
 
@@ -132,11 +135,49 @@ async function authenticate(request, env) {
     const authSource = request.headers.get('X-Auth-Source');
     if (authSource === 'matrix') {
       const userId = request.headers.get('X-User-Id') || 'matrix_user';
+      const verified = await verifyMatrixToken(token, userId, env);
+      if (!verified) return null;
       return { id: userId, plan: 'free' };
     }
   }
 
   return null;
+}
+
+async function verifySrpProof(proof, srpId, verifier, salt) {
+  try {
+    const proofHash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`${proof}:${srpId}:${verifier}:${salt}`));
+    const proofHex = Array.from(new Uint8Array(proofHash)).map(b => b.toString(16).padStart(2, '0')).join('');
+    const verifierHash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier));
+    const verifierHex = Array.from(new Uint8Array(verifierHash)).map(b => b.toString(16).padStart(2, '0')).join('');
+    return proofHex.substring(0, 32) === verifierHex.substring(0, 32);
+  } catch (e) {
+    return false;
+  }
+}
+
+async function verifyMatrixToken(token, claimedUserId, env) {
+  const homeserver = env.MATRIX_HOMESERVER || 'https://matrix.omnivium.app';
+  const cacheKey = `matrix_auth:${token.slice(-16)}`;
+  try {
+    const cached = await env.KV?.get(cacheKey);
+    if (cached === claimedUserId) return true;
+  } catch {}
+  try {
+    const resp = await fetch(`${homeserver}/_matrix/client/v3/account/whoami`, {
+      headers: { 'Authorization': `Bearer ${token}` },
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!resp.ok) return false;
+    const data = await resp.json();
+    if (data.user_id !== claimedUserId) return false;
+    try {
+      await env.KV?.put(cacheKey, claimedUserId, { expirationTtl: 300 });
+    } catch {}
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 async function checkRateLimit(userId, plan, env) {
@@ -1332,6 +1373,95 @@ export default {
         supabase_anon_key: env.SUPABASE_ANON_KEY || null,
         backend_url: `https://${request.headers.get('host')}`,
       }, 200, {}, origin);
+    }
+
+    if (path === '/config/ssl-pins' && request.method === 'GET') {
+      const pins = env.SSL_PINS ? JSON.parse(env.SSL_PINS) : {};
+      return jsonResponse(pins, 200, {
+        'Cache-Control': 'public, max-age=3600',
+      }, origin);
+    }
+
+    if (path === '/config/encryption-key' && request.method === 'POST') {
+      const user = await authenticate(request, env);
+      if (!user) return jsonResponse({ error: 'Unauthorized' }, 401, {}, origin);
+      try {
+        const body = await request.json();
+        const key = body.key;
+        if (!key) return jsonResponse({ error: 'Missing key' }, 400, {}, origin);
+        await env.KV?.put(`enc_key:${user.id}`, key, { expirationTtl: 86400 * 30 });
+        return jsonResponse({ ok: true }, 200, {}, origin);
+      } catch (e) {
+        return jsonResponse({ error: 'Invalid body' }, 400, {}, origin);
+      }
+    }
+
+    if (path === '/auth/srp-login' && request.method === 'POST') {
+      try {
+        const body = await request.json();
+        const { username, srp_proof, srp_id } = body;
+        if (!username || !srp_proof || !srp_id) {
+          return jsonResponse({ error: 'Missing fields' }, 400, {}, origin);
+        }
+
+        const storedVerifier = await env.KV?.get(`srp:${username}`);
+        const storedSalt = await env.KV?.get(`srp_salt:${username}`);
+        if (!storedVerifier || !storedSalt) {
+          return jsonResponse({ error: 'SRP not configured' }, 400, {}, origin);
+        }
+
+        const isValid = await verifySrpProof(srp_proof, srp_id, storedVerifier, storedSalt);
+        if (!isValid) {
+          return jsonResponse({ error: 'SRP verification failed' }, 401, {}, origin);
+        }
+
+        const homeserver = env.MATRIX_HOMESERVER || 'https://matrix.omnivium.app';
+        const matrixPassword = await env.KV?.get(`srp_pass:${username}`);
+        if (!matrixPassword) {
+          return jsonResponse({ error: 'No stored credentials' }, 500, {}, origin);
+        }
+
+        const loginResp = await fetch(`${homeserver}/_matrix/client/v3/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'm.login.password',
+            identifier: { type: 'm.id.user', user: username },
+            password: matrixPassword,
+          }),
+        });
+
+        const loginData = await loginResp.json();
+        if (loginData.access_token) {
+          return jsonResponse({
+            access_token: loginData.access_token,
+            user_id: loginData.user_id,
+            device_id: loginData.device_id,
+            homeserver: homeserver,
+          }, 200, {}, origin);
+        } else {
+          return jsonResponse({ error: loginData.error || 'Matrix login failed' }, 401, {}, origin);
+        }
+      } catch (e) {
+        return jsonResponse({ error: 'SRP login failed' }, 500, {}, origin);
+      }
+    }
+
+    if (path === '/auth/srp-register' && request.method === 'POST') {
+      const user = await authenticate(request, env);
+      if (!user) return jsonResponse({ error: 'Unauthorized' }, 401, {}, origin);
+      try {
+        const body = await request.json();
+        const { username, verifier, salt } = body;
+        if (!username || !verifier || !salt) {
+          return jsonResponse({ error: 'Missing fields' }, 400, {}, origin);
+        }
+        await env.KV?.put(`srp:${username}`, verifier, { expirationTtl: 86400 * 365 });
+        await env.KV?.put(`srp_salt:${username}`, salt, { expirationTtl: 86400 * 365 });
+        return jsonResponse({ ok: true }, 200, {}, origin);
+      } catch (e) {
+        return jsonResponse({ error: 'SRP register failed' }, 500, {}, origin);
+      }
     }
 
     if (path === '/models') {

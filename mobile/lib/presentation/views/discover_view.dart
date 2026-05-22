@@ -1,6 +1,7 @@
-﻿import 'dart:ui';
+import 'dart:ui';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../theme/app_colors.dart';
 import '../theme/locale_provider.dart';
@@ -9,6 +10,7 @@ import '../../core/navigation_provider.dart';
 import '../../core/api_proxy_service.dart';
 import '../../core/app_logger.dart';
 import '../../core/remote_config_service.dart';
+import '../../core/lite_mode.dart';
 import '../widgets/skeleton_loader.dart';
 import '../utils/responsive.dart';
 
@@ -127,6 +129,8 @@ class _DiscoverViewState extends State<DiscoverView> {
 
     return Scaffold(
       body: Semantics(label: localeProvider.t('go_back'), child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
         onHorizontalDragEnd: (d) {
           if (d.primaryVelocity != null && d.primaryVelocity! > 500) {
             widget.provider.navigation.setCurrentView(ViewState.home);
@@ -153,69 +157,132 @@ class _DiscoverViewState extends State<DiscoverView> {
               left: 0,
               right: 0,
               child: ClipRect(
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                  child: Container(
-                    color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.8),
-                    child: SafeArea(
-                      bottom: false,
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-                            child: Row(
+                child: LiteMode.instance.blurEffectsEnabled
+                    ? BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                        child: Container(
+                          color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.8),
+                          child: SafeArea(
+                            bottom: false,
+                            child: Column(
                               children: [
-                                Semantics(label: localeProvider.t('go_back'), child: GestureDetector(
-                                  onTap: () => widget.provider.navigation.setCurrentView(ViewState.home),
-                                  child: Icon(LucideIcons.arrowLeft, color: AppColors.textSecondary(context)),
-                                )),
-                                const SizedBox(width: 16),
-                                Text(localeProvider.t('discover'), style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
-                                const Spacer(),
-                                Stack(
-                                  children: [
-                                    Icon(LucideIcons.heart, color: AppColors.textSecondary(context), size: 24),
-                                    Positioned(
-                                      top: 2,
-                                      right: -2,
-                                      child: Container(
-                                        width: 12,
-                                        height: 12,
-                                        decoration: BoxDecoration(
-                                          color: AppColors.textPrimary(context),
-                                          borderRadius: BorderRadius.circular(6),
-                                          border: Border.all(color: Theme.of(context).scaffoldBackgroundColor, width: 2),
-                                        ),
-                                        child: Center(
-                                          child: Text('+', style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context))),
-                                        ),
+                                Padding(
+                                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                                  child: Row(
+                                    children: [
+                                      Semantics(label: localeProvider.t('go_back'), child: GestureDetector(
+                                        behavior: HitTestBehavior.opaque,
+                                        onTap: () => widget.provider.navigation.setCurrentView(ViewState.home),
+                                        child: Icon(LucideIcons.arrowLeft, color: AppColors.textSecondary(context)),
+                                      )),
+                                      const SizedBox(width: 16),
+                                      Text(localeProvider.t('discover'), style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
+                                      const Spacer(),
+                                      Stack(
+                                        children: [
+                                          Icon(LucideIcons.heart, color: AppColors.textSecondary(context), size: 24),
+                                          Positioned(
+                                            top: 2,
+                                            right: -2,
+                                            child: Container(
+                                              width: 12,
+                                              height: 12,
+                                              decoration: BoxDecoration(
+                                                color: AppColors.textPrimary(context),
+                                                borderRadius: BorderRadius.circular(6),
+                                                border: Border.all(color: Theme.of(context).scaffoldBackgroundColor, width: 2),
+                                              ),
+                                              child: Center(
+                                                child: Text('+', style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context))),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 40,
+                                  child: ListView(
+                                    scrollDirection: Axis.horizontal,
+                                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                                    children: [
+                                      _tab(context, localeProvider.t('for_you'), active: true),
+                                      _tab(context, localeProvider.t('headline_news')),
+                                      _tab(context, localeProvider.t('science_tech')),
+                                      _tab(context, localeProvider.t('business')),
+                                      _tab(context, localeProvider.t('art_culture')),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                              ],
+                            ),
+                          ),
+                        ),
+                      )
+                    : Container(
+                        color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.95),
+                        child: SafeArea(
+                          bottom: false,
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                                child: Row(
+                                  children: [
+                                    Semantics(label: localeProvider.t('go_back'), child: GestureDetector(
+                                      behavior: HitTestBehavior.opaque,
+                                      onTap: () => widget.provider.navigation.setCurrentView(ViewState.home),
+                                      child: Icon(LucideIcons.arrowLeft, color: AppColors.textSecondary(context)),
+                                    )),
+                                    const SizedBox(width: 16),
+                                    Text(localeProvider.t('discover'), style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
+                                    const Spacer(),
+                                    Stack(
+                                      children: [
+                                        Icon(LucideIcons.heart, color: AppColors.textSecondary(context), size: 24),
+                                        Positioned(
+                                          top: 2,
+                                          right: -2,
+                                          child: Container(
+                                            width: 12,
+                                            height: 12,
+                                            decoration: BoxDecoration(
+                                              color: AppColors.textPrimary(context),
+                                              borderRadius: BorderRadius.circular(6),
+                                              border: Border.all(color: Theme.of(context).scaffoldBackgroundColor, width: 2),
+                                            ),
+                                            child: Center(
+                                              child: Text('+', style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: AppColors.textPrimary(context))),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
-                              ],
-                            ),
+                              ),
+                              SizedBox(
+                                height: 40,
+                                child: ListView(
+                                  scrollDirection: Axis.horizontal,
+                                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                                  children: [
+                                    _tab(context, localeProvider.t('for_you'), active: true),
+                                    _tab(context, localeProvider.t('headline_news')),
+                                    _tab(context, localeProvider.t('science_tech')),
+                                    _tab(context, localeProvider.t('business')),
+                                    _tab(context, localeProvider.t('art_culture')),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                            ],
                           ),
-                          SizedBox(
-                            height: 40,
-                            child: ListView(
-                              scrollDirection: Axis.horizontal,
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              children: [
-                                _tab(context, localeProvider.t('for_you'), active: true),
-                                _tab(context, localeProvider.t('headline_news')),
-                                _tab(context, localeProvider.t('science_tech')),
-                                _tab(context, localeProvider.t('business')),
-                                _tab(context, localeProvider.t('art_culture')),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
-                ),
               ),
             ),
           ],
@@ -239,11 +306,11 @@ class _DiscoverViewState extends State<DiscoverView> {
             if (item.imgSrc.isNotEmpty)
               Expanded(
                 flex: 55,
-                child: Image.network(
-                  item.imgSrc,
-                  semanticLabel: localeProvider.t('article_cover'),
+                child: CachedNetworkImage(
+                  imageUrl: item.imgSrc,
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => Container(
+                  placeholder: (_, _) => Container(color: AppColors.sf(context), child: Center(child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.accent)))),
+                  errorWidget: (_, _, _) => Container(
                     color: AppColors.sf(context),
                     child: Icon(LucideIcons.image, color: AppColors.textDisabled(context), size: 48),
                   ),
@@ -286,13 +353,12 @@ class _DiscoverViewState extends State<DiscoverView> {
                           backgroundColor: item.avatarColor,
                           child: ClipOval(
                             child: item.imgSrc.isNotEmpty
-                                ? Image.network(
-                                    'https://picsum.photos/seed/${item.author}/100/100',
-                                    semanticLabel: localeProvider.t('author_avatar'),
+                                ? CachedNetworkImage(
+                                    imageUrl: 'https://picsum.photos/seed/${item.author}/100/100',
                                     width: 24,
                                     height: 24,
                                     fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) => const SizedBox(),
+                                    errorWidget: (_, _, _) => const SizedBox(),
                                   )
                                 : Icon(LucideIcons.user, size: 14, color: AppColors.textPrimary(context)),
                           ),

@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/locale_provider.dart';
 import '../../core/agent/agent_state.dart';
@@ -30,6 +30,8 @@ class ThoughtChainPanel extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Semantics(label: localeProvider.t('toggle_thought_chain'), child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
             onTap: onToggle,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

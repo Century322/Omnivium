@@ -1,11 +1,11 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:matrix/matrix.dart';
 import '../theme/app_colors.dart';
 import '../theme/locale_provider.dart';
 import '../../core/app_provider.dart';
+import '../../core/app_navigator.dart';
 import 'add_friend_view.dart';
-import 'friend_profile_view.dart';
 
 class ContactsView extends StatefulWidget {
   final AppProvider provider;
@@ -17,6 +17,13 @@ class ContactsView extends StatefulWidget {
 
 class _ContactsViewState extends State<ContactsView> {
   String _searchQuery = '';
+  final _searchFocus = FocusNode();
+
+  @override
+  void dispose() {
+    _searchFocus.dispose();
+    super.dispose();
+  }
 
   List<Room> get _filteredDirectChats {
     final chats = widget.provider.matrix.directChats;
@@ -42,7 +49,7 @@ class _ContactsViewState extends State<ContactsView> {
     final groupChats = _filteredGroupChats;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.bg(context),
       appBar: AppBar(
         backgroundColor: AppColors.sf(context),
         elevation: 0,
@@ -75,19 +82,28 @@ class _ContactsViewState extends State<ContactsView> {
             child: ListenableBuilder(
               listenable: widget.provider.matrix,
               builder: (context, _) {
-                return ListView(
-                  children: [
-                    if (directChats.isNotEmpty) ...[
-                      _buildSectionHeader(context, localeProvider.t('direct_chats'), directChats.length),
-                      ...directChats.map((room) => _buildContactTile(context, room, isDirect: true)),
-                    ],
-                    if (groupChats.isNotEmpty) ...[
-                      _buildSectionHeader(context, localeProvider.t('group_chats'), groupChats.length),
-                      ...groupChats.map((room) => _buildContactTile(context, room, isDirect: false)),
-                    ],
-                    if (directChats.isEmpty && groupChats.isEmpty)
-                      _buildEmptyState(context),
+                if (directChats.isEmpty && groupChats.isEmpty) {
+                  return _buildEmptyState(context);
+                }
+                final items = <dynamic>[
+                  if (directChats.isNotEmpty) ...[
+                    '_header_direct',
+                    ...directChats,
                   ],
+                  if (groupChats.isNotEmpty) ...[
+                    '_header_group',
+                    ...groupChats,
+                  ],
+                ];
+                return ListView.builder(
+                  itemCount: items.length,
+                  itemBuilder: (context, index) {
+                    final item = items[index];
+                    if (item == '_header_direct') return _buildSectionHeader(context, localeProvider.t('direct_chats'), directChats.length);
+                    if (item == '_header_group') return _buildSectionHeader(context, localeProvider.t('group_chats'), groupChats.length);
+                    final room = item as Room;
+                    return _buildContactTile(context, room, isDirect: directChats.contains(room));
+                  },
                 );
               },
             ),
@@ -101,30 +117,40 @@ class _ContactsViewState extends State<ContactsView> {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
       color: AppColors.sf(context),
-      child: Container(
-        height: 40,
-        decoration: BoxDecoration(
-          color: AppColors.background,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 14),
-        child: Row(
-          children: [
-            Icon(LucideIcons.search, size: 16, color: AppColors.textHint(context)),
-            const SizedBox(width: 10),
-            Expanded(
-              child: TextField(
-                style: TextStyle(color: AppColors.textPrimary(context), fontSize: 14),
-                decoration: InputDecoration(
-                  labelText:  localeProvider.t('search_id'),
-                  hintStyle: TextStyle(color: AppColors.textDisabled(context), fontSize: 14),
-                  border: InputBorder.none,
-                ),
-                onChanged: (v) => setState(() => _searchQuery = v),
-              ),
+      child: AnimatedBuilder(
+        animation: Listenable.merge([_searchFocus]),
+        builder: (context, _) {
+          final isFocused = _searchFocus.hasFocus;
+          return Container(
+            height: 40,
+            decoration: BoxDecoration(
+              color: AppColors.bg(context),
+              borderRadius: BorderRadius.circular(20),
+              border: isFocused ? Border.all(color: AppColors.accent) : null,
             ),
-          ],
-        ),
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            child: Row(
+              children: [
+                Icon(LucideIcons.search, size: 16, color: isFocused ? AppColors.accent : AppColors.textHint(context)),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: TextField(
+                    focusNode: _searchFocus,
+                    style: TextStyle(color: AppColors.textPrimary(context), fontSize: 14),
+                    decoration: InputDecoration(
+                      labelText:  localeProvider.t('search_id'),
+                      hintStyle: TextStyle(color: AppColors.textDisabled(context), fontSize: 14),
+                      border: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                    ),
+                    onChanged: (v) => setState(() => _searchQuery = v),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
@@ -150,7 +176,10 @@ class _ContactsViewState extends State<ContactsView> {
     final time = lastEvent?.originServerTs;
     final timeStr = time != null ? _formatTime(time) : '';
 
-    return ListTile(
+    return Semantics(
+      button: true,
+      label: '$displayName${lastMessage.isNotEmpty ? ', $lastMessage' : ''}${timeStr.isNotEmpty ? ', $timeStr' : ''}',
+      child: ListTile(
       leading: CircleAvatar(
         backgroundColor: isDirect ? AppColors.accBg(context) : AppColors.sfActive(context),
         child: isDirect
@@ -165,11 +194,50 @@ class _ContactsViewState extends State<ContactsView> {
           ? Text(timeStr, style: TextStyle(color: AppColors.textDisabled(context), fontSize: 11))
           : null,
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => FriendProfileView(provider: widget.provider, roomId: room.id)),
-        );
+        AppNavigator.go(context, '/chat', args: {'roomId': room.id});
       },
+      onLongPress: () => _showContactOptions(context, room),
+      ),
+    );
+  }
+
+  void _showContactOptions(BuildContext context, Room room) {
+    final t = localeProvider.t;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.sf(context),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (_) => SafeArea(child: Column(mainAxisSize: MainAxisSize.min, children: [
+        ListTile(
+          leading: Icon(LucideIcons.messageCircle, color: AppColors.sec(context)),
+          title: Text(t('open_chat'), style: TextStyle(color: AppColors.textPrimary(context))),
+          onTap: () { Navigator.pop(context); AppNavigator.go(context, '/chat', args: {'roomId': room.id}); },
+        ),
+        ListTile(
+          leading: Icon(LucideIcons.bellOff, color: AppColors.textSecondary(context)),
+          title: Text(t('mute'), style: TextStyle(color: AppColors.textPrimary(context))),
+          onTap: () { Navigator.pop(context); room.setPushRuleState(PushRuleState.dontNotify); },
+        ),
+        if (!room.isDirectChat)
+          ListTile(
+            leading: Icon(LucideIcons.logOut, color: AppColors.dng(context)),
+            title: Text(t('leave_group'), style: TextStyle(color: AppColors.dng(context))),
+            onTap: () {
+              Navigator.pop(context);
+              showDialog(context: context, builder: (_) => AlertDialog(
+                backgroundColor: AppColors.sf(context), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                title: Text(t('leave_group'), style: TextStyle(color: AppColors.textPrimary(context))),
+                content: Text(t('leave_group_confirm'), style: TextStyle(color: AppColors.textSecondary(context))),
+                actions: [
+                  TextButton(onPressed: () => Navigator.pop(context), child: Text(t('cancel'))),
+                  FilledButton(style: FilledButton.styleFrom(backgroundColor: AppColors.dng(context)),
+                    onPressed: () { Navigator.pop(context); room.leave(); }, child: Text(t('leave'))),
+                ],
+              ));
+            },
+          ),
+        const SizedBox(height: 16),
+      ])),
     );
   }
 

@@ -22,7 +22,7 @@ void main() {
       await tester.pumpWidget(const MaterialApp(
         home: Scaffold(body: IncognitoIcon()),
       ));
-      expect(find.bySemanticsLabel('Incognito mode'), findsOneWidget);
+      expect(find.bySemanticsLabel('隐身模式'), findsOneWidget);
     });
   });
 }

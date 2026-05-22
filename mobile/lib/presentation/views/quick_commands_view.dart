@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../core/quick_command_service.dart';
 import '../../core/quick_command_provider.dart';
@@ -228,6 +228,8 @@ class _QuickCommandsViewState extends State<QuickCommandsView> with SingleTicker
                         children: emojiOptions.map((emoji) {
                           final isSelected = emojiCtrl.text == emoji;
                           return GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
                             onTap: () {
                               emojiCtrl.text = emoji;
                               setDialogState(() {});
@@ -287,6 +289,8 @@ class _QuickCommandsViewState extends State<QuickCommandsView> with SingleTicker
                           final (value, label) = opt;
                           final isSelected = selectedCategory == value;
                           return GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
                             onTap: () {
                               selectedCategory = value;
                               setDialogState(() {});

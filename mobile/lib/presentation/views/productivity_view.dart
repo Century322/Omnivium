@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../core/note_service.dart';
 import '../../core/note_provider.dart';
@@ -100,18 +100,20 @@ class _ProductivityViewState extends State<ProductivityView> with SingleTickerPr
         }
         final pending = todos.where((t) => !t.isDone).toList();
         final done = todos.where((t) => t.isDone).toList();
-        return ListView(
+        final items = <dynamic>[
+          if (pending.isNotEmpty) ...['_header_pending', ...pending],
+          if (done.isNotEmpty) ...['_header_done', ...done],
+        ];
+        if (items.isEmpty) return Center(child: Text(t('no_todos'), style: TextStyle(color: AppColors.textTertiary(context))));
+        return ListView.builder(
           padding: const EdgeInsets.symmetric(vertical: 8),
-          children: [
-            if (pending.isNotEmpty) ...[
-              Padding(padding: const EdgeInsets.fromLTRB(16, 8, 16, 4), child: Text(t('pending'), style: TextStyle(color: AppColors.textSecondary(context), fontSize: 13, fontWeight: FontWeight.w600))),
-              ...pending.map((todo) => _buildTodoCard(todo)),
-            ],
-            if (done.isNotEmpty) ...[
-              Padding(padding: const EdgeInsets.fromLTRB(16, 16, 16, 4), child: Text(t('completed'), style: TextStyle(color: AppColors.textSecondary(context), fontSize: 13, fontWeight: FontWeight.w600))),
-              ...done.map((todo) => _buildTodoCard(todo)),
-            ],
-          ],
+          itemCount: items.length,
+          itemBuilder: (context, index) {
+            final item = items[index];
+            if (item == '_header_pending') return Padding(padding: const EdgeInsets.fromLTRB(16, 8, 16, 4), child: Text(t('pending'), style: TextStyle(color: AppColors.textSecondary(context), fontSize: 13, fontWeight: FontWeight.w600)));
+            if (item == '_header_done') return Padding(padding: const EdgeInsets.fromLTRB(16, 16, 16, 4), child: Text(t('completed'), style: TextStyle(color: AppColors.textSecondary(context), fontSize: 13, fontWeight: FontWeight.w600)));
+            return _buildTodoCard(item);
+          },
         );
       },
     );
@@ -171,6 +173,8 @@ class _ProductivityViewState extends State<ProductivityView> with SingleTickerPr
       decoration: BoxDecoration(color: AppColors.sf(context), borderRadius: BorderRadius.circular(12)),
       child: ListTile(
         leading: Semantics(label: localeProvider.t('toggle_completion'), child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
           onTap: () => widget.provider.toggleDone(todo.id),
           child: Container(
             width: 24, height: 24,
@@ -188,7 +192,10 @@ class _ProductivityViewState extends State<ProductivityView> with SingleTickerPr
           fontWeight: FontWeight.w500,
           decoration: todo.isDone ? TextDecoration.lineThrough : null,
         )),
-        trailing: IconButton(tooltip: localeProvider.t('delete'), icon: Icon(LucideIcons.trash2, size: 16, color: AppColors.dng(context).withValues(alpha: 0.7)), onPressed: () => widget.provider.deleteItem(todo.id)),
+        trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+          IconButton(tooltip: localeProvider.t('edit'), icon: Icon(LucideIcons.pencil, size: 16, color: AppColors.textSecondary(context)), onPressed: () => _showEditTodoDialog(todo)),
+          IconButton(tooltip: localeProvider.t('delete'), icon: Icon(LucideIcons.trash2, size: 16, color: AppColors.dng(context).withValues(alpha: 0.7)), onPressed: () => widget.provider.deleteItem(todo.id)),
+        ]),
       ),
     );
   }
@@ -213,7 +220,10 @@ class _ProductivityViewState extends State<ProductivityView> with SingleTickerPr
         ),
         title: Text(schedule.title, style: TextStyle(color: AppColors.textPrimary(context), fontSize: 15, fontWeight: FontWeight.w500)),
         subtitle: schedule.dueDate != null ? Text(_formatDateTime(schedule.dueDate!), style: TextStyle(color: isOverdue ? AppColors.dng(context) : AppColors.textSecondary(context), fontSize: 12)) : null,
-        trailing: IconButton(tooltip: localeProvider.t('delete'), icon: Icon(LucideIcons.trash2, size: 16, color: AppColors.dng(context).withValues(alpha: 0.7)), onPressed: () => widget.provider.deleteItem(schedule.id)),
+        trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+          IconButton(tooltip: localeProvider.t('edit'), icon: Icon(LucideIcons.pencil, size: 16, color: AppColors.textSecondary(context)), onPressed: () => _showEditScheduleDialog(schedule)),
+          IconButton(tooltip: localeProvider.t('delete'), icon: Icon(LucideIcons.trash2, size: 16, color: AppColors.dng(context).withValues(alpha: 0.7)), onPressed: () => widget.provider.deleteItem(schedule.id)),
+        ]),
       ),
     );
   }
@@ -280,6 +290,8 @@ class _ProductivityViewState extends State<ProductivityView> with SingleTickerPr
                       if (type == NoteType.schedule) ...[
                         const SizedBox(height: 8),
                         Semantics(label: localeProvider.t('select_date'), child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
                           onTap: () async {
                             final date = await showDatePicker(context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(const Duration(days: 365)));
                             if (date != null) setDialogState(() => dueDate = date);
@@ -296,6 +308,8 @@ class _ProductivityViewState extends State<ProductivityView> with SingleTickerPr
                         )),
                         const SizedBox(height: 8),
                         Semantics(label: localeProvider.t('select_time'), child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
                           onTap: () async {
                             final time = await showTimePicker(context: context, initialTime: TimeOfDay.now());
                             if (time != null) setDialogState(() => dueTime = time);
@@ -410,5 +424,41 @@ class _ProductivityViewState extends State<ProductivityView> with SingleTickerPr
         );
       },
     );
+  }
+
+  void _showEditTodoDialog(NoteItem todo) {
+    final titleCtrl = TextEditingController(text: todo.title);
+    showDialog(context: context, builder: (_) => AlertDialog(
+      backgroundColor: AppColors.sf(context), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      title: Text(localeProvider.t('edit'), style: TextStyle(color: AppColors.textPrimary(context))),
+      content: TextField(controller: titleCtrl, autofocus: true, style: TextStyle(color: AppColors.textPrimary(context)),
+        decoration: InputDecoration(hintText: localeProvider.t('title'))),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: Text(localeProvider.t('cancel'))),
+        FilledButton(onPressed: () { widget.provider.updateItem(todo.copyWith(title: titleCtrl.text)); Navigator.pop(context); }, child: Text(localeProvider.t('save'))),
+      ],
+    ));
+  }
+
+  void _showEditScheduleDialog(NoteItem schedule) {
+    final titleCtrl = TextEditingController(text: schedule.title);
+    DateTime? newDate = schedule.dueDate;
+    showDialog(context: context, builder: (_) => StatefulBuilder(builder: (ctx, setDialogState) => AlertDialog(
+      backgroundColor: AppColors.sf(ctx), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      title: Text(localeProvider.t('edit'), style: TextStyle(color: AppColors.textPrimary(ctx))),
+      content: Column(mainAxisSize: MainAxisSize.min, children: [
+        TextField(controller: titleCtrl, autofocus: true, style: TextStyle(color: AppColors.textPrimary(ctx)),
+          decoration: InputDecoration(hintText: localeProvider.t('title'))),
+        const SizedBox(height: 12),
+        GestureDetector(onTap: () async {
+          final d = await showDatePicker(context: ctx, initialDate: newDate ?? DateTime.now(), firstDate: DateTime(2024), lastDate: DateTime(2030));
+          if (d != null) setDialogState(() => newDate = d);
+        }, child: Text(newDate != null ? _formatDateTime(newDate!) : localeProvider.t('select_date'), style: TextStyle(color: AppColors.acc(ctx)))),
+      ]),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(ctx), child: Text(localeProvider.t('cancel'))),
+        FilledButton(onPressed: () { widget.provider.updateItem(schedule.copyWith(title: titleCtrl.text, dueDate: newDate)); Navigator.pop(ctx); }, child: Text(localeProvider.t('save'))),
+      ],
+    )));
   }
 }

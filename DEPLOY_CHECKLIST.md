@@ -27,7 +27,7 @@ keyAlias=upload
 3. 下载 `google-services.json` 放入 `android/app/`
 4. （iOS）下载 `GoogleService-Info.plist` 放入 `ios/Runner/`
 
-详细步骤参考 [FIREBASE_SETUP.md](FIREBASE_SETUP.md)
+详细步骤参考 Firebase 官方文档
 
 ### 4. 放入应用图标源文件
 
@@ -145,9 +145,12 @@ openssl s_client -connect api.omnivium.app:443 | openssl x509 -pubkey -noout | o
 | 服务 | 状态 | 部署方式 |
 |------|------|---------|
 | Matrix Synapse | ✅ 已有 | Docker Compose |
-| API 代理 | ✅ 模板就绪 | Cloudflare Workers |
+| API 代理 | ✅ 已部署 | Cloudflare Workers |
 | Supabase Auth | ✅ 已集成 | Supabase Cloud |
-| 数据同步 | ✅ 已集成 | Supabase PostgreSQL |
+| 数据同步 | ✅ 已集成 | Supabase PostgreSQL（4表 + RLS） |
+| 应用层加密 | ✅ 已实现 | AES-256-GCM |
+| 两步验证 | ✅ 已实现 | TOTP |
+| 推送加密 | ✅ 已实现 | EncryptionService |
 
 ### 需要新增
 | 服务 | 优先级 | 技术选择 | 成本 |
@@ -160,15 +163,23 @@ openssl s_client -connect api.omnivium.app:443 | openssl x509 -pubkey -noout | o
 
 ## 五、安全加固检查清单
 
-- [ ] SSL Pinning 已启用
-- [ ] API Key 已迁移到服务端代理
-- [ ] Root/越狱检测已启用
-- [ ] 代码混淆构建已验证
-- [ ] ProGuard 规则已测试
-- [ ] 敏感字符串已加密（API Key 不硬编码）
-- [ ] 网络请求全部 HTTPS
-- [ ] 本地敏感数据使用 flutter_secure_storage
-- [ ] 日志中无敏感信息泄露
+- [x] SSL Pinning 框架就绪（待配置真实证书 hash）
+- [x] API Key 已迁移到服务端代理
+- [x] Root/越狱检测已启用
+- [x] 代码混淆构建已验证
+- [x] ProGuard 规则已测试
+- [x] 敏感字符串已加密（API Key 不硬编码）
+- [x] 网络请求全部 HTTPS
+- [x] 本地敏感数据使用 flutter_secure_storage
+- [x] 日志中无敏感信息泄露
+- [x] 应用层加密（AES-256-GCM）
+- [x] HMAC 请求签名 + 时间戳防重放
+- [x] Matrix Token 服务端验证
+- [x] 两步验证（TOTP）
+- [x] 推送载荷加密
+- [x] 多端点故障转移
+- [ ] Supabase 数据库表已创建（执行 deploy/supabase-schema.sql）
+- [ ] SSL Pinning 真实证书 hash 已配置（通过 SSL_PINS 环境变量）
 - [ ] 截屏/录屏保护（可选，金融级）
 
 ---

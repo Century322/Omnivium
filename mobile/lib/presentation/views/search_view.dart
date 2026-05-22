@@ -1,4 +1,4 @@
-﻿import '../../core/app_logger.dart';
+import '../../core/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../widgets/skeleton_loader.dart';
@@ -145,7 +145,9 @@ class _SearchViewState extends State<SearchView> {
       child: Row(
         children: [
           Semantics(label: localeProvider.t('go_back'), child: GestureDetector(
-            onTap: () => widget.provider.navigation.setCurrentView(ViewState.library),
+
+      behavior: HitTestBehavior.opaque,
+            onTap: () => widget.provider.navigation.setCurrentView(ViewState.home),
             child: Padding(
               padding: const EdgeInsets.all(8),
               child: Icon(LucideIcons.arrowLeft, color: AppColors.textTertiary(context), size: 20),
@@ -173,12 +175,16 @@ class _SearchViewState extends State<SearchView> {
                         labelText:  localeProvider.t('search_posts'),
                         hintStyle: TextStyle(color: AppColors.textDisabled(context), fontWeight: FontWeight.w500),
                         border: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                enabledBorder: InputBorder.none,
                       ),
                       onSubmitted: _doSearch,
                     ),
                   ),
                   if (_searchController.text.isNotEmpty)
                     Semantics(label: localeProvider.t('clear_search'), button: true, child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
                       onTap: () {
                         _searchController.clear();
                         setState(() {
@@ -231,6 +237,8 @@ class _SearchViewState extends State<SearchView> {
             children: [
               Text(localeProvider.t('search_history'), style: TextStyle(color: AppColors.mut(context), fontSize: 12, fontWeight: FontWeight.w600)),
               Semantics(label: localeProvider.t('clear_search_history'), button: true, child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
                 onTap: _clearHistory,
                 child: Text(localeProvider.t('clear'), style: TextStyle(color: AppColors.accent, fontSize: 12)),
               )),
@@ -268,21 +276,21 @@ class _SearchViewState extends State<SearchView> {
     final users = _results.where((r) => r.type == _SearchResultType.user).toList();
     final conversations = _results.where((r) => r.type == _SearchResultType.conversation).toList();
 
-    return ListView(
-      children: [
-        if (conversations.isNotEmpty) ...[
-          _buildSectionHeader(context, localeProvider.t('conversations'), conversations.length),
-          ...conversations.map((r) => _buildResultTile(context, r)),
-        ],
-        if (messages.isNotEmpty) ...[
-          _buildSectionHeader(context, localeProvider.t('messages'), messages.length),
-          ...messages.map((r) => _buildResultTile(context, r)),
-        ],
-        if (users.isNotEmpty) ...[
-          _buildSectionHeader(context, localeProvider.t('contacts'), users.length),
-          ...users.map((r) => _buildResultTile(context, r)),
-        ],
-      ],
+    final items = <dynamic>[
+      if (conversations.isNotEmpty) ...['_header_conv', ...conversations],
+      if (messages.isNotEmpty) ...['_header_msg', ...messages],
+      if (users.isNotEmpty) ...['_header_user', ...users],
+    ];
+    if (items.isEmpty) return Center(child: Text(localeProvider.t('no_results'), style: TextStyle(color: AppColors.textTertiary(context))));
+    return ListView.builder(
+      itemCount: items.length,
+      itemBuilder: (context, index) {
+        final item = items[index];
+        if (item == '_header_conv') return _buildSectionHeader(context, localeProvider.t('conversations'), conversations.length);
+        if (item == '_header_msg') return _buildSectionHeader(context, localeProvider.t('messages'), messages.length);
+        if (item == '_header_user') return _buildSectionHeader(context, localeProvider.t('contacts'), users.length);
+        return _buildResultTile(context, item as _SearchResult);
+      },
     );
   }
 

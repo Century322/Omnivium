@@ -71,6 +71,8 @@ class HomeHeader extends StatelessWidget {
         Semantics(
           label: localeProvider.t('close_conversation'),
           child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
             onTap: onCloseConversation,
             child: Container(
               width: 32,
@@ -85,6 +87,8 @@ class HomeHeader extends StatelessWidget {
         ),
         const Spacer(),
         GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
           onTap: onShowConversationMenu,
           child: Container(
             width: 32,
@@ -106,6 +110,8 @@ class HomeHeader extends StatelessWidget {
       child: Row(
         children: [
           GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
             onTap: isLibraryMode ? onToggleContacts : onOpenDrawer,
             child: Container(
               width: 30,
@@ -130,6 +136,8 @@ class HomeHeader extends StatelessWidget {
             ),
           ),
           GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
             onTap: isLibraryMode ? onToggleSearch : onOpenDiscover,
             child: isLibraryMode
                 ? Container(
@@ -188,9 +196,11 @@ class HomeHeader extends StatelessWidget {
             Row(children: [
               Expanded(
                 child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
                   onTap: onSwitchToChat,
                   child: Center(
-                    child: Icon(LucideIcons.search,
+                    child: Icon(LucideIcons.messageCircle,
                         size: 18,
                         color: t < 0.5 ? AppColors.textPrimary(context) : AppColors.tabIn(context)),
                   ),
@@ -198,6 +208,8 @@ class HomeHeader extends StatelessWidget {
               ),
               Expanded(
                 child: GestureDetector(
+
+      behavior: HitTestBehavior.opaque,
                   onTap: onSwitchToLibrary,
                   child: Center(
                     child: Icon(LucideIcons.monitor,

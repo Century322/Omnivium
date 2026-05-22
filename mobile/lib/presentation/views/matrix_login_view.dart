@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../theme/app_colors.dart';
 import '../theme/locale_provider.dart';
 import '../../core/app_provider.dart';
+import '../../core/totp_service.dart';
+import '../../core/srp_service.dart';
 
 class MatrixLoginView extends StatefulWidget {
   final AppProvider provider;
@@ -18,10 +20,16 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
   final _usernameCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
   final _homeserverCtrl = TextEditingController(text: 'https://matrix.omnivium.app');
+  final _usernameFocus = FocusNode();
+  final _passwordFocus = FocusNode();
+  final _homeserverFocus = FocusNode();
   bool _isRegister = false;
   bool _obscurePassword = true;
   bool _isLoading = false;
   bool _showAdvanced = false;
+  bool _showTotp = false;
+  final _totpCtrl = TextEditingController();
+  final _totpFocus = FocusNode();
   String? _error;
   static const _defaultHomeserver = 'https://matrix.omnivium.app';
 
@@ -30,6 +38,11 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
     _usernameCtrl.dispose();
     _passwordCtrl.dispose();
     _homeserverCtrl.dispose();
+    _totpCtrl.dispose();
+    _usernameFocus.dispose();
+    _passwordFocus.dispose();
+    _homeserverFocus.dispose();
+    _totpFocus.dispose();
     super.dispose();
   }
 
@@ -41,6 +54,13 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
 
   Future<void> _submit() async {
     final t = localeProvider.t;
+    if (_showTotp) {
+      final code = _totpCtrl.text.trim();
+      if (code.length != 6) { setState(() => _error = t('invalid_code')); return; }
+      if (!TotpService.instance.verify(code)) { setState(() => _error = t('invalid_code')); return; }
+      widget.onLoginSuccess?.call();
+      return;
+    }
     final username = _usernameCtrl.text.trim();
     final password = _passwordCtrl.text.trim();
     if (username.isEmpty || password.isEmpty) { setState(() => _error = t('fill_all_fields')); return; }
@@ -49,10 +69,39 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
     setState(() { _isLoading = true; _error = null; });
     try {
       final homeserver = await _getHomeserver();
-      if (_isRegister) { await widget.provider.matrix.register(username, password, homeserver); }
-      else { await widget.provider.matrix.login(username, password, homeserver); }
-      if (mounted && widget.provider.matrix.isLoggedIn) { widget.onLoginSuccess?.call(); }
-      else if (mounted && widget.provider.matrix.error != null) { setState(() => _error = widget.provider.matrix.error); }
+      final srp = SrpService.instance;
+
+      if (!_isRegister && srp.hasVerifier && srp.username == username) {
+        final srpResult = await srp.srpLogin(username, password);
+        if (srpResult != null && srpResult['access_token'] != null) {
+          await widget.provider.matrix.loginWithToken(srpResult['access_token'], srpResult['homeserver'] ?? homeserver);
+          if (mounted && widget.provider.matrix.isLoggedIn) {
+            if (TotpService.instance.isEnabled) {
+              setState(() { _showTotp = true; _isLoading = false; });
+              Future.delayed(const Duration(milliseconds: 100), () => _totpFocus.requestFocus());
+            } else {
+              widget.onLoginSuccess?.call();
+            }
+            return;
+          }
+        }
+      }
+
+      if (_isRegister) {
+        await widget.provider.matrix.register(username, password, homeserver);
+        await srp.createVerifier(username, password);
+      } else {
+        await widget.provider.matrix.login(username, password, homeserver);
+        await srp.createVerifier(username, password);
+      }
+      if (mounted && widget.provider.matrix.isLoggedIn) {
+        if (TotpService.instance.isEnabled) {
+          setState(() { _showTotp = true; _isLoading = false; });
+          Future.delayed(const Duration(milliseconds: 100), () => _totpFocus.requestFocus());
+        } else {
+          widget.onLoginSuccess?.call();
+        }
+      } else if (mounted && widget.provider.matrix.error != null) { setState(() => _error = widget.provider.matrix.error); }
     } catch (e) { if (!mounted) return; setState(() => _error = e.toString().replaceAll('Exception: ', '')); }
     if (mounted) setState(() => _isLoading = false);
   }
@@ -75,25 +124,47 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
           const SizedBox(height: 48),
           Container(decoration: BoxDecoration(color: AppColors.sf(context), borderRadius: BorderRadius.circular(16)),
             child: Column(children: [
-              TextField(controller: _usernameCtrl, style: TextStyle(color: AppColors.textPrimary(context), fontSize: 16),
+              TextField(controller: _usernameCtrl, focusNode: _usernameFocus, style: TextStyle(color: AppColors.textPrimary(context), fontSize: 16),
                 decoration: InputDecoration(labelText: t('username'), hintText: t('username'), hintStyle: TextStyle(color: AppColors.iconGray(context), fontSize: 16),
                   prefixIcon: Icon(LucideIcons.user, color: AppColors.iconGray(context), size: 20), filled: true, fillColor: AppColors.sf(context),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none), contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14))),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14))),
               Divider(height: 1, color: AppColors.divider(context)),
-              TextField(controller: _passwordCtrl, obscureText: _obscurePassword, style: TextStyle(color: AppColors.textPrimary(context), fontSize: 16), onSubmitted: (_) => _submit(),
+              TextField(controller: _passwordCtrl, focusNode: _passwordFocus, obscureText: _obscurePassword, style: TextStyle(color: AppColors.textPrimary(context), fontSize: 16), onSubmitted: (_) => _submit(),
                 decoration: InputDecoration(labelText: t('password'), hintText: t('password'), hintStyle: TextStyle(color: AppColors.iconGray(context), fontSize: 16),
                   prefixIcon: Icon(LucideIcons.lock, color: AppColors.iconGray(context), size: 20),
                   suffixIcon: Semantics(label: localeProvider.t('toggle_password'), child: GestureDetector(onTap: () => setState(() => _obscurePassword = !_obscurePassword),
                     child: Icon(_obscurePassword ? LucideIcons.eye : LucideIcons.eyeOff, color: AppColors.iconGray(context), size: 20))),
                   filled: true, fillColor: AppColors.sf(context),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none), contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14))),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14))),
             ])),
-          if (_showAdvanced) ...[const SizedBox(height: 12),
+          if (_showTotp) ...[const SizedBox(height: 12),
             Container(decoration: BoxDecoration(color: AppColors.sf(context), borderRadius: BorderRadius.circular(16)),
-              child: TextField(controller: _homeserverCtrl, style: TextStyle(color: AppColors.textPrimary(context), fontSize: 14),
+              child: TextField(controller: _totpCtrl, focusNode: _totpFocus, keyboardType: TextInputType.number, maxLength: 6,
+                style: TextStyle(color: AppColors.textPrimary(context), fontSize: 24, fontWeight: FontWeight.w700, letterSpacing: 8),
+                textAlign: TextAlign.center,
+                decoration: InputDecoration(counterText: '', labelText: t('verification_code'), hintStyle: TextStyle(color: AppColors.iconGray(context), fontSize: 14),
+                  filled: true, fillColor: AppColors.sf(context),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14)),
+                onSubmitted: (_) => _submit())),
+          ],
+          if (_showAdvanced && !_showTotp) ...[const SizedBox(height: 12),
+            Container(decoration: BoxDecoration(color: AppColors.sf(context), borderRadius: BorderRadius.circular(16)),
+              child: TextField(controller: _homeserverCtrl, focusNode: _homeserverFocus, style: TextStyle(color: AppColors.textPrimary(context), fontSize: 14),
                 decoration: InputDecoration(labelText: t('server_address'), hintText: t('server_address'), hintStyle: TextStyle(color: AppColors.iconGray(context), fontSize: 14),
                   prefixIcon: Icon(LucideIcons.server, color: AppColors.iconGray(context), size: 18), filled: true, fillColor: AppColors.sf(context),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none), contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12))))],
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12))))],
           const SizedBox(height: 8),
           Semantics(label: localeProvider.t('advanced_options'), child: GestureDetector(onTap: () => setState(() => _showAdvanced = !_showAdvanced),
             child: Align(alignment: Alignment.centerRight, child: Text(_showAdvanced ? t('hide_advanced') : t('advanced_options'), style: TextStyle(color: AppColors.textTertiary(context), fontSize: 12))))),

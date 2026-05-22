@@ -16,8 +16,8 @@ class SupabaseSyncService {
   Future<void> init() async {
     final auth = AuthService.instance;
     if (!auth.isAuthenticated) return;
-    _userId = auth.currentUser?.id;
-    _initialized = true;
+    _userId = auth.matrixUserId ?? auth.currentUser?.id;
+    _initialized = _userId != null;
   }
 
   Future<T> _withRetry<T>(Future<T> Function() operation) async {

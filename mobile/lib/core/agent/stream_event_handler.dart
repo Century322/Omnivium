@@ -107,7 +107,13 @@ class StreamEventHandler {
   }
 
   void completeStreamWithError(int msgIndex, Object error) {
-    _conversation.finalizeStreaming(msgIndex, 'Error: $error');
+    String msg;
+    if (error is RateLimitException) {
+      msg = '⚠️ ${error.waitSeconds < 60 ? '${error.waitSeconds}s' : '${(error.waitSeconds / 60).round()}min'}';
+    } else {
+      msg = 'Error: $error';
+    }
+    _conversation.finalizeStreaming(msgIndex, msg);
     _streamingController.addError(error.toString());
   }
 

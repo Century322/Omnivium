@@ -65,6 +65,20 @@ class MatrixProvider extends ChangeNotifier {
     if (!_disposed) notifyListeners();
   }
 
+  Future<void> loginWithToken(String token, String homeserverUrl) async {
+    _isLoading = true;
+    _error = null;
+    if (!_disposed) notifyListeners();
+    try {
+      await _service.loginWithToken(token, homeserverUrl);
+      _listenToSync();
+    } catch (e) {
+      _error = e.toString();
+    }
+    _isLoading = false;
+    if (!_disposed) notifyListeners();
+  }
+
   Future<void> register(String username, String password, String homeserverUrl) async {
     _isLoading = true;
     _error = null;

@@ -20,30 +20,38 @@ class SettingItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final effectiveTextColor = textColor ?? AppColors.textPrimary(context);
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title, style: TextStyle(fontSize: 16, color: effectiveTextColor)),
-                  if (subtitle != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 4),
-                      child: Text(
-                        subtitle!,
-                        style: TextStyle(fontSize: 13, color: AppColors.mut(context), height: 1.4),
-                      ),
-                    ),
-                ],
-              ),
+    return Semantics(
+      button: onTap != null,
+      label: '$title${subtitle != null ? ', $subtitle' : ''}',
+      enabled: onTap != null,
+      child: InkWell(
+        onTap: onTap,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 48),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(title, style: TextStyle(fontSize: 16, color: effectiveTextColor)),
+                      if (subtitle != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: Text(
+                            subtitle!,
+                            style: TextStyle(fontSize: 13, color: AppColors.mut(context), height: 1.4),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                rightContent ?? const SizedBox.shrink(),
+              ],
             ),
-            rightContent ?? const SizedBox.shrink(),
-          ],
+          ),
         ),
       ),
     );

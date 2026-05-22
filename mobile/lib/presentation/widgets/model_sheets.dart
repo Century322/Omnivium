@@ -20,9 +20,8 @@ class OptionsContent extends StatelessWidget {
         children: [
           Container(width: 40, height: 4, decoration: BoxDecoration(color: AppColors.textDisabled(context), borderRadius: BorderRadius.circular(2))),
           const SizedBox(height: 16),
-          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          Row(mainAxisAlignment: MainAxisAlignment.start, children: [
             Text(localeProvider.t('options'), style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500, color: AppColors.textPrimary(context))),
-            GestureDetector(onTap: onClose, child: Container(width: 32, height: 32, decoration: BoxDecoration(color: AppColors.sfAlt(context), borderRadius: BorderRadius.circular(16)), child: Icon(LucideIcons.x, size: 18, color: AppColors.sec(context)))),
           ]),
           const SizedBox(height: 24),
           Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
@@ -113,9 +112,8 @@ class ModelsContent extends StatelessWidget {
       child: Column(mainAxisSize: MainAxisSize.min, children: [
         Container(width: 40, height: 4, decoration: BoxDecoration(color: AppColors.textDisabled(context), borderRadius: BorderRadius.circular(2))),
         const SizedBox(height: 20),
-        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+        Row(mainAxisAlignment: MainAxisAlignment.start, children: [
           Text(localeProvider.t('model'), style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500, color: AppColors.textPrimary(context))),
-          GestureDetector(onTap: onClose, child: Container(width: 32, height: 32, decoration: BoxDecoration(color: AppColors.sfAlt(context), borderRadius: BorderRadius.circular(16)), child: Icon(LucideIcons.x, size: 18, color: AppColors.sec(context)))),
         ]),
         const SizedBox(height: 20),
         if (models.isEmpty) Padding(padding: const EdgeInsets.symmetric(vertical: 24), child: Center(child: Text(localeProvider.t('no_models'), style: TextStyle(color: AppColors.textDisabled(context), fontSize: 14)))),

@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'app_colors.dart';
@@ -53,6 +53,27 @@ class ThemeProvider extends ChangeNotifier {
       case ThemeMode.light: return localeProvider.t('light');
       case ThemeMode.system: return localeProvider.t('system');
       default: return localeProvider.t('dark');
+    }
+  }
+
+  SystemUiOverlayStyle get overlayStyle {
+    switch (_mode) {
+      case ThemeMode.light:
+        return const SystemUiOverlayStyle(
+          statusBarColor: AppColors.lightBackground,
+          statusBarIconBrightness: Brightness.dark,
+          statusBarBrightness: Brightness.light,
+          systemNavigationBarColor: AppColors.lightBackground,
+          systemNavigationBarIconBrightness: Brightness.dark,
+        );
+      default:
+        return const SystemUiOverlayStyle(
+          statusBarColor: AppColors.background,
+          statusBarIconBrightness: Brightness.light,
+          statusBarBrightness: Brightness.dark,
+          systemNavigationBarColor: AppColors.background,
+          systemNavigationBarIconBrightness: Brightness.light,
+        );
     }
   }
 

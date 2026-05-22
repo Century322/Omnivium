@@ -86,6 +86,17 @@ class ConversationManager {
     _chatHistory.add(ChatMessage(role: 'assistant', content: content));
   }
 
+  void removeMessagePair(int assistantIndex) {
+    if (assistantIndex <= 0 || assistantIndex >= _messages.length) return;
+    final userContent = _messages[assistantIndex - 1].content;
+    _messages.removeAt(assistantIndex);
+    _messages.removeAt(assistantIndex - 1);
+    _chatHistory.removeWhere((m) =>
+      m.role == 'user' && m.content == userContent);
+    _chatHistory.removeWhere((m) =>
+      m.role == 'assistant' && _messages.every((cm) => cm.content != m.content));
+  }
+
   void addThought(ThoughtType type, String content, {Map<String, dynamic>? metadata}) {
     _currentThoughts.add(ThoughtStep(
       type: type,
