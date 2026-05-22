@@ -41,7 +41,6 @@ class _SettingsViewState extends State<SettingsView>
   bool _dataRetention = true;
   bool _agentEnabled = true;
   bool _lockEnabled = false;
-  String _agentPermission = 'confirm';
   String _assistantLang = 'auto';
   String _imageModel = 'Default';
   String _sttEngine = 'system';
@@ -73,8 +72,6 @@ class _SettingsViewState extends State<SettingsView>
       _dataRetention = prefs.getBool('omnivium_data_retention') ?? true;
       _agentEnabled = prefs.getBool('omnivium_agent_enabled') ?? true;
       _lockEnabled = prefs.getBool('lock_enabled') ?? false;
-      _agentPermission =
-          prefs.getString('omnivium_agent_permission') ?? 'confirm';
       _assistantLang = prefs.getString('omnivium_assistant_lang') ?? 'auto';
       _imageModel = prefs.getString('omnivium_image_model') ?? 'Default';
       _sttEngine = prefs.getString('omnivium_stt_engine') ?? 'system';
