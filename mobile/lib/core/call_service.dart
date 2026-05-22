@@ -31,7 +31,7 @@ class VoIPCall {
   bool get isActive =>
       state == CallState.connected || state == CallState.connecting;
 
-  Future<void> createPeerConnection() async {
+  Future<void> _setupPeerConnection() async {
     final config = {
       'iceServers': [
         {'urls': 'stun:stun.l.google.com:19302'},
@@ -64,7 +64,7 @@ class VoIPCall {
   }
 
   Future<String?> createOffer() async {
-    await createPeerConnection();
+    await _setupPeerConnection();
     final offer = await _peerConnection!.createOffer({
       'offerToReceiveAudio': true,
       'offerToReceiveVideo': false,
@@ -81,7 +81,7 @@ class VoIPCall {
   }
 
   Future<String?> createAnswer(String offerSdp) async {
-    await createPeerConnection();
+    await _setupPeerConnection();
     final offer = RTCSessionDescription(offerSdp, 'offer');
     await _peerConnection!.setRemoteDescription(offer);
 
@@ -154,20 +154,17 @@ class CallService {
     AppLogger.instance.info('CallService initialized');
   }
 
-  void _handleTimelineEvent(matrix.EventUpdate update) {
+  void _handleTimelineEvent(matrix.Event event) {
     try {
-      final content = update.content;
-      if (content is! Map<String, dynamic>) return;
-
-      final type = content['type'] as String?;
+      final type = event.type;
       if (type == null || !type.startsWith('m.call.')) return;
 
-      final callContent = content['content'] as Map<String, dynamic>?;
-      if (callContent == null) return;
+      final callContent = event.content;
+      if (callContent.isEmpty) return;
 
       final callId = callContent['call_id'] as String?;
-      final roomId = update.roomID;
-      if (callId == null || roomId == null) return;
+      final roomId = event.room.id;
+      if (callId == null) return;
 
       switch (type) {
         case 'm.call.invite':
@@ -376,7 +373,7 @@ class CallService {
     try {
       final room = client.getRoomById(roomId);
       if (room == null) return;
-      await room.sendEvent(type, content);
+      await room.sendEvent(content, type: type);
     } catch (e) {
       AppLogger.instance.error('Failed to send call event', error: e);
     }

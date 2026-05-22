@@ -460,11 +460,13 @@ class _FriendChatPanelState extends State<FriendChatPanel>
   }
 
   void _startVoiceCall() {
-    final room = _room;
+    final client = widget.provider.matrix.client;
+    if (client == null) return;
+    final room = client.getRoomById(widget.chatTargetId);
     if (room == null) return;
     final remoteMembers = room.getParticipants();
     final remoteUser = remoteMembers
-        .where((m) => m.id != room.client.userID)
+        .where((m) => m.id != client.userID)
         .firstOrNull;
     if (remoteUser == null) return;
 
