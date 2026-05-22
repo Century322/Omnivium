@@ -6,7 +6,9 @@ import 'package:omnivium/presentation/views/my_id_view.dart';
 void main() {
   group('MyIdView', () {
     testWidgets('renders my id view', (tester) async {
-      await tester.pumpWidget(MaterialApp(home: MyIdView(provider: AppProvider())));
+      await tester.pumpWidget(
+        MaterialApp(home: MyIdView(provider: AppProvider())),
+      );
       expect(find.byType(MyIdView), findsOneWidget);
     });
   });

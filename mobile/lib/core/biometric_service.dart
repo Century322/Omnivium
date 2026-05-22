@@ -22,7 +22,9 @@ class BiometricService {
       if (_isAvailable) {
         _biometricTypes = await _localAuth.getAvailableBiometrics();
       }
-      AppLogger.instance.info('Biometric: available=$_isAvailable, types=$_biometricTypes');
+      AppLogger.instance.info(
+        'Biometric: available=$_isAvailable, types=$_biometricTypes',
+      );
     } on PlatformException catch (e) {
       AppLogger.instance.info('Biometric init failed: $e');
       _isAvailable = false;

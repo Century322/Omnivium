@@ -16,11 +16,11 @@ class JournalEntry {
   });
 
   Map<String, dynamic> toJson() => {
-        'sequence': sequence,
-        'timestamp': timestamp,
-        'type': type,
-        'data': data,
-      };
+    'sequence': sequence,
+    'timestamp': timestamp,
+    'type': type,
+    'data': data,
+  };
 }
 
 class EventJournal {
@@ -34,9 +34,9 @@ class EventJournal {
     required RuntimeClock clock,
     int compactionThreshold = 10000,
     PersistenceBackend? persistence,
-  })  : _clock = clock,
-        _compactionThreshold = compactionThreshold,
-        _persistence = persistence;
+  }) : _clock = clock,
+       _compactionThreshold = compactionThreshold,
+       _persistence = persistence;
 
   int get length => _entries.length;
   int get currentSequence => _sequence;
@@ -83,7 +83,12 @@ class EventJournal {
     });
   }
 
-  JournalEntry appendCapabilityInvoke(String capabilityId, String pluginId, String callerId, {String status = 'started'}) {
+  JournalEntry appendCapabilityInvoke(
+    String capabilityId,
+    String pluginId,
+    String callerId, {
+    String status = 'started',
+  }) {
     return append('capability_invoke', {
       'capabilityId': capabilityId,
       'pluginId': pluginId,
@@ -93,17 +98,18 @@ class EventJournal {
   }
 
   JournalEntry appendTaskSchedule(String taskId, String status) {
-    return append('task_schedule', {
-      'taskId': taskId,
-      'status': status,
-    });
+    return append('task_schedule', {'taskId': taskId, 'status': status});
   }
 
   JournalEntry appendSnapshot(Map<String, dynamic> snapshot) {
     return append('snapshot', snapshot);
   }
 
-  List<JournalEntry> replay({int? fromSequence, int? toSequence, String? type}) {
+  List<JournalEntry> replay({
+    int? fromSequence,
+    int? toSequence,
+    String? type,
+  }) {
     var filtered = _entries;
 
     if (fromSequence != null) {

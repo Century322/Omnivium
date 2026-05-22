@@ -53,9 +53,7 @@ class AgentStateMachine {
   bool get canRecover => _recoverCount < _maxRecoverAttempts;
 
   bool transition(AgentState newState, {String? condition}) {
-    final valid = _transitions.any(
-      (t) => t.from == _state && t.to == newState,
-    );
+    final valid = _transitions.any((t) => t.from == _state && t.to == newState);
 
     if (!valid) return false;
 
@@ -74,7 +72,9 @@ class AgentStateMachine {
 
   void _applyTransition(AgentState newState, String? condition) {
     final oldState = _state;
-    _history.add(StateTransition(from: oldState, to: newState, condition: condition));
+    _history.add(
+      StateTransition(from: oldState, to: newState, condition: condition),
+    );
     if (_history.length > _maxHistorySize) {
       _history.removeRange(0, _history.length - _maxHistorySize);
     }

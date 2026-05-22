@@ -30,11 +30,32 @@ class _GlobalErrorWidget extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.error_outline, size: 48, color: AppColors.dng(context)),
+              Icon(
+                Icons.error_outline,
+                size: 48,
+                color: AppColors.dng(context),
+              ),
               const SizedBox(height: 12),
-              Text(t('something_went_wrong'), style: TextStyle(color: AppColors.textPrimary(context), fontSize: 16, fontWeight: FontWeight.w600), textAlign: TextAlign.center),
+              Text(
+                t('something_went_wrong'),
+                style: TextStyle(
+                  color: AppColors.textPrimary(context),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+                textAlign: TextAlign.center,
+              ),
               const SizedBox(height: 8),
-              Text(details.exceptionAsString(), style: TextStyle(color: AppColors.textSecondary(context), fontSize: 12), textAlign: TextAlign.center, maxLines: 3, overflow: TextOverflow.ellipsis),
+              Text(
+                details.exceptionAsString(),
+                style: TextStyle(
+                  color: AppColors.textSecondary(context),
+                  fontSize: 12,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+              ),
             ],
           ),
         ),
@@ -87,7 +108,8 @@ class _AppErrorBoundaryState extends State<AppErrorBoundary> {
 class _ErrorCatcher extends StatelessWidget {
   final Widget child;
   final void Function(Object, StackTrace) onCaught;
-  const _ErrorCatcher({required this.child, required this.onCaught, Key? key}) : super(key: key);
+  const _ErrorCatcher({required this.child, required this.onCaught, Key? key})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -110,9 +132,24 @@ class _ErrorRecoveryView extends StatelessWidget {
           children: [
             Icon(Icons.error_outline, size: 56, color: AppColors.dng(context)),
             const SizedBox(height: 16),
-            Text(t('something_went_wrong'), style: TextStyle(color: AppColors.textPrimary(context), fontSize: 18, fontWeight: FontWeight.w600), textAlign: TextAlign.center),
+            Text(
+              t('something_went_wrong'),
+              style: TextStyle(
+                color: AppColors.textPrimary(context),
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
+            ),
             const SizedBox(height: 8),
-            Text(t('error_boundary_desc'), style: TextStyle(color: AppColors.textSecondary(context), fontSize: 14), textAlign: TextAlign.center),
+            Text(
+              t('error_boundary_desc'),
+              style: TextStyle(
+                color: AppColors.textSecondary(context),
+                fontSize: 14,
+              ),
+              textAlign: TextAlign.center,
+            ),
             const SizedBox(height: 24),
             FilledButton.icon(
               onPressed: onRetry,

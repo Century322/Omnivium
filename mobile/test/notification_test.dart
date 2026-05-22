@@ -5,8 +5,11 @@ void main() {
   group('AppNotification', () {
     test('creates with required fields', () {
       final notif = AppNotification(
-        id: 'n1', title: 'Test', body: 'Body',
-        type: NotificationType.message, timestamp: DateTime(2024),
+        id: 'n1',
+        title: 'Test',
+        body: 'Body',
+        type: NotificationType.message,
+        timestamp: DateTime(2024),
       );
       expect(notif.id, 'n1');
       expect(notif.title, 'Test');
@@ -17,9 +20,13 @@ void main() {
 
     test('creates with optional fields', () {
       final notif = AppNotification(
-        id: 'n1', title: 'Test', body: 'Body',
-        type: NotificationType.invite, timestamp: DateTime(2024),
-        roomId: 'room1', senderId: 'user1',
+        id: 'n1',
+        title: 'Test',
+        body: 'Body',
+        type: NotificationType.invite,
+        timestamp: DateTime(2024),
+        roomId: 'room1',
+        senderId: 'user1',
       );
       expect(notif.roomId, 'room1');
       expect(notif.senderId, 'user1');
@@ -27,8 +34,11 @@ void main() {
 
     test('can be copied as read', () {
       final notif = AppNotification(
-        id: 'n1', title: 'Test', body: 'Body',
-        type: NotificationType.message, timestamp: DateTime(2024),
+        id: 'n1',
+        title: 'Test',
+        body: 'Body',
+        type: NotificationType.message,
+        timestamp: DateTime(2024),
       );
       expect(notif.read, false);
       final readNotif = notif.copyWith(read: true);
@@ -38,8 +48,11 @@ void main() {
 
     test('supports optional roomId and senderId', () {
       final notif = AppNotification(
-        id: 'n1', title: 'Test', body: 'Body',
-        type: NotificationType.message, timestamp: DateTime(2024),
+        id: 'n1',
+        title: 'Test',
+        body: 'Body',
+        type: NotificationType.message,
+        timestamp: DateTime(2024),
       );
       expect(notif.roomId, isNull);
       expect(notif.senderId, isNull);
@@ -48,9 +61,13 @@ void main() {
     test('toJson returns correct map', () {
       final ts = DateTime(2024, 1, 15);
       final notif = AppNotification(
-        id: 'n1', title: 'Test', body: 'Body',
-        type: NotificationType.message, timestamp: ts,
-        roomId: 'room1', senderId: 'user1',
+        id: 'n1',
+        title: 'Test',
+        body: 'Body',
+        type: NotificationType.message,
+        timestamp: ts,
+        roomId: 'room1',
+        senderId: 'user1',
       );
       final json = notif.toJson();
       expect(json['id'], 'n1');
@@ -64,9 +81,14 @@ void main() {
 
     test('fromJson creates correct object', () {
       final json = {
-        'id': 'n1', 'title': 'Test', 'body': 'Body',
-        'type': 'message', 'timestamp': '2024-01-15T00:00:00.000',
-        'read': true, 'roomId': 'room1', 'senderId': 'user1',
+        'id': 'n1',
+        'title': 'Test',
+        'body': 'Body',
+        'type': 'message',
+        'timestamp': '2024-01-15T00:00:00.000',
+        'read': true,
+        'roomId': 'room1',
+        'senderId': 'user1',
       };
       final notif = AppNotification.fromJson(json);
       expect(notif.id, 'n1');
@@ -80,8 +102,11 @@ void main() {
 
     test('fromJson handles missing optional fields', () {
       final json = {
-        'id': 'n1', 'title': 'Test', 'body': 'Body',
-        'type': 'message', 'timestamp': '2024-01-15T00:00:00.000',
+        'id': 'n1',
+        'title': 'Test',
+        'body': 'Body',
+        'type': 'message',
+        'timestamp': '2024-01-15T00:00:00.000',
       };
       final notif = AppNotification.fromJson(json);
       expect(notif.read, false);
@@ -91,9 +116,14 @@ void main() {
 
     test('toJson and fromJson round-trip', () {
       final notif = AppNotification(
-        id: 'n1', title: 'Test', body: 'Body',
-        type: NotificationType.invite, timestamp: DateTime(2024, 1, 15),
-        roomId: 'room1', senderId: 'user1', read: true,
+        id: 'n1',
+        title: 'Test',
+        body: 'Body',
+        type: NotificationType.invite,
+        timestamp: DateTime(2024, 1, 15),
+        roomId: 'room1',
+        senderId: 'user1',
+        read: true,
       );
       final json = notif.toJson();
       final restored = AppNotification.fromJson(json);
@@ -108,12 +138,18 @@ void main() {
 
     test('different notification types', () {
       final messageNotif = AppNotification(
-        id: 'n1', title: 'Msg', body: 'Hello',
-        type: NotificationType.message, timestamp: DateTime(2024),
+        id: 'n1',
+        title: 'Msg',
+        body: 'Hello',
+        type: NotificationType.message,
+        timestamp: DateTime(2024),
       );
       final inviteNotif = AppNotification(
-        id: 'n2', title: 'Invite', body: 'Invited',
-        type: NotificationType.invite, timestamp: DateTime(2024),
+        id: 'n2',
+        title: 'Invite',
+        body: 'Invited',
+        type: NotificationType.invite,
+        timestamp: DateTime(2024),
       );
       expect(messageNotif.type, NotificationType.message);
       expect(inviteNotif.type, NotificationType.invite);

@@ -28,10 +28,10 @@ class ObservatoryEvent {
   });
 
   Map<String, dynamic> toJson() => {
-        'type': type.name,
-        'timestamp': timestamp,
-        'data': data,
-      };
+    'type': type.name,
+    'timestamp': timestamp,
+    'data': data,
+  };
 }
 
 class RuntimeObservatory {
@@ -51,9 +51,9 @@ class RuntimeObservatory {
     required RuntimeContainer container,
     DistributedRuntime? distributed,
     int bufferSize = 1000,
-  })  : _container = container,
-        _distributed = distributed,
-        _bufferSize = bufferSize;
+  }) : _container = container,
+       _distributed = distributed,
+       _bufferSize = bufferSize;
 
   Stream<ObservatoryEvent> get events => _eventController.stream;
   List<ObservatoryEvent> get recentEvents => List.unmodifiable(_eventBuffer);
@@ -62,7 +62,8 @@ class RuntimeObservatory {
   void start({Duration interval = const Duration(milliseconds: 500)}) {
     if (_pollTimer != null) return;
 
-    _lastJournalSeq = _container.eventJournal.replay().lastOrNull?.sequence ?? 0;
+    _lastJournalSeq =
+        _container.eventJournal.replay().lastOrNull?.sequence ?? 0;
     _lastStatus = _container.stateSnapshot.status;
 
     _pollTimer = Timer.periodic(interval, (_) => _poll());
@@ -128,7 +129,11 @@ class RuntimeObservatory {
     });
   }
 
-  void notifyCapabilityInvoke(String capabilityId, String pluginId, String status) {
+  void notifyCapabilityInvoke(
+    String capabilityId,
+    String pluginId,
+    String status,
+  ) {
     _emit(ObservatoryEventType.capabilityInvoke, {
       'capabilityId': capabilityId,
       'pluginId': pluginId,
@@ -136,7 +141,11 @@ class RuntimeObservatory {
     });
   }
 
-  void notifyPolicyDecision(String callerId, String targetCapability, bool allowed) {
+  void notifyPolicyDecision(
+    String callerId,
+    String targetCapability,
+    bool allowed,
+  ) {
     _emit(ObservatoryEventType.policyDecision, {
       'callerId': callerId,
       'targetCapability': targetCapability,
@@ -145,10 +154,7 @@ class RuntimeObservatory {
   }
 
   void notifyDistributedEvent(String type, Map<String, dynamic> data) {
-    _emit(ObservatoryEventType.distributedEvent, {
-      'eventType': type,
-      ...data,
-    });
+    _emit(ObservatoryEventType.distributedEvent, {'eventType': type, ...data});
   }
 
   void _emit(ObservatoryEventType type, Map<String, dynamic> data) {
@@ -180,23 +186,17 @@ class RuntimeObservatory {
         'loaded': snap.loadedPluginCount,
         'active': snap.activePluginCount,
       },
-      'tasks': {
-        'active': snap.activeTaskCount,
-      },
-      'sessions': {
-        'active': snap.activeSessionCount,
-      },
-      'capabilities': {
-        'total': snap.capabilityCount,
-      },
+      'tasks': {'active': snap.activeTaskCount},
+      'sessions': {'active': snap.activeSessionCount},
+      'capabilities': {'total': snap.capabilityCount},
       'resources': {
-        'tokens': '${_container.resourceController.usage.tokensUsed}/${_container.resourceController.budget.maxTokens}',
-        'streams': '${_container.resourceController.usage.activeStreams}/${_container.resourceController.budget.maxStreams}',
+        'tokens':
+            '${_container.resourceController.usage.tokensUsed}/${_container.resourceController.budget.maxTokens}',
+        'streams':
+            '${_container.resourceController.usage.activeStreams}/${_container.resourceController.budget.maxStreams}',
         'violations': _container.resourceController.violations.length,
       },
-      'journal': {
-        'entries': _container.eventJournal.replay().length,
-      },
+      'journal': {'entries': _container.eventJournal.replay().length},
       'distributed': _distributed != null
           ? {
               'nodeId': _distributed.nodeId,
@@ -215,7 +215,8 @@ class RuntimeObservatory {
     final edges = <Map<String, dynamic>>[];
 
     for (final d in descriptors) {
-      final state = _container.pluginRegistry.pluginStates[d.id]?.name ?? 'unknown';
+      final state =
+          _container.pluginRegistry.pluginStates[d.id]?.name ?? 'unknown';
       nodes.add({
         'id': d.id,
         'name': d.name,
@@ -243,31 +244,43 @@ class RuntimeObservatory {
         : entries;
 
     return {
-      'entries': limited.map((e) => {
-        'seq': e.sequence,
-        'type': e.type,
-        'ts': e.timestamp,
-        'data': e.data,
-      }).toList(),
+      'entries': limited
+          .map(
+            (e) => {
+              'seq': e.sequence,
+              'type': e.type,
+              'ts': e.timestamp,
+              'data': e.data,
+            },
+          )
+          .toList(),
     };
   }
 
   Map<String, dynamic> getTraceFlamegraph() {
     final traces = _container.traceService.recentTraces(limit: 100);
     return {
-      'traces': traces.map((t) => {
-        'traceId': t.traceId,
-        'createdAt': t.createdAt,
-        'totalDurationMs': t.totalDurationMs,
-        'spanCount': t.spans.length,
-        'spans': t.spans.map((s) => {
-          'spanId': s.spanId,
-          'operation': s.operation,
-          'startTimeMs': s.startTimeMs,
-          'durationMs': s.durationMs,
-          'status': s.status,
-        }).toList(),
-      }).toList(),
+      'traces': traces
+          .map(
+            (t) => {
+              'traceId': t.traceId,
+              'createdAt': t.createdAt,
+              'totalDurationMs': t.totalDurationMs,
+              'spanCount': t.spans.length,
+              'spans': t.spans
+                  .map(
+                    (s) => {
+                      'spanId': s.spanId,
+                      'operation': s.operation,
+                      'startTimeMs': s.startTimeMs,
+                      'durationMs': s.durationMs,
+                      'status': s.status,
+                    },
+                  )
+                  .toList(),
+            },
+          )
+          .toList(),
     };
   }
 
@@ -281,17 +294,25 @@ class RuntimeObservatory {
     return {
       'initialized': true,
       'localNodeId': dist.nodeId,
-      'nodes': nodes.map((n) => {
-        'id': n.nodeId,
-        'address': n.addressKey,
-        'role': n.role.name,
-        'state': n.state.name,
-      }).toList(),
-      'remoteCapabilities': bindings.map((b) => {
-        'capabilityId': b.capabilityId,
-        'providerNodeId': b.providerNodeId,
-        'state': b.state.name,
-      }).toList(),
+      'nodes': nodes
+          .map(
+            (n) => {
+              'id': n.nodeId,
+              'address': n.addressKey,
+              'role': n.role.name,
+              'state': n.state.name,
+            },
+          )
+          .toList(),
+      'remoteCapabilities': bindings
+          .map(
+            (b) => {
+              'capabilityId': b.capabilityId,
+              'providerNodeId': b.providerNodeId,
+              'state': b.state.name,
+            },
+          )
+          .toList(),
     };
   }
 

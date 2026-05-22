@@ -27,7 +27,11 @@ Future<Map<String, bool>> performSecurityCheck() async {
           break;
         }
       } catch (e, stackTrace) {
-        AppLogger.instance.warning('Root check path access failed', error: e, stackTrace: stackTrace);
+        AppLogger.instance.warning(
+          'Root check path access failed',
+          error: e,
+          stackTrace: stackTrace,
+        );
       }
     }
 
@@ -60,7 +64,11 @@ Future<Map<String, bool>> performSecurityCheck() async {
           break;
         }
       } catch (e, stackTrace) {
-        AppLogger.instance.warning('Jailbreak check path access failed', error: e, stackTrace: stackTrace);
+        AppLogger.instance.warning(
+          'Jailbreak check path access failed',
+          error: e,
+          stackTrace: stackTrace,
+        );
       }
     }
 
@@ -77,17 +85,18 @@ Future<bool> _checkAndroidEmulator() async {
     final buildProps = File('/system/build.prop');
     if (await buildProps.exists()) {
       final content = await buildProps.readAsString();
-      indicators['product_model'] = content.contains('sdk') ||
+      indicators['product_model'] =
+          content.contains('sdk') ||
           content.contains('google_sdk') ||
           content.contains('Emulator') ||
           content.contains('Android SDK built for x86') ||
           content.contains('Genymotion') ||
           content.contains('generic');
-      indicators['product_device'] = content.contains('generic') ||
-          content.contains('vbox');
+      indicators['product_device'] =
+          content.contains('generic') || content.contains('vbox');
       indicators['product_board'] = content.contains('goldfish');
-      indicators['hardware'] = content.contains('ranchu') ||
-          content.contains('vbox86');
+      indicators['hardware'] =
+          content.contains('ranchu') || content.contains('vbox86');
     }
   } catch (_) {}
 

@@ -29,38 +29,54 @@ class ThoughtChainPanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Semantics(label: localeProvider.t('toggle_thought_chain'), child: GestureDetector(
-
-      behavior: HitTestBehavior.opaque,
-            onTap: onToggle,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: Row(
-                children: [
-                  Icon(Icons.psychology, size: 16, color: AppColors.accent.withValues(alpha: 0.8)),
-                  const SizedBox(width: 6),
-                  Text(
-                    localeProvider.t('thinking_process'),
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.accent.withValues(alpha: 0.9),
+          Semantics(
+            label: localeProvider.t('toggle_thought_chain'),
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: onToggle,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.psychology,
+                      size: 16,
+                      color: AppColors.accent.withValues(alpha: 0.8),
                     ),
-                  ),
-                  const Spacer(),
-                  AnimatedRotation(
-                    turns: isExpanded ? 0.0 : -0.25,
-                    duration: const Duration(milliseconds: 200),
-                    child: Icon(Icons.expand_more, size: 16, color: AppColors.textTertiary(context)),
-                  ),
-                ],
+                    const SizedBox(width: 6),
+                    Text(
+                      localeProvider.t('thinking_process'),
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.accent.withValues(alpha: 0.9),
+                      ),
+                    ),
+                    const Spacer(),
+                    AnimatedRotation(
+                      turns: isExpanded ? 0.0 : -0.25,
+                      duration: const Duration(milliseconds: 200),
+                      child: Icon(
+                        Icons.expand_more,
+                        size: 16,
+                        color: AppColors.textTertiary(context),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          )),
+          ),
           if (isExpanded) ...[
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Container(height: 0.5, color: AppColors.accent.withValues(alpha: 0.1)),
+              child: Container(
+                height: 0.5,
+                color: AppColors.accent.withValues(alpha: 0.1),
+              ),
             ),
             const SizedBox(height: 6),
             ...thoughts.map((step) => _ThoughtStepTile(step: step)),
@@ -80,14 +96,18 @@ class _ThoughtStepTile extends StatefulWidget {
   State<_ThoughtStepTile> createState() => _ThoughtStepTileState();
 }
 
-class _ThoughtStepTileState extends State<_ThoughtStepTile> with SingleTickerProviderStateMixin {
+class _ThoughtStepTileState extends State<_ThoughtStepTile>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _opacity;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 400));
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
     _opacity = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
     _controller.forward();
   }
@@ -146,13 +166,17 @@ class ThinkingIndicator extends StatefulWidget {
   State<ThinkingIndicator> createState() => _ThinkingIndicatorState();
 }
 
-class _ThinkingIndicatorState extends State<ThinkingIndicator> with SingleTickerProviderStateMixin {
+class _ThinkingIndicatorState extends State<ThinkingIndicator>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 1500))..repeat();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat();
   }
 
   @override
@@ -172,7 +196,9 @@ class _ThinkingIndicatorState extends State<ThinkingIndicator> with SingleTicker
             height: 16,
             child: CircularProgressIndicator(
               strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation(AppColors.accent.withValues(alpha: 0.6)),
+              valueColor: AlwaysStoppedAnimation(
+                AppColors.accent.withValues(alpha: 0.6),
+              ),
             ),
           ),
           const SizedBox(width: 8),

@@ -1,8 +1,4 @@
-enum BindingState {
-  available,
-  unreachable,
-  deprecated,
-}
+enum BindingState { available, unreachable, deprecated }
 
 class RemoteCapabilityBinding {
   final String capabilityId;
@@ -34,32 +30,31 @@ class RemoteCapabilityBinding {
     int? lastVerifiedAt,
     int? version,
     Map<String, String>? metadata,
-  }) =>
-      RemoteCapabilityBinding(
-        capabilityId: capabilityId ?? this.capabilityId,
-        providerNodeId: providerNodeId ?? this.providerNodeId,
-        providerPluginId: providerPluginId ?? this.providerPluginId,
-        state: state ?? this.state,
-        discoveredAt: discoveredAt ?? this.discoveredAt,
-        lastVerifiedAt: lastVerifiedAt ?? this.lastVerifiedAt,
-        version: version ?? this.version,
-        metadata: metadata ?? this.metadata,
-      );
+  }) => RemoteCapabilityBinding(
+    capabilityId: capabilityId ?? this.capabilityId,
+    providerNodeId: providerNodeId ?? this.providerNodeId,
+    providerPluginId: providerPluginId ?? this.providerPluginId,
+    state: state ?? this.state,
+    discoveredAt: discoveredAt ?? this.discoveredAt,
+    lastVerifiedAt: lastVerifiedAt ?? this.lastVerifiedAt,
+    version: version ?? this.version,
+    metadata: metadata ?? this.metadata,
+  );
 
   bool get isAvailable => state == BindingState.available;
 
   String get bindingKey => '$providerNodeId:$providerPluginId:$capabilityId';
 
   Map<String, dynamic> toJson() => {
-        'capabilityId': capabilityId,
-        'providerNodeId': providerNodeId,
-        'providerPluginId': providerPluginId,
-        'state': state.name,
-        'discoveredAt': discoveredAt,
-        'lastVerifiedAt': lastVerifiedAt,
-        'version': version,
-        'metadata': metadata,
-      };
+    'capabilityId': capabilityId,
+    'providerNodeId': providerNodeId,
+    'providerPluginId': providerPluginId,
+    'state': state.name,
+    'discoveredAt': discoveredAt,
+    'lastVerifiedAt': lastVerifiedAt,
+    'version': version,
+    'metadata': metadata,
+  };
 
   factory RemoteCapabilityBinding.fromJson(Map<String, dynamic> json) =>
       RemoteCapabilityBinding(
@@ -73,6 +68,9 @@ class RemoteCapabilityBinding {
         discoveredAt: json['discoveredAt'] as int,
         lastVerifiedAt: json['lastVerifiedAt'] as int,
         version: json['version'] as int? ?? 1,
-        metadata: (json['metadata'] as Map<String, dynamic>?)?.cast<String, String>() ?? {},
+        metadata:
+            (json['metadata'] as Map<String, dynamic>?)
+                ?.cast<String, String>() ??
+            {},
       );
 }

@@ -61,14 +61,16 @@ void main() {
 
     test('custom rule overrides default', () {
       final engine = PolicyEngine.defaultPolicy();
-      engine.addRule(const PolicyRule(
-        id: 'allow-agent-storage-delete',
-        description: 'Allow agent to delete storage in dev',
-        effect: PolicyEffect.allow,
-        callerPattern: 'fake-agent',
-        targetPattern: 'storage.delete',
-        priority: 150,
-      ));
+      engine.addRule(
+        const PolicyRule(
+          id: 'allow-agent-storage-delete',
+          description: 'Allow agent to delete storage in dev',
+          effect: PolicyEffect.allow,
+          callerPattern: 'fake-agent',
+          targetPattern: 'storage.delete',
+          priority: 150,
+        ),
+      );
 
       final decision = engine.evaluate(
         callerId: 'fake-agent',
@@ -79,20 +81,24 @@ void main() {
 
     test('wildcard caller matches all', () {
       final engine = PolicyEngine();
-      engine.addRule(const PolicyRule(
-        id: 'deny-all-chaos',
-        description: 'Deny all chaos capabilities',
-        effect: PolicyEffect.deny,
-        callerPattern: '*',
-        targetPattern: 'chaos.*',
-        priority: 100,
-      ));
-      engine.addRule(const PolicyRule(
-        id: 'allow-all',
-        description: 'Allow all',
-        effect: PolicyEffect.allow,
-        priority: 0,
-      ));
+      engine.addRule(
+        const PolicyRule(
+          id: 'deny-all-chaos',
+          description: 'Deny all chaos capabilities',
+          effect: PolicyEffect.deny,
+          callerPattern: '*',
+          targetPattern: 'chaos.*',
+          priority: 100,
+        ),
+      );
+      engine.addRule(
+        const PolicyRule(
+          id: 'allow-all',
+          description: 'Allow all',
+          effect: PolicyEffect.allow,
+          priority: 0,
+        ),
+      );
 
       expect(engine.isAllowed('any-plugin', 'chaos.crash'), isFalse);
       expect(engine.isAllowed('any-plugin', 'storage.read'), isTrue);
@@ -110,17 +116,25 @@ void main() {
 
     test('scope restriction', () {
       final engine = PolicyEngine();
-      engine.addRule(const PolicyRule(
-        id: 'own-scope-only',
-        description: 'Only own scope allowed',
-        effect: PolicyEffect.allow,
-        maxScope: PolicyScope.own,
-        priority: 10,
-      ));
+      engine.addRule(
+        const PolicyRule(
+          id: 'own-scope-only',
+          description: 'Only own scope allowed',
+          effect: PolicyEffect.allow,
+          maxScope: PolicyScope.own,
+          priority: 10,
+        ),
+      );
 
       expect(engine.isAllowed('plugin', 'cap', scope: PolicyScope.own), isTrue);
-      expect(engine.isAllowed('plugin', 'cap', scope: PolicyScope.session), isFalse);
-      expect(engine.isAllowed('plugin', 'cap', scope: PolicyScope.cluster), isFalse);
+      expect(
+        engine.isAllowed('plugin', 'cap', scope: PolicyScope.session),
+        isFalse,
+      );
+      expect(
+        engine.isAllowed('plugin', 'cap', scope: PolicyScope.cluster),
+        isFalse,
+      );
     });
   });
 
@@ -176,7 +190,10 @@ void main() {
 
     test('events per second enforcement', () {
       final controller = ResourceController(
-        budget: const ResourceBudget(maxEventsPerSec: 1000, maxEventAmplification: 1000.0),
+        budget: const ResourceBudget(
+          maxEventsPerSec: 1000,
+          maxEventAmplification: 1000.0,
+        ),
       );
 
       expect(controller.recordEvents(500), isTrue);
@@ -253,7 +270,10 @@ void main() {
 
     test('compaction reduces entries', () async {
       final container = await RuntimeContainer.boot();
-      final journal = EventJournal(clock: container.clock, compactionThreshold: 10);
+      final journal = EventJournal(
+        clock: container.clock,
+        compactionThreshold: 10,
+      );
 
       for (var i = 0; i < 10; i++) {
         journal.append('bulk', {'index': i});
@@ -277,13 +297,18 @@ void main() {
   group('Snapshot Service', () {
     test('take and retrieve snapshot', () async {
       final container = await RuntimeContainer.boot();
-      await container.registerPlugin(StoragePlugin.descriptor(), StoragePlugin());
+      await container.registerPlugin(
+        StoragePlugin.descriptor(),
+        StoragePlugin(),
+      );
 
       final snapshot = container.snapshotService.take(
         status: RuntimeStatus.running,
         pluginStates: container.pluginRegistry.pluginStates,
         sessions: {},
-        capabilityCache: container.pluginRegistry.loadedDescriptors.expand((d) => d.capabilityIds).toList(),
+        capabilityCache: container.pluginRegistry.loadedDescriptors
+            .expand((d) => d.capabilityIds)
+            .toList(),
         resourceUsage: container.resourceController.usage,
       );
 
@@ -357,8 +382,14 @@ void main() {
 
     test('policy engine blocks agent from storage.delete via router', () async {
       final container = await RuntimeContainer.boot();
-      await container.registerPlugin(StoragePlugin.descriptor(), StoragePlugin());
-      await container.registerPlugin(FakeAgentPlugin.descriptor(), FakeAgentPlugin());
+      await container.registerPlugin(
+        StoragePlugin.descriptor(),
+        StoragePlugin(),
+      );
+      await container.registerPlugin(
+        FakeAgentPlugin.descriptor(),
+        FakeAgentPlugin(),
+      );
 
       final decision = container.policyEngine.evaluate(
         callerId: 'agent.fake-agent',
@@ -369,7 +400,10 @@ void main() {
 
     test('resource controller tracks usage during operations', () async {
       final container = await RuntimeContainer.boot();
-      await container.registerPlugin(StoragePlugin.descriptor(), StoragePlugin());
+      await container.registerPlugin(
+        StoragePlugin.descriptor(),
+        StoragePlugin(),
+      );
 
       container.resourceController.tryAcquireStream(pluginId: 'storage');
       expect(container.resourceController.usage.activeStreams, 1);

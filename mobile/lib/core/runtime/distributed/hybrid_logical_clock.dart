@@ -13,12 +13,11 @@ class HybridTimestamp {
     int? physicalTime,
     int? logicalTime,
     String? nodeId,
-  }) =>
-      HybridTimestamp(
-        physicalTime: physicalTime ?? this.physicalTime,
-        logicalTime: logicalTime ?? this.logicalTime,
-        nodeId: nodeId ?? this.nodeId,
-      );
+  }) => HybridTimestamp(
+    physicalTime: physicalTime ?? this.physicalTime,
+    logicalTime: logicalTime ?? this.logicalTime,
+    nodeId: nodeId ?? this.nodeId,
+  );
 
   int compareTo(HybridTimestamp other) {
     final ptCmp = physicalTime.compareTo(other.physicalTime);
@@ -36,12 +35,13 @@ class HybridTimestamp {
       !isBefore(other) && !isAfter(other) && nodeId != other.nodeId;
 
   Map<String, dynamic> toJson() => {
-        'pt': physicalTime,
-        'lt': logicalTime,
-        'node': nodeId,
-      };
+    'pt': physicalTime,
+    'lt': logicalTime,
+    'node': nodeId,
+  };
 
-  factory HybridTimestamp.fromJson(Map<String, dynamic> json) => HybridTimestamp(
+  factory HybridTimestamp.fromJson(Map<String, dynamic> json) =>
+      HybridTimestamp(
         physicalTime: json['pt'] as int,
         logicalTime: json['lt'] as int? ?? 0,
         nodeId: json['node'] as String? ?? 'local',
@@ -67,22 +67,20 @@ class HybridLogicalClock {
   int _logicalTime;
   final String _nodeId;
 
-  HybridLogicalClock({
-    required String nodeId,
-    int? initialTime,
-  })  : _nodeId = nodeId,
-        _physicalTime = initialTime ?? DateTime.now().millisecondsSinceEpoch,
-        _logicalTime = 0;
+  HybridLogicalClock({required String nodeId, int? initialTime})
+    : _nodeId = nodeId,
+      _physicalTime = initialTime ?? DateTime.now().millisecondsSinceEpoch,
+      _logicalTime = 0;
 
   String get nodeId => _nodeId;
   int get physicalTime => _physicalTime;
   int get logicalTime => _logicalTime;
 
   HybridTimestamp get now => HybridTimestamp(
-        physicalTime: _physicalTime,
-        logicalTime: _logicalTime,
-        nodeId: _nodeId,
-      );
+    physicalTime: _physicalTime,
+    logicalTime: _logicalTime,
+    nodeId: _nodeId,
+  );
 
   HybridTimestamp tick() {
     final wallTime = DateTime.now().millisecondsSinceEpoch;

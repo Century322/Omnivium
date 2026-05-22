@@ -1,4 +1,3 @@
-
 enum FrameType {
   data,
   ack,
@@ -11,19 +10,9 @@ enum FrameType {
   control,
 }
 
-enum CompressionType {
-  none,
-  gzip,
-  lz4,
-  zstd,
-}
+enum CompressionType { none, gzip, lz4, zstd }
 
-enum AuthMethod {
-  none,
-  token,
-  certificate,
-  sharedSecret,
-}
+enum AuthMethod { none, token, certificate, sharedSecret }
 
 class WireFrame {
   final int frameId;
@@ -49,15 +38,15 @@ class WireFrame {
   int get estimatedSize => 32 + headers.length * 32 + payload.length;
 
   Map<String, dynamic> toJson() => {
-        'fid': frameId,
-        'type': type.name,
-        'src': sourceNodeId,
-        'dst': targetNodeId,
-        'hlc': hlcTime,
-        'seq': sequence,
-        'hdr': headers,
-        'payloadLen': payload.length,
-      };
+    'fid': frameId,
+    'type': type.name,
+    'src': sourceNodeId,
+    'dst': targetNodeId,
+    'hlc': hlcTime,
+    'seq': sequence,
+    'hdr': headers,
+    'payloadLen': payload.length,
+  };
 }
 
 class WireEnvelope {
@@ -92,18 +81,18 @@ class WireEnvelope {
   bool get isFirstChunk => chunkIndex == 0;
 
   Map<String, dynamic> toJson() => {
-        'eid': envelopeId,
-        'cid': correlationId,
-        'msgType': messageType,
-        'src': sourceNodeId,
-        'dst': targetNodeId,
-        'hlc': hlcTime,
-        'comp': compression.name,
-        'chunks': totalChunks,
-        'chunkIdx': chunkIndex,
-        'payloadLen': payload.length,
-        'meta': metadata,
-      };
+    'eid': envelopeId,
+    'cid': correlationId,
+    'msgType': messageType,
+    'src': sourceNodeId,
+    'dst': targetNodeId,
+    'hlc': hlcTime,
+    'comp': compression.name,
+    'chunks': totalChunks,
+    'chunkIdx': chunkIndex,
+    'payloadLen': payload.length,
+    'meta': metadata,
+  };
 }
 
 class AckFrame {
@@ -124,13 +113,13 @@ class AckFrame {
   });
 
   Map<String, dynamic> toJson() => {
-        'ackFid': ackFrameId,
-        'origFid': originalFrameId,
-        'src': sourceNodeId,
-        'ok': success,
-        'err': errorCode,
-        'hlc': hlcTime,
-      };
+    'ackFid': ackFrameId,
+    'origFid': originalFrameId,
+    'src': sourceNodeId,
+    'ok': success,
+    'err': errorCode,
+    'hlc': hlcTime,
+  };
 }
 
 class HeartbeatFrame {
@@ -147,19 +136,14 @@ class HeartbeatFrame {
   });
 
   Map<String, dynamic> toJson() => {
-        'src': sourceNodeId,
-        'hlc': hlcTime,
-        'inc': incarnation,
-        'health': health.name,
-      };
+    'src': sourceNodeId,
+    'hlc': hlcTime,
+    'inc': incarnation,
+    'health': health.name,
+  };
 }
 
-enum NodeHealth {
-  healthy,
-  degraded,
-  overloaded,
-  recovering,
-}
+enum NodeHealth { healthy, degraded, overloaded, recovering }
 
 class HandshakeFrame {
   final String sourceNodeId;
@@ -181,13 +165,13 @@ class HandshakeFrame {
   });
 
   Map<String, dynamic> toJson() => {
-        'src': sourceNodeId,
-        'ver': protocolVersion,
-        'auth': authMethod.name,
-        'comp': supportedCompression.name,
-        'maxFrame': maxFrameSize,
-        'caps': capabilities,
-      };
+    'src': sourceNodeId,
+    'ver': protocolVersion,
+    'auth': authMethod.name,
+    'comp': supportedCompression.name,
+    'maxFrame': maxFrameSize,
+    'caps': capabilities,
+  };
 }
 
 class HandshakeAckFrame {
@@ -208,13 +192,13 @@ class HandshakeAckFrame {
   });
 
   Map<String, dynamic> toJson() => {
-        'src': sourceNodeId,
-        'ok': accepted,
-        'reason': rejectReason,
-        'comp': negotiatedCompression.name,
-        'maxFrame': negotiatedMaxFrameSize,
-        'hlc': hlcTime,
-      };
+    'src': sourceNodeId,
+    'ok': accepted,
+    'reason': rejectReason,
+    'comp': negotiatedCompression.name,
+    'maxFrame': negotiatedMaxFrameSize,
+    'hlc': hlcTime,
+  };
 }
 
 class WireProtocolConfig {

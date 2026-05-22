@@ -64,7 +64,10 @@ void main() {
     test('copyWith updates specified fields', () {
       final now = DateTime.now();
       final state = CardState(id: 'c5', type: 'test', createdAt: now);
-      final updated = state.copyWith(lifecycle: CardLifecycle.interactive, data: {'key': 'val'});
+      final updated = state.copyWith(
+        lifecycle: CardLifecycle.interactive,
+        data: {'key': 'val'},
+      );
       expect(updated.id, 'c5');
       expect(updated.lifecycle, CardLifecycle.interactive);
       expect(updated.data['key'], 'val');
@@ -73,7 +76,12 @@ void main() {
 
     test('copyWith without args keeps original values', () {
       final now = DateTime.now();
-      final state = CardState(id: 'c6', type: 'test', createdAt: now, lifecycle: CardLifecycle.streaming);
+      final state = CardState(
+        id: 'c6',
+        type: 'test',
+        createdAt: now,
+        lifecycle: CardLifecycle.streaming,
+      );
       final copy = state.copyWith();
       expect(copy.lifecycle, CardLifecycle.streaming);
       expect(copy.id, 'c6');
@@ -99,7 +107,11 @@ void main() {
     });
 
     test('create with custom data and ttl', () {
-      final card = runtime.create('image', data: {'src': 'test.png'}, ttl: const Duration(minutes: 5));
+      final card = runtime.create(
+        'image',
+        data: {'src': 'test.png'},
+        ttl: const Duration(minutes: 5),
+      );
       expect(card.data['src'], 'test.png');
       expect(card.ttl, const Duration(minutes: 5));
     });
@@ -115,13 +127,20 @@ void main() {
 
     test('update modifies card lifecycle and data', () {
       final card = runtime.create('test');
-      final updated = runtime.update(card.id, lifecycle: CardLifecycle.streaming, data: {'x': 1});
+      final updated = runtime.update(
+        card.id,
+        lifecycle: CardLifecycle.streaming,
+        data: {'x': 1},
+      );
       expect(updated!.lifecycle, CardLifecycle.streaming);
       expect(updated.data['x'], 1);
     });
 
     test('update returns null for unknown id', () {
-      expect(runtime.update('unknown', lifecycle: CardLifecycle.expired), isNull);
+      expect(
+        runtime.update('unknown', lifecycle: CardLifecycle.expired),
+        isNull,
+      );
     });
 
     test('dismiss removes card', () {

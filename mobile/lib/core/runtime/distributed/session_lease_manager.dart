@@ -25,9 +25,9 @@ class SessionLeaseManager {
     required String localNodeId,
     required HybridLogicalClock clock,
     LeaseConfig config = const LeaseConfig(),
-  })  : _localNodeId = localNodeId,
-        _clock = clock,
-        _config = config;
+  }) : _localNodeId = localNodeId,
+       _clock = clock,
+       _config = config;
 
   String get localNodeId => _localNodeId;
   int get activeLeaseCount => _leases.values.where((l) => l.isActive).length;
@@ -126,9 +126,9 @@ class SessionLeaseManager {
     final gracePeriodMs = _config.expiryGracePeriod.inMilliseconds;
 
     final expiredSessions = _leases.entries
-        .where((e) =>
-            e.value.isExpired &&
-            now - e.value.expiresAt > gracePeriodMs)
+        .where(
+          (e) => e.value.isExpired && now - e.value.expiresAt > gracePeriodMs,
+        )
         .map((e) => e.key)
         .toList();
 

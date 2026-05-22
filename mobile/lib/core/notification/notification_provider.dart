@@ -26,26 +26,37 @@ class NotificationProvider extends ChangeNotifier {
         final list = jsonDecode(raw) as List;
         _notifications.clear();
         for (final item in list) {
-          _notifications.add(AppNotification.fromJson(item as Map<String, dynamic>));
+          _notifications.add(
+            AppNotification.fromJson(item as Map<String, dynamic>),
+          );
         }
         if (_notifications.length > _maxNotifications) {
           _notifications.removeRange(_maxNotifications, _notifications.length);
         }
         if (!_disposed) notifyListeners();
-      } catch (e, stackTrace) { AppLogger.instance.error('Operation failed', error: e, stackTrace: stackTrace); }
+      } catch (e, stackTrace) {
+        AppLogger.instance.error(
+          'Operation failed',
+          error: e,
+          stackTrace: stackTrace,
+        );
+      }
     }
     NotificationCenter.observe(Event.pushNotification, _onPushNotification);
   }
 
   void _onPushNotification(Map<String, dynamic>? data) {
     if (data == null) return;
-    _notifications.insert(0, AppNotification(
-      id: 'push_${DateTime.now().millisecondsSinceEpoch}',
-      title: data['title'] as String? ?? '',
-      body: data['body'] as String? ?? '',
-      type: NotificationType.system,
-      timestamp: DateTime.now(),
-    ));
+    _notifications.insert(
+      0,
+      AppNotification(
+        id: 'push_${DateTime.now().millisecondsSinceEpoch}',
+        title: data['title'] as String? ?? '',
+        body: data['body'] as String? ?? '',
+        type: NotificationType.system,
+        timestamp: DateTime.now(),
+      ),
+    );
     if (_notifications.length > _maxNotifications) {
       _notifications.removeRange(_maxNotifications, _notifications.length);
     }
@@ -55,7 +66,9 @@ class NotificationProvider extends ChangeNotifier {
 
   Future<void> _persist() async {
     final db = DatabaseService.instance;
-    final json = jsonEncode(_notifications.take(100).map((n) => n.toJson()).toList());
+    final json = jsonEncode(
+      _notifications.take(100).map((n) => n.toJson()).toList(),
+    );
     await db.putCache(_notificationsKey, json);
   }
 
@@ -81,15 +94,18 @@ class NotificationProvider extends ChangeNotifier {
               final notifId = '${roomId}_${senderId}_$ts';
               final existing = _notifications.any((n) => n.id == notifId);
               if (!existing) {
-                _notifications.insert(0, AppNotification(
-                  id: notifId,
-                  title: roomName,
-                  body: body,
-                  type: NotificationType.message,
-                  roomId: roomId,
-                  senderId: senderId,
-                  timestamp: DateTime.fromMillisecondsSinceEpoch(ts),
-                ));
+                _notifications.insert(
+                  0,
+                  AppNotification(
+                    id: notifId,
+                    title: roomName,
+                    body: body,
+                    type: NotificationType.message,
+                    roomId: roomId,
+                    senderId: senderId,
+                    timestamp: DateTime.fromMillisecondsSinceEpoch(ts),
+                  ),
+                );
               }
             }
             if (type == 'm.room.member') {
@@ -98,19 +114,29 @@ class NotificationProvider extends ChangeNotifier {
                 final notifId = '${roomId}_invite_$ts';
                 final existing = _notifications.any((n) => n.id == notifId);
                 if (!existing) {
-                  _notifications.insert(0, AppNotification(
-                    id: notifId,
-                    title: localeProvider.t('friend_invite'),
-                    body: '$senderId ${localeProvider.t('invited_you_to_chat')}',
-                    type: NotificationType.invite,
-                    roomId: roomId,
-                    senderId: senderId,
-                    timestamp: DateTime.fromMillisecondsSinceEpoch(ts),
-                  ));
+                  _notifications.insert(
+                    0,
+                    AppNotification(
+                      id: notifId,
+                      title: localeProvider.t('friend_invite'),
+                      body:
+                          '$senderId ${localeProvider.t('invited_you_to_chat')}',
+                      type: NotificationType.invite,
+                      roomId: roomId,
+                      senderId: senderId,
+                      timestamp: DateTime.fromMillisecondsSinceEpoch(ts),
+                    ),
+                  );
                 }
               }
             }
-          } catch (e, stackTrace) { AppLogger.instance.error('Operation failed', error: e, stackTrace: stackTrace); }
+          } catch (e, stackTrace) {
+            AppLogger.instance.error(
+              'Operation failed',
+              error: e,
+              stackTrace: stackTrace,
+            );
+          }
         }
       }
       if (_notifications.length > _maxNotifications) {

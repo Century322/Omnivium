@@ -30,13 +30,17 @@ class OmniviumSDK {
 
   bool get isInitialized => _container != null && RuntimeContainer.isBooted;
   RuntimeContainer get container {
-    if (_container == null) throw StateError('OmniviumSDK not initialized. Call init() first.');
+    if (_container == null)
+      throw StateError('OmniviumSDK not initialized. Call init() first.');
     return _container!;
   }
 
   DistributedRuntime? get distributed => _distributed;
 
-  static Future<OmniviumSDK> init({RuntimeConfig? config, PersistenceBackend? persistence}) async {
+  static Future<OmniviumSDK> init({
+    RuntimeConfig? config,
+    PersistenceBackend? persistence,
+  }) async {
     final sdk = OmniviumSDK.instance;
     sdk._container = await RuntimeContainer.boot(config);
     await sdk._registerBuiltinPlugins(persistence ?? InMemoryPersistence());
@@ -58,7 +62,9 @@ class OmniviumSDK {
     }
   }
 
-  static Future<OmniviumSDK> initDistributed(DistributedRuntimeConfig config) async {
+  static Future<OmniviumSDK> initDistributed(
+    DistributedRuntimeConfig config,
+  ) async {
     final sdk = OmniviumSDK.instance;
     sdk._container = await RuntimeContainer.boot();
     sdk._distributed = DistributedRuntime(config);
@@ -96,15 +102,17 @@ class OmniviumSDK {
     );
 
     if (!decision.allowed) {
-      return CapabilityResult.fail(RuntimeError.permissionDenied(
-        message: 'Policy denied: ${decision.matchedRuleId}',
-      ));
+      return CapabilityResult.fail(
+        RuntimeError.permissionDenied(
+          message: 'Policy denied: ${decision.matchedRuleId}',
+        ),
+      );
     }
 
     if (!container.resourceController.tryAcquireTokens(1)) {
-      return CapabilityResult.fail(RuntimeError.unavailable(
-        message: 'Token budget exceeded',
-      ));
+      return CapabilityResult.fail(
+        RuntimeError.unavailable(message: 'Token budget exceeded'),
+      );
     }
 
     return container.capabilityRouter.invoke(
@@ -122,27 +130,37 @@ class OmniviumSDK {
   }) async {
     final dist = _distributed;
     if (dist == null) {
-      return CapabilityResult.fail(RuntimeError.unavailable(
-        message: 'Distributed runtime not initialized',
-      ));
+      return CapabilityResult.fail(
+        RuntimeError.unavailable(
+          message: 'Distributed runtime not initialized',
+        ),
+      );
     }
 
     final route = dist.capabilityRouter.route(capabilityId);
     if (!route.isAvailable) {
-      return CapabilityResult.fail(RuntimeError.notFound(
-        message: 'Capability not available: $capabilityId (${route.reason})',
-      ));
+      return CapabilityResult.fail(
+        RuntimeError.notFound(
+          message: 'Capability not available: $capabilityId (${route.reason})',
+        ),
+      );
     }
 
     if (route.isLocal) {
-      return invokeCapability(capabilityId, params: params, timeoutMs: timeoutMs);
+      return invokeCapability(
+        capabilityId,
+        params: params,
+        timeoutMs: timeoutMs,
+      );
     }
 
     final lease = dist.leaseManager.tryAcquire('remote_$capabilityId');
     if (lease == null) {
-      return CapabilityResult.fail(RuntimeError.unavailable(
-        message: 'Could not acquire lease for $capabilityId',
-      ));
+      return CapabilityResult.fail(
+        RuntimeError.unavailable(
+          message: 'Could not acquire lease for $capabilityId',
+        ),
+      );
     }
 
     try {
@@ -187,13 +205,18 @@ class OmniviumSDK {
 
   List<Map<String, dynamic>> listPlugins() {
     final container = this.container;
-    return container.pluginRegistry.loadedDescriptors.map((d) => {
-      'id': d.id,
-      'name': d.name,
-      'version': d.version,
-      'capabilities': d.capabilityIds,
-      'state': container.pluginRegistry.pluginStates[d.id]?.name ?? 'unknown',
-    }).toList();
+    return container.pluginRegistry.loadedDescriptors
+        .map(
+          (d) => {
+            'id': d.id,
+            'name': d.name,
+            'version': d.version,
+            'capabilities': d.capabilityIds,
+            'state':
+                container.pluginRegistry.pluginStates[d.id]?.name ?? 'unknown',
+          },
+        )
+        .toList();
   }
 
   List<Map<String, dynamic>> listCapabilities() {
@@ -218,36 +241,48 @@ class OmniviumSDK {
     final container = this.container;
     final entries = container.eventJournal.replay();
     final limited = limit != null ? entries.take(limit).toList() : entries;
-    return limited.map((e) => {
-      'sequence': e.sequence,
-      'type': e.type,
-      'timestamp': e.timestamp,
-      'data': e.data,
-    }).toList();
+    return limited
+        .map(
+          (e) => {
+            'sequence': e.sequence,
+            'type': e.type,
+            'timestamp': e.timestamp,
+            'data': e.data,
+          },
+        )
+        .toList();
   }
 
   List<Map<String, dynamic>> listTraces({int? limit}) {
     final container = this.container;
     final traces = container.traceService.recentTraces(limit: limit ?? 50);
-    return traces.map((t) => {
-      'traceId': t.traceId,
-      'createdAt': t.createdAt,
-      'spanCount': t.spans.length,
-      'totalDurationMs': t.totalDurationMs,
-    }).toList();
+    return traces
+        .map(
+          (t) => {
+            'traceId': t.traceId,
+            'createdAt': t.createdAt,
+            'spanCount': t.spans.length,
+            'totalDurationMs': t.totalDurationMs,
+          },
+        )
+        .toList();
   }
 
   List<Map<String, dynamic>> listNodes() {
     final dist = _distributed;
     if (dist == null) return [];
 
-    return dist.nodeDiscovery.allNodes.map((n) => {
-      'nodeId': n.nodeId,
-      'address': n.addressKey,
-      'role': n.role.name,
-      'state': n.state.name,
-      'incarnation': n.incarnation,
-    }).toList();
+    return dist.nodeDiscovery.allNodes
+        .map(
+          (n) => {
+            'nodeId': n.nodeId,
+            'address': n.addressKey,
+            'role': n.role.name,
+            'state': n.state.name,
+            'incarnation': n.incarnation,
+          },
+        )
+        .toList();
   }
 }
 
@@ -300,15 +335,15 @@ class PluginBuilder {
   }
 
   PluginDescriptor build() => PluginDescriptor(
-        id: _id,
-        name: _name,
-        version: _version,
-        description: _description,
-        author: _author,
-        capabilities: _capabilities,
-        permissions: _permissions,
-        isolation: _isolation,
-      );
+    id: _id,
+    name: _name,
+    version: _version,
+    description: _description,
+    author: _author,
+    capabilities: _capabilities,
+    permissions: _permissions,
+    isolation: _isolation,
+  );
 
   Future<bool> register(PluginHandler handler) async {
     final descriptor = build();
@@ -364,13 +399,13 @@ class CapabilityBuilder {
   }
 
   CapabilityDeclaration build() => CapabilityDeclaration(
-        id: _id,
-        name: _name,
-        description: _description,
-        channel: _channel,
-        permission: _permission,
-        isDestructive: _isDestructive,
-        timeoutMs: _timeoutMs,
-        maxRetries: _maxRetries,
-      );
+    id: _id,
+    name: _name,
+    description: _description,
+    channel: _channel,
+    permission: _permission,
+    isDestructive: _isDestructive,
+    timeoutMs: _timeoutMs,
+    maxRetries: _maxRetries,
+  );
 }

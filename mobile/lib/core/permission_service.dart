@@ -80,7 +80,9 @@ class PermissionService {
     return false;
   }
 
-  Future<Map<Permission, PermissionStatus>> requestMultiple(List<Permission> permissions) async {
+  Future<Map<Permission, PermissionStatus>> requestMultiple(
+    List<Permission> permissions,
+  ) async {
     try {
       return await permissions.request();
     } catch (e) {

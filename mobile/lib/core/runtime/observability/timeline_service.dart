@@ -36,47 +36,73 @@ class TimelineService {
   List<TimelineEntry> get entries => List.unmodifiable(_entries);
   int get entryCount => _entries.length;
 
-  void record(TimelineEntryType type, String source, {Map<String, dynamic> data = const {}}) {
-    _entries.add(TimelineEntry(
-      timestamp: _clock.now(),
-      type: type,
-      source: source,
-      data: data,
-    ));
+  void record(
+    TimelineEntryType type,
+    String source, {
+    Map<String, dynamic> data = const {},
+  }) {
+    _entries.add(
+      TimelineEntry(
+        timestamp: _clock.now(),
+        type: type,
+        source: source,
+        data: data,
+      ),
+    );
   }
 
   void recordEvent(RuntimeEvent event) {
-    record(TimelineEntryType.event, event.source.pluginId, data: {
-      'eventType': event.type,
-      'phase': event.phase.name,
-      'scope': event.scope.name,
-      'permission': event.permission.name,
-    });
+    record(
+      TimelineEntryType.event,
+      event.source.pluginId,
+      data: {
+        'eventType': event.type,
+        'phase': event.phase.name,
+        'scope': event.scope.name,
+        'permission': event.permission.name,
+      },
+    );
   }
 
-  void recordPluginLifecycle(String pluginId, String transition, {String from = '', String to = ''}) {
-    record(TimelineEntryType.pluginLifecycle, pluginId, data: {
-      'transition': transition,
-      'from': from,
-      'to': to,
-    });
+  void recordPluginLifecycle(
+    String pluginId,
+    String transition, {
+    String from = '',
+    String to = '',
+  }) {
+    record(
+      TimelineEntryType.pluginLifecycle,
+      pluginId,
+      data: {'transition': transition, 'from': from, 'to': to},
+    );
   }
 
-  void recordCapabilityInvoke(String capabilityId, String pluginId, {String status = 'started'}) {
-    record(TimelineEntryType.capabilityInvoke, pluginId, data: {
-      'capabilityId': capabilityId,
-      'status': status,
-    });
+  void recordCapabilityInvoke(
+    String capabilityId,
+    String pluginId, {
+    String status = 'started',
+  }) {
+    record(
+      TimelineEntryType.capabilityInvoke,
+      pluginId,
+      data: {'capabilityId': capabilityId, 'status': status},
+    );
   }
 
   void recordTask(String taskId, {String status = 'scheduled'}) {
-    record(TimelineEntryType.taskSchedule, 'scheduler', data: {
-      'taskId': taskId,
-      'status': status,
-    });
+    record(
+      TimelineEntryType.taskSchedule,
+      'scheduler',
+      data: {'taskId': taskId, 'status': status},
+    );
   }
 
-  List<TimelineEntry> replay({int? fromTimestamp, int? toTimestamp, TimelineEntryType? type, String? source}) {
+  List<TimelineEntry> replay({
+    int? fromTimestamp,
+    int? toTimestamp,
+    TimelineEntryType? type,
+    String? source,
+  }) {
     var filtered = _entries;
 
     if (fromTimestamp != null) {

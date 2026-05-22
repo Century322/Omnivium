@@ -19,7 +19,11 @@ void main() {
     TrustLevel trustLevel = TrustLevel.untrusted,
     Set<String> allowedCapabilities = const {'*'},
     Set<String> deniedCapabilities = const {},
-    ResourceBudget budget = const ResourceBudget(maxTokens: 1000, maxStreams: 5, maxTasks: 10),
+    ResourceBudget budget = const ResourceBudget(
+      maxTokens: 1000,
+      maxStreams: 5,
+      maxTasks: 10,
+    ),
     TrustBoundary trustBoundary = const TrustBoundary(boundaryId: 'hostile'),
     Duration maxExecutionTime = const Duration(seconds: 60),
     int maxConcurrentTasks = 10,
@@ -56,14 +60,18 @@ void main() {
 
   group('Hostile: Capability Abuse', () {
     test('untrusted sandbox cannot access system capabilities', () {
-      securityManager.registerCapabilityAuth(const CapabilityAuth(
-        capabilityId: 'runtime.admin',
-        requiredTrustLevel: TrustLevel.system,
-      ));
-      securityManager.registerCapabilityAuth(const CapabilityAuth(
-        capabilityId: 'runtime.shutdown',
-        requiredTrustLevel: TrustLevel.system,
-      ));
+      securityManager.registerCapabilityAuth(
+        const CapabilityAuth(
+          capabilityId: 'runtime.admin',
+          requiredTrustLevel: TrustLevel.system,
+        ),
+      );
+      securityManager.registerCapabilityAuth(
+        const CapabilityAuth(
+          capabilityId: 'runtime.shutdown',
+          requiredTrustLevel: TrustLevel.system,
+        ),
+      );
 
       final sandbox = createHostileSandbox(trustLevel: TrustLevel.untrusted);
       sandbox.start();
@@ -75,7 +83,12 @@ void main() {
       expect(shutdownResult.allowed, isFalse);
 
       expect(sandbox.violations.length, 2);
-      expect(sandbox.violations.every((v) => v.type == SandboxViolationType.trustInsufficient), isTrue);
+      expect(
+        sandbox.violations.every(
+          (v) => v.type == SandboxViolationType.trustInsufficient,
+        ),
+        isTrue,
+      );
     });
 
     test('agent sandbox cannot access storage.delete via policy', () {
@@ -88,7 +101,12 @@ void main() {
 
       final result = sandbox.checkCapabilityAccess('storage.delete');
       expect(result.allowed, isFalse);
-      expect(sandbox.violations.any((v) => v.type == SandboxViolationType.policyDenied), isTrue);
+      expect(
+        sandbox.violations.any(
+          (v) => v.type == SandboxViolationType.policyDenied,
+        ),
+        isTrue,
+      );
     });
 
     test('capability enumeration attack is blocked by trust boundary', () {
@@ -116,7 +134,11 @@ void main() {
 
       for (final cap in blocked) {
         final result = sandbox.checkCapabilityAccess(cap);
-        expect(result.allowed, isFalse, reason: 'Capability $cap should be blocked');
+        expect(
+          result.allowed,
+          isFalse,
+          reason: 'Capability $cap should be blocked',
+        );
       }
 
       expect(sandbox.violations.length, blocked.length);
@@ -126,7 +148,11 @@ void main() {
       final sandbox = createHostileSandbox(
         trustLevel: TrustLevel.verified,
         allowedCapabilities: {'*'},
-        deniedCapabilities: {'storage.delete', 'runtime.admin', 'network.connect'},
+        deniedCapabilities: {
+          'storage.delete',
+          'runtime.admin',
+          'network.connect',
+        },
       );
       sandbox.start();
 
@@ -148,7 +174,12 @@ void main() {
       }
 
       expect(sandbox.violations.length, 100);
-      expect(sandbox.violations.every((v) => v.type == SandboxViolationType.capabilityDenied), isTrue);
+      expect(
+        sandbox.violations.every(
+          (v) => v.type == SandboxViolationType.capabilityDenied,
+        ),
+        isTrue,
+      );
     });
 
     test('sandbox.* plugins cannot access runtime.* capabilities', () {
@@ -166,7 +197,11 @@ void main() {
   group('Hostile: Resource Exhaustion', () {
     test('token exhaustion attack is blocked by budget', () {
       final sandbox = createHostileSandbox(
-        budget: const ResourceBudget(maxTokens: 100, maxStreams: 5, maxTasks: 10),
+        budget: const ResourceBudget(
+          maxTokens: 100,
+          maxStreams: 5,
+          maxTasks: 10,
+        ),
       );
       sandbox.start();
 
@@ -174,12 +209,21 @@ void main() {
       expect(sandbox.tryAcquireTokens(50), isTrue);
       expect(sandbox.tryAcquireTokens(1), isFalse);
 
-      expect(sandbox.violations.any((v) => v.type == SandboxViolationType.budgetExceeded), isTrue);
+      expect(
+        sandbox.violations.any(
+          (v) => v.type == SandboxViolationType.budgetExceeded,
+        ),
+        isTrue,
+      );
     });
 
     test('task flood attack is blocked by concurrent task limit', () {
       final sandbox = createHostileSandbox(
-        budget: const ResourceBudget(maxTokens: 10000, maxStreams: 20, maxTasks: 5),
+        budget: const ResourceBudget(
+          maxTokens: 10000,
+          maxStreams: 20,
+          maxTasks: 5,
+        ),
         maxConcurrentTasks: 5,
       );
       sandbox.start();
@@ -192,12 +236,21 @@ void main() {
         expect(sandbox.tryAcquireTask(), isFalse);
       }
 
-      expect(sandbox.violations.any((v) => v.type == SandboxViolationType.taskLimitExceeded), isTrue);
+      expect(
+        sandbox.violations.any(
+          (v) => v.type == SandboxViolationType.taskLimitExceeded,
+        ),
+        isTrue,
+      );
     });
 
     test('stream exhaustion attack is blocked', () {
       final sandbox = createHostileSandbox(
-        budget: const ResourceBudget(maxTokens: 10000, maxStreams: 3, maxTasks: 20),
+        budget: const ResourceBudget(
+          maxTokens: 10000,
+          maxStreams: 3,
+          maxTasks: 20,
+        ),
       );
       sandbox.start();
 
@@ -209,29 +262,41 @@ void main() {
         expect(sandbox.tryAcquireStream(), isFalse);
       }
 
-      expect(sandbox.violations.any((v) => v.type == SandboxViolationType.streamLimitExceeded), isTrue);
-    });
-
-    test('combined resource exhaustion — all budgets enforced simultaneously', () {
-      final sandbox = createHostileSandbox(
-        budget: const ResourceBudget(maxTokens: 200, maxStreams: 2, maxTasks: 3),
-        maxConcurrentTasks: 3,
+      expect(
+        sandbox.violations.any(
+          (v) => v.type == SandboxViolationType.streamLimitExceeded,
+        ),
+        isTrue,
       );
-      sandbox.start();
-
-      expect(sandbox.tryAcquireTokens(200), isTrue);
-      expect(sandbox.tryAcquireTask(), isTrue);
-      expect(sandbox.tryAcquireTask(), isTrue);
-      expect(sandbox.tryAcquireTask(), isTrue);
-      expect(sandbox.tryAcquireStream(), isTrue);
-      expect(sandbox.tryAcquireStream(), isTrue);
-
-      expect(sandbox.tryAcquireTokens(1), isFalse);
-      expect(sandbox.tryAcquireTask(), isFalse);
-      expect(sandbox.tryAcquireStream(), isFalse);
-
-      expect(sandbox.violations.length, 3);
     });
+
+    test(
+      'combined resource exhaustion — all budgets enforced simultaneously',
+      () {
+        final sandbox = createHostileSandbox(
+          budget: const ResourceBudget(
+            maxTokens: 200,
+            maxStreams: 2,
+            maxTasks: 3,
+          ),
+          maxConcurrentTasks: 3,
+        );
+        sandbox.start();
+
+        expect(sandbox.tryAcquireTokens(200), isTrue);
+        expect(sandbox.tryAcquireTask(), isTrue);
+        expect(sandbox.tryAcquireTask(), isTrue);
+        expect(sandbox.tryAcquireTask(), isTrue);
+        expect(sandbox.tryAcquireStream(), isTrue);
+        expect(sandbox.tryAcquireStream(), isTrue);
+
+        expect(sandbox.tryAcquireTokens(1), isFalse);
+        expect(sandbox.tryAcquireTask(), isFalse);
+        expect(sandbox.tryAcquireStream(), isFalse);
+
+        expect(sandbox.violations.length, 3);
+      },
+    );
 
     test('resource operations fail on terminated sandbox', () {
       final sandbox = createHostileSandbox();
@@ -264,7 +329,11 @@ void main() {
           createdAt: clock.tick().physicalTime,
         ),
         resources: SandboxResources(
-          budget: const ResourceBudget(maxTokens: 100000, maxStreams: 100, maxTasks: 100),
+          budget: const ResourceBudget(
+            maxTokens: 100000,
+            maxStreams: 100,
+            maxTasks: 100,
+          ),
           usage: ResourceUsage(),
           trustBoundary: const TrustBoundary(boundaryId: 'hostile'),
           maxExecutionTime: const Duration(milliseconds: 1),
@@ -371,14 +440,21 @@ void main() {
     });
 
     test('ExecutionGovernor terminates hostile sandbox and prevents reuse', () {
-      final governor = ExecutionGovernor(securityManager: securityManager, clock: clock);
+      final governor = ExecutionGovernor(
+        securityManager: securityManager,
+        clock: clock,
+      );
 
       final sandbox = governor.create(
         type: SandboxType.agent,
         pluginId: 'hostile.agent',
         trustLevel: TrustLevel.untrusted,
         resources: SandboxResources(
-          budget: const ResourceBudget(maxTokens: 100, maxStreams: 2, maxTasks: 3),
+          budget: const ResourceBudget(
+            maxTokens: 100,
+            maxStreams: 2,
+            maxTasks: 3,
+          ),
           usage: ResourceUsage(),
           trustBoundary: const TrustBoundary(boundaryId: 'hostile'),
         ),
@@ -442,9 +518,7 @@ void main() {
       final leaseManager = UnifiedLeaseManager(
         localNodeId: 'node-1',
         clock: leaseClock,
-        config: const LeaseConfig(
-          sessionTtl: Duration(milliseconds: 100),
-        ),
+        config: const LeaseConfig(sessionTtl: Duration(milliseconds: 100)),
       );
 
       final lease = leaseManager.acquire(LeaseType.session, 'session-1');
@@ -512,24 +586,33 @@ void main() {
 
   group('Hostile: Trust Downgrade', () {
     test('untrusted entity cannot access verified-level capabilities', () {
-      securityManager.registerCapabilityAuth(const CapabilityAuth(
-        capabilityId: 'storage.write',
-        requiredTrustLevel: TrustLevel.verified,
-      ));
+      securityManager.registerCapabilityAuth(
+        const CapabilityAuth(
+          capabilityId: 'storage.write',
+          requiredTrustLevel: TrustLevel.verified,
+        ),
+      );
 
       final sandbox = createHostileSandbox(trustLevel: TrustLevel.untrusted);
       sandbox.start();
 
       final result = sandbox.checkCapabilityAccess('storage.write');
       expect(result.allowed, isFalse);
-      expect(sandbox.violations.any((v) => v.type == SandboxViolationType.trustInsufficient), isTrue);
+      expect(
+        sandbox.violations.any(
+          (v) => v.type == SandboxViolationType.trustInsufficient,
+        ),
+        isTrue,
+      );
     });
 
     test('verified entity cannot access system-level capabilities', () {
-      securityManager.registerCapabilityAuth(const CapabilityAuth(
-        capabilityId: 'runtime.shutdown',
-        requiredTrustLevel: TrustLevel.system,
-      ));
+      securityManager.registerCapabilityAuth(
+        const CapabilityAuth(
+          capabilityId: 'runtime.shutdown',
+          requiredTrustLevel: TrustLevel.system,
+        ),
+      );
 
       final sandbox = createHostileSandbox(trustLevel: TrustLevel.verified);
       sandbox.start();
@@ -539,10 +622,12 @@ void main() {
     });
 
     test('blocked trust level is completely denied', () {
-      securityManager.registerCapabilityAuth(const CapabilityAuth(
-        capabilityId: 'storage.read',
-        requiredTrustLevel: TrustLevel.untrusted,
-      ));
+      securityManager.registerCapabilityAuth(
+        const CapabilityAuth(
+          capabilityId: 'storage.read',
+          requiredTrustLevel: TrustLevel.untrusted,
+        ),
+      );
 
       final sandbox = createHostileSandbox(trustLevel: TrustLevel.blocked);
       sandbox.start();
@@ -594,31 +679,52 @@ void main() {
     });
 
     test('Law 10 enforcement — trust level must be respected', () {
-      final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
+      final enforcer = RuntimeLawEnforcer(
+        clock: clock,
+        securityManager: securityManager,
+      );
 
-      final systemOnly = enforcer.enforceTrustLevel('sb-1', TrustLevel.system, TrustLevel.untrusted);
+      final systemOnly = enforcer.enforceTrustLevel(
+        'sb-1',
+        TrustLevel.system,
+        TrustLevel.untrusted,
+      );
       expect(systemOnly.compliant, isFalse);
       expect(systemOnly.lawId, RuntimeLawId.trustLevelMustBeRespected);
 
-      final verifiedAccess = enforcer.enforceTrustLevel('sb-1', TrustLevel.verified, TrustLevel.signed);
+      final verifiedAccess = enforcer.enforceTrustLevel(
+        'sb-1',
+        TrustLevel.verified,
+        TrustLevel.signed,
+      );
       expect(verifiedAccess.compliant, isTrue);
 
-      final equalLevel = enforcer.enforceTrustLevel('sb-1', TrustLevel.verified, TrustLevel.verified);
+      final equalLevel = enforcer.enforceTrustLevel(
+        'sb-1',
+        TrustLevel.verified,
+        TrustLevel.verified,
+      );
       expect(equalLevel.compliant, isTrue);
     });
 
-    test('SecurityManager rate limiting blocks brute force trust escalation', () {
-      for (var i = 0; i < 5; i++) {
-        securityManager.recordAuthFailure('attacker');
-      }
+    test(
+      'SecurityManager rate limiting blocks brute force trust escalation',
+      () {
+        for (var i = 0; i < 5; i++) {
+          securityManager.recordAuthFailure('attacker');
+        }
 
-      expect(securityManager.checkAuthRateLimit('attacker'), isFalse);
-    });
+        expect(securityManager.checkAuthRateLimit('attacker'), isFalse);
+      },
+    );
   });
 
   group('Hostile: Side-Channel Probing', () {
     test('Law 4 — side channel detection is enforced', () {
-      final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
+      final enforcer = RuntimeLawEnforcer(
+        clock: clock,
+        securityManager: securityManager,
+      );
 
       final hiddenSocket = enforcer.enforceNoSideChannels('sb-1', true);
       expect(hiddenSocket.compliant, isFalse);
@@ -630,7 +736,10 @@ void main() {
     });
 
     test('Law 3 — global state sharing is detected', () {
-      final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
+      final enforcer = RuntimeLawEnforcer(
+        clock: clock,
+        securityManager: securityManager,
+      );
 
       final globalAccess = enforcer.enforceNoGlobalState('sb-1', true);
       expect(globalAccess.compliant, isFalse);
@@ -641,16 +750,25 @@ void main() {
     });
 
     test('side channel violations are audited by SecurityManager', () {
-      final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
+      final enforcer = RuntimeLawEnforcer(
+        clock: clock,
+        securityManager: securityManager,
+      );
 
       enforcer.enforceNoSideChannels('sb-probe', true);
 
       final auditLog = securityManager.auditLog();
-      expect(auditLog.any((e) => e.action == 'law.violation' && e.success == false), isTrue);
+      expect(
+        auditLog.any((e) => e.action == 'law.violation' && e.success == false),
+        isTrue,
+      );
     });
 
     test('multiple side channel types are all detected', () {
-      final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
+      final enforcer = RuntimeLawEnforcer(
+        clock: clock,
+        securityManager: securityManager,
+      );
 
       final channels = [
         ('hidden_socket', true),
@@ -669,16 +787,22 @@ void main() {
       expect(enforcer.violationsFor('sb-probe').length, channels.length);
     });
 
-    test('global state violations across multiple sandboxes are tracked independently', () {
-      final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
+    test(
+      'global state violations across multiple sandboxes are tracked independently',
+      () {
+        final enforcer = RuntimeLawEnforcer(
+          clock: clock,
+          securityManager: securityManager,
+        );
 
-      enforcer.enforceNoGlobalState('sb-1', true);
-      enforcer.enforceNoGlobalState('sb-2', true);
-      enforcer.enforceNoGlobalState('sb-1', true);
+        enforcer.enforceNoGlobalState('sb-1', true);
+        enforcer.enforceNoGlobalState('sb-2', true);
+        enforcer.enforceNoGlobalState('sb-1', true);
 
-      expect(enforcer.violationsFor('sb-1').length, 2);
-      expect(enforcer.violationsFor('sb-2').length, 1);
-    });
+        expect(enforcer.violationsFor('sb-1').length, 2);
+        expect(enforcer.violationsFor('sb-2').length, 1);
+      },
+    );
 
     test('SandboxIsolate records bypass attempts as violations', () {
       final sandbox = createHostileSandbox(
@@ -689,27 +813,53 @@ void main() {
 
       sandbox.checkCapabilityAccess('runtime.internal');
 
-      expect(sandbox.violations.any((v) => v.type == SandboxViolationType.capabilityDenied), isTrue);
+      expect(
+        sandbox.violations.any(
+          (v) => v.type == SandboxViolationType.capabilityDenied,
+        ),
+        isTrue,
+      );
     });
   });
 
   group('Hostile: Law Enforcement Under Attack', () {
     test('Law 1 — capability routing bypass is detected and audited', () {
-      final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
+      final enforcer = RuntimeLawEnforcer(
+        clock: clock,
+        securityManager: securityManager,
+      );
 
-      final directCall = enforcer.enforceCapabilityRouting('sb-1', 'storage.read', false);
+      final directCall = enforcer.enforceCapabilityRouting(
+        'sb-1',
+        'storage.read',
+        false,
+      );
       expect(directCall.compliant, isFalse);
       expect(directCall.lawId, RuntimeLawId.noBypassCapabilityRouter);
 
-      final routedCall = enforcer.enforceCapabilityRouting('sb-1', 'storage.read', true);
+      final routedCall = enforcer.enforceCapabilityRouting(
+        'sb-1',
+        'storage.read',
+        true,
+      );
       expect(routedCall.compliant, isTrue);
 
       final auditLog = securityManager.auditLog();
-      expect(auditLog.any((e) => e.context.containsKey('law') && e.context['law'] == 'noBypassCapabilityRouter'), isTrue);
+      expect(
+        auditLog.any(
+          (e) =>
+              e.context.containsKey('law') &&
+              e.context['law'] == 'noBypassCapabilityRouter',
+        ),
+        isTrue,
+      );
     });
 
     test('Law 2 — scheduler bypass is detected', () {
-      final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
+      final enforcer = RuntimeLawEnforcer(
+        clock: clock,
+        securityManager: securityManager,
+      );
 
       final directSpawn = enforcer.enforceSchedulerUsage('sb-1', false);
       expect(directSpawn.compliant, isFalse);
@@ -720,7 +870,10 @@ void main() {
     });
 
     test('Law 5 + 9 — untraced operations are detected', () {
-      final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
+      final enforcer = RuntimeLawEnforcer(
+        clock: clock,
+        securityManager: securityManager,
+      );
 
       final untraced = enforcer.enforceTracing('sb-1', false);
       expect(untraced.compliant, isFalse);
@@ -731,7 +884,10 @@ void main() {
     });
 
     test('Law 6 — budget bypass is detected', () {
-      final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
+      final enforcer = RuntimeLawEnforcer(
+        clock: clock,
+        securityManager: securityManager,
+      );
 
       final unaccounted = enforcer.enforceBudget('sb-1', false);
       expect(unaccounted.compliant, isFalse);
@@ -742,7 +898,10 @@ void main() {
     });
 
     test('all 10 laws can be violated and detected', () {
-      final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
+      final enforcer = RuntimeLawEnforcer(
+        clock: clock,
+        securityManager: securityManager,
+      );
 
       enforcer.enforceCapabilityRouting('sb-1', 'cap', false);
       enforcer.enforceSchedulerUsage('sb-1', false);
@@ -750,7 +909,11 @@ void main() {
       enforcer.enforceNoSideChannels('sb-1', true);
       enforcer.enforceTracing('sb-1', false);
       enforcer.enforceBudget('sb-1', false);
-      enforcer.enforceTrustLevel('sb-1', TrustLevel.system, TrustLevel.untrusted);
+      enforcer.enforceTrustLevel(
+        'sb-1',
+        TrustLevel.system,
+        TrustLevel.untrusted,
+      );
 
       expect(enforcer.totalViolations(), 7);
 
@@ -762,7 +925,10 @@ void main() {
     });
 
     test('law enforcement audit trail is immutable and complete', () {
-      final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
+      final enforcer = RuntimeLawEnforcer(
+        clock: clock,
+        securityManager: securityManager,
+      );
 
       enforcer.enforceCapabilityRouting('sb-1', 'cap', false);
       enforcer.enforceCapabilityRouting('sb-1', 'cap', true);
@@ -776,73 +942,98 @@ void main() {
   });
 
   group('Hostile: Combined Attack Scenarios', () {
-    test('malicious agent: capability abuse + resource exhaustion + trust escalation', () {
-      securityManager.registerCapabilityAuth(const CapabilityAuth(
-        capabilityId: 'admin.wipe',
-        requiredTrustLevel: TrustLevel.system,
-      ));
+    test(
+      'malicious agent: capability abuse + resource exhaustion + trust escalation',
+      () {
+        securityManager.registerCapabilityAuth(
+          const CapabilityAuth(
+            capabilityId: 'admin.wipe',
+            requiredTrustLevel: TrustLevel.system,
+          ),
+        );
 
-      final sandbox = createHostileSandbox(
-        type: SandboxType.agent,
-        pluginId: 'agent.malicious',
-        trustLevel: TrustLevel.verified,
-        budget: const ResourceBudget(maxTokens: 50, maxStreams: 2, maxTasks: 3),
-        maxConcurrentTasks: 3,
-        deniedCapabilities: {'storage.delete'},
-      );
-      sandbox.start();
+        final sandbox = createHostileSandbox(
+          type: SandboxType.agent,
+          pluginId: 'agent.malicious',
+          trustLevel: TrustLevel.verified,
+          budget: const ResourceBudget(
+            maxTokens: 50,
+            maxStreams: 2,
+            maxTasks: 3,
+          ),
+          maxConcurrentTasks: 3,
+          deniedCapabilities: {'storage.delete'},
+        );
+        sandbox.start();
 
-      final capResult = sandbox.checkCapabilityAccess('admin.wipe');
-      expect(capResult.allowed, isFalse);
+        final capResult = sandbox.checkCapabilityAccess('admin.wipe');
+        expect(capResult.allowed, isFalse);
 
-      final deleteResult = sandbox.checkCapabilityAccess('storage.delete');
-      expect(deleteResult.allowed, isFalse);
+        final deleteResult = sandbox.checkCapabilityAccess('storage.delete');
+        expect(deleteResult.allowed, isFalse);
 
-      expect(sandbox.tryAcquireTokens(50), isTrue);
-      expect(sandbox.tryAcquireTokens(1), isFalse);
+        expect(sandbox.tryAcquireTokens(50), isTrue);
+        expect(sandbox.tryAcquireTokens(1), isFalse);
 
-      expect(sandbox.tryAcquireTask(), isTrue);
-      expect(sandbox.tryAcquireTask(), isTrue);
-      expect(sandbox.tryAcquireTask(), isTrue);
-      expect(sandbox.tryAcquireTask(), isFalse);
+        expect(sandbox.tryAcquireTask(), isTrue);
+        expect(sandbox.tryAcquireTask(), isTrue);
+        expect(sandbox.tryAcquireTask(), isTrue);
+        expect(sandbox.tryAcquireTask(), isFalse);
 
-      expect(sandbox.violations.length, greaterThanOrEqualTo(3));
-    });
+        expect(sandbox.violations.length, greaterThanOrEqualTo(3));
+      },
+    );
 
-    test('rogue miniapp: sandbox escape attempt + side channel + budget bypass', () {
-      final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
+    test(
+      'rogue miniapp: sandbox escape attempt + side channel + budget bypass',
+      () {
+        final enforcer = RuntimeLawEnforcer(
+          clock: clock,
+          securityManager: securityManager,
+        );
 
-      final sandbox = createHostileSandbox(
-        type: SandboxType.miniApp,
-        pluginId: 'miniapp.rogue',
-        trustLevel: TrustLevel.verified,
-        trustBoundary: const TrustBoundary(
-          boundaryId: 'miniapp',
-          allowedCapabilities: {'ui.render'},
-          allowNetworkAccess: false,
-          allowFileSystemAccess: false,
-        ),
-        budget: const ResourceBudget(maxTokens: 100, maxStreams: 1, maxTasks: 2),
-      );
-      sandbox.start();
+        final sandbox = createHostileSandbox(
+          type: SandboxType.miniApp,
+          pluginId: 'miniapp.rogue',
+          trustLevel: TrustLevel.verified,
+          trustBoundary: const TrustBoundary(
+            boundaryId: 'miniapp',
+            allowedCapabilities: {'ui.render'},
+            allowNetworkAccess: false,
+            allowFileSystemAccess: false,
+          ),
+          budget: const ResourceBudget(
+            maxTokens: 100,
+            maxStreams: 1,
+            maxTasks: 2,
+          ),
+        );
+        sandbox.start();
 
-      expect(sandbox.checkCapabilityAccess('network.connect').allowed, isFalse);
-      expect(sandbox.checkCapabilityAccess('file.read').allowed, isFalse);
+        expect(
+          sandbox.checkCapabilityAccess('network.connect').allowed,
+          isFalse,
+        );
+        expect(sandbox.checkCapabilityAccess('file.read').allowed, isFalse);
 
-      enforcer.enforceNoSideChannels(sandbox.identity.sandboxId, true);
-      enforcer.enforceBudget(sandbox.identity.sandboxId, false);
+        enforcer.enforceNoSideChannels(sandbox.identity.sandboxId, true);
+        enforcer.enforceBudget(sandbox.identity.sandboxId, false);
 
-      expect(sandbox.tryAcquireTokens(100), isTrue);
-      expect(sandbox.tryAcquireTokens(1), isFalse);
+        expect(sandbox.tryAcquireTokens(100), isTrue);
+        expect(sandbox.tryAcquireTokens(1), isFalse);
 
-      sandbox.terminate('rogue_activity');
+        sandbox.terminate('rogue_activity');
 
-      expect(sandbox.checkCapabilityAccess('ui.render').allowed, isFalse);
-      expect(enforcer.violationsFor(sandbox.identity.sandboxId).length, 2);
-    });
+        expect(sandbox.checkCapabilityAccess('ui.render').allowed, isFalse);
+        expect(enforcer.violationsFor(sandbox.identity.sandboxId).length, 2);
+      },
+    );
 
     test('coordinated attack: multiple sandboxes attacking simultaneously', () {
-      final governor = ExecutionGovernor(securityManager: securityManager, clock: clock);
+      final governor = ExecutionGovernor(
+        securityManager: securityManager,
+        clock: clock,
+      );
 
       final attackers = <SandboxIsolate>[];
       for (var i = 0; i < 5; i++) {
@@ -851,7 +1042,11 @@ void main() {
           pluginId: 'agent.attacker-$i',
           trustLevel: TrustLevel.verified,
           resources: SandboxResources(
-            budget: const ResourceBudget(maxTokens: 100, maxStreams: 2, maxTasks: 3),
+            budget: const ResourceBudget(
+              maxTokens: 100,
+              maxStreams: 2,
+              maxTasks: 3,
+            ),
             usage: ResourceUsage(),
             deniedCapabilities: {'storage.delete', 'runtime.admin'},
             trustBoundary: const TrustBoundary(boundaryId: 'hostile'),
@@ -933,14 +1128,19 @@ void main() {
     });
 
     test('law enforcement is non-repudiable — audit log persists', () {
-      final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
+      final enforcer = RuntimeLawEnforcer(
+        clock: clock,
+        securityManager: securityManager,
+      );
 
       enforcer.enforceCapabilityRouting('sb-1', 'cap', false);
       enforcer.enforceNoSideChannels('sb-1', true);
       enforcer.enforceBudget('sb-1', false);
 
       final auditLog = securityManager.auditLog();
-      final lawViolations = auditLog.where((e) => e.action == 'law.violation').toList();
+      final lawViolations = auditLog
+          .where((e) => e.action == 'law.violation')
+          .toList();
       expect(lawViolations.length, 3);
 
       for (final entry in lawViolations) {

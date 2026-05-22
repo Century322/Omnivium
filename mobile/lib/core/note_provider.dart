@@ -17,7 +17,11 @@ class NoteProvider extends ChangeNotifier {
       await _service.init();
       notifyListeners();
     } catch (e, stackTrace) {
-      AppLogger.instance.warning('NoteProvider init failed', error: e, stackTrace: stackTrace);
+      AppLogger.instance.warning(
+        'NoteProvider init failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -26,7 +30,11 @@ class NoteProvider extends ChangeNotifier {
       await _service.addItem(item);
       notifyListeners();
     } catch (e, stackTrace) {
-      AppLogger.instance.warning('NoteProvider addItem failed', error: e, stackTrace: stackTrace);
+      AppLogger.instance.warning(
+        'NoteProvider addItem failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -35,7 +43,11 @@ class NoteProvider extends ChangeNotifier {
       await _service.updateItem(item);
       notifyListeners();
     } catch (e, stackTrace) {
-      AppLogger.instance.warning('NoteProvider updateItem failed', error: e, stackTrace: stackTrace);
+      AppLogger.instance.warning(
+        'NoteProvider updateItem failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -44,7 +56,11 @@ class NoteProvider extends ChangeNotifier {
       await _service.deleteItem(id);
       notifyListeners();
     } catch (e, stackTrace) {
-      AppLogger.instance.warning('NoteProvider deleteItem failed', error: e, stackTrace: stackTrace);
+      AppLogger.instance.warning(
+        'NoteProvider deleteItem failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -53,7 +69,11 @@ class NoteProvider extends ChangeNotifier {
       await _service.toggleDone(id);
       notifyListeners();
     } catch (e, stackTrace) {
-      AppLogger.instance.warning('NoteProvider toggleDone failed', error: e, stackTrace: stackTrace);
+      AppLogger.instance.warning(
+        'NoteProvider toggleDone failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
   }
 }

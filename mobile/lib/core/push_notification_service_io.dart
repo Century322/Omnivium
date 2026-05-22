@@ -11,7 +11,9 @@ Future<void> initFirebaseMessaging(PushNotificationService service) async {
   try {
     await Firebase.initializeApp();
   } catch (e) {
-    debugPrint('Firebase init failed (google-services.json may be missing): $e');
+    debugPrint(
+      'Firebase init failed (google-services.json may be missing): $e',
+    );
     return;
   }
 
@@ -34,26 +36,32 @@ Future<void> initFirebaseMessaging(PushNotificationService service) async {
         service.setFcmToken(token);
       }
 
-      _firebaseSubs.add(messaging.onTokenRefresh.listen((newToken) {
-        service.setFcmToken(newToken);
-      }));
+      _firebaseSubs.add(
+        messaging.onTokenRefresh.listen((newToken) {
+          service.setFcmToken(newToken);
+        }),
+      );
 
-      _firebaseSubs.add(FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-        final notification = message.notification;
-        if (notification != null) {
-          final dialogId = message.data['dialog_id'] as String? ?? '';
-          NotificationQueue.instance.enqueue(
-            dialogId: dialogId,
-            sender: notification.title ?? 'Omnivium',
-            message: notification.body ?? '',
-            data: message.data,
-          );
-        }
-      }));
+      _firebaseSubs.add(
+        FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+          final notification = message.notification;
+          if (notification != null) {
+            final dialogId = message.data['dialog_id'] as String? ?? '';
+            NotificationQueue.instance.enqueue(
+              dialogId: dialogId,
+              sender: notification.title ?? 'Omnivium',
+              message: notification.body ?? '',
+              data: message.data,
+            );
+          }
+        }),
+      );
 
-      _firebaseSubs.add(FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-        service.handleMessageOpened(message.data);
-      }));
+      _firebaseSubs.add(
+        FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+          service.handleMessageOpened(message.data);
+        }),
+      );
     }
   } catch (e) {
     debugPrint('Firebase messaging setup failed: $e');

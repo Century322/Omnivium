@@ -13,7 +13,8 @@ class QuickCommandsView extends StatefulWidget {
   State<QuickCommandsView> createState() => _QuickCommandsViewState();
 }
 
-class _QuickCommandsViewState extends State<QuickCommandsView> with SingleTickerProviderStateMixin {
+class _QuickCommandsViewState extends State<QuickCommandsView>
+    with SingleTickerProviderStateMixin {
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
 
@@ -26,9 +27,10 @@ class _QuickCommandsViewState extends State<QuickCommandsView> with SingleTicker
       duration: const Duration(milliseconds: 400),
       vsync: this,
     );
-    _slideAnimation = Tween<Offset>(begin: const Offset(1, 0), end: Offset.zero).animate(
-      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
-    );
+    _slideAnimation = Tween<Offset>(begin: const Offset(1, 0), end: Offset.zero)
+        .animate(
+          CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+        );
     _slideController.forward();
   }
 
@@ -47,27 +49,66 @@ class _QuickCommandsViewState extends State<QuickCommandsView> with SingleTicker
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
           tooltip: localeProvider.t('back'),
-          icon: Icon(LucideIcons.chevronLeft, color: AppColors.textPrimary(context)),
+          icon: Icon(
+            LucideIcons.chevronLeft,
+            color: AppColors.textPrimary(context),
+          ),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(t('quick_commands'), style: TextStyle(color: AppColors.textPrimary(context), fontSize: 17, fontWeight: FontWeight.w600)),
+        title: Text(
+          t('quick_commands'),
+          style: TextStyle(
+            color: AppColors.textPrimary(context),
+            fontSize: 17,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
         actions: [
           PopupMenuButton<String>(
-            icon: Icon(LucideIcons.moreVertical, color: AppColors.textSecondary(context), size: 20),
+            icon: Icon(
+              LucideIcons.moreVertical,
+              color: AppColors.textSecondary(context),
+              size: 20,
+            ),
             color: AppColors.sf(context),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             onSelected: (value) async {
               if (value == 'reset') {
                 final confirmed = await showDialog<bool>(
                   context: context,
                   builder: (ctx) => AlertDialog(
                     backgroundColor: AppColors.sf(context),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                    title: Text(t('reset_commands'), style: TextStyle(color: AppColors.textPrimary(context), fontSize: 16)),
-                    content: Text(t('reset_commands_confirm'), style: TextStyle(color: AppColors.textSecondary(context), fontSize: 14)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    title: Text(
+                      t('reset_commands'),
+                      style: TextStyle(
+                        color: AppColors.textPrimary(context),
+                        fontSize: 16,
+                      ),
+                    ),
+                    content: Text(
+                      t('reset_commands_confirm'),
+                      style: TextStyle(
+                        color: AppColors.textSecondary(context),
+                        fontSize: 14,
+                      ),
+                    ),
                     actions: [
-                      TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(t('cancel'))),
-                      TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(t('confirm'), style: TextStyle(color: AppColors.accent))),
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx, false),
+                        child: Text(t('cancel')),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx, true),
+                        child: Text(
+                          t('confirm'),
+                          style: TextStyle(color: AppColors.accent),
+                        ),
+                      ),
                     ],
                   ),
                 );
@@ -77,7 +118,16 @@ class _QuickCommandsViewState extends State<QuickCommandsView> with SingleTicker
               }
             },
             itemBuilder: (_) => [
-              PopupMenuItem(value: 'reset', child: Text(t('reset_commands'), style: TextStyle(color: AppColors.textPrimary(context), fontSize: 14))),
+              PopupMenuItem(
+                value: 'reset',
+                child: Text(
+                  t('reset_commands'),
+                  style: TextStyle(
+                    color: AppColors.textPrimary(context),
+                    fontSize: 14,
+                  ),
+                ),
+              ),
             ],
           ),
         ],
@@ -93,19 +143,27 @@ class _QuickCommandsViewState extends State<QuickCommandsView> with SingleTicker
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(LucideIcons.zapOff, size: 48, color: AppColors.iconGray(context)),
+                    Icon(
+                      LucideIcons.zapOff,
+                      size: 48,
+                      color: AppColors.iconGray(context),
+                    ),
                     const SizedBox(height: 12),
-                    Text(t('no_quick_commands'), style: TextStyle(color: AppColors.textSecondary(context), fontSize: 15)),
+                    Text(
+                      t('no_quick_commands'),
+                      style: TextStyle(
+                        color: AppColors.textSecondary(context),
+                        fontSize: 15,
+                      ),
+                    ),
                   ],
                 ),
               );
             }
             return ReorderableListView.builder(
               padding: const EdgeInsets.symmetric(vertical: 8),
-              proxyDecorator: (child, index, animation) => Material(
-                color: Colors.transparent,
-                child: child,
-              ),
+              proxyDecorator: (child, index, animation) =>
+                  Material(color: Colors.transparent, child: child),
               itemCount: commands.length,
               onReorder: (oldIndex, newIndex) {
                 widget.provider.reorderCommands(oldIndex, newIndex);
@@ -121,7 +179,11 @@ class _QuickCommandsViewState extends State<QuickCommandsView> with SingleTicker
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showEditDialog(context),
         backgroundColor: AppColors.accent,
-        child: Icon(LucideIcons.plus, color: AppColors.textPrimary(context), size: 24),
+        child: Icon(
+          LucideIcons.plus,
+          color: AppColors.textPrimary(context),
+          size: 24,
+        ),
       ),
     );
   }
@@ -145,22 +207,49 @@ class _QuickCommandsViewState extends State<QuickCommandsView> with SingleTicker
           alignment: Alignment.center,
           child: Text(cmd.emoji, style: const TextStyle(fontSize: 20)),
         ),
-        title: Text(cmd.name, style: TextStyle(color: AppColors.textPrimary(context), fontSize: 15, fontWeight: FontWeight.w500)),
-        subtitle: Text(cmd.prompt, style: TextStyle(color: AppColors.textSecondary(context), fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis),
+        title: Text(
+          cmd.name,
+          style: TextStyle(
+            color: AppColors.textPrimary(context),
+            fontSize: 15,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        subtitle: Text(
+          cmd.prompt,
+          style: TextStyle(
+            color: AppColors.textSecondary(context),
+            fontSize: 12,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
               tooltip: localeProvider.t('edit'),
-              icon: Icon(LucideIcons.pencil, size: 16, color: AppColors.textSecondary(context)),
+              icon: Icon(
+                LucideIcons.pencil,
+                size: 16,
+                color: AppColors.textSecondary(context),
+              ),
               onPressed: () => _showEditDialog(context, existing: cmd),
             ),
             IconButton(
               tooltip: localeProvider.t('delete'),
-              icon: Icon(LucideIcons.trash2, size: 16, color: AppColors.dng(context).withValues(alpha: 0.7)),
+              icon: Icon(
+                LucideIcons.trash2,
+                size: 16,
+                color: AppColors.dng(context).withValues(alpha: 0.7),
+              ),
               onPressed: () => _deleteCommand(cmd),
             ),
-            Icon(LucideIcons.gripVertical, size: 18, color: AppColors.iconGray(context)),
+            Icon(
+              LucideIcons.gripVertical,
+              size: 18,
+              color: AppColors.iconGray(context),
+            ),
           ],
         ),
       ),
@@ -173,11 +262,29 @@ class _QuickCommandsViewState extends State<QuickCommandsView> with SingleTicker
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.sf(context),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(t('delete_command'), style: TextStyle(color: AppColors.textPrimary(context), fontSize: 16)),
-        content: Text(t('delete_command_confirm'), style: TextStyle(color: AppColors.textSecondary(context), fontSize: 14)),
+        title: Text(
+          t('delete_command'),
+          style: TextStyle(color: AppColors.textPrimary(context), fontSize: 16),
+        ),
+        content: Text(
+          t('delete_command_confirm'),
+          style: TextStyle(
+            color: AppColors.textSecondary(context),
+            fontSize: 14,
+          ),
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(t('cancel'))),
-          TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(t('delete'), style: TextStyle(color: AppColors.dng(context)))),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(t('cancel')),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(
+              t('delete'),
+              style: TextStyle(color: AppColors.dng(context)),
+            ),
+          ),
         ],
       ),
     );
@@ -193,7 +300,24 @@ class _QuickCommandsViewState extends State<QuickCommandsView> with SingleTicker
     final promptCtrl = TextEditingController(text: existing?.prompt ?? '');
     String selectedCategory = existing?.category ?? 'general';
 
-    final emojiOptions = ['??', '??', '??', '??', '??', '??', '?', '??', '??', '??', '??', '??', '??', '??', '?', '??'];
+    final emojiOptions = [
+      '??',
+      '??',
+      '??',
+      '??',
+      '??',
+      '??',
+      '?',
+      '??',
+      '??',
+      '??',
+      '??',
+      '??',
+      '??',
+      '??',
+      '?',
+      '??',
+    ];
     final categoryOptions = [
       ('general', t('category_general')),
       ('tool', t('category_tool')),
@@ -208,10 +332,16 @@ class _QuickCommandsViewState extends State<QuickCommandsView> with SingleTicker
           builder: (ctx, setDialogState) {
             return AlertDialog(
               backgroundColor: AppColors.sf(context),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
               title: Text(
                 isEdit ? t('edit_command') : t('add_command'),
-                style: TextStyle(color: AppColors.textPrimary(context), fontSize: 17, fontWeight: FontWeight.w600),
+                style: TextStyle(
+                  color: AppColors.textPrimary(context),
+                  fontSize: 17,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               content: SingleChildScrollView(
                 child: SizedBox(
@@ -220,7 +350,13 @@ class _QuickCommandsViewState extends State<QuickCommandsView> with SingleTicker
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(t('command_emoji'), style: TextStyle(color: AppColors.textSecondary(context), fontSize: 13)),
+                      Text(
+                        t('command_emoji'),
+                        style: TextStyle(
+                          color: AppColors.textSecondary(context),
+                          fontSize: 13,
+                        ),
+                      ),
                       const SizedBox(height: 8),
                       Wrap(
                         spacing: 8,
@@ -228,8 +364,7 @@ class _QuickCommandsViewState extends State<QuickCommandsView> with SingleTicker
                         children: emojiOptions.map((emoji) {
                           final isSelected = emojiCtrl.text == emoji;
                           return GestureDetector(
-
-      behavior: HitTestBehavior.opaque,
+                            behavior: HitTestBehavior.opaque,
                             onTap: () {
                               emojiCtrl.text = emoji;
                               setDialogState(() {});
@@ -238,49 +373,101 @@ class _QuickCommandsViewState extends State<QuickCommandsView> with SingleTicker
                               width: 36,
                               height: 36,
                               decoration: BoxDecoration(
-                                color: isSelected ? AppColors.accent.withValues(alpha: 0.15) : AppColors.sfAlt(context),
+                                color: isSelected
+                                    ? AppColors.accent.withValues(alpha: 0.15)
+                                    : AppColors.sfAlt(context),
                                 borderRadius: BorderRadius.circular(8),
-                                border: isSelected ? Border.all(color: AppColors.accent, width: 2) : null,
+                                border: isSelected
+                                    ? Border.all(
+                                        color: AppColors.accent,
+                                        width: 2,
+                                      )
+                                    : null,
                               ),
                               alignment: Alignment.center,
-                              child: Text(emoji, style: const TextStyle(fontSize: 18)),
+                              child: Text(
+                                emoji,
+                                style: const TextStyle(fontSize: 18),
+                              ),
                             ),
                           );
                         }).toList(),
                       ),
                       const SizedBox(height: 16),
-                      Text(t('command_name'), style: TextStyle(color: AppColors.textSecondary(context), fontSize: 13)),
+                      Text(
+                        t('command_name'),
+                        style: TextStyle(
+                          color: AppColors.textSecondary(context),
+                          fontSize: 13,
+                        ),
+                      ),
                       const SizedBox(height: 6),
                       TextField(
                         controller: nameCtrl,
-                        style: TextStyle(color: AppColors.textPrimary(context), fontSize: 15),
+                        style: TextStyle(
+                          color: AppColors.textPrimary(context),
+                          fontSize: 15,
+                        ),
                         decoration: InputDecoration(
-                          labelText:  t('command_name_hint'),
-                          hintStyle: TextStyle(color: AppColors.textDisabled(context), fontSize: 14),
+                          labelText: t('command_name_hint'),
+                          hintStyle: TextStyle(
+                            color: AppColors.textDisabled(context),
+                            fontSize: 14,
+                          ),
                           filled: true,
                           fillColor: AppColors.sfAlt(context),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 10,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 16),
-                      Text(t('command_prompt'), style: TextStyle(color: AppColors.textSecondary(context), fontSize: 13)),
+                      Text(
+                        t('command_prompt'),
+                        style: TextStyle(
+                          color: AppColors.textSecondary(context),
+                          fontSize: 13,
+                        ),
+                      ),
                       const SizedBox(height: 6),
                       TextField(
                         controller: promptCtrl,
                         maxLines: 3,
-                        style: TextStyle(color: AppColors.textPrimary(context), fontSize: 15),
+                        style: TextStyle(
+                          color: AppColors.textPrimary(context),
+                          fontSize: 15,
+                        ),
                         decoration: InputDecoration(
-                          labelText:  t('command_prompt_hint'),
-                          hintStyle: TextStyle(color: AppColors.textDisabled(context), fontSize: 14),
+                          labelText: t('command_prompt_hint'),
+                          hintStyle: TextStyle(
+                            color: AppColors.textDisabled(context),
+                            fontSize: 14,
+                          ),
                           filled: true,
                           fillColor: AppColors.sfAlt(context),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 10,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 16),
-                      Text(t('command_category'), style: TextStyle(color: AppColors.textSecondary(context), fontSize: 13)),
+                      Text(
+                        t('command_category'),
+                        style: TextStyle(
+                          color: AppColors.textSecondary(context),
+                          fontSize: 13,
+                        ),
+                      ),
                       const SizedBox(height: 6),
                       Wrap(
                         spacing: 8,
@@ -289,24 +476,40 @@ class _QuickCommandsViewState extends State<QuickCommandsView> with SingleTicker
                           final (value, label) = opt;
                           final isSelected = selectedCategory == value;
                           return GestureDetector(
-
-      behavior: HitTestBehavior.opaque,
+                            behavior: HitTestBehavior.opaque,
                             onTap: () {
                               selectedCategory = value;
                               setDialogState(() {});
                             },
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: isSelected ? AppColors.accent.withValues(alpha: 0.15) : AppColors.sfAlt(context),
-                                borderRadius: BorderRadius.circular(8),
-                                border: isSelected ? Border.all(color: AppColors.accent, width: 1.5) : null,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
                               ),
-                              child: Text(label, style: TextStyle(
-                                color: isSelected ? AppColors.accent : AppColors.textSecondary(context),
-                                fontSize: 13,
-                                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                              )),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? AppColors.accent.withValues(alpha: 0.15)
+                                    : AppColors.sfAlt(context),
+                                borderRadius: BorderRadius.circular(8),
+                                border: isSelected
+                                    ? Border.all(
+                                        color: AppColors.accent,
+                                        width: 1.5,
+                                      )
+                                    : null,
+                              ),
+                              child: Text(
+                                label,
+                                style: TextStyle(
+                                  color: isSelected
+                                      ? AppColors.accent
+                                      : AppColors.textSecondary(context),
+                                  fontSize: 13,
+                                  fontWeight: isSelected
+                                      ? FontWeight.w600
+                                      : FontWeight.normal,
+                                ),
+                              ),
                             ),
                           );
                         }).toList(),
@@ -350,7 +553,10 @@ class _QuickCommandsViewState extends State<QuickCommandsView> with SingleTicker
                     }
                     if (ctx.mounted) Navigator.pop(ctx);
                   },
-                  child: Text(isEdit ? t('save') : t('create'), style: TextStyle(color: AppColors.accent)),
+                  child: Text(
+                    isEdit ? t('save') : t('create'),
+                    style: TextStyle(color: AppColors.accent),
+                  ),
                 ),
               ],
             );

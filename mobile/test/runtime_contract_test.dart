@@ -1,4 +1,4 @@
-﻿import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:omnivium/core/runtime/kernel/runtime_container.dart';
 import 'package:omnivium/core/runtime/kernel/runtime_config.dart';
 import 'package:omnivium/core/runtime/kernel/runtime_state.dart';
@@ -14,27 +14,41 @@ import 'package:omnivium/core/runtime/vocabulary/capability_context.dart';
 import 'package:omnivium/core/runtime/vocabulary/runtime_message.dart';
 
 class TestPluginHandler implements PluginHandler {
-  final CapabilityResult Function(String, dynamic, CapabilityContext)? onCapability;
-  final Future<HandlerResult> Function(RuntimeMessage, CapabilityContext)? onMessage;
-  final Future<HandlerResult> Function(RuntimeEvent, CapabilityContext)? onEvent;
+  final CapabilityResult Function(String, dynamic, CapabilityContext)?
+  onCapability;
+  final Future<HandlerResult> Function(RuntimeMessage, CapabilityContext)?
+  onMessage;
+  final Future<HandlerResult> Function(RuntimeEvent, CapabilityContext)?
+  onEvent;
 
   TestPluginHandler({this.onCapability, this.onMessage, this.onEvent});
 
   @override
-  Future<HandlerResult> handleMessage(RuntimeMessage message, CapabilityContext context) async {
+  Future<HandlerResult> handleMessage(
+    RuntimeMessage message,
+    CapabilityContext context,
+  ) async {
     if (onMessage != null) return onMessage!(message, context);
     return HandlerResult.ok();
   }
 
   @override
-  Future<HandlerResult> handleEvent(RuntimeEvent event, CapabilityContext context) async {
+  Future<HandlerResult> handleEvent(
+    RuntimeEvent event,
+    CapabilityContext context,
+  ) async {
     if (onEvent != null) return onEvent!(event, context);
     return HandlerResult.ok();
   }
 
   @override
-  Future<CapabilityResult> invokeCapability(String capabilityId, dynamic params, CapabilityContext context) async {
-    if (onCapability != null) return onCapability!(capabilityId, params, context);
+  Future<CapabilityResult> invokeCapability(
+    String capabilityId,
+    dynamic params,
+    CapabilityContext context,
+  ) async {
+    if (onCapability != null)
+      return onCapability!(capabilityId, params, context);
     return CapabilityResult.ok();
   }
 }
@@ -60,7 +74,10 @@ void main() {
     });
 
     test('boot with custom config', () async {
-      final config = RuntimeConfig(nodeId: 'test-node', runtimeVersion: '2.0.0');
+      final config = RuntimeConfig(
+        nodeId: 'test-node',
+        runtimeVersion: '2.0.0',
+      );
       final container = await RuntimeContainer.boot(config);
       expect(container.config.nodeId, 'test-node');
       expect(container.config.runtimeVersion, '2.0.0');
@@ -156,11 +173,17 @@ void main() {
 
       final suspended = await container.suspendPlugin('suspend-test');
       expect(suspended, isTrue);
-      expect(container.pluginRegistry.state('suspend-test'), PluginState.suspended);
+      expect(
+        container.pluginRegistry.state('suspend-test'),
+        PluginState.suspended,
+      );
 
       final reactivated = await container.activatePlugin('suspend-test');
       expect(reactivated, isTrue);
-      expect(container.pluginRegistry.state('suspend-test'), PluginState.active);
+      expect(
+        container.pluginRegistry.state('suspend-test'),
+        PluginState.active,
+      );
     });
   });
 
@@ -187,7 +210,8 @@ void main() {
         ],
       );
       final handler = TestPluginHandler(
-        onCapability: (id, params, ctx) => CapabilityResult.ok({'echo': params}),
+        onCapability: (id, params, ctx) =>
+            CapabilityResult.ok({'echo': params}),
       );
       await container.registerPlugin(descriptor, handler);
 
@@ -212,7 +236,8 @@ void main() {
         ],
       );
       final handler = TestPluginHandler(
-        onCapability: (id, params, ctx) => CapabilityResult.ok('Hello, $params!'),
+        onCapability: (id, params, ctx) =>
+            CapabilityResult.ok('Hello, $params!'),
       );
       await container.registerPlugin(descriptor, handler);
 
@@ -269,18 +294,13 @@ void main() {
 
     test('publish and subscribe', () async {
       final received = <RuntimeEvent>[];
-      container.eventBus.subscribe(
-        'test.event',
-        (event) async {
-          received.add(event);
-        },
-      );
+      container.eventBus.subscribe('test.event', (event) async {
+        received.add(event);
+      });
 
-      container.eventBus.publish(
-        'test.event',
-        {'key': 'value'},
-        source: RuntimeIdentity.forPlugin('test-source'),
-      );
+      container.eventBus.publish('test.event', {
+        'key': 'value',
+      }, source: RuntimeIdentity.forPlugin('test-source'));
 
       await Future.delayed(const Duration(milliseconds: 50));
       expect(received.length, 1);
@@ -289,12 +309,9 @@ void main() {
 
     test('unsubscribe stops receiving', () async {
       final received = <RuntimeEvent>[];
-      final sub = container.eventBus.subscribe(
-        'test.unsub',
-        (event) async {
-          received.add(event);
-        },
-      );
+      final sub = container.eventBus.subscribe('test.unsub', (event) async {
+        received.add(event);
+      });
 
       container.eventBus.publish(
         'test.unsub',
@@ -371,13 +388,10 @@ void main() {
         createdAt: DateTime.now().millisecondsSinceEpoch,
       );
 
-      final future = container.scheduler.schedule(
-        task,
-        (token) async {
-          await Future.delayed(const Duration(seconds: 10));
-          return 'should not reach';
-        },
-      );
+      final future = container.scheduler.schedule(task, (token) async {
+        await Future.delayed(const Duration(seconds: 10));
+        return 'should not reach';
+      });
 
       await Future.delayed(const Duration(milliseconds: 10));
       final cancelled = container.scheduler.cancel('task-cancel');
@@ -399,13 +413,10 @@ void main() {
       );
 
       try {
-        await container.scheduler.schedule(
-          task,
-          (token) async {
-            await Future.delayed(const Duration(seconds: 10));
-            return 'should not reach';
-          },
-        );
+        await container.scheduler.schedule(task, (token) async {
+          await Future.delayed(const Duration(seconds: 10));
+          return 'should not reach';
+        });
         fail('Should have thrown');
       } catch (e) {
         expect(e, isNotNull);
@@ -435,4 +446,3 @@ void main() {
     });
   });
 }
-

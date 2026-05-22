@@ -41,10 +41,42 @@ void main() {
     });
 
     test('computes violation counts per law', () {
-      graph.record(sandboxId: 'sb-1', operationType: 'capability', violatedLaw: RuntimeLawId.noBypassCapabilityRouter, compliant: false, escalationBefore: EscalationLevel.warning, escalationAfter: EscalationLevel.warning, timestamp: 1);
-      graph.record(sandboxId: 'sb-1', operationType: 'capability', violatedLaw: RuntimeLawId.noBypassCapabilityRouter, compliant: false, escalationBefore: EscalationLevel.warning, escalationAfter: EscalationLevel.warning, timestamp: 2);
-      graph.record(sandboxId: 'sb-1', operationType: 'task', violatedLaw: RuntimeLawId.noBypassScheduler, compliant: false, escalationBefore: EscalationLevel.warning, escalationAfter: EscalationLevel.warning, timestamp: 3);
-      graph.record(sandboxId: 'sb-1', operationType: 'capability', violatedLaw: null, compliant: true, escalationBefore: EscalationLevel.warning, escalationAfter: EscalationLevel.warning, timestamp: 4);
+      graph.record(
+        sandboxId: 'sb-1',
+        operationType: 'capability',
+        violatedLaw: RuntimeLawId.noBypassCapabilityRouter,
+        compliant: false,
+        escalationBefore: EscalationLevel.warning,
+        escalationAfter: EscalationLevel.warning,
+        timestamp: 1,
+      );
+      graph.record(
+        sandboxId: 'sb-1',
+        operationType: 'capability',
+        violatedLaw: RuntimeLawId.noBypassCapabilityRouter,
+        compliant: false,
+        escalationBefore: EscalationLevel.warning,
+        escalationAfter: EscalationLevel.warning,
+        timestamp: 2,
+      );
+      graph.record(
+        sandboxId: 'sb-1',
+        operationType: 'task',
+        violatedLaw: RuntimeLawId.noBypassScheduler,
+        compliant: false,
+        escalationBefore: EscalationLevel.warning,
+        escalationAfter: EscalationLevel.warning,
+        timestamp: 3,
+      );
+      graph.record(
+        sandboxId: 'sb-1',
+        operationType: 'capability',
+        violatedLaw: null,
+        compliant: true,
+        escalationBefore: EscalationLevel.warning,
+        escalationAfter: EscalationLevel.warning,
+        timestamp: 4,
+      );
 
       final stats = graph.computeStatistics();
 
@@ -58,12 +90,36 @@ void main() {
 
     test('identifies most violated laws', () {
       for (var i = 0; i < 5; i++) {
-        graph.record(sandboxId: 'sb-1', operationType: 'capability', violatedLaw: RuntimeLawId.noBypassCapabilityRouter, compliant: false, escalationBefore: EscalationLevel.warning, escalationAfter: EscalationLevel.warning, timestamp: i);
+        graph.record(
+          sandboxId: 'sb-1',
+          operationType: 'capability',
+          violatedLaw: RuntimeLawId.noBypassCapabilityRouter,
+          compliant: false,
+          escalationBefore: EscalationLevel.warning,
+          escalationAfter: EscalationLevel.warning,
+          timestamp: i,
+        );
       }
       for (var i = 0; i < 3; i++) {
-        graph.record(sandboxId: 'sb-1', operationType: 'task', violatedLaw: RuntimeLawId.noBudgetBypass, compliant: false, escalationBefore: EscalationLevel.warning, escalationAfter: EscalationLevel.warning, timestamp: i + 10);
+        graph.record(
+          sandboxId: 'sb-1',
+          operationType: 'task',
+          violatedLaw: RuntimeLawId.noBudgetBypass,
+          compliant: false,
+          escalationBefore: EscalationLevel.warning,
+          escalationAfter: EscalationLevel.warning,
+          timestamp: i + 10,
+        );
       }
-      graph.record(sandboxId: 'sb-1', operationType: 'state', violatedLaw: RuntimeLawId.noSideChannels, compliant: false, escalationBefore: EscalationLevel.warning, escalationAfter: EscalationLevel.warning, timestamp: 20);
+      graph.record(
+        sandboxId: 'sb-1',
+        operationType: 'state',
+        violatedLaw: RuntimeLawId.noSideChannels,
+        compliant: false,
+        escalationBefore: EscalationLevel.warning,
+        escalationAfter: EscalationLevel.warning,
+        timestamp: 20,
+      );
 
       final mostViolated = graph.computeStatistics().mostViolatedLaws(limit: 3);
 
@@ -74,10 +130,26 @@ void main() {
 
     test('identifies most dangerous sandboxes', () {
       for (var i = 0; i < 10; i++) {
-        graph.record(sandboxId: 'sb-dangerous', operationType: 'capability', violatedLaw: RuntimeLawId.noBypassCapabilityRouter, compliant: false, escalationBefore: EscalationLevel.warning, escalationAfter: EscalationLevel.warning, timestamp: i);
+        graph.record(
+          sandboxId: 'sb-dangerous',
+          operationType: 'capability',
+          violatedLaw: RuntimeLawId.noBypassCapabilityRouter,
+          compliant: false,
+          escalationBefore: EscalationLevel.warning,
+          escalationAfter: EscalationLevel.warning,
+          timestamp: i,
+        );
       }
       for (var i = 0; i < 3; i++) {
-        graph.record(sandboxId: 'sb-mild', operationType: 'task', violatedLaw: RuntimeLawId.noBudgetBypass, compliant: false, escalationBefore: EscalationLevel.warning, escalationAfter: EscalationLevel.warning, timestamp: i);
+        graph.record(
+          sandboxId: 'sb-mild',
+          operationType: 'task',
+          violatedLaw: RuntimeLawId.noBudgetBypass,
+          compliant: false,
+          escalationBefore: EscalationLevel.warning,
+          escalationAfter: EscalationLevel.warning,
+          timestamp: i,
+        );
       }
 
       final dangerous = graph.computeStatistics().mostDangerousSandboxes();
@@ -88,10 +160,28 @@ void main() {
 
     test('identifies most abused capabilities', () {
       for (var i = 0; i < 7; i++) {
-        graph.record(sandboxId: 'sb-1', operationType: 'capability', violatedLaw: RuntimeLawId.noBypassCapabilityRouter, compliant: false, capabilityId: 'storage.delete', escalationBefore: EscalationLevel.warning, escalationAfter: EscalationLevel.warning, timestamp: i);
+        graph.record(
+          sandboxId: 'sb-1',
+          operationType: 'capability',
+          violatedLaw: RuntimeLawId.noBypassCapabilityRouter,
+          compliant: false,
+          capabilityId: 'storage.delete',
+          escalationBefore: EscalationLevel.warning,
+          escalationAfter: EscalationLevel.warning,
+          timestamp: i,
+        );
       }
       for (var i = 0; i < 2; i++) {
-        graph.record(sandboxId: 'sb-1', operationType: 'capability', violatedLaw: RuntimeLawId.trustLevelMustBeRespected, compliant: false, capabilityId: 'runtime.admin', escalationBefore: EscalationLevel.warning, escalationAfter: EscalationLevel.warning, timestamp: i + 10);
+        graph.record(
+          sandboxId: 'sb-1',
+          operationType: 'capability',
+          violatedLaw: RuntimeLawId.trustLevelMustBeRespected,
+          compliant: false,
+          capabilityId: 'runtime.admin',
+          escalationBefore: EscalationLevel.warning,
+          escalationAfter: EscalationLevel.warning,
+          timestamp: i + 10,
+        );
       }
 
       final abused = graph.computeStatistics().mostAbusedCapabilities();
@@ -101,33 +191,113 @@ void main() {
     });
 
     test('tracks escalation path for a sandbox', () {
-      graph.record(sandboxId: 'sb-1', operationType: 'capability', violatedLaw: null, compliant: true, escalationBefore: EscalationLevel.warning, escalationAfter: EscalationLevel.warning, timestamp: 1);
-      graph.record(sandboxId: 'sb-1', operationType: 'capability', violatedLaw: RuntimeLawId.noBypassCapabilityRouter, compliant: false, escalationBefore: EscalationLevel.warning, escalationAfter: EscalationLevel.restricted, timestamp: 2);
-      graph.record(sandboxId: 'sb-1', operationType: 'capability', violatedLaw: RuntimeLawId.noBypassCapabilityRouter, compliant: false, escalationBefore: EscalationLevel.restricted, escalationAfter: EscalationLevel.terminated, timestamp: 3);
+      graph.record(
+        sandboxId: 'sb-1',
+        operationType: 'capability',
+        violatedLaw: null,
+        compliant: true,
+        escalationBefore: EscalationLevel.warning,
+        escalationAfter: EscalationLevel.warning,
+        timestamp: 1,
+      );
+      graph.record(
+        sandboxId: 'sb-1',
+        operationType: 'capability',
+        violatedLaw: RuntimeLawId.noBypassCapabilityRouter,
+        compliant: false,
+        escalationBefore: EscalationLevel.warning,
+        escalationAfter: EscalationLevel.restricted,
+        timestamp: 2,
+      );
+      graph.record(
+        sandboxId: 'sb-1',
+        operationType: 'capability',
+        violatedLaw: RuntimeLawId.noBypassCapabilityRouter,
+        compliant: false,
+        escalationBefore: EscalationLevel.restricted,
+        escalationAfter: EscalationLevel.terminated,
+        timestamp: 3,
+      );
 
       final path = graph.escalationPathFor('sb-1');
 
       expect(path.decisions.length, 3);
-      expect(path.levelTransitions, [EscalationLevel.warning, EscalationLevel.restricted, EscalationLevel.terminated]);
+      expect(path.levelTransitions, [
+        EscalationLevel.warning,
+        EscalationLevel.restricted,
+        EscalationLevel.terminated,
+      ]);
       expect(path.reachedTermination, isTrue);
     });
 
     test('filters violations by law', () {
-      graph.record(sandboxId: 'sb-1', operationType: 'capability', violatedLaw: RuntimeLawId.noBypassCapabilityRouter, compliant: false, escalationBefore: EscalationLevel.warning, escalationAfter: EscalationLevel.warning, timestamp: 1);
-      graph.record(sandboxId: 'sb-1', operationType: 'task', violatedLaw: RuntimeLawId.noBudgetBypass, compliant: false, escalationBefore: EscalationLevel.warning, escalationAfter: EscalationLevel.warning, timestamp: 2);
-      graph.record(sandboxId: 'sb-1', operationType: 'capability', violatedLaw: RuntimeLawId.noBypassCapabilityRouter, compliant: false, escalationBefore: EscalationLevel.warning, escalationAfter: EscalationLevel.warning, timestamp: 3);
+      graph.record(
+        sandboxId: 'sb-1',
+        operationType: 'capability',
+        violatedLaw: RuntimeLawId.noBypassCapabilityRouter,
+        compliant: false,
+        escalationBefore: EscalationLevel.warning,
+        escalationAfter: EscalationLevel.warning,
+        timestamp: 1,
+      );
+      graph.record(
+        sandboxId: 'sb-1',
+        operationType: 'task',
+        violatedLaw: RuntimeLawId.noBudgetBypass,
+        compliant: false,
+        escalationBefore: EscalationLevel.warning,
+        escalationAfter: EscalationLevel.warning,
+        timestamp: 2,
+      );
+      graph.record(
+        sandboxId: 'sb-1',
+        operationType: 'capability',
+        violatedLaw: RuntimeLawId.noBypassCapabilityRouter,
+        compliant: false,
+        escalationBefore: EscalationLevel.warning,
+        escalationAfter: EscalationLevel.warning,
+        timestamp: 3,
+      );
 
-      final routerViolations = graph.violationsForLaw(RuntimeLawId.noBypassCapabilityRouter);
+      final routerViolations = graph.violationsForLaw(
+        RuntimeLawId.noBypassCapabilityRouter,
+      );
       expect(routerViolations.length, 2);
 
-      final budgetViolations = graph.violationsForLaw(RuntimeLawId.noBudgetBypass);
+      final budgetViolations = graph.violationsForLaw(
+        RuntimeLawId.noBudgetBypass,
+      );
       expect(budgetViolations.length, 1);
     });
 
     test('filters decisions by time range', () {
-      graph.record(sandboxId: 'sb-1', operationType: 'capability', violatedLaw: null, compliant: true, escalationBefore: EscalationLevel.warning, escalationAfter: EscalationLevel.warning, timestamp: 100);
-      graph.record(sandboxId: 'sb-1', operationType: 'capability', violatedLaw: null, compliant: true, escalationBefore: EscalationLevel.warning, escalationAfter: EscalationLevel.warning, timestamp: 200);
-      graph.record(sandboxId: 'sb-1', operationType: 'capability', violatedLaw: null, compliant: true, escalationBefore: EscalationLevel.warning, escalationAfter: EscalationLevel.warning, timestamp: 300);
+      graph.record(
+        sandboxId: 'sb-1',
+        operationType: 'capability',
+        violatedLaw: null,
+        compliant: true,
+        escalationBefore: EscalationLevel.warning,
+        escalationAfter: EscalationLevel.warning,
+        timestamp: 100,
+      );
+      graph.record(
+        sandboxId: 'sb-1',
+        operationType: 'capability',
+        violatedLaw: null,
+        compliant: true,
+        escalationBefore: EscalationLevel.warning,
+        escalationAfter: EscalationLevel.warning,
+        timestamp: 200,
+      );
+      graph.record(
+        sandboxId: 'sb-1',
+        operationType: 'capability',
+        violatedLaw: null,
+        compliant: true,
+        escalationBefore: EscalationLevel.warning,
+        escalationAfter: EscalationLevel.warning,
+        timestamp: 300,
+      );
 
       final range = graph.decisionsInTimeRange(150, 250);
       expect(range.length, 1);
@@ -199,8 +369,18 @@ void main() {
 
     test('integrity verification passes for clean ledger', () {
       ledger.append(entryType: 'a', sandboxId: 'sb-1', data: {}, timestamp: 1);
-      ledger.append(entryType: 'b', sandboxId: 'sb-2', data: {'x': 1}, timestamp: 2);
-      ledger.append(entryType: 'c', sandboxId: 'sb-1', data: {'y': 2}, timestamp: 3);
+      ledger.append(
+        entryType: 'b',
+        sandboxId: 'sb-2',
+        data: {'x': 1},
+        timestamp: 2,
+      );
+      ledger.append(
+        entryType: 'c',
+        sandboxId: 'sb-1',
+        data: {'y': 2},
+        timestamp: 3,
+      );
 
       expect(ledger.verifyIntegrity(), isTrue);
     });
@@ -216,7 +396,12 @@ void main() {
 
     test('each entry has unique hash', () {
       for (var i = 0; i < 100; i++) {
-        ledger.append(entryType: 'op', sandboxId: 'sb-$i', data: {'i': i}, timestamp: i);
+        ledger.append(
+          entryType: 'op',
+          sandboxId: 'sb-$i',
+          data: {'i': i},
+          timestamp: i,
+        );
       }
 
       final hashes = ledger.entries.map((e) => e.hash).toSet();
@@ -234,9 +419,24 @@ void main() {
     });
 
     test('filters entries by type', () {
-      ledger.append(entryType: 'law.violation', sandboxId: 'sb-1', data: {}, timestamp: 1);
-      ledger.append(entryType: 'capability.approved', sandboxId: 'sb-1', data: {}, timestamp: 2);
-      ledger.append(entryType: 'law.violation', sandboxId: 'sb-2', data: {}, timestamp: 3);
+      ledger.append(
+        entryType: 'law.violation',
+        sandboxId: 'sb-1',
+        data: {},
+        timestamp: 1,
+      );
+      ledger.append(
+        entryType: 'capability.approved',
+        sandboxId: 'sb-1',
+        data: {},
+        timestamp: 2,
+      );
+      ledger.append(
+        entryType: 'law.violation',
+        sandboxId: 'sb-2',
+        data: {},
+        timestamp: 3,
+      );
 
       final violations = ledger.entriesOfType('law.violation');
       expect(violations.length, 2);
@@ -244,7 +444,12 @@ void main() {
 
     test('filters entries by sequence range', () {
       for (var i = 0; i < 10; i++) {
-        ledger.append(entryType: 'op', sandboxId: 'sb-1', data: {}, timestamp: i);
+        ledger.append(
+          entryType: 'op',
+          sandboxId: 'sb-1',
+          data: {},
+          timestamp: i,
+        );
       }
 
       final range = ledger.entriesInRange(3, 7);
@@ -254,7 +459,12 @@ void main() {
     });
 
     test('JSON serialization preserves chain data', () {
-      ledger.append(entryType: 'law.violation', sandboxId: 'sb-1', data: {'law': 'test'}, timestamp: 1000);
+      ledger.append(
+        entryType: 'law.violation',
+        sandboxId: 'sb-1',
+        data: {'law': 'test'},
+        timestamp: 1000,
+      );
 
       final json = ledger.entries.first.toJson();
       expect(json['seq'], 0);
@@ -299,7 +509,13 @@ void main() {
       );
 
       expect(proof.isComplete, isFalse);
-      expect(proof.missingProofs(), ['RouteProof', 'BudgetProof', 'TraceProof', 'TrustProof', 'SchedulerProof']);
+      expect(proof.missingProofs(), [
+        'RouteProof',
+        'BudgetProof',
+        'TraceProof',
+        'TrustProof',
+        'SchedulerProof',
+      ]);
     });
 
     test('partial proof — only route proof missing', () {
@@ -353,7 +569,10 @@ void main() {
     setUp(() {
       final clock = HybridLogicalClock(nodeId: 'trace-test');
       final securityManager = SecurityManager();
-      final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
+      final enforcer = RuntimeLawEnforcer(
+        clock: clock,
+        securityManager: securityManager,
+      );
       guard = ConstitutionalGuard(enforcer: enforcer);
     });
 

@@ -1,9 +1,4 @@
-enum LeaseState {
-  active,
-  expired,
-  released,
-  revoked,
-}
+enum LeaseState { active, expired, released, revoked }
 
 class DistributedSessionLease {
   final String sessionId;
@@ -29,31 +24,31 @@ class DistributedSessionLease {
     int? acquiredAt,
     int? expiresAt,
     int? renewalCount,
-  }) =>
-      DistributedSessionLease(
-        sessionId: sessionId ?? this.sessionId,
-        ownerNodeId: ownerNodeId ?? this.ownerNodeId,
-        state: state ?? this.state,
-        acquiredAt: acquiredAt ?? this.acquiredAt,
-        expiresAt: expiresAt ?? this.expiresAt,
-        renewalCount: renewalCount ?? this.renewalCount,
-      );
+  }) => DistributedSessionLease(
+    sessionId: sessionId ?? this.sessionId,
+    ownerNodeId: ownerNodeId ?? this.ownerNodeId,
+    state: state ?? this.state,
+    acquiredAt: acquiredAt ?? this.acquiredAt,
+    expiresAt: expiresAt ?? this.expiresAt,
+    renewalCount: renewalCount ?? this.renewalCount,
+  );
 
   bool get isActive => state == LeaseState.active;
   bool get isExpired => state == LeaseState.expired;
 
-  bool isValidAt(int timestamp) => state == LeaseState.active && timestamp < expiresAt;
+  bool isValidAt(int timestamp) =>
+      state == LeaseState.active && timestamp < expiresAt;
 
   Duration get ttl => Duration(milliseconds: expiresAt - acquiredAt);
 
   Map<String, dynamic> toJson() => {
-        'sessionId': sessionId,
-        'ownerNodeId': ownerNodeId,
-        'state': state.name,
-        'acquiredAt': acquiredAt,
-        'expiresAt': expiresAt,
-        'renewalCount': renewalCount,
-      };
+    'sessionId': sessionId,
+    'ownerNodeId': ownerNodeId,
+    'state': state.name,
+    'acquiredAt': acquiredAt,
+    'expiresAt': expiresAt,
+    'renewalCount': renewalCount,
+  };
 
   factory DistributedSessionLease.fromJson(Map<String, dynamic> json) =>
       DistributedSessionLease(

@@ -26,7 +26,8 @@ class AppDrawer extends StatefulWidget {
   State<AppDrawer> createState() => AppDrawerState();
 }
 
-class AppDrawerState extends State<AppDrawer> with SingleTickerProviderStateMixin {
+class AppDrawerState extends State<AppDrawer>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<Offset> _slide;
   late Animation<double> _fade;
@@ -58,8 +59,6 @@ class AppDrawerState extends State<AppDrawer> with SingleTickerProviderStateMixi
     });
   }
 
-
-
   void _showProfile() {
     close();
     AppNavigator.go(context, '/my-id');
@@ -78,11 +77,30 @@ class AppDrawerState extends State<AppDrawer> with SingleTickerProviderStateMixi
           children: [
             Padding(
               padding: const EdgeInsets.all(16),
-              child: Text(session.title, style: TextStyle(color: AppColors.textPrimary(context), fontSize: 16, fontWeight: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),
+              child: Text(
+                session.title,
+                style: TextStyle(
+                  color: AppColors.textPrimary(context),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
             ListTile(
-              leading: Icon(LucideIcons.pencil, color: AppColors.sec(context), size: 18),
-              title: Text(localeProvider.t('rename'), style: TextStyle(color: AppColors.textSecondary(context), fontSize: 15)),
+              leading: Icon(
+                LucideIcons.pencil,
+                color: AppColors.sec(context),
+                size: 18,
+              ),
+              title: Text(
+                localeProvider.t('rename'),
+                style: TextStyle(
+                  color: AppColors.textSecondary(context),
+                  fontSize: 15,
+                ),
+              ),
               onTap: () {
                 Navigator.pop(context);
                 _showRenameDialog(session);
@@ -90,8 +108,18 @@ class AppDrawerState extends State<AppDrawer> with SingleTickerProviderStateMixi
             ),
             if (!session.isArchived)
               ListTile(
-                leading: Icon(LucideIcons.archive, color: AppColors.sec(context), size: 18),
-                title: Text(localeProvider.t('archive'), style: TextStyle(color: AppColors.textSecondary(context), fontSize: 15)),
+                leading: Icon(
+                  LucideIcons.archive,
+                  color: AppColors.sec(context),
+                  size: 18,
+                ),
+                title: Text(
+                  localeProvider.t('archive'),
+                  style: TextStyle(
+                    color: AppColors.textSecondary(context),
+                    fontSize: 15,
+                  ),
+                ),
                 onTap: () {
                   widget.provider.session.archiveSession(session.id);
                   Navigator.pop(context);
@@ -99,31 +127,68 @@ class AppDrawerState extends State<AppDrawer> with SingleTickerProviderStateMixi
               ),
             if (session.isArchived)
               ListTile(
-                leading: Icon(LucideIcons.archiveRestore, color: AppColors.sec(context), size: 18),
-                title: Text(localeProvider.t('unarchive'), style: TextStyle(color: AppColors.textSecondary(context), fontSize: 15)),
+                leading: Icon(
+                  LucideIcons.archiveRestore,
+                  color: AppColors.sec(context),
+                  size: 18,
+                ),
+                title: Text(
+                  localeProvider.t('unarchive'),
+                  style: TextStyle(
+                    color: AppColors.textSecondary(context),
+                    fontSize: 15,
+                  ),
+                ),
                 onTap: () {
                   widget.provider.session.unarchiveSession(session.id);
                   Navigator.pop(context);
                 },
               ),
             ListTile(
-              leading: Icon(LucideIcons.trash2, color: AppColors.dng(context), size: 18),
-              title: Text(localeProvider.t('delete'), style: TextStyle(color: AppColors.dng(context), fontSize: 15)),
+              leading: Icon(
+                LucideIcons.trash2,
+                color: AppColors.dng(context),
+                size: 18,
+              ),
+              title: Text(
+                localeProvider.t('delete'),
+                style: TextStyle(color: AppColors.dng(context), fontSize: 15),
+              ),
               onTap: () {
                 Navigator.pop(context);
-                showDialog(context: context, builder: (_) => AlertDialog(
-                  backgroundColor: AppColors.sf(context), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  title: Text(localeProvider.t('delete_session'), style: TextStyle(color: AppColors.textPrimary(context))),
-                  content: Text(localeProvider.t('delete_session_confirm'), style: TextStyle(color: AppColors.textSecondary(context))),
-                  actions: [
-                    TextButton(onPressed: () => Navigator.pop(context), child: Text(localeProvider.t('cancel'))),
-                    FilledButton(
-                      style: FilledButton.styleFrom(backgroundColor: AppColors.dng(context)),
-                      onPressed: () { Navigator.pop(context); widget.provider.session.deleteSession(session.id); },
-                      child: Text(localeProvider.t('delete')),
+                showDialog(
+                  context: context,
+                  builder: (_) => AlertDialog(
+                    backgroundColor: AppColors.sf(context),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                  ],
-                ));
+                    title: Text(
+                      localeProvider.t('delete_session'),
+                      style: TextStyle(color: AppColors.textPrimary(context)),
+                    ),
+                    content: Text(
+                      localeProvider.t('delete_session_confirm'),
+                      style: TextStyle(color: AppColors.textSecondary(context)),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text(localeProvider.t('cancel')),
+                      ),
+                      FilledButton(
+                        style: FilledButton.styleFrom(
+                          backgroundColor: AppColors.dng(context),
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                          widget.provider.session.deleteSession(session.id);
+                        },
+                        child: Text(localeProvider.t('delete')),
+                      ),
+                    ],
+                  ),
+                );
               },
             ),
             const SizedBox(height: 8),
@@ -140,32 +205,47 @@ class AppDrawerState extends State<AppDrawer> with SingleTickerProviderStateMixi
       builder: (_) => AlertDialog(
         backgroundColor: AppColors.sf(context),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(localeProvider.t('rename_conversation'), style: TextStyle(color: AppColors.textPrimary(context))),
+        title: Text(
+          localeProvider.t('rename_conversation'),
+          style: TextStyle(color: AppColors.textPrimary(context)),
+        ),
         content: TextField(
           controller: controller,
           autofocus: true,
           style: TextStyle(color: AppColors.textPrimary(context)),
           decoration: InputDecoration(
-            labelText:  localeProvider.t('enter_new_name'),
+            labelText: localeProvider.t('enter_new_name'),
             hintStyle: TextStyle(color: AppColors.textDisabled(context)),
             filled: true,
             fillColor: AppColors.sfAlt(context),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(localeProvider.t('cancel'), style: TextStyle(color: AppColors.sec(context))),
+            child: Text(
+              localeProvider.t('cancel'),
+              style: TextStyle(color: AppColors.sec(context)),
+            ),
           ),
           TextButton(
             onPressed: () {
               if (controller.text.trim().isNotEmpty) {
-                widget.provider.session.updateSessionTitle(session.id, controller.text.trim());
+                widget.provider.session.updateSessionTitle(
+                  session.id,
+                  controller.text.trim(),
+                );
               }
               Navigator.pop(context);
             },
-            child: Text(localeProvider.t('ok'), style: TextStyle(color: AppColors.accent)),
+            child: Text(
+              localeProvider.t('ok'),
+              style: TextStyle(color: AppColors.accent),
+            ),
           ),
         ],
       ),
@@ -175,7 +255,9 @@ class AppDrawerState extends State<AppDrawer> with SingleTickerProviderStateMixi
   Widget _buildUserAvatar({required double size, required double radius}) {
     final userId = widget.provider.matrix.userId ?? '';
     final cleaned = userId.replaceAll('@', '');
-    final letter = cleaned.isNotEmpty ? cleaned.substring(0, 1).toUpperCase() : '?';
+    final letter = cleaned.isNotEmpty
+        ? cleaned.substring(0, 1).toUpperCase()
+        : '?';
     return Container(
       width: size,
       height: size,
@@ -184,7 +266,14 @@ class AppDrawerState extends State<AppDrawer> with SingleTickerProviderStateMixi
         borderRadius: BorderRadius.circular(radius),
       ),
       child: Center(
-        child: Text(letter, style: TextStyle(color: AppColors.accent, fontSize: size * 0.4, fontWeight: FontWeight.w600)),
+        child: Text(
+          letter,
+          style: TextStyle(
+            color: AppColors.accent,
+            fontSize: size * 0.4,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ),
     );
   }
@@ -194,15 +283,19 @@ class AppDrawerState extends State<AppDrawer> with SingleTickerProviderStateMixi
     final screenWidth = MediaQuery.of(context).size.width;
     final drawerWidth = (screenWidth * 0.85).clamp(0.0, 360.0);
 
-    return Stack(children: [
-      FadeTransition(
+    return Stack(
+      children: [
+        FadeTransition(
           opacity: _fade,
           child: GestureDetector(
-
-      behavior: HitTestBehavior.opaque,
-              onTap: close,
-              child: Container(color: AppColors.bg(context).withValues(alpha: 0.6)))),
-      SlideTransition(
+            behavior: HitTestBehavior.opaque,
+            onTap: close,
+            child: Container(
+              color: AppColors.bg(context).withValues(alpha: 0.6),
+            ),
+          ),
+        ),
+        SlideTransition(
           position: _slide,
           child: Container(
             width: drawerWidth,
@@ -212,164 +305,345 @@ class AppDrawerState extends State<AppDrawer> with SingleTickerProviderStateMixi
             ),
             child: SafeArea(
               right: false,
-              child: Column(children: [
-                if (widget.provider.navigation.isIncognito)
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: AppColors.accent.withValues(alpha: 0.15),
-                      borderRadius: const BorderRadius.horizontal(right: Radius.circular(24)),
-                    ),
-                    child: Row(children: [
-                      IncognitoIcon(size: 14, color: AppColors.accent),
-                      const SizedBox(width: 8),
-                      Text(localeProvider.t('incognito_mode'), style: TextStyle(color: AppColors.accent, fontSize: 12, fontWeight: FontWeight.w600)),
-                    ]),
-                  ),
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(children: [
-                    Semantics(
-                      button: true,
-                      label: widget.provider.navigation.isIncognito ? localeProvider.t('incognito_mode') : localeProvider.t('my_profile'),
-                      child: GestureDetector(
-
-      behavior: HitTestBehavior.opaque,
-                      onTap: _showProfile,
-                      child: Container(
-                        width: 32, height: 32,
-                        decoration: BoxDecoration(color: AppColors.sfAlt(context), borderRadius: BorderRadius.circular(16)),
-                        child: widget.provider.navigation.isIncognito
-                            ? Center(child: IncognitoIcon(size: 18, color: AppColors.textPrimary(context)))
-                            : _buildUserAvatar(size: 32, radius: 16),
+              child: Column(
+                children: [
+                  if (widget.provider.navigation.isIncognito)
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
                       ),
-                    )),
-                    const SizedBox(width: 12),
-                    Semantics(label: localeProvider.t('user_profile'), child: GestureDetector(
-
-      behavior: HitTestBehavior.opaque,
-                      onTap: _showProfile,
-                      child: Text(
-                          widget.provider.matrix.isLoggedIn
-                              ? (widget.provider.matrix.userId?.split(':').first.replaceAll('@', '') ?? localeProvider.t('user'))
-                              : localeProvider.t('user'),
-                          style: TextStyle(color: AppColors.textPrimary(context), fontWeight: FontWeight.w500, fontSize: 15)),
-                    )),
-                    const Spacer(),
-                    ListenableBuilder(
-                      listenable: widget.provider.notification,
-                      builder: (context, _) {
-                        final unread = widget.provider.notification.unreadCount;
-                        return Semantics(label: localeProvider.t('notifications'), child: GestureDetector(
-
-      behavior: HitTestBehavior.opaque,
-                          onTap: widget.onOpenNotifications,
-                          child: Container(
-                            width: 32, height: 32,
-                            decoration: BoxDecoration(color: AppColors.sfAlt(context), borderRadius: BorderRadius.circular(16)),
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                Icon(LucideIcons.bell, size: 18, color: AppColors.sec(context)),
-                                if (unread > 0)
-                                  Positioned(
-                                    right: 2, top: 2,
-                                    child: Container(
-                                      padding: const EdgeInsets.all(2),
-                                      decoration: BoxDecoration(color: AppColors.accent, borderRadius: BorderRadius.circular(6)),
-                                      constraints: const BoxConstraints(minWidth: 12, minHeight: 12),
-                                      child: Text('$unread', style: TextStyle(color: AppColors.textPrimary(context), fontSize: 7, fontWeight: FontWeight.w700)),
-                                    ),
-                                  ),
-                              ],
+                      decoration: BoxDecoration(
+                        color: AppColors.accent.withValues(alpha: 0.15),
+                        borderRadius: const BorderRadius.horizontal(
+                          right: Radius.circular(24),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          IncognitoIcon(size: 14, color: AppColors.accent),
+                          const SizedBox(width: 8),
+                          Text(
+                            localeProvider.t('incognito_mode'),
+                            style: TextStyle(
+                              color: AppColors.accent,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
-                        ));
-                      },
+                        ],
+                      ),
                     ),
-                    const SizedBox(width: 8),
-                    Semantics(label: localeProvider.t('settings'), child: GestureDetector(
-
-      behavior: HitTestBehavior.opaque,
-                        onTap: widget.onOpenSettings,
-                        child: Container(
-                          width: 32, height: 32,
-                          decoration: BoxDecoration(color: AppColors.sfAlt(context), borderRadius: BorderRadius.circular(16)),
-                          child: Icon(LucideIcons.settings, size: 18, color: AppColors.sec(context)),
-                        ))),
-                  ])),
-                Expanded(
-                  child: ListenableBuilder(
-                    listenable: widget.provider.session,
-                    builder: (context, _) {
-                      final sessions = widget.provider.session.sessions;
-                      final archived = widget.provider.session.archivedSessions;
-                      final activeId = widget.provider.session.activeSessionId;
-                      return Column(
-                        children: [
-                          Expanded(
-                            child: sessions.isEmpty && archived.isEmpty
-                                ? Center(child: Text(localeProvider.t('no_conversations'), style: TextStyle(color: AppColors.textDisabled(context), fontSize: 14)))
-                                : ListView.builder(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                    itemCount: sessions.length + (archived.isNotEmpty ? 1 + archived.length : 0),
-                                    itemBuilder: (context, i) {
-                                      if (archived.isNotEmpty && i == sessions.length) {
-                                        return Padding(
-                                          padding: const EdgeInsets.symmetric(vertical: 8),
-                                          child: Text(localeProvider.t('archived'), style: TextStyle(color: AppColors.textDisabled(context), fontSize: 12, fontWeight: FontWeight.w500)),
-                                        );
-                                      }
-                                      final list = i < sessions.length ? sessions : archived;
-                                      final idx = i < sessions.length ? i : i - sessions.length - 1;
-                                      final s = list[idx];
-                                      final isActive = s.id == activeId;
-                                      return GestureDetector(
-
-      behavior: HitTestBehavior.opaque,
-                                        onLongPress: () => _showSessionContextMenu(s),
-                                        child: Container(
-                                          margin: const EdgeInsets.only(bottom: 4),
-                                          decoration: BoxDecoration(
-                                            color: isActive ? AppColors.sfActive(context) : Colors.transparent,
-                                            borderRadius: BorderRadius.circular(12),
-                                          ),
-                                          child: ListTile(
-                                            dense: true,
-                                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-                                            title: Row(
-                                              children: [
-                                                Expanded(child: Text(s.title,
-                                                    style: TextStyle(color: isActive ? AppColors.textPrimary(context) : AppColors.textSecondary(context), fontSize: 14, fontWeight: FontWeight.w500),
-                                                    maxLines: 1, overflow: TextOverflow.ellipsis)),
-                                                if (s.isPinned) Padding(padding: const EdgeInsets.only(left: 4), child: Icon(LucideIcons.pin, size: 12, color: AppColors.acc(context))),
-                                                if (s.isMuted) Padding(padding: const EdgeInsets.only(left: 4), child: Icon(LucideIcons.bellOff, size: 12, color: AppColors.textDisabled(context))),
-                                              ],
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        Semantics(
+                          button: true,
+                          label: widget.provider.navigation.isIncognito
+                              ? localeProvider.t('incognito_mode')
+                              : localeProvider.t('my_profile'),
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: _showProfile,
+                            child: Container(
+                              width: 32,
+                              height: 32,
+                              decoration: BoxDecoration(
+                                color: AppColors.sfAlt(context),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: widget.provider.navigation.isIncognito
+                                  ? Center(
+                                      child: IncognitoIcon(
+                                        size: 18,
+                                        color: AppColors.textPrimary(context),
+                                      ),
+                                    )
+                                  : _buildUserAvatar(size: 32, radius: 16),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Semantics(
+                          label: localeProvider.t('user_profile'),
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: _showProfile,
+                            child: Text(
+                              widget.provider.matrix.isLoggedIn
+                                  ? (widget.provider.matrix.userId
+                                            ?.split(':')
+                                            .first
+                                            .replaceAll('@', '') ??
+                                        localeProvider.t('user'))
+                                  : localeProvider.t('user'),
+                              style: TextStyle(
+                                color: AppColors.textPrimary(context),
+                                fontWeight: FontWeight.w500,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const Spacer(),
+                        ListenableBuilder(
+                          listenable: widget.provider.notification,
+                          builder: (context, _) {
+                            final unread =
+                                widget.provider.notification.unreadCount;
+                            return Semantics(
+                              label: localeProvider.t('notifications'),
+                              child: GestureDetector(
+                                behavior: HitTestBehavior.opaque,
+                                onTap: widget.onOpenNotifications,
+                                child: Container(
+                                  width: 32,
+                                  height: 32,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.sfAlt(context),
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      Icon(
+                                        LucideIcons.bell,
+                                        size: 18,
+                                        color: AppColors.sec(context),
+                                      ),
+                                      if (unread > 0)
+                                        Positioned(
+                                          right: 2,
+                                          top: 2,
+                                          child: Container(
+                                            padding: const EdgeInsets.all(2),
+                                            decoration: BoxDecoration(
+                                              color: AppColors.accent,
+                                              borderRadius:
+                                                  BorderRadius.circular(6),
                                             ),
-                                            subtitle: Text(formatRelativeTime(s.lastActiveAt), style: TextStyle(color: AppColors.textDisabled(context), fontSize: 11)),
-                                            onTap: () {
-                                              if (s.isArchived) {
-                                                widget.provider.session.unarchiveSession(s.id);
-                                              }
-                                              widget.provider.session.switchSession(s.id);
-                                              close();
-                                            },
+                                            constraints: const BoxConstraints(
+                                              minWidth: 12,
+                                              minHeight: 12,
+                                            ),
+                                            child: Text(
+                                              '$unread',
+                                              style: TextStyle(
+                                                color: AppColors.textPrimary(
+                                                  context,
+                                                ),
+                                                fontSize: 7,
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
                                           ),
                                         ),
-                                      );
-                                    },
+                                    ],
                                   ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(width: 8),
+                        Semantics(
+                          label: localeProvider.t('settings'),
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: widget.onOpenSettings,
+                            child: Container(
+                              width: 32,
+                              height: 32,
+                              decoration: BoxDecoration(
+                                color: AppColors.sfAlt(context),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Icon(
+                                LucideIcons.settings,
+                                size: 18,
+                                color: AppColors.sec(context),
+                              ),
+                            ),
                           ),
-                        ],
-                      );
-                    },
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ]),
+                  Expanded(
+                    child: ListenableBuilder(
+                      listenable: widget.provider.session,
+                      builder: (context, _) {
+                        final sessions = widget.provider.session.sessions;
+                        final archived =
+                            widget.provider.session.archivedSessions;
+                        final activeId =
+                            widget.provider.session.activeSessionId;
+                        return Column(
+                          children: [
+                            Expanded(
+                              child: sessions.isEmpty && archived.isEmpty
+                                  ? Center(
+                                      child: Text(
+                                        localeProvider.t('no_conversations'),
+                                        style: TextStyle(
+                                          color: AppColors.textDisabled(
+                                            context,
+                                          ),
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    )
+                                  : ListView.builder(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 8,
+                                      ),
+                                      itemCount:
+                                          sessions.length +
+                                          (archived.isNotEmpty
+                                              ? 1 + archived.length
+                                              : 0),
+                                      itemBuilder: (context, i) {
+                                        if (archived.isNotEmpty &&
+                                            i == sessions.length) {
+                                          return Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: 8,
+                                            ),
+                                            child: Text(
+                                              localeProvider.t('archived'),
+                                              style: TextStyle(
+                                                color: AppColors.textDisabled(
+                                                  context,
+                                                ),
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                        final list = i < sessions.length
+                                            ? sessions
+                                            : archived;
+                                        final idx = i < sessions.length
+                                            ? i
+                                            : i - sessions.length - 1;
+                                        final s = list[idx];
+                                        final isActive = s.id == activeId;
+                                        return GestureDetector(
+                                          behavior: HitTestBehavior.opaque,
+                                          onLongPress: () =>
+                                              _showSessionContextMenu(s),
+                                          child: Container(
+                                            margin: const EdgeInsets.only(
+                                              bottom: 4,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: isActive
+                                                  ? AppColors.sfActive(context)
+                                                  : Colors.transparent,
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+                                            child: ListTile(
+                                              dense: true,
+                                              contentPadding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 12,
+                                                    vertical: 2,
+                                                  ),
+                                              title: Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                      s.title,
+                                                      style: TextStyle(
+                                                        color: isActive
+                                                            ? AppColors.textPrimary(
+                                                                context,
+                                                              )
+                                                            : AppColors.textSecondary(
+                                                                context,
+                                                              ),
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
+                                                      maxLines: 1,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
+                                                  if (s.isPinned)
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                            left: 4,
+                                                          ),
+                                                      child: Icon(
+                                                        LucideIcons.pin,
+                                                        size: 12,
+                                                        color: AppColors.acc(
+                                                          context,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  if (s.isMuted)
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                            left: 4,
+                                                          ),
+                                                      child: Icon(
+                                                        LucideIcons.bellOff,
+                                                        size: 12,
+                                                        color:
+                                                            AppColors.textDisabled(
+                                                              context,
+                                                            ),
+                                                      ),
+                                                    ),
+                                                ],
+                                              ),
+                                              subtitle: Text(
+                                                formatRelativeTime(
+                                                  s.lastActiveAt,
+                                                ),
+                                                style: TextStyle(
+                                                  color: AppColors.textDisabled(
+                                                    context,
+                                                  ),
+                                                  fontSize: 11,
+                                                ),
+                                              ),
+                                              onTap: () {
+                                                if (s.isArchived) {
+                                                  widget.provider.session
+                                                      .unarchiveSession(s.id);
+                                                }
+                                                widget.provider.session
+                                                    .switchSession(s.id);
+                                                close();
+                                              },
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-          ),
-    ]);
+        ),
+      ],
+    );
   }
 }

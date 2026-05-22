@@ -30,8 +30,14 @@ void main() {
     await container.registerPlugin(StoragePlugin.descriptor(), StoragePlugin());
     await container.registerPlugin(ConfigPlugin.descriptor(), ConfigPlugin());
     await container.registerPlugin(MetricsPlugin.descriptor(), MetricsPlugin());
-    await container.registerPlugin(NotificationPlugin.descriptor(), NotificationPlugin());
-    await container.registerPlugin(FakeAgentPlugin.descriptor(), FakeAgentPlugin());
+    await container.registerPlugin(
+      NotificationPlugin.descriptor(),
+      NotificationPlugin(),
+    );
+    await container.registerPlugin(
+      FakeAgentPlugin.descriptor(),
+      FakeAgentPlugin(),
+    );
     await container.registerPlugin(MemoryPlugin.descriptor(), MemoryPlugin());
   }
 
@@ -70,7 +76,9 @@ void main() {
     test('write and read', () async {
       await bootWithSystemPlugins();
       final container = RuntimeContainer.instance;
-      const perm = RuntimePermission(capabilities: ['storage.write', 'storage.read']);
+      const perm = RuntimePermission(
+        capabilities: ['storage.write', 'storage.read'],
+      );
 
       await container.capabilityRouter.invoke(
         'storage.write',
@@ -105,7 +113,9 @@ void main() {
     test('list keys after writes', () async {
       await bootWithSystemPlugins();
       final container = RuntimeContainer.instance;
-      const perm = RuntimePermission(capabilities: ['storage.write', 'storage.list']);
+      const perm = RuntimePermission(
+        capabilities: ['storage.write', 'storage.list'],
+      );
 
       await container.capabilityRouter.invoke(
         'storage.write',
@@ -135,7 +145,9 @@ void main() {
     test('set and get', () async {
       await bootWithSystemPlugins();
       final container = RuntimeContainer.instance;
-      const perm = RuntimePermission(capabilities: ['config.set', 'config.get']);
+      const perm = RuntimePermission(
+        capabilities: ['config.set', 'config.get'],
+      );
 
       await container.capabilityRouter.invoke(
         'config.set',
@@ -248,11 +260,17 @@ void main() {
     test('write, read, and search', () async {
       await bootWithSystemPlugins();
       final container = RuntimeContainer.instance;
-      const perm = RuntimePermission(capabilities: ['memory.write', 'memory.read', 'memory.search']);
+      const perm = RuntimePermission(
+        capabilities: ['memory.write', 'memory.read', 'memory.search'],
+      );
 
       final writeResult = await container.capabilityRouter.invoke(
         'memory.write',
-        {'content': 'Omnivium is an AI super platform', 'category': 'project', 'importance': 0.9},
+        {
+          'content': 'Omnivium is an AI super platform',
+          'category': 'project',
+          'importance': 0.9,
+        },
         caller: RuntimeIdentity.forPlugin('test'),
         callerPermission: perm,
       );
@@ -283,7 +301,9 @@ void main() {
     test('embed returns vector', () async {
       await bootWithSystemPlugins();
       final container = RuntimeContainer.instance;
-      const perm = RuntimePermission(capabilities: ['memory.write', 'memory.embed']);
+      const perm = RuntimePermission(
+        capabilities: ['memory.write', 'memory.embed'],
+      );
 
       final writeResult = await container.capabilityRouter.invoke(
         'memory.write',
@@ -360,10 +380,16 @@ void main() {
       for (final desc in descriptors) {
         for (final cap in desc.capabilities) {
           final parts = cap.id.split('.');
-          expect(parts.length, greaterThanOrEqualTo(2),
-              reason: '${cap.id} must follow domain.action format');
-          expect(parts[0], matches(r'^[a-z]+$'),
-              reason: '${cap.id} domain must be lowercase');
+          expect(
+            parts.length,
+            greaterThanOrEqualTo(2),
+            reason: '${cap.id} must follow domain.action format',
+          );
+          expect(
+            parts[0],
+            matches(r'^[a-z]+$'),
+            reason: '${cap.id} domain must be lowercase',
+          );
         }
       }
     });

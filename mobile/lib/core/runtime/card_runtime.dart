@@ -33,15 +33,14 @@ class CardState {
     CardLifecycle? lifecycle,
     Map<String, dynamic>? data,
     Duration? ttl,
-  }) =>
-      CardState(
-        id: id,
-        type: type,
-        lifecycle: lifecycle ?? this.lifecycle,
-        data: data ?? this.data,
-        createdAt: createdAt,
-        ttl: ttl ?? this.ttl,
-      );
+  }) => CardState(
+    id: id,
+    type: type,
+    lifecycle: lifecycle ?? this.lifecycle,
+    data: data ?? this.data,
+    createdAt: createdAt,
+    ttl: ttl ?? this.ttl,
+  );
 }
 
 class CardRuntime {
@@ -64,7 +63,11 @@ class CardRuntime {
     _expiryTimer = Timer.periodic(_expiryCheckInterval, (_) => expireCards());
   }
 
-  CardState create(String type, {Map<String, dynamic> data = const {}, Duration? ttl}) {
+  CardState create(
+    String type, {
+    Map<String, dynamic> data = const {},
+    Duration? ttl,
+  }) {
     final baseId = DateTime.now().millisecondsSinceEpoch;
     var id = 'card_$baseId';
     var counter = 0;
@@ -85,7 +88,12 @@ class CardRuntime {
 
   CardState? get(String id) => _cards[id];
 
-  CardState? update(String id, {CardLifecycle? lifecycle, Map<String, dynamic>? data, Duration? ttl}) {
+  CardState? update(
+    String id, {
+    CardLifecycle? lifecycle,
+    Map<String, dynamic>? data,
+    Duration? ttl,
+  }) {
     final card = _cards[id];
     if (card == null) return null;
     final updated = card.copyWith(lifecycle: lifecycle, data: data, ttl: ttl);

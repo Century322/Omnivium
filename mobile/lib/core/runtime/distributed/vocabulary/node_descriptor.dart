@@ -1,17 +1,6 @@
-enum NodeRole {
-  primary,
-  edge,
-  mobile,
-  worker,
-}
+enum NodeRole { primary, edge, mobile, worker }
 
-enum NodeState {
-  joining,
-  alive,
-  suspect,
-  dead,
-  left,
-}
+enum NodeState { joining, alive, suspect, dead, left }
 
 class NodeDescriptor {
   final String nodeId;
@@ -46,18 +35,17 @@ class NodeDescriptor {
     int? joinedAt,
     int? lastHeartbeatAt,
     Map<String, String>? metadata,
-  }) =>
-      NodeDescriptor(
-        nodeId: nodeId ?? this.nodeId,
-        address: address ?? this.address,
-        port: port ?? this.port,
-        role: role ?? this.role,
-        state: state ?? this.state,
-        incarnation: incarnation ?? this.incarnation,
-        joinedAt: joinedAt ?? this.joinedAt,
-        lastHeartbeatAt: lastHeartbeatAt ?? this.lastHeartbeatAt,
-        metadata: metadata ?? this.metadata,
-      );
+  }) => NodeDescriptor(
+    nodeId: nodeId ?? this.nodeId,
+    address: address ?? this.address,
+    port: port ?? this.port,
+    role: role ?? this.role,
+    state: state ?? this.state,
+    incarnation: incarnation ?? this.incarnation,
+    joinedAt: joinedAt ?? this.joinedAt,
+    lastHeartbeatAt: lastHeartbeatAt ?? this.lastHeartbeatAt,
+    metadata: metadata ?? this.metadata,
+  );
 
   bool get isAlive => state == NodeState.alive;
   bool get isSuspect => state == NodeState.suspect;
@@ -66,32 +54,34 @@ class NodeDescriptor {
   String get addressKey => '$address:$port';
 
   Map<String, dynamic> toJson() => {
-        'nodeId': nodeId,
-        'address': address,
-        'port': port,
-        'role': role.name,
-        'state': state.name,
-        'incarnation': incarnation,
-        'joinedAt': joinedAt,
-        'lastHeartbeatAt': lastHeartbeatAt,
-        'metadata': metadata,
-      };
+    'nodeId': nodeId,
+    'address': address,
+    'port': port,
+    'role': role.name,
+    'state': state.name,
+    'incarnation': incarnation,
+    'joinedAt': joinedAt,
+    'lastHeartbeatAt': lastHeartbeatAt,
+    'metadata': metadata,
+  };
 
   factory NodeDescriptor.fromJson(Map<String, dynamic> json) => NodeDescriptor(
-        nodeId: json['nodeId'] as String,
-        address: json['address'] as String,
-        port: json['port'] as int? ?? 0,
-        role: NodeRole.values.firstWhere(
-          (r) => r.name == json['role'],
-          orElse: () => NodeRole.worker,
-        ),
-        state: NodeState.values.firstWhere(
-          (s) => s.name == json['state'],
-          orElse: () => NodeState.joining,
-        ),
-        incarnation: json['incarnation'] as int? ?? 0,
-        joinedAt: json['joinedAt'] as int? ?? 0,
-        lastHeartbeatAt: json['lastHeartbeatAt'] as int? ?? 0,
-        metadata: (json['metadata'] as Map<String, dynamic>?)?.cast<String, String>() ?? {},
-      );
+    nodeId: json['nodeId'] as String,
+    address: json['address'] as String,
+    port: json['port'] as int? ?? 0,
+    role: NodeRole.values.firstWhere(
+      (r) => r.name == json['role'],
+      orElse: () => NodeRole.worker,
+    ),
+    state: NodeState.values.firstWhere(
+      (s) => s.name == json['state'],
+      orElse: () => NodeState.joining,
+    ),
+    incarnation: json['incarnation'] as int? ?? 0,
+    joinedAt: json['joinedAt'] as int? ?? 0,
+    lastHeartbeatAt: json['lastHeartbeatAt'] as int? ?? 0,
+    metadata:
+        (json['metadata'] as Map<String, dynamic>?)?.cast<String, String>() ??
+        {},
+  );
 }

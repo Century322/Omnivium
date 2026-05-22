@@ -11,7 +11,10 @@ class DatabaseMigration {
 
   final Map<int, Future<void> Function(DatabaseService)> _migrations = {};
 
-  void registerMigration(int version, Future<void> Function(DatabaseService) migration) {
+  void registerMigration(
+    int version,
+    Future<void> Function(DatabaseService) migration,
+  ) {
     _migrations[version] = migration;
   }
 
@@ -23,7 +26,9 @@ class DatabaseMigration {
 
     if (currentVersion >= _currentVersion) return;
 
-    AppLogger.instance.info('DB migration: $currentVersion -> $_currentVersion');
+    AppLogger.instance.info(
+      'DB migration: $currentVersion -> $_currentVersion',
+    );
 
     for (var v = currentVersion + 1; v <= _currentVersion; v++) {
       final migration = _migrations[v];
@@ -32,7 +37,11 @@ class DatabaseMigration {
           await migration(db);
           AppLogger.instance.info('DB migration v$v applied');
         } catch (e, stackTrace) {
-          AppLogger.instance.error('DB migration v$v failed', error: e, stackTrace: stackTrace);
+          AppLogger.instance.error(
+            'DB migration v$v failed',
+            error: e,
+            stackTrace: stackTrace,
+          );
           rethrow;
         }
       }
@@ -45,7 +54,9 @@ class DatabaseMigration {
     if (!db.isInitialized) return false;
     try {
       final sessions = db.getAllSessions();
-      AppLogger.instance.info('DB integrity: ${sessions.length} sessions readable');
+      AppLogger.instance.info(
+        'DB integrity: ${sessions.length} sessions readable',
+      );
       return true;
     } catch (e) {
       AppLogger.instance.error('DB integrity check failed', error: e);

@@ -33,7 +33,11 @@ class MatrixProvider extends ChangeNotifier {
       if (parts.length < 2) return null;
       return '${c.homeserver}/_matrix/media/v3/download/${parts[0]}/${parts[1]}';
     } catch (e, stackTrace) {
-    AppLogger.instance.warning('Operation failed', error: e, stackTrace: stackTrace);
+      AppLogger.instance.warning(
+        'Operation failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
       return null;
     }
   }
@@ -46,13 +50,18 @@ class MatrixProvider extends ChangeNotifier {
 
   String? _activeRoomId;
   String? get activeRoomId => _activeRoomId;
-  Room? get activeRoom => _activeRoomId != null ? _service.getRoom(_activeRoomId!) : null;
+  Room? get activeRoom =>
+      _activeRoomId != null ? _service.getRoom(_activeRoomId!) : null;
 
   final List<Event> _newEvents = [];
   List<Event> get newEvents => List.unmodifiable(_newEvents);
   void clearNewEvents() => _newEvents.clear();
 
-  Future<void> login(String username, String password, String homeserverUrl) async {
+  Future<void> login(
+    String username,
+    String password,
+    String homeserverUrl,
+  ) async {
     _isLoading = true;
     _error = null;
     if (!_disposed) notifyListeners();
@@ -82,7 +91,11 @@ class MatrixProvider extends ChangeNotifier {
     if (!_disposed) notifyListeners();
   }
 
-  Future<void> register(String username, String password, String homeserverUrl) async {
+  Future<void> register(
+    String username,
+    String password,
+    String homeserverUrl,
+  ) async {
     _isLoading = true;
     _error = null;
     if (!_disposed) notifyListeners();
@@ -139,22 +152,45 @@ class MatrixProvider extends ChangeNotifier {
     await _service.sendMessage(roomId, text);
   }
 
-  Future<void> sendTypingNotification(String roomId, {required bool isTyping}) async {
+  Future<void> sendTypingNotification(
+    String roomId, {
+    required bool isTyping,
+  }) async {
     final room = _service.getRoom(roomId);
     if (room == null) return;
     try {
       await room.setTyping(isTyping, timeout: isTyping ? 5000 : 0);
-    } catch (e, stackTrace) { AppLogger.instance.error('Operation failed', error: e, stackTrace: stackTrace); }
+    } catch (e, stackTrace) {
+      AppLogger.instance.error(
+        'Operation failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
+    }
   }
 
-  Future<void> sendImage(String roomId, String filePath, String fileName) async {
+  Future<void> sendImage(
+    String roomId,
+    String filePath,
+    String fileName,
+  ) async {
     final room = _service.getRoom(roomId);
     if (room == null) return;
     try {
       final bytes = await File(filePath).readAsBytes();
-      final file = MatrixFile.fromMimeType(bytes: bytes, name: fileName, mimeType: 'image/${fileName.split('.').last}');
+      final file = MatrixFile.fromMimeType(
+        bytes: bytes,
+        name: fileName,
+        mimeType: 'image/${fileName.split('.').last}',
+      );
       await room.sendFileEvent(file);
-    } catch (e, stackTrace) { AppLogger.instance.error('Send image failed', error: e, stackTrace: stackTrace); }
+    } catch (e, stackTrace) {
+      AppLogger.instance.error(
+        'Send image failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
+    }
   }
 
   Future<void> sendFile(String roomId, String filePath, String fileName) async {
@@ -164,7 +200,13 @@ class MatrixProvider extends ChangeNotifier {
       final bytes = await File(filePath).readAsBytes();
       final file = MatrixFile(bytes: bytes, name: fileName);
       await room.sendFileEvent(file);
-    } catch (e, stackTrace) { AppLogger.instance.error('Send file failed', error: e, stackTrace: stackTrace); }
+    } catch (e, stackTrace) {
+      AppLogger.instance.error(
+        'Send file failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
+    }
   }
 
   Future<List<Profile>> searchUsers(String query) async {
@@ -188,11 +230,18 @@ class MatrixProvider extends ChangeNotifier {
                 final room = _service.client?.getRoomById(entry.key);
                 if (room != null) {
                   final event = Event.fromMatrixEvent(eventMap, room);
-                  if (event.type == EventTypes.Message && event.senderId != userId) {
+                  if (event.type == EventTypes.Message &&
+                      event.senderId != userId) {
                     _newEvents.add(event);
                   }
                 }
-              } catch (e, stackTrace) { AppLogger.instance.error('Operation failed', error: e, stackTrace: stackTrace); }
+              } catch (e, stackTrace) {
+                AppLogger.instance.error(
+                  'Operation failed',
+                  error: e,
+                  stackTrace: stackTrace,
+                );
+              }
             }
           }
 
@@ -204,14 +253,22 @@ class MatrixProvider extends ChangeNotifier {
                   final content = event.content;
                   final userIds = content['user_ids'] as List? ?? [];
                   final roomId = entry.key;
-                  _typingUsers.removeWhere((k, _) => k.startsWith('${roomId}_'));
+                  _typingUsers.removeWhere(
+                    (k, _) => k.startsWith('${roomId}_'),
+                  );
                   for (final uid in userIds) {
                     if (uid != userId) {
                       _typingUsers['${roomId}_$uid'] = true;
                     }
                   }
                 }
-              } catch (e, stackTrace) { AppLogger.instance.error('Operation failed', error: e, stackTrace: stackTrace); }
+              } catch (e, stackTrace) {
+                AppLogger.instance.error(
+                  'Operation failed',
+                  error: e,
+                  stackTrace: stackTrace,
+                );
+              }
             }
           }
         }

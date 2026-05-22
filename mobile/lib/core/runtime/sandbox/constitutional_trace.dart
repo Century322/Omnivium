@@ -3,11 +3,7 @@ import 'package:crypto/crypto.dart';
 import '../stability/security.dart';
 import 'runtime_law.dart';
 
-enum EscalationLevel {
-  warning,
-  restricted,
-  terminated,
-}
+enum EscalationLevel { warning, restricted, terminated }
 
 class LawDecisionRecord {
   final int seq;
@@ -37,18 +33,18 @@ class LawDecisionRecord {
   });
 
   Map<String, dynamic> toJson() => {
-        'seq': seq,
-        'ts': timestamp,
-        'sandbox': sandboxId,
-        'op': operationType,
-        'law': violatedLaw?.name,
-        'compliant': compliant,
-        'cap': capabilityId,
-        'caller': callerId,
-        'trust': callerTrust?.name,
-        'escBefore': escalationBefore.name,
-        'escAfter': escalationAfter.name,
-      };
+    'seq': seq,
+    'ts': timestamp,
+    'sandbox': sandboxId,
+    'op': operationType,
+    'law': violatedLaw?.name,
+    'compliant': compliant,
+    'cap': capabilityId,
+    'caller': callerId,
+    'trust': callerTrust?.name,
+    'escBefore': escalationBefore.name,
+    'escAfter': escalationAfter.name,
+  };
 }
 
 class LawStatistics {
@@ -157,7 +153,8 @@ class ConstitutionalTraceGraph {
       } else {
         totalViolations++;
         if (d.violatedLaw != null) {
-          violationCounts[d.violatedLaw!] = (violationCounts[d.violatedLaw!] ?? 0) + 1;
+          violationCounts[d.violatedLaw!] =
+              (violationCounts[d.violatedLaw!] ?? 0) + 1;
         }
         sandboxViolationCounts[d.sandboxId] =
             (sandboxViolationCounts[d.sandboxId] ?? 0) + 1;
@@ -186,8 +183,9 @@ class ConstitutionalTraceGraph {
   }
 
   EscalationPath escalationPathFor(String sandboxId) {
-    final sandboxDecisions =
-        _decisions.where((d) => d.sandboxId == sandboxId).toList();
+    final sandboxDecisions = _decisions
+        .where((d) => d.sandboxId == sandboxId)
+        .toList();
     final transitions = <EscalationLevel>[];
 
     EscalationLevel? lastLevel;
@@ -208,11 +206,13 @@ class ConstitutionalTraceGraph {
   List<LawDecisionRecord> violationsForLaw(RuntimeLawId lawId) =>
       _decisions.where((d) => d.violatedLaw == lawId).toList();
 
-  List<LawDecisionRecord> violationsForSandbox(String sandboxId) =>
-      _decisions.where((d) => d.sandboxId == sandboxId && !d.compliant).toList();
+  List<LawDecisionRecord> violationsForSandbox(String sandboxId) => _decisions
+      .where((d) => d.sandboxId == sandboxId && !d.compliant)
+      .toList();
 
-  List<LawDecisionRecord> decisionsInTimeRange(int from, int to) =>
-      _decisions.where((d) => d.timestamp >= from && d.timestamp <= to).toList();
+  List<LawDecisionRecord> decisionsInTimeRange(int from, int to) => _decisions
+      .where((d) => d.timestamp >= from && d.timestamp <= to)
+      .toList();
 
   void clear() {
     _decisions.clear();
@@ -240,14 +240,14 @@ class LedgerEntry {
   });
 
   Map<String, dynamic> toJson() => {
-        'seq': seq,
-        'ts': timestamp,
-        'type': entryType,
-        'sandbox': sandboxId,
-        'data': data,
-        'hash': hash,
-        'prevHash': previousHash,
-      };
+    'seq': seq,
+    'ts': timestamp,
+    'type': entryType,
+    'sandbox': sandboxId,
+    'data': data,
+    'hash': hash,
+    'prevHash': previousHash,
+  };
 }
 
 class ImmutableAuditLedger {
@@ -268,7 +268,14 @@ class ImmutableAuditLedger {
   }) {
     final seq = _seq++;
     final previousHash = _lastHash;
-    final hash = _computeHash(seq, timestamp, entryType, sandboxId, data, previousHash);
+    final hash = _computeHash(
+      seq,
+      timestamp,
+      entryType,
+      sandboxId,
+      data,
+      previousHash,
+    );
 
     final entry = LedgerEntry(
       seq: seq,
@@ -293,8 +300,12 @@ class ImmutableAuditLedger {
       if (entry.previousHash != expectedPrevHash) return false;
 
       final expectedHash = _computeHash(
-        entry.seq, entry.timestamp, entry.entryType,
-        entry.sandboxId, entry.data, entry.previousHash,
+        entry.seq,
+        entry.timestamp,
+        entry.entryType,
+        entry.sandboxId,
+        entry.data,
+        entry.previousHash,
       );
       if (entry.hash != expectedHash) return false;
 
@@ -311,8 +322,12 @@ class ImmutableAuditLedger {
     if (entry.previousHash != expectedPrevHash) return false;
 
     final expectedHash = _computeHash(
-      entry.seq, entry.timestamp, entry.entryType,
-      entry.sandboxId, entry.data, entry.previousHash,
+      entry.seq,
+      entry.timestamp,
+      entry.entryType,
+      entry.sandboxId,
+      entry.data,
+      entry.previousHash,
     );
     return entry.hash == expectedHash;
   }
@@ -326,9 +341,16 @@ class ImmutableAuditLedger {
   List<LedgerEntry> entriesInRange(int fromSeq, int toSeq) =>
       _entries.where((e) => e.seq >= fromSeq && e.seq <= toSeq).toList();
 
-  String _computeHash(int seq, int timestamp, String type, String sandboxId,
-      Map<String, dynamic> data, String? previousHash) {
-    final input = '$seq|$timestamp|$type|$sandboxId|${jsonEncode(data)}|$previousHash';
+  String _computeHash(
+    int seq,
+    int timestamp,
+    String type,
+    String sandboxId,
+    Map<String, dynamic> data,
+    String? previousHash,
+  ) {
+    final input =
+        '$seq|$timestamp|$type|$sandboxId|${jsonEncode(data)}|$previousHash';
     final bytes = utf8.encode(input);
     final digest = sha256.convert(bytes);
     return 'ledger_${digest.toString().substring(0, 32)}';
@@ -360,7 +382,8 @@ class CapabilityProof {
     required this.sandboxId,
   });
 
-  bool get isComplete => routeProof && budgetProof && traceProof && trustProof && schedulerProof;
+  bool get isComplete =>
+      routeProof && budgetProof && traceProof && trustProof && schedulerProof;
 
   List<String> missingProofs() {
     final missing = <String>[];
@@ -373,18 +396,18 @@ class CapabilityProof {
   }
 
   Map<String, dynamic> toJson() => {
-        'cap': capabilityId,
-        'caller': callerId,
-        'trust': callerTrust.name,
-        'route': routeProof,
-        'budget': budgetProof,
-        'trace': traceProof,
-        'trustProof': trustProof,
-        'scheduler': schedulerProof,
-        'ts': timestamp,
-        'sandbox': sandboxId,
-        'complete': isComplete,
-      };
+    'cap': capabilityId,
+    'caller': callerId,
+    'trust': callerTrust.name,
+    'route': routeProof,
+    'budget': budgetProof,
+    'trace': traceProof,
+    'trustProof': trustProof,
+    'scheduler': schedulerProof,
+    'ts': timestamp,
+    'sandbox': sandboxId,
+    'complete': isComplete,
+  };
 
   factory CapabilityProof.forCapabilityInvocation({
     required String capabilityId,
@@ -397,17 +420,16 @@ class CapabilityProof {
     required bool scheduledThroughScheduler,
     required int timestamp,
     required String sandboxId,
-  }) =>
-      CapabilityProof(
-        capabilityId: capabilityId,
-        callerId: callerId,
-        callerTrust: callerTrust,
-        routeProof: wasRoutedThroughRouter,
-        budgetProof: budgetApproved,
-        traceProof: hasTraceSpan,
-        trustProof: trustVerified,
-        schedulerProof: scheduledThroughScheduler,
-        timestamp: timestamp,
-        sandboxId: sandboxId,
-      );
+  }) => CapabilityProof(
+    capabilityId: capabilityId,
+    callerId: callerId,
+    callerTrust: callerTrust,
+    routeProof: wasRoutedThroughRouter,
+    budgetProof: budgetApproved,
+    traceProof: hasTraceSpan,
+    trustProof: trustVerified,
+    schedulerProof: scheduledThroughScheduler,
+    timestamp: timestamp,
+    sandboxId: sandboxId,
+  );
 }

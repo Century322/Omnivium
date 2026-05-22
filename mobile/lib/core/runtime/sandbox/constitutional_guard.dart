@@ -8,10 +8,55 @@ import 'constitutional_civilization_layer.dart';
 import 'civilization_network.dart';
 
 export 'constitutional_trace.dart' show EscalationLevel;
-export 'constitutional_civilization.dart' show PolicyLoophole, ConstitutionalAmendment, ReputationScore, TrustDecayPolicy, Sanction, Appeal, SanctionType, AppealStatus;
-export 'constitutional_sovereign.dart' show ConstitutionalConsensus, LawManifest, LawFork, LawForkResolution, ConsensusVote, ConsensusResult, TrustPassport, FederatedReputation, AutonomousLegislature, LegislativeProposal, LegislativeStage;
-export 'constitutional_civilization_layer.dart' show CivilizationTransport, DiplomacyMessage, DiplomacyMessageType, DiplomacyChannel, CivilizationIdentity, TrustGraph, FederationMembership, ExecutionCredits, FederationTreasury, ResourceEconomy;
-export 'civilization_network.dart' show CivilizationNetwork, WireMessage, WireMessageType, GossipProtocol, ConstitutionalReplication, ByzantineDetector, ByzantineVerdict, ByzantineAccusation, NetworkNode, NodeStatus, ReplicationEntry, ReplicationResult;
+export 'constitutional_civilization.dart'
+    show
+        PolicyLoophole,
+        ConstitutionalAmendment,
+        ReputationScore,
+        TrustDecayPolicy,
+        Sanction,
+        Appeal,
+        SanctionType,
+        AppealStatus;
+export 'constitutional_sovereign.dart'
+    show
+        ConstitutionalConsensus,
+        LawManifest,
+        LawFork,
+        LawForkResolution,
+        ConsensusVote,
+        ConsensusResult,
+        TrustPassport,
+        FederatedReputation,
+        AutonomousLegislature,
+        LegislativeProposal,
+        LegislativeStage;
+export 'constitutional_civilization_layer.dart'
+    show
+        CivilizationTransport,
+        DiplomacyMessage,
+        DiplomacyMessageType,
+        DiplomacyChannel,
+        CivilizationIdentity,
+        TrustGraph,
+        FederationMembership,
+        ExecutionCredits,
+        FederationTreasury,
+        ResourceEconomy;
+export 'civilization_network.dart'
+    show
+        CivilizationNetwork,
+        WireMessage,
+        WireMessageType,
+        GossipProtocol,
+        ConstitutionalReplication,
+        ByzantineDetector,
+        ByzantineVerdict,
+        ByzantineAccusation,
+        NetworkNode,
+        NodeStatus,
+        ReplicationEntry,
+        ReplicationResult;
 
 class ViolationEscalationPolicy {
   final int warningThreshold;
@@ -62,15 +107,14 @@ class EscalationState {
     int? totalViolations,
     int? lastEscalationAt,
     String? restrictionReason,
-  }) =>
-      EscalationState(
-        sandboxId: sandboxId,
-        level: level ?? this.level,
-        weightedScore: weightedScore ?? this.weightedScore,
-        totalViolations: totalViolations ?? this.totalViolations,
-        lastEscalationAt: lastEscalationAt ?? this.lastEscalationAt,
-        restrictionReason: restrictionReason ?? this.restrictionReason,
-      );
+  }) => EscalationState(
+    sandboxId: sandboxId,
+    level: level ?? this.level,
+    weightedScore: weightedScore ?? this.weightedScore,
+    totalViolations: totalViolations ?? this.totalViolations,
+    lastEscalationAt: lastEscalationAt ?? this.lastEscalationAt,
+    restrictionReason: restrictionReason ?? this.restrictionReason,
+  );
 }
 
 class BypassPattern {
@@ -100,9 +144,16 @@ class BypassDetectionResult {
     this.evidence,
   });
 
-  factory BypassDetectionResult.clean() => const BypassDetectionResult(bypassDetected: false);
-  factory BypassDetectionResult.detected(BypassPattern pattern, String evidence) =>
-      BypassDetectionResult(bypassDetected: true, pattern: pattern, evidence: evidence);
+  factory BypassDetectionResult.clean() =>
+      const BypassDetectionResult(bypassDetected: false);
+  factory BypassDetectionResult.detected(
+    BypassPattern pattern,
+    String evidence,
+  ) => BypassDetectionResult(
+    bypassDetected: true,
+    pattern: pattern,
+    evidence: evidence,
+  );
 }
 
 class BypassDetector {
@@ -304,33 +355,37 @@ class ConstitutionalGuard {
     required CivilizationIdentity? identity,
     required ResourceEconomy? economy,
     required CivilizationNetwork? network,
-  })  : _enforcer = enforcer,
-        _bypassDetector = bypassDetector,
-        _escalationPolicy = escalationPolicy,
-        _traceGraph = traceGraph,
-        _ledger = ledger,
-        _evolutionEngine = evolutionEngine,
-        _reputationEconomy = reputationEconomy,
-        _judiciary = judiciary,
-        _consensus = consensus,
-        _federatedReputation = federatedReputation,
-        _legislatureInit = legislature,
-        _legislature = legislature,
-        _transport = transport,
-        _identity = identity,
-        _economy = economy,
-        _network = network;
+  }) : _enforcer = enforcer,
+       _bypassDetector = bypassDetector,
+       _escalationPolicy = escalationPolicy,
+       _traceGraph = traceGraph,
+       _ledger = ledger,
+       _evolutionEngine = evolutionEngine,
+       _reputationEconomy = reputationEconomy,
+       _judiciary = judiciary,
+       _consensus = consensus,
+       _federatedReputation = federatedReputation,
+       _legislatureInit = legislature,
+       _legislature = legislature,
+       _transport = transport,
+       _identity = identity,
+       _economy = economy,
+       _network = network;
 
   factory ConstitutionalGuard({
     required RuntimeLawEnforcer enforcer,
-    ViolationEscalationPolicy escalationPolicy = const ViolationEscalationPolicy(),
+    ViolationEscalationPolicy escalationPolicy =
+        const ViolationEscalationPolicy(),
     TrustDecayPolicy trustDecayPolicy = const TrustDecayPolicy(),
     String? nodeId,
     bool enableNetwork = false,
   }) {
     final sharedTraceGraph = ConstitutionalTraceGraph();
     final sharedLedger = ImmutableAuditLedger();
-    final sharedReputationEconomy = ReputationEconomy(sharedTraceGraph, policy: trustDecayPolicy);
+    final sharedReputationEconomy = ReputationEconomy(
+      sharedTraceGraph,
+      policy: trustDecayPolicy,
+    );
     final sharedJudiciary = RuntimeJudiciary(sharedTraceGraph, sharedLedger);
     return ConstitutionalGuard._internal(
       enforcer: enforcer,
@@ -341,13 +396,35 @@ class ConstitutionalGuard {
       evolutionEngine: ConstitutionalEvolutionEngine(sharedTraceGraph),
       reputationEconomy: sharedReputationEconomy,
       judiciary: sharedJudiciary,
-      consensus: nodeId != null ? ConstitutionalConsensus(localNodeId: nodeId, traceGraph: sharedTraceGraph) : null,
-      federatedReputation: nodeId != null ? FederatedReputation(localRuntimeId: nodeId, traceGraph: sharedTraceGraph) : null,
+      consensus: nodeId != null
+          ? ConstitutionalConsensus(
+              localNodeId: nodeId,
+              traceGraph: sharedTraceGraph,
+            )
+          : null,
+      federatedReputation: nodeId != null
+          ? FederatedReputation(
+              localRuntimeId: nodeId,
+              traceGraph: sharedTraceGraph,
+            )
+          : null,
       legislature: null,
-      transport: nodeId != null ? CivilizationTransport(localNodeId: nodeId, traceGraph: sharedTraceGraph) : null,
+      transport: nodeId != null
+          ? CivilizationTransport(
+              localNodeId: nodeId,
+              traceGraph: sharedTraceGraph,
+            )
+          : null,
       identity: nodeId != null ? CivilizationIdentity.generate(nodeId) : null,
-      economy: nodeId != null ? ResourceEconomy(federationId: nodeId, ledger: sharedLedger) : null,
-      network: (nodeId != null && enableNetwork) ? CivilizationNetwork(localNodeId: nodeId, traceGraph: sharedTraceGraph) : null,
+      economy: nodeId != null
+          ? ResourceEconomy(federationId: nodeId, ledger: sharedLedger)
+          : null,
+      network: (nodeId != null && enableNetwork)
+          ? CivilizationNetwork(
+              localNodeId: nodeId,
+              traceGraph: sharedTraceGraph,
+            )
+          : null,
     );
   }
 
@@ -355,26 +432,45 @@ class ConstitutionalGuard {
     required RuntimeLawEnforcer enforcer,
     required ConstitutionalTraceGraph traceGraph,
     required ImmutableAuditLedger ledger,
-    ViolationEscalationPolicy escalationPolicy = const ViolationEscalationPolicy(),
+    ViolationEscalationPolicy escalationPolicy =
+        const ViolationEscalationPolicy(),
     TrustDecayPolicy trustDecayPolicy = const TrustDecayPolicy(),
     String? nodeId,
     bool enableNetwork = false,
-  })  : _enforcer = enforcer,
-        _bypassDetector = BypassDetector(),
-        _escalationPolicy = escalationPolicy,
-        _traceGraph = traceGraph,
-        _ledger = ledger,
-        _evolutionEngine = ConstitutionalEvolutionEngine(traceGraph),
-        _reputationEconomy = ReputationEconomy(traceGraph, policy: trustDecayPolicy),
-        _judiciary = RuntimeJudiciary(traceGraph, ledger),
-        _consensus = nodeId != null ? ConstitutionalConsensus(localNodeId: nodeId, traceGraph: traceGraph) : null,
-        _federatedReputation = nodeId != null ? FederatedReputation(localRuntimeId: nodeId, traceGraph: traceGraph) : null,
-        _legislatureInit = null,
-        _legislature = null,
-        _transport = nodeId != null ? CivilizationTransport(localNodeId: nodeId, traceGraph: traceGraph) : null,
-        _identity = nodeId != null ? CivilizationIdentity.generate(nodeId) : null,
-        _economy = nodeId != null ? ResourceEconomy(federationId: nodeId, ledger: ledger) : null,
-        _network = (nodeId != null && enableNetwork) ? CivilizationNetwork(localNodeId: nodeId, traceGraph: traceGraph) : null;
+  }) : _enforcer = enforcer,
+       _bypassDetector = BypassDetector(),
+       _escalationPolicy = escalationPolicy,
+       _traceGraph = traceGraph,
+       _ledger = ledger,
+       _evolutionEngine = ConstitutionalEvolutionEngine(traceGraph),
+       _reputationEconomy = ReputationEconomy(
+         traceGraph,
+         policy: trustDecayPolicy,
+       ),
+       _judiciary = RuntimeJudiciary(traceGraph, ledger),
+       _consensus = nodeId != null
+           ? ConstitutionalConsensus(
+               localNodeId: nodeId,
+               traceGraph: traceGraph,
+             )
+           : null,
+       _federatedReputation = nodeId != null
+           ? FederatedReputation(localRuntimeId: nodeId, traceGraph: traceGraph)
+           : null,
+       _legislatureInit = null,
+       _legislature = null,
+       _transport = nodeId != null
+           ? CivilizationTransport(localNodeId: nodeId, traceGraph: traceGraph)
+           : null,
+       _identity = nodeId != null
+           ? CivilizationIdentity.generate(nodeId)
+           : null,
+       _economy = nodeId != null
+           ? ResourceEconomy(federationId: nodeId, ledger: ledger)
+           : null,
+       _network = (nodeId != null && enableNetwork)
+           ? CivilizationNetwork(localNodeId: nodeId, traceGraph: traceGraph)
+           : null;
 
   RuntimeLawEnforcer get enforcer => _enforcer;
   BypassDetector get bypassDetector => _bypassDetector;
@@ -394,7 +490,8 @@ class ConstitutionalGuard {
   CivilizationNetwork? get network => _network;
 
   AutonomousLegislature enableLegislature() {
-    if (_consensus == null) throw StateError('Cannot enable legislature without nodeId');
+    if (_consensus == null)
+      throw StateError('Cannot enable legislature without nodeId');
     final legislature = AutonomousLegislature(
       consensus: _consensus,
       traceGraph: _traceGraph,
@@ -421,9 +518,25 @@ class ConstitutionalGuard {
     final escBefore = escalation.level;
 
     if (escalation.level == EscalationLevel.terminated) {
-      _log('capability.blocked', sandboxId, 'Sandbox terminated due to prior violations');
-      _recordTrace(sandboxId, 'capability', null, false, capabilityId, callerId, callerTrust, escBefore);
-      _appendLedger('capability.blocked', sandboxId, {'reason': 'terminated', 'cap': capabilityId});
+      _log(
+        'capability.blocked',
+        sandboxId,
+        'Sandbox terminated due to prior violations',
+      );
+      _recordTrace(
+        sandboxId,
+        'capability',
+        null,
+        false,
+        capabilityId,
+        callerId,
+        callerTrust,
+        escBefore,
+      );
+      _appendLedger('capability.blocked', sandboxId, {
+        'reason': 'terminated',
+        'cap': capabilityId,
+      });
       return ConstitutionalCheckResult.denied(
         reason: 'Sandbox terminated due to constitutional violations',
         violatedLaw: null,
@@ -435,13 +548,31 @@ class ConstitutionalGuard {
     }
 
     final routingResult = _enforcer.enforceCapabilityRouting(
-      sandboxId, capabilityId, wasRoutedThroughRouter,
+      sandboxId,
+      capabilityId,
+      wasRoutedThroughRouter,
     );
     if (!routingResult.compliant) {
       _recordViolation(sandboxId, SandboxViolationType.bypassAttempt);
-      _log('capability.blocked', sandboxId, 'CapabilityRouter bypass: $capabilityId');
-      _recordTrace(sandboxId, 'capability', RuntimeLawId.noBypassCapabilityRouter, false, capabilityId, callerId, callerTrust, escBefore);
-      _appendLedger('law.violation', sandboxId, {'law': 'noBypassCapabilityRouter', 'cap': capabilityId});
+      _log(
+        'capability.blocked',
+        sandboxId,
+        'CapabilityRouter bypass: $capabilityId',
+      );
+      _recordTrace(
+        sandboxId,
+        'capability',
+        RuntimeLawId.noBypassCapabilityRouter,
+        false,
+        capabilityId,
+        callerId,
+        callerTrust,
+        escBefore,
+      );
+      _appendLedger('law.violation', sandboxId, {
+        'law': 'noBypassCapabilityRouter',
+        'cap': capabilityId,
+      });
       return ConstitutionalCheckResult.denied(
         reason: routingResult.violation!,
         violatedLaw: RuntimeLawId.noBypassCapabilityRouter,
@@ -449,13 +580,32 @@ class ConstitutionalGuard {
     }
 
     final trustResult = _enforcer.enforceTrustLevel(
-      sandboxId, requiredTrust, callerTrust,
+      sandboxId,
+      requiredTrust,
+      callerTrust,
     );
     if (!trustResult.compliant) {
       _recordViolation(sandboxId, SandboxViolationType.trustInsufficient);
-      _log('capability.blocked', sandboxId, 'Trust level violation: ${callerTrust.name} -> $requiredTrust');
-      _recordTrace(sandboxId, 'capability', RuntimeLawId.trustLevelMustBeRespected, false, capabilityId, callerId, callerTrust, escBefore);
-      _appendLedger('law.violation', sandboxId, {'law': 'trustLevelMustBeRespected', 'cap': capabilityId, 'caller': callerId});
+      _log(
+        'capability.blocked',
+        sandboxId,
+        'Trust level violation: ${callerTrust.name} -> $requiredTrust',
+      );
+      _recordTrace(
+        sandboxId,
+        'capability',
+        RuntimeLawId.trustLevelMustBeRespected,
+        false,
+        capabilityId,
+        callerId,
+        callerTrust,
+        escBefore,
+      );
+      _appendLedger('law.violation', sandboxId, {
+        'law': 'trustLevelMustBeRespected',
+        'cap': capabilityId,
+        'caller': callerId,
+      });
       return ConstitutionalCheckResult.denied(
         reason: trustResult.violation!,
         violatedLaw: RuntimeLawId.trustLevelMustBeRespected,
@@ -465,9 +615,25 @@ class ConstitutionalGuard {
     final traceResult = _enforcer.enforceTracing(sandboxId, hasTraceSpan);
     if (!traceResult.compliant) {
       _recordViolation(sandboxId, SandboxViolationType.bypassAttempt);
-      _log('capability.blocked', sandboxId, 'Untraced capability invocation: $capabilityId');
-      _recordTrace(sandboxId, 'capability', RuntimeLawId.allOpsMustBeTraced, false, capabilityId, callerId, callerTrust, escBefore);
-      _appendLedger('law.violation', sandboxId, {'law': 'allOpsMustBeTraced', 'cap': capabilityId});
+      _log(
+        'capability.blocked',
+        sandboxId,
+        'Untraced capability invocation: $capabilityId',
+      );
+      _recordTrace(
+        sandboxId,
+        'capability',
+        RuntimeLawId.allOpsMustBeTraced,
+        false,
+        capabilityId,
+        callerId,
+        callerTrust,
+        escBefore,
+      );
+      _appendLedger('law.violation', sandboxId, {
+        'law': 'allOpsMustBeTraced',
+        'cap': capabilityId,
+      });
       return ConstitutionalCheckResult.denied(
         reason: traceResult.violation!,
         violatedLaw: RuntimeLawId.allOpsMustBeTraced,
@@ -475,9 +641,24 @@ class ConstitutionalGuard {
     }
 
     _log('capability.approved', sandboxId, 'Capability $capabilityId approved');
-    _recordTrace(sandboxId, 'capability', null, true, capabilityId, callerId, callerTrust, escBefore);
-    _appendLedger('capability.approved', sandboxId, {'cap': capabilityId, 'caller': callerId});
-    _reputationEconomy.recordCompliance(sandboxId, _enforcer.clock.tick().physicalTime);
+    _recordTrace(
+      sandboxId,
+      'capability',
+      null,
+      true,
+      capabilityId,
+      callerId,
+      callerTrust,
+      escBefore,
+    );
+    _appendLedger('capability.approved', sandboxId, {
+      'cap': capabilityId,
+      'caller': callerId,
+    });
+    _reputationEconomy.recordCompliance(
+      sandboxId,
+      _enforcer.clock.tick().physicalTime,
+    );
     return ConstitutionalCheckResult.allowed();
   }
 
@@ -500,11 +681,21 @@ class ConstitutionalGuard {
     }
 
     final schedulerResult = _enforcer.enforceSchedulerUsage(
-      sandboxId, wasScheduledThroughScheduler,
+      sandboxId,
+      wasScheduledThroughScheduler,
     );
     if (!schedulerResult.compliant) {
       _recordViolation(sandboxId, SandboxViolationType.bypassAttempt);
-      _recordTrace(sandboxId, 'task', RuntimeLawId.noBypassScheduler, false, null, null, null, escBefore);
+      _recordTrace(
+        sandboxId,
+        'task',
+        RuntimeLawId.noBypassScheduler,
+        false,
+        null,
+        null,
+        null,
+        escBefore,
+      );
       _appendLedger('law.violation', sandboxId, {'law': 'noBypassScheduler'});
       return ConstitutionalCheckResult.denied(
         reason: schedulerResult.violation!,
@@ -515,7 +706,16 @@ class ConstitutionalGuard {
     final budgetResult = _enforcer.enforceBudget(sandboxId, budgetApproved);
     if (!budgetResult.compliant) {
       _recordViolation(sandboxId, SandboxViolationType.budgetExceeded);
-      _recordTrace(sandboxId, 'task', RuntimeLawId.noBudgetBypass, false, null, null, null, escBefore);
+      _recordTrace(
+        sandboxId,
+        'task',
+        RuntimeLawId.noBudgetBypass,
+        false,
+        null,
+        null,
+        null,
+        escBefore,
+      );
       _appendLedger('law.violation', sandboxId, {'law': 'noBudgetBypass'});
       return ConstitutionalCheckResult.denied(
         reason: budgetResult.violation!,
@@ -526,7 +726,16 @@ class ConstitutionalGuard {
     final traceResult = _enforcer.enforceTracing(sandboxId, hasTraceSpan);
     if (!traceResult.compliant) {
       _recordViolation(sandboxId, SandboxViolationType.bypassAttempt);
-      _recordTrace(sandboxId, 'task', RuntimeLawId.allOpsMustBeTraced, false, null, null, null, escBefore);
+      _recordTrace(
+        sandboxId,
+        'task',
+        RuntimeLawId.allOpsMustBeTraced,
+        false,
+        null,
+        null,
+        null,
+        escBefore,
+      );
       _appendLedger('law.violation', sandboxId, {'law': 'allOpsMustBeTraced'});
       return ConstitutionalCheckResult.denied(
         reason: traceResult.violation!,
@@ -536,7 +745,10 @@ class ConstitutionalGuard {
 
     _recordTrace(sandboxId, 'task', null, true, null, null, null, escBefore);
     _appendLedger('task.approved', sandboxId, {});
-    _reputationEconomy.recordCompliance(sandboxId, _enforcer.clock.tick().physicalTime);
+    _reputationEconomy.recordCompliance(
+      sandboxId,
+      _enforcer.clock.tick().physicalTime,
+    );
     return ConstitutionalCheckResult.allowed();
   }
 
@@ -550,7 +762,16 @@ class ConstitutionalGuard {
     final escBefore = escalation.level;
 
     if (escalation.level == EscalationLevel.terminated) {
-      _recordTrace(sandboxId, 'state', null, false, null, null, null, escBefore);
+      _recordTrace(
+        sandboxId,
+        'state',
+        null,
+        false,
+        null,
+        null,
+        null,
+        escBefore,
+      );
       _appendLedger('state.blocked', sandboxId, {'reason': 'terminated'});
       return ConstitutionalCheckResult.denied(
         reason: 'Sandbox terminated',
@@ -558,21 +779,47 @@ class ConstitutionalGuard {
       );
     }
 
-    final globalStateResult = _enforcer.enforceNoGlobalState(sandboxId, accessedGlobalState);
+    final globalStateResult = _enforcer.enforceNoGlobalState(
+      sandboxId,
+      accessedGlobalState,
+    );
     if (!globalStateResult.compliant) {
       _recordViolation(sandboxId, SandboxViolationType.bypassAttempt);
-      _recordTrace(sandboxId, 'state', RuntimeLawId.noGlobalStateSharing, false, null, null, null, escBefore);
-      _appendLedger('law.violation', sandboxId, {'law': 'noGlobalStateSharing'});
+      _recordTrace(
+        sandboxId,
+        'state',
+        RuntimeLawId.noGlobalStateSharing,
+        false,
+        null,
+        null,
+        null,
+        escBefore,
+      );
+      _appendLedger('law.violation', sandboxId, {
+        'law': 'noGlobalStateSharing',
+      });
       return ConstitutionalCheckResult.denied(
         reason: globalStateResult.violation!,
         violatedLaw: RuntimeLawId.noGlobalStateSharing,
       );
     }
 
-    final sideChannelResult = _enforcer.enforceNoSideChannels(sandboxId, usedSideChannel);
+    final sideChannelResult = _enforcer.enforceNoSideChannels(
+      sandboxId,
+      usedSideChannel,
+    );
     if (!sideChannelResult.compliant) {
       _recordViolation(sandboxId, SandboxViolationType.bypassAttempt);
-      _recordTrace(sandboxId, 'state', RuntimeLawId.noSideChannels, false, null, null, null, escBefore);
+      _recordTrace(
+        sandboxId,
+        'state',
+        RuntimeLawId.noSideChannels,
+        false,
+        null,
+        null,
+        null,
+        escBefore,
+      );
       _appendLedger('law.violation', sandboxId, {'law': 'noSideChannels'});
       return ConstitutionalCheckResult.denied(
         reason: sideChannelResult.violation!,
@@ -583,7 +830,16 @@ class ConstitutionalGuard {
     final traceResult = _enforcer.enforceTracing(sandboxId, hasTraceSpan);
     if (!traceResult.compliant) {
       _recordViolation(sandboxId, SandboxViolationType.bypassAttempt);
-      _recordTrace(sandboxId, 'state', RuntimeLawId.allOpsMustBeTraced, false, null, null, null, escBefore);
+      _recordTrace(
+        sandboxId,
+        'state',
+        RuntimeLawId.allOpsMustBeTraced,
+        false,
+        null,
+        null,
+        null,
+        escBefore,
+      );
       _appendLedger('law.violation', sandboxId, {'law': 'allOpsMustBeTraced'});
       return ConstitutionalCheckResult.denied(
         reason: traceResult.violation!,
@@ -593,7 +849,10 @@ class ConstitutionalGuard {
 
     _recordTrace(sandboxId, 'state', null, true, null, null, null, escBefore);
     _appendLedger('state.approved', sandboxId, {});
-    _reputationEconomy.recordCompliance(sandboxId, _enforcer.clock.tick().physicalTime);
+    _reputationEconomy.recordCompliance(
+      sandboxId,
+      _enforcer.clock.tick().physicalTime,
+    );
     return ConstitutionalCheckResult.allowed();
   }
 
@@ -619,7 +878,10 @@ class ConstitutionalGuard {
     );
   }
 
-  EscalationLevel updateEscalation(String sandboxId, SandboxViolationType violationType) {
+  EscalationLevel updateEscalation(
+    String sandboxId,
+    SandboxViolationType violationType,
+  ) {
     final current = escalationFor(sandboxId);
     final weight = _escalationPolicy.weightFor(violationType);
     final newScore = current.weightedScore + weight;
@@ -630,13 +892,16 @@ class ConstitutionalGuard {
 
     if (newScore >= _escalationPolicy.terminationThreshold) {
       newLevel = EscalationLevel.terminated;
-      reason = 'Score $newScore reached termination threshold ${_escalationPolicy.terminationThreshold}';
+      reason =
+          'Score $newScore reached termination threshold ${_escalationPolicy.terminationThreshold}';
     } else if (newScore >= _escalationPolicy.restrictedThreshold) {
       newLevel = EscalationLevel.restricted;
-      reason = 'Score $newScore reached restricted threshold ${_escalationPolicy.restrictedThreshold}';
+      reason =
+          'Score $newScore reached restricted threshold ${_escalationPolicy.restrictedThreshold}';
     } else if (newScore >= _escalationPolicy.warningThreshold) {
       newLevel = EscalationLevel.warning;
-      reason = 'Score $newScore reached warning threshold ${_escalationPolicy.warningThreshold}';
+      reason =
+          'Score $newScore reached warning threshold ${_escalationPolicy.warningThreshold}';
     } else {
       newLevel = current.level;
     }
@@ -649,7 +914,11 @@ class ConstitutionalGuard {
       restrictionReason: reason,
     );
 
-    _log('escalation.${newLevel.name}', sandboxId, reason ?? 'Violation recorded (score: $newScore)');
+    _log(
+      'escalation.${newLevel.name}',
+      sandboxId,
+      reason ?? 'Violation recorded (score: $newScore)',
+    );
 
     return newLevel;
   }
@@ -698,7 +967,11 @@ class ConstitutionalGuard {
     );
   }
 
-  void _appendLedger(String entryType, String sandboxId, Map<String, dynamic> data) {
+  void _appendLedger(
+    String entryType,
+    String sandboxId,
+    Map<String, dynamic> data,
+  ) {
     _ledger.append(
       entryType: entryType,
       sandboxId: sandboxId,
@@ -708,12 +981,14 @@ class ConstitutionalGuard {
   }
 
   void _log(String action, String sandboxId, String detail) {
-    _guardLog.add(ConstitutionalGuardEvent(
-      action: action,
-      sandboxId: sandboxId,
-      detail: detail,
-      timestamp: _enforcer.clock.tick().physicalTime,
-    ));
+    _guardLog.add(
+      ConstitutionalGuardEvent(
+        action: action,
+        sandboxId: sandboxId,
+        detail: detail,
+        timestamp: _enforcer.clock.tick().physicalTime,
+      ),
+    );
   }
 }
 
@@ -733,8 +1008,11 @@ class ConstitutionalCheckResult {
   factory ConstitutionalCheckResult.denied({
     required String reason,
     required RuntimeLawId? violatedLaw,
-  }) =>
-      ConstitutionalCheckResult._(allowed: false, reason: reason, violatedLaw: violatedLaw);
+  }) => ConstitutionalCheckResult._(
+    allowed: false,
+    reason: reason,
+    violatedLaw: violatedLaw,
+  );
 }
 
 class ConstitutionalGuardEvent {

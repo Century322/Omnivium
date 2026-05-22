@@ -12,7 +12,11 @@ class QuickCommandProvider extends ChangeNotifier {
     try {
       await _service.init();
     } catch (e, stackTrace) {
-      AppLogger.instance.error('QuickCommand init failed', error: e, stackTrace: stackTrace);
+      AppLogger.instance.error(
+        'QuickCommand init failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
     notifyListeners();
   }
@@ -21,7 +25,11 @@ class QuickCommandProvider extends ChangeNotifier {
     try {
       await _service.addCommand(command);
     } catch (e, stackTrace) {
-      AppLogger.instance.error('QuickCommand add failed', error: e, stackTrace: stackTrace);
+      AppLogger.instance.error(
+        'QuickCommand add failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
     notifyListeners();
   }
@@ -30,7 +38,11 @@ class QuickCommandProvider extends ChangeNotifier {
     try {
       await _service.updateCommand(command);
     } catch (e, stackTrace) {
-      AppLogger.instance.error('QuickCommand update failed', error: e, stackTrace: stackTrace);
+      AppLogger.instance.error(
+        'QuickCommand update failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
     notifyListeners();
   }
@@ -39,7 +51,11 @@ class QuickCommandProvider extends ChangeNotifier {
     try {
       await _service.deleteCommand(id);
     } catch (e, stackTrace) {
-      AppLogger.instance.error('QuickCommand delete failed', error: e, stackTrace: stackTrace);
+      AppLogger.instance.error(
+        'QuickCommand delete failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
     notifyListeners();
   }
@@ -48,7 +64,11 @@ class QuickCommandProvider extends ChangeNotifier {
     try {
       await _service.reorderCommands(oldIndex, newIndex);
     } catch (e, stackTrace) {
-      AppLogger.instance.error('QuickCommand reorder failed', error: e, stackTrace: stackTrace);
+      AppLogger.instance.error(
+        'QuickCommand reorder failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
     notifyListeners();
   }
@@ -57,7 +77,11 @@ class QuickCommandProvider extends ChangeNotifier {
     try {
       await _service.resetToDefaults();
     } catch (e, stackTrace) {
-      AppLogger.instance.error('QuickCommand reset failed', error: e, stackTrace: stackTrace);
+      AppLogger.instance.error(
+        'QuickCommand reset failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
     notifyListeners();
   }

@@ -7,7 +7,8 @@ enum NoteType { text, todo, schedule }
 
 NoteType _parseNoteType(dynamic value) {
   if (value is String) {
-    return NoteType.values.where((e) => e.name == value).firstOrNull ?? NoteType.text;
+    return NoteType.values.where((e) => e.name == value).firstOrNull ??
+        NoteType.text;
   }
   if (value is int) {
     return NoteType.values[value.clamp(0, NoteType.values.length - 1)];
@@ -53,7 +54,9 @@ class NoteItem {
     content: json['content'] as String? ?? '',
     type: _parseNoteType(json['type']),
     isDone: json['isDone'] as bool? ?? false,
-    dueDate: json['dueDate'] != null ? DateTime.parse(json['dueDate'] as String) : null,
+    dueDate: json['dueDate'] != null
+        ? DateTime.parse(json['dueDate'] as String)
+        : null,
     createdAt: DateTime.parse(json['createdAt'] as String),
     updatedAt: DateTime.parse(json['updatedAt'] as String),
   );
@@ -99,9 +102,15 @@ class NoteService {
     if (raw != null) {
       try {
         final list = jsonDecode(raw) as List;
-        _items = list.map((item) => NoteItem.fromJson(item as Map<String, dynamic>)).toList();
+        _items = list
+            .map((item) => NoteItem.fromJson(item as Map<String, dynamic>))
+            .toList();
       } catch (e, stackTrace) {
-        AppLogger.instance.warning('Notes load failed', error: e, stackTrace: stackTrace);
+        AppLogger.instance.warning(
+          'Notes load failed',
+          error: e,
+          stackTrace: stackTrace,
+        );
         _items = [];
       }
     }
@@ -126,14 +135,18 @@ class NoteService {
         } else {
           final cloudUpdated = cloud['updated_at'] as String?;
           final localUpdated = _items[localIdx].updatedAt.toIso8601String();
-          if (cloudUpdated != null && cloudUpdated.compareTo(localUpdated) > 0) {
+          if (cloudUpdated != null &&
+              cloudUpdated.compareTo(localUpdated) > 0) {
             try {
               _items[localIdx] = NoteItem.fromJson(cloud);
             } catch (_) {}
           }
         }
       }
-      await db.data.put(_boxKey, jsonEncode(_items.map((n) => n.toJson()).toList()));
+      await db.data.put(
+        _boxKey,
+        jsonEncode(_items.map((n) => n.toJson()).toList()),
+      );
     } catch (e) {
       AppLogger.instance.info('Cloud notes merge failed: $e');
     }
@@ -141,7 +154,10 @@ class NoteService {
 
   Future<void> _save() async {
     final db = DatabaseService.instance;
-    await db.data.put(_boxKey, jsonEncode(_items.map((n) => n.toJson()).toList()));
+    await db.data.put(
+      _boxKey,
+      jsonEncode(_items.map((n) => n.toJson()).toList()),
+    );
     _syncAllToCloud();
   }
 
@@ -188,18 +204,26 @@ class NoteService {
     }
   }
 
-  List<NoteItem> getNotes() => _items.where((n) => n.type == NoteType.text).toList();
-  List<NoteItem> getTodos() => _items.where((n) => n.type == NoteType.todo).toList();
-  List<NoteItem> getSchedules() => _items.where((n) => n.type == NoteType.schedule).toList();
+  List<NoteItem> getNotes() =>
+      _items.where((n) => n.type == NoteType.text).toList();
+  List<NoteItem> getTodos() =>
+      _items.where((n) => n.type == NoteType.todo).toList();
+  List<NoteItem> getSchedules() =>
+      _items.where((n) => n.type == NoteType.schedule).toList();
   List<NoteItem> getTodaySchedules() {
     final now = DateTime.now();
-    return _items.where((n) =>
-      n.type == NoteType.schedule &&
-      n.dueDate != null &&
-      n.dueDate!.year == now.year &&
-      n.dueDate!.month == now.month &&
-      n.dueDate!.day == now.day
-    ).toList();
+    return _items
+        .where(
+          (n) =>
+              n.type == NoteType.schedule &&
+              n.dueDate != null &&
+              n.dueDate!.year == now.year &&
+              n.dueDate!.month == now.month &&
+              n.dueDate!.day == now.day,
+        )
+        .toList();
   }
-  List<NoteItem> getPendingTodos() => _items.where((n) => n.type == NoteType.todo && !n.isDone).toList();
+
+  List<NoteItem> getPendingTodos() =>
+      _items.where((n) => n.type == NoteType.todo && !n.isDone).toList();
 }

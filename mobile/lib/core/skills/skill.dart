@@ -10,8 +10,10 @@ class SkillResult {
 
   const SkillResult({required this.success, this.data, this.error});
 
-  factory SkillResult.ok(dynamic data) => SkillResult(success: true, data: data);
-  factory SkillResult.fail(String error) => SkillResult(success: false, error: error);
+  factory SkillResult.ok(dynamic data) =>
+      SkillResult(success: true, data: data);
+  factory SkillResult.fail(String error) =>
+      SkillResult(success: false, error: error);
 }
 
 class SkillVersion {
@@ -42,7 +44,10 @@ class SkillVersion {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is SkillVersion && major == other.major && minor == other.minor && patch == other.patch;
+      other is SkillVersion &&
+          major == other.major &&
+          minor == other.minor &&
+          patch == other.patch;
 
   @override
   int get hashCode => Object.hash(major, minor, patch);
@@ -58,7 +63,8 @@ abstract class Skill {
   int get maxRetries;
   bool get isDestructive;
   SkillVersion get version => const SkillVersion(major: 1, minor: 0, patch: 0);
-  SkillVersion get minRequiredVersion => const SkillVersion(major: 1, minor: 0, patch: 0);
+  SkillVersion get minRequiredVersion =>
+      const SkillVersion(major: 1, minor: 0, patch: 0);
 
   Future<SkillResult> execute(Map<String, dynamic> params);
 
@@ -101,15 +107,28 @@ class RemoteSkill extends Skill {
   Future<SkillResult> execute(Map<String, dynamic> params) async {
     try {
       final proxy = ApiProxyService.instance;
-      if (!proxy.isConfigured) return SkillResult.fail('API proxy not configured');
+      if (!proxy.isConfigured)
+        return SkillResult.fail('API proxy not configured');
       final uri = Uri.parse('${proxy.backendUrl}$endpoint');
-      final response = await proxy.secureClient.post(uri, headers: {...proxy.buildAuthHeaders(), ...proxy.buildDeviceHeaders(), 'Content-Type': 'application/json'}, body: jsonEncode(params));
+      final response = await proxy.secureClient.post(
+        uri,
+        headers: {
+          ...proxy.buildAuthHeaders(),
+          ...proxy.buildDeviceHeaders(),
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(params),
+      );
       if (response.statusCode == 200) {
         return SkillResult.ok(response.body);
       }
       return SkillResult.fail('Remote skill failed: ${response.statusCode}');
     } catch (e, stackTrace) {
-      AppLogger.instance.error('Remote skill execute failed', error: e, stackTrace: stackTrace);
+      AppLogger.instance.error(
+        'Remote skill execute failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
       return SkillResult.fail(e.toString());
     }
   }

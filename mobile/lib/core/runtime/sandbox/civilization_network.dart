@@ -45,28 +45,28 @@ class WireMessage {
   });
 
   Map<String, dynamic> toJson() => {
-        'type': type.name,
-        'sender': senderId,
-        'target': targetId,
-        'seq': sequenceNumber,
-        'epoch': epoch,
-        'payload': payload,
-        'ts': timestamp,
-        'msgId': messageId,
-        'sig': signature,
-      };
+    'type': type.name,
+    'sender': senderId,
+    'target': targetId,
+    'seq': sequenceNumber,
+    'epoch': epoch,
+    'payload': payload,
+    'ts': timestamp,
+    'msgId': messageId,
+    'sig': signature,
+  };
 
   factory WireMessage.fromJson(Map<String, dynamic> json) => WireMessage(
-        type: WireMessageType.values.firstWhere((t) => t.name == json['type']),
-        senderId: json['sender'] as String,
-        targetId: json['target'] as String,
-        sequenceNumber: json['seq'] as int,
-        epoch: json['epoch'] as int,
-        payload: Map<String, dynamic>.from(json['payload'] as Map),
-        timestamp: json['ts'] as int,
-        messageId: json['msgId'] as String,
-        signature: json['sig'] as String,
-      );
+    type: WireMessageType.values.firstWhere((t) => t.name == json['type']),
+    senderId: json['sender'] as String,
+    targetId: json['target'] as String,
+    sequenceNumber: json['seq'] as int,
+    epoch: json['epoch'] as int,
+    payload: Map<String, dynamic>.from(json['payload'] as Map),
+    timestamp: json['ts'] as int,
+    messageId: json['msgId'] as String,
+    signature: json['sig'] as String,
+  );
 
   List<int> toBytes() {
     return utf8.encode(jsonEncode(toJson()));
@@ -78,7 +78,13 @@ class WireMessage {
     return WireMessage.fromJson(parsed);
   }
 
-  static String computeSignature(String senderId, String targetId, int timestamp, int seq, Map<String, dynamic> payload) {
+  static String computeSignature(
+    String senderId,
+    String targetId,
+    int timestamp,
+    int seq,
+    Map<String, dynamic> payload,
+  ) {
     final input = '$senderId|$targetId|$timestamp|$seq|${jsonEncode(payload)}';
     final bytes = utf8.encode(input);
     final digest = sha256.convert(bytes);
@@ -129,7 +135,8 @@ class GossipProtocol {
       relayed.add(relay);
     }
 
-    _propagationCount[message.messageId] = (_propagationCount[message.messageId] ?? 0) + targets.length;
+    _propagationCount[message.messageId] =
+        (_propagationCount[message.messageId] ?? 0) + targets.length;
     return relayed;
   }
 
@@ -154,16 +161,20 @@ class ConstitutionalReplication {
   final Map<String, int> _replicationLag = {};
   int _replicationSeq = 0;
 
-  ConstitutionalReplication({
-    required this.localNodeId,
-    int initialEpoch = 0,
-  }) : _localManifest = LawManifest.forNode(localNodeId, initialEpoch);
+  ConstitutionalReplication({required this.localNodeId, int initialEpoch = 0})
+    : _localManifest = LawManifest.forNode(localNodeId, initialEpoch);
 
   LawManifest get localManifest => _localManifest;
-  Map<String, LawManifest> get replicatedManifests => Map.unmodifiable(_replicatedManifests);
-  List<ReplicationEntry> get replicationLog => List.unmodifiable(_replicationLog);
+  Map<String, LawManifest> get replicatedManifests =>
+      Map.unmodifiable(_replicatedManifests);
+  List<ReplicationEntry> get replicationLog =>
+      List.unmodifiable(_replicationLog);
 
-  ReplicationResult replicateFrom(String remoteNodeId, LawManifest remoteManifest, int timestamp) {
+  ReplicationResult replicateFrom(
+    String remoteNodeId,
+    LawManifest remoteManifest,
+    int timestamp,
+  ) {
     final existing = _replicatedManifests[remoteNodeId];
     final lag = existing != null ? remoteManifest.epoch - existing.epoch : 0;
     _replicationLag[remoteNodeId] = lag;
@@ -275,15 +286,16 @@ class ByzantineDetector {
   final Map<String, ByzantineVerdict> _verdicts = {};
   int _accusationSeq = 0;
 
-  ByzantineDetector({
-    required this.localNodeId,
-    this.accusationThreshold = 3,
-  });
+  ByzantineDetector({required this.localNodeId, this.accusationThreshold = 3});
 
   List<ByzantineAccusation> get accusations => List.unmodifiable(_accusations);
   Map<String, ByzantineVerdict> get verdicts => Map.unmodifiable(_verdicts);
 
-  void reportInconsistentMessage(String nodeId, String messageId, int timestamp) {
+  void reportInconsistentMessage(
+    String nodeId,
+    String messageId,
+    int timestamp,
+  ) {
     _inconsistentMessages[nodeId] = (_inconsistentMessages[nodeId] ?? 0) + 1;
     _checkThreshold(nodeId, 'inconsistent_messages', timestamp);
   }
@@ -299,11 +311,13 @@ class ByzantineDetector {
   }
 
   void _checkThreshold(String nodeId, String reason, int timestamp) {
-    final totalEvidence = (_inconsistentMessages[nodeId] ?? 0) +
+    final totalEvidence =
+        (_inconsistentMessages[nodeId] ?? 0) +
         (_missingHeartbeats[nodeId] ?? 0) +
         (_conflictingVotes[nodeId] ?? 0);
 
-    if (totalEvidence >= accusationThreshold && !_verdicts.containsKey(nodeId)) {
+    if (totalEvidence >= accusationThreshold &&
+        !_verdicts.containsKey(nodeId)) {
       final accusation = ByzantineAccusation(
         accusationId: 'byz-${_accusationSeq++}',
         accusedNodeId: nodeId,
@@ -322,9 +336,11 @@ class ByzantineDetector {
     }
   }
 
-  ByzantineVerdict verdictFor(String nodeId) => _verdicts[nodeId] ?? ByzantineVerdict.trusted;
+  ByzantineVerdict verdictFor(String nodeId) =>
+      _verdicts[nodeId] ?? ByzantineVerdict.trusted;
 
-  bool isByzantine(String nodeId) => _verdicts[nodeId] == ByzantineVerdict.confirmed;
+  bool isByzantine(String nodeId) =>
+      _verdicts[nodeId] == ByzantineVerdict.confirmed;
 
   void confirmByzantine(String nodeId, int timestamp) {
     _verdicts[nodeId] = ByzantineVerdict.confirmed;
@@ -343,11 +359,7 @@ class ByzantineDetector {
       (_conflictingVotes[nodeId] ?? 0);
 }
 
-enum ByzantineVerdict {
-  trusted,
-  suspected,
-  confirmed,
-}
+enum ByzantineVerdict { trusted, suspected, confirmed }
 
 class ByzantineAccusation {
   final String accusationId;
@@ -367,13 +379,13 @@ class ByzantineAccusation {
   });
 
   Map<String, dynamic> toJson() => {
-        'id': accusationId,
-        'accused': accusedNodeId,
-        'accuser': accuserNodeId,
-        'reason': reason,
-        'evidence': evidence,
-        'ts': timestamp,
-      };
+    'id': accusationId,
+    'accused': accusedNodeId,
+    'accuser': accuserNodeId,
+    'reason': reason,
+    'evidence': evidence,
+    'ts': timestamp,
+  };
 }
 
 class NetworkNode {
@@ -400,27 +412,21 @@ class NetworkNode {
     int? lastSeen,
     TrustLevel? trustLevel,
     int? latency,
-  }) =>
-      NetworkNode(
-        nodeId: nodeId,
-        endpoint: endpoint,
-        status: status ?? this.status,
-        lastSeen: lastSeen ?? this.lastSeen,
-        connectedAt: connectedAt,
-        trustLevel: trustLevel ?? this.trustLevel,
-        latency: latency ?? this.latency,
-      );
+  }) => NetworkNode(
+    nodeId: nodeId,
+    endpoint: endpoint,
+    status: status ?? this.status,
+    lastSeen: lastSeen ?? this.lastSeen,
+    connectedAt: connectedAt,
+    trustLevel: trustLevel ?? this.trustLevel,
+    latency: latency ?? this.latency,
+  );
 
   bool get isAlive => status == NodeStatus.connected;
   bool get isTrusted => trustLevel.index <= TrustLevel.verified.index;
 }
 
-enum NodeStatus {
-  connecting,
-  connected,
-  disconnected,
-  banned,
-}
+enum NodeStatus { connecting, connected, disconnected, banned }
 
 class CivilizationNetwork {
   final String localNodeId;
@@ -442,16 +448,26 @@ class CivilizationNetwork {
     int byzantineThreshold = 3,
     int heartbeatInterval = 5000,
     ConstitutionalTraceGraph? traceGraph,
-  })  : _traceGraph = traceGraph,
-        _replication = ConstitutionalReplication(localNodeId: localNodeId, initialEpoch: initialEpoch),
-        _gossip = GossipProtocol(localNodeId: localNodeId, fanout: gossipFanout),
-        _byzantine = ByzantineDetector(localNodeId: localNodeId, accusationThreshold: byzantineThreshold),
-        _heartbeatInterval = heartbeatInterval;
+  }) : _traceGraph = traceGraph,
+       _replication = ConstitutionalReplication(
+         localNodeId: localNodeId,
+         initialEpoch: initialEpoch,
+       ),
+       _gossip = GossipProtocol(localNodeId: localNodeId, fanout: gossipFanout),
+       _byzantine = ByzantineDetector(
+         localNodeId: localNodeId,
+         accusationThreshold: byzantineThreshold,
+       ),
+       _heartbeatInterval = heartbeatInterval;
 
   void attachTransport(RuntimeTransport transport) {
     _transport = transport;
     transport.incoming.listen((msg) {
-      final wireMsg = WireMessage.fromBytes(msg.payload['raw'] is List<int> ? msg.payload['raw'] as List<int> : utf8.encode(jsonEncode(msg.payload)));
+      final wireMsg = WireMessage.fromBytes(
+        msg.payload['raw'] is List<int>
+            ? msg.payload['raw'] as List<int>
+            : utf8.encode(jsonEncode(msg.payload)),
+      );
       _receiveQueue.add(wireMsg);
     });
   }
@@ -465,7 +481,12 @@ class CivilizationNetwork {
   int get connectedNodeCount => _nodes.values.where((n) => n.isAlive).length;
   int get totalNodeCount => _nodes.length;
 
-  NetworkNode addNode(String nodeId, String endpoint, TrustLevel trustLevel, int timestamp) {
+  NetworkNode addNode(
+    String nodeId,
+    String endpoint,
+    TrustLevel trustLevel,
+    int timestamp,
+  ) {
     final node = NetworkNode(
       nodeId: nodeId,
       endpoint: endpoint,
@@ -481,25 +502,38 @@ class CivilizationNetwork {
   NetworkNode? connectNode(String nodeId, int timestamp) {
     final node = _nodes[nodeId];
     if (node == null) return null;
-    _nodes[nodeId] = node.copyWith(status: NodeStatus.connected, lastSeen: timestamp);
+    _nodes[nodeId] = node.copyWith(
+      status: NodeStatus.connected,
+      lastSeen: timestamp,
+    );
     return _nodes[nodeId];
   }
 
   NetworkNode? disconnectNode(String nodeId, int timestamp) {
     final node = _nodes[nodeId];
     if (node == null) return null;
-    _nodes[nodeId] = node.copyWith(status: NodeStatus.disconnected, lastSeen: timestamp);
+    _nodes[nodeId] = node.copyWith(
+      status: NodeStatus.disconnected,
+      lastSeen: timestamp,
+    );
     return _nodes[nodeId];
   }
 
   void banNode(String nodeId, int timestamp) {
     final node = _nodes[nodeId];
     if (node == null) return;
-    _nodes[nodeId] = node.copyWith(status: NodeStatus.banned, lastSeen: timestamp);
+    _nodes[nodeId] = node.copyWith(
+      status: NodeStatus.banned,
+      lastSeen: timestamp,
+    );
     _byzantine.confirmByzantine(nodeId, timestamp);
   }
 
-  WireMessage sendConstitutionSync(String targetId, LawManifest manifest, int timestamp) {
+  WireMessage sendConstitutionSync(
+    String targetId,
+    LawManifest manifest,
+    int timestamp,
+  ) {
     final msg = _createWireMessage(
       type: WireMessageType.constitutionSync,
       targetId: targetId,
@@ -514,7 +548,11 @@ class CivilizationNetwork {
     return msg;
   }
 
-  WireMessage sendJudiciaryBroadcast(String targetId, Map<String, dynamic> sanctionData, int timestamp) {
+  WireMessage sendJudiciaryBroadcast(
+    String targetId,
+    Map<String, dynamic> sanctionData,
+    int timestamp,
+  ) {
     final msg = _createWireMessage(
       type: WireMessageType.judiciaryBroadcast,
       targetId: targetId,
@@ -526,7 +564,11 @@ class CivilizationNetwork {
     return msg;
   }
 
-  WireMessage sendLegislativeGossip(String targetId, Map<String, dynamic> proposalData, int timestamp) {
+  WireMessage sendLegislativeGossip(
+    String targetId,
+    Map<String, dynamic> proposalData,
+    int timestamp,
+  ) {
     final msg = _createWireMessage(
       type: WireMessageType.legislativeGossip,
       targetId: targetId,
@@ -538,7 +580,13 @@ class CivilizationNetwork {
     return msg;
   }
 
-  WireMessage sendConsensusVote(String targetId, String amendmentId, bool support, String? reason, int timestamp) {
+  WireMessage sendConsensusVote(
+    String targetId,
+    String amendmentId,
+    bool support,
+    String? reason,
+    int timestamp,
+  ) {
     final msg = _createWireMessage(
       type: WireMessageType.consensusVote,
       targetId: targetId,
@@ -557,14 +605,22 @@ class CivilizationNetwork {
     final msg = _createWireMessage(
       type: WireMessageType.heartbeat,
       targetId: targetId,
-      payload: {'epoch': epoch, 'status': 'alive', 'nodes': _aliveNodeIds().length},
+      payload: {
+        'epoch': epoch,
+        'status': 'alive',
+        'nodes': _aliveNodeIds().length,
+      },
       timestamp: timestamp,
     );
     _sendQueue.add(msg);
     return msg;
   }
 
-  WireMessage sendByzantineAccusation(String targetId, ByzantineAccusation accusation, int timestamp) {
+  WireMessage sendByzantineAccusation(
+    String targetId,
+    ByzantineAccusation accusation,
+    int timestamp,
+  ) {
     final msg = _createWireMessage(
       type: WireMessageType.byzantineAccusation,
       targetId: targetId,
@@ -576,7 +632,11 @@ class CivilizationNetwork {
     return msg;
   }
 
-  WireMessage sendLawEnactment(String targetId, LegislativeProposal proposal, int timestamp) {
+  WireMessage sendLawEnactment(
+    String targetId,
+    LegislativeProposal proposal,
+    int timestamp,
+  ) {
     final msg = _createWireMessage(
       type: WireMessageType.lawEnactment,
       targetId: targetId,
@@ -647,7 +707,11 @@ class CivilizationNetwork {
   void _handleByzantineAccusation(WireMessage message) {
     final accusedId = message.payload['accused'] as String?;
     if (accusedId != null) {
-      _byzantine.reportInconsistentMessage(accusedId, message.messageId, message.timestamp);
+      _byzantine.reportInconsistentMessage(
+        accusedId,
+        message.messageId,
+        message.timestamp,
+      );
     }
   }
 
@@ -685,7 +749,9 @@ class CivilizationNetwork {
     for (final entry in _nodes.entries) {
       if (entry.value.isAlive && timestamp - entry.value.lastSeen > timeout) {
         _byzantine.reportMissingHeartbeat(entry.key, timestamp);
-        _nodes[entry.key] = entry.value.copyWith(status: NodeStatus.disconnected);
+        _nodes[entry.key] = entry.value.copyWith(
+          status: NodeStatus.disconnected,
+        );
       }
     }
   }
@@ -701,7 +767,13 @@ class CivilizationNetwork {
   }) {
     final seq = _messageSeq++;
     final msgId = '${localNodeId}_$seq';
-    final sig = WireMessage.computeSignature(localNodeId, targetId, timestamp, seq, payload);
+    final sig = WireMessage.computeSignature(
+      localNodeId,
+      targetId,
+      timestamp,
+      seq,
+      payload,
+    );
     return WireMessage(
       type: type,
       senderId: localNodeId,

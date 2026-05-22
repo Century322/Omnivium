@@ -56,15 +56,23 @@ class DatabaseService {
     if (_aesKey == null) return plainText;
     try {
       final iv = encrypt.IV.fromSecureRandom(16);
-      final encrypter = encrypt.Encrypter(encrypt.AES(_aesKey!, mode: encrypt.AESMode.cbc));
+      final encrypter = encrypt.Encrypter(
+        encrypt.AES(_aesKey!, mode: encrypt.AESMode.cbc),
+      );
       final encrypted = encrypter.encrypt(plainText, iv: iv);
       final combined = Uint8List(iv.bytes.length + encrypted.bytes.length);
       combined.setRange(0, iv.bytes.length, iv.bytes);
       combined.setRange(iv.bytes.length, combined.length, encrypted.bytes);
       return base64.encode(combined);
     } catch (e, stackTrace) {
-      AppLogger.instance.error('AES encryption failed - data will NOT be stored unencrypted', error: e, stackTrace: stackTrace);
-      throw StateError('Encryption failed. Data will not be stored in plaintext.');
+      AppLogger.instance.error(
+        'AES encryption failed - data will NOT be stored unencrypted',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      throw StateError(
+        'Encryption failed. Data will not be stored in plaintext.',
+      );
     }
   }
 
@@ -76,8 +84,13 @@ class DatabaseService {
       final ivBytes = combined.sublist(0, 16);
       final encryptedBytes = combined.sublist(16);
       final iv = encrypt.IV(Uint8List.fromList(ivBytes));
-      final encrypter = encrypt.Encrypter(encrypt.AES(_aesKey!, mode: encrypt.AESMode.cbc));
-      final decrypted = encrypter.decrypt(encrypt.Encrypted(Uint8List.fromList(encryptedBytes)), iv: iv);
+      final encrypter = encrypt.Encrypter(
+        encrypt.AES(_aesKey!, mode: encrypt.AESMode.cbc),
+      );
+      final decrypted = encrypter.decrypt(
+        encrypt.Encrypted(Uint8List.fromList(encryptedBytes)),
+        iv: iv,
+      );
       return decrypted;
     } catch (e) {
       AppLogger.instance.warning('AES decryption failed', error: e);
@@ -98,7 +111,11 @@ class DatabaseService {
     try {
       return jsonDecode(decrypted) as Map<String, dynamic>;
     } catch (e, stackTrace) {
-      AppLogger.instance.warning('Encrypted data parse failed', error: e, stackTrace: stackTrace);
+      AppLogger.instance.warning(
+        'Encrypted data parse failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
       return null;
     }
   }
@@ -117,20 +134,31 @@ class DatabaseService {
     try {
       return jsonDecode(raw) as Map<String, dynamic>;
     } catch (e, stackTrace) {
-      AppLogger.instance.warning('Operation failed', error: e, stackTrace: stackTrace);
+      AppLogger.instance.warning(
+        'Operation failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
       return null;
     }
   }
 
   List<Map<String, dynamic>> getAllSessions() {
-    return _sessions.values.map((raw) {
-      try {
-        return jsonDecode(raw) as Map<String, dynamic>;
-      } catch (e, stackTrace) {
-        AppLogger.instance.warning('Operation failed', error: e, stackTrace: stackTrace);
-        return <String, dynamic>{};
-      }
-    }).where((m) => m.isNotEmpty).toList();
+    return _sessions.values
+        .map((raw) {
+          try {
+            return jsonDecode(raw) as Map<String, dynamic>;
+          } catch (e, stackTrace) {
+            AppLogger.instance.warning(
+              'Operation failed',
+              error: e,
+              stackTrace: stackTrace,
+            );
+            return <String, dynamic>{};
+          }
+        })
+        .where((m) => m.isNotEmpty)
+        .toList();
   }
 
   Future<void> deleteSession(String id) async {
@@ -147,20 +175,31 @@ class DatabaseService {
     try {
       return jsonDecode(raw) as Map<String, dynamic>;
     } catch (e, stackTrace) {
-      AppLogger.instance.warning('Operation failed', error: e, stackTrace: stackTrace);
+      AppLogger.instance.warning(
+        'Operation failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
       return null;
     }
   }
 
   List<Map<String, dynamic>> getAllMemories() {
-    return _memory.values.map((raw) {
-      try {
-        return jsonDecode(raw) as Map<String, dynamic>;
-      } catch (e, stackTrace) {
-        AppLogger.instance.warning('Operation failed', error: e, stackTrace: stackTrace);
-        return <String, dynamic>{};
-      }
-    }).where((m) => m.isNotEmpty).toList();
+    return _memory.values
+        .map((raw) {
+          try {
+            return jsonDecode(raw) as Map<String, dynamic>;
+          } catch (e, stackTrace) {
+            AppLogger.instance.warning(
+              'Operation failed',
+              error: e,
+              stackTrace: stackTrace,
+            );
+            return <String, dynamic>{};
+          }
+        })
+        .where((m) => m.isNotEmpty)
+        .toList();
   }
 
   Future<void> deleteMemory(String id) async {
@@ -191,19 +230,28 @@ class DatabaseService {
     try {
       return jsonDecode(raw) as Map<String, dynamic>;
     } catch (e, stackTrace) {
-      AppLogger.instance.warning('Operation failed', error: e, stackTrace: stackTrace);
+      AppLogger.instance.warning(
+        'Operation failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
       return null;
     }
   }
 
-  List<Map<String, dynamic>> queryData(bool Function(Map<String, dynamic>) predicate) {
-    return _data.values.map((raw) {
-      try {
-        return jsonDecode(raw) as Map<String, dynamic>;
-      } catch (_) {
-        return <String, dynamic>{};
-      }
-    }).where((m) => m.isNotEmpty && predicate(m)).toList();
+  List<Map<String, dynamic>> queryData(
+    bool Function(Map<String, dynamic>) predicate,
+  ) {
+    return _data.values
+        .map((raw) {
+          try {
+            return jsonDecode(raw) as Map<String, dynamic>;
+          } catch (_) {
+            return <String, dynamic>{};
+          }
+        })
+        .where((m) => m.isNotEmpty && predicate(m))
+        .toList();
   }
 
   Future<void> deleteData(String key) async {
@@ -224,7 +272,13 @@ class DatabaseService {
           }
         }
         await prefs.remove('omnivium_sessions');
-      } catch (e, stackTrace) { AppLogger.instance.error('Operation failed', error: e, stackTrace: stackTrace); }
+      } catch (e, stackTrace) {
+        AppLogger.instance.error(
+          'Operation failed',
+          error: e,
+          stackTrace: stackTrace,
+        );
+      }
     }
     final memRaw = prefs.getString('omnivium_memories');
     if (memRaw != null) {
@@ -238,7 +292,13 @@ class DatabaseService {
           }
         }
         await prefs.remove('omnivium_memories');
-      } catch (e, stackTrace) { AppLogger.instance.error('Operation failed', error: e, stackTrace: stackTrace); }
+      } catch (e, stackTrace) {
+        AppLogger.instance.error(
+          'Operation failed',
+          error: e,
+          stackTrace: stackTrace,
+        );
+      }
     }
   }
 

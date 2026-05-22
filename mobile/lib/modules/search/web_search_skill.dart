@@ -39,7 +39,15 @@ class WebSearchSkill extends Skill {
       final proxy = ApiProxyService.instance;
       final uri = Uri.parse('${proxy.backendUrl}/ai/search');
       final response = await proxy.secureClient
-          .post(uri, headers: <String, String>{...proxy.buildAuthHeaders(), ...proxy.buildDeviceHeaders(), 'Content-Type': 'application/json'}, body: jsonEncode({'q': query}))
+          .post(
+            uri,
+            headers: <String, String>{
+              ...proxy.buildAuthHeaders(),
+              ...proxy.buildDeviceHeaders(),
+              'Content-Type': 'application/json',
+            },
+            body: jsonEncode({'q': query}),
+          )
           .timeout(Duration(milliseconds: timeoutMs));
 
       if (response.statusCode != 200) {

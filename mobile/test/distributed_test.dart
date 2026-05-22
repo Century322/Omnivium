@@ -20,13 +20,25 @@ void main() {
     });
 
     test('message ordering is per-session', () {
-      expect(DistributedInvariants.messageOrdering, MessageOrderingModel.perSessionOrdering);
+      expect(
+        DistributedInvariants.messageOrdering,
+        MessageOrderingModel.perSessionOrdering,
+      );
     });
 
     test('delivery semantics are differentiated by object type', () {
-      expect(DistributedInvariants.capabilityInvokeDelivery, DeliveryGuarantee.atMostOnce);
-      expect(DistributedInvariants.eventPropagationDelivery, DeliveryGuarantee.atLeastOnce);
-      expect(DistributedInvariants.journalDelivery, DeliveryGuarantee.exactlyOnce);
+      expect(
+        DistributedInvariants.capabilityInvokeDelivery,
+        DeliveryGuarantee.atMostOnce,
+      );
+      expect(
+        DistributedInvariants.eventPropagationDelivery,
+        DeliveryGuarantee.atLeastOnce,
+      );
+      expect(
+        DistributedInvariants.journalDelivery,
+        DeliveryGuarantee.exactlyOnce,
+      );
     });
 
     test('session ownership is single writer', () {
@@ -34,11 +46,17 @@ void main() {
     });
 
     test('capability consistency is eventually consistent', () {
-      expect(DistributedInvariants.capabilityConsistency, CapabilityConsistencyModel.eventuallyConsistent);
+      expect(
+        DistributedInvariants.capabilityConsistency,
+        CapabilityConsistencyModel.eventuallyConsistent,
+      );
     });
 
     test('time authority is hybrid logical clock', () {
-      expect(DistributedInvariants.timeAuthority, TimeAuthorityModel.hybridLogicalClock);
+      expect(
+        DistributedInvariants.timeAuthority,
+        TimeAuthorityModel.hybridLogicalClock,
+      );
     });
 
     test('node failure is isolated', () {
@@ -165,17 +183,21 @@ void main() {
       final clock = HybridLogicalClock(nodeId: 'local');
       final discovery = NodeDiscovery(localNodeId: 'local', clock: clock);
 
-      discovery.join(NodeDescriptor(
-        nodeId: 'node-A',
-        address: '10.0.0.1',
-        state: NodeState.alive,
-      ));
+      discovery.join(
+        NodeDescriptor(
+          nodeId: 'node-A',
+          address: '10.0.0.1',
+          state: NodeState.alive,
+        ),
+      );
 
-      discovery.join(NodeDescriptor(
-        nodeId: 'node-B',
-        address: '10.0.0.2',
-        state: NodeState.alive,
-      ));
+      discovery.join(
+        NodeDescriptor(
+          nodeId: 'node-B',
+          address: '10.0.0.2',
+          state: NodeState.alive,
+        ),
+      );
 
       expect(discovery.aliveCount, 2);
       expect(discovery.isAlive('node-A'), isTrue);
@@ -185,11 +207,13 @@ void main() {
       final clock = HybridLogicalClock(nodeId: 'local');
       final discovery = NodeDiscovery(localNodeId: 'local', clock: clock);
 
-      discovery.join(NodeDescriptor(
-        nodeId: 'node-A',
-        address: '10.0.0.1',
-        state: NodeState.alive,
-      ));
+      discovery.join(
+        NodeDescriptor(
+          nodeId: 'node-A',
+          address: '10.0.0.1',
+          state: NodeState.alive,
+        ),
+      );
 
       expect(discovery.aliveCount, 1);
       discovery.leave('node-A');
@@ -200,11 +224,13 @@ void main() {
       final clock = HybridLogicalClock(nodeId: 'local');
       final discovery = NodeDiscovery(localNodeId: 'local', clock: clock);
 
-      discovery.join(NodeDescriptor(
-        nodeId: 'node-A',
-        address: '10.0.0.1',
-        state: NodeState.alive,
-      ));
+      discovery.join(
+        NodeDescriptor(
+          nodeId: 'node-A',
+          address: '10.0.0.1',
+          state: NodeState.alive,
+        ),
+      );
 
       discovery.markSuspect('node-A');
       expect(discovery.get('node-A')!.state, NodeState.suspect);
@@ -222,11 +248,13 @@ void main() {
       );
 
       for (var i = 0; i < 5; i++) {
-        discovery.join(NodeDescriptor(
-          nodeId: 'node-$i',
-          address: '10.0.0.$i',
-          state: NodeState.alive,
-        ));
+        discovery.join(
+          NodeDescriptor(
+            nodeId: 'node-$i',
+            address: '10.0.0.$i',
+            state: NodeState.alive,
+          ),
+        );
       }
 
       final targets = discovery.selectGossipTargets();
@@ -260,19 +288,23 @@ void main() {
       final clock = HybridLogicalClock(nodeId: 'local');
       final discovery = NodeDiscovery(localNodeId: 'local', clock: clock);
 
-      discovery.join(NodeDescriptor(
-        nodeId: 'node-A',
-        address: '10.0.0.1',
-        state: NodeState.alive,
-        incarnation: 5,
-      ));
+      discovery.join(
+        NodeDescriptor(
+          nodeId: 'node-A',
+          address: '10.0.0.1',
+          state: NodeState.alive,
+          incarnation: 5,
+        ),
+      );
 
-      discovery.join(NodeDescriptor(
-        nodeId: 'node-A',
-        address: '10.0.0.1',
-        state: NodeState.alive,
-        incarnation: 3,
-      ));
+      discovery.join(
+        NodeDescriptor(
+          nodeId: 'node-A',
+          address: '10.0.0.1',
+          state: NodeState.alive,
+          incarnation: 3,
+        ),
+      );
 
       expect(discovery.get('node-A')!.incarnation, 5);
     });
@@ -281,8 +313,20 @@ void main() {
       final clock = HybridLogicalClock(nodeId: 'local');
       final discovery = NodeDiscovery(localNodeId: 'local', clock: clock);
 
-      discovery.join(NodeDescriptor(nodeId: 'n1', address: '10.0.0.1', state: NodeState.alive));
-      discovery.join(NodeDescriptor(nodeId: 'n2', address: '10.0.0.2', state: NodeState.alive));
+      discovery.join(
+        NodeDescriptor(
+          nodeId: 'n1',
+          address: '10.0.0.1',
+          state: NodeState.alive,
+        ),
+      );
+      discovery.join(
+        NodeDescriptor(
+          nodeId: 'n2',
+          address: '10.0.0.2',
+          state: NodeState.alive,
+        ),
+      );
 
       final events = discovery.drainEvents();
       expect(events.length, greaterThanOrEqualTo(2));
@@ -314,12 +358,14 @@ void main() {
       final clock = HybridLogicalClock(nodeId: 'local');
       final router = RemoteCapabilityRouter(localNodeId: 'local', clock: clock);
 
-      router.receiveAdvertisement(CapabilityAdvertisement(
-        nodeId: 'remote-1',
-        capabilityIds: ['agent.chat', 'agent.execute'],
-        pluginId: 'agent-plugin',
-        timestamp: clock.tick().physicalTime,
-      ));
+      router.receiveAdvertisement(
+        CapabilityAdvertisement(
+          nodeId: 'remote-1',
+          capabilityIds: ['agent.chat', 'agent.execute'],
+          pluginId: 'agent-plugin',
+          timestamp: clock.tick().physicalTime,
+        ),
+      );
 
       final result = router.route('agent.chat');
       expect(result.isRemote, isTrue);
@@ -332,7 +378,9 @@ void main() {
 
       router.registerLocalCapability('storage.read');
 
-      final result = router.routeWithFallback('storage.write', ['storage.read']);
+      final result = router.routeWithFallback('storage.write', [
+        'storage.read',
+      ]);
       expect(result.decision, RouteDecision.fallback);
       expect(result.capabilityId, 'storage.read');
     });
@@ -341,12 +389,14 @@ void main() {
       final clock = HybridLogicalClock(nodeId: 'local');
       final router = RemoteCapabilityRouter(localNodeId: 'local', clock: clock);
 
-      router.receiveAdvertisement(CapabilityAdvertisement(
-        nodeId: 'remote-1',
-        capabilityIds: ['agent.chat'],
-        pluginId: 'agent',
-        timestamp: clock.tick().physicalTime,
-      ));
+      router.receiveAdvertisement(
+        CapabilityAdvertisement(
+          nodeId: 'remote-1',
+          capabilityIds: ['agent.chat'],
+          pluginId: 'agent',
+          timestamp: clock.tick().physicalTime,
+        ),
+      );
 
       expect(router.route('agent.chat').isRemote, isTrue);
 
@@ -360,7 +410,10 @@ void main() {
 
       router.registerLocalCapabilities(['storage.read', 'storage.write']);
 
-      final ad = router.createAdvertisement('storage', ['storage.read', 'storage.write']);
+      final ad = router.createAdvertisement('storage', [
+        'storage.read',
+        'storage.write',
+      ]);
       expect(ad.nodeId, 'local');
       expect(ad.capabilityIds, ['storage.read', 'storage.write']);
     });
@@ -369,12 +422,14 @@ void main() {
       final clock = HybridLogicalClock(nodeId: 'local');
       final router = RemoteCapabilityRouter(localNodeId: 'local', clock: clock);
 
-      router.receiveAdvertisement(CapabilityAdvertisement(
-        nodeId: 'remote-1',
-        capabilityIds: ['agent.chat'],
-        pluginId: 'agent',
-        timestamp: clock.tick().physicalTime,
-      ));
+      router.receiveAdvertisement(
+        CapabilityAdvertisement(
+          nodeId: 'remote-1',
+          capabilityIds: ['agent.chat'],
+          pluginId: 'agent',
+          timestamp: clock.tick().physicalTime,
+        ),
+      );
 
       router.markCapabilityUnreachable('agent.chat');
       final binding = router.remoteBindings.first;
@@ -434,7 +489,10 @@ void main() {
 
       final renewed = manager.renew('session-1');
       expect(renewed, isTrue);
-      expect(manager.activeLeases.first.expiresAt, greaterThanOrEqualTo(originalExpiry));
+      expect(
+        manager.activeLeases.first.expiresAt,
+        greaterThanOrEqualTo(originalExpiry),
+      );
     });
 
     test('release lease', () {
@@ -501,7 +559,10 @@ void main() {
   group('Distributed Trace', () {
     test('start trace and span', () {
       final clock = HybridLogicalClock(nodeId: 'node-A');
-      final service = DistributedTraceService(localNodeId: 'node-A', clock: clock);
+      final service = DistributedTraceService(
+        localNodeId: 'node-A',
+        clock: clock,
+      );
 
       final trace = service.startTrace();
       final span = service.startSpan(
@@ -515,7 +576,10 @@ void main() {
 
     test('cross-node trace propagation', () {
       final clockA = HybridLogicalClock(nodeId: 'node-A');
-      final serviceA = DistributedTraceService(localNodeId: 'node-A', clock: clockA);
+      final serviceA = DistributedTraceService(
+        localNodeId: 'node-A',
+        clock: clockA,
+      );
 
       final trace = serviceA.startTrace();
       final span = serviceA.startSpan(
@@ -532,7 +596,10 @@ void main() {
 
     test('receive remote span and correlate', () {
       final clockA = HybridLogicalClock(nodeId: 'node-A');
-      final serviceA = DistributedTraceService(localNodeId: 'node-A', clock: clockA);
+      final serviceA = DistributedTraceService(
+        localNodeId: 'node-A',
+        clock: clockA,
+      );
 
       final trace = serviceA.startTrace();
       final spanA = serviceA.startSpan(
@@ -543,9 +610,15 @@ void main() {
       final context = serviceA.propagateContext(spanA);
 
       final clockB = HybridLogicalClock(nodeId: 'node-B');
-      final serviceB = DistributedTraceService(localNodeId: 'node-B', clock: clockB);
+      final serviceB = DistributedTraceService(
+        localNodeId: 'node-B',
+        clock: clockB,
+      );
 
-      final spanB = serviceB.startRemoteSpan(context, operation: 'handle.remote');
+      final spanB = serviceB.startRemoteSpan(
+        context,
+        operation: 'handle.remote',
+      );
 
       expect(spanB.remoteParentSpanId, spanA.spanId);
       expect(spanB.remoteNodeId, 'node-A');
@@ -574,7 +647,10 @@ void main() {
 
     test('receive remote spans merges into trace', () {
       final clock = HybridLogicalClock(nodeId: 'node-A');
-      final service = DistributedTraceService(localNodeId: 'node-A', clock: clock);
+      final service = DistributedTraceService(
+        localNodeId: 'node-A',
+        clock: clock,
+      );
 
       final trace = service.startTrace(traceId: 'trace-1');
 
@@ -635,13 +711,15 @@ void main() {
       final transport = LocalTransport(localNodeId: 'node-A');
 
       expect(
-        () => transport.send(TransportMessage(
-          id: 'msg-1',
-          type: 'test',
-          sourceNodeId: 'node-A',
-          targetNodeId: 'node-B',
-          timestamp: HybridTimestampLike(physicalTime: 0),
-        )),
+        () => transport.send(
+          TransportMessage(
+            id: 'msg-1',
+            type: 'test',
+            sourceNodeId: 'node-A',
+            targetNodeId: 'node-B',
+            timestamp: HybridTimestampLike(physicalTime: 0),
+          ),
+        ),
         throwsStateError,
       );
     });
@@ -691,10 +769,12 @@ void main() {
 
   group('Distributed Runtime Integration', () {
     test('start and stop lifecycle', () async {
-      final runtime = DistributedRuntime(const DistributedRuntimeConfig(
-        nodeId: 'test-node',
-        address: '127.0.0.1',
-      ));
+      final runtime = DistributedRuntime(
+        const DistributedRuntimeConfig(
+          nodeId: 'test-node',
+          address: '127.0.0.1',
+        ),
+      );
 
       expect(runtime.state, DistributedRuntimeState.uninitialized);
 
@@ -708,13 +788,16 @@ void main() {
     });
 
     test('register local capabilities', () async {
-      final runtime = DistributedRuntime(const DistributedRuntimeConfig(
-        nodeId: 'test-node',
-      ));
+      final runtime = DistributedRuntime(
+        const DistributedRuntimeConfig(nodeId: 'test-node'),
+      );
 
       await runtime.start();
 
-      runtime.registerLocalCapabilities('storage', ['storage.read', 'storage.write']);
+      runtime.registerLocalCapabilities('storage', [
+        'storage.read',
+        'storage.write',
+      ]);
 
       expect(runtime.capabilityRouter.localCapabilityCount, 2);
 
@@ -726,47 +809,56 @@ void main() {
     });
 
     test('node failure handling', () async {
-      final runtime = DistributedRuntime(const DistributedRuntimeConfig(
-        nodeId: 'test-node',
-      ));
+      final runtime = DistributedRuntime(
+        const DistributedRuntimeConfig(nodeId: 'test-node'),
+      );
 
       await runtime.start();
 
-      runtime.nodeDiscovery.join(NodeDescriptor(
-        nodeId: 'remote-1',
-        address: '10.0.0.1',
-        state: NodeState.alive,
-      ));
+      runtime.nodeDiscovery.join(
+        NodeDescriptor(
+          nodeId: 'remote-1',
+          address: '10.0.0.1',
+          state: NodeState.alive,
+        ),
+      );
 
-      runtime.capabilityRouter.receiveAdvertisement(CapabilityAdvertisement(
-        nodeId: 'remote-1',
-        capabilityIds: ['agent.chat'],
-        pluginId: 'agent',
-        timestamp: runtime.clock.tick().physicalTime,
-      ));
+      runtime.capabilityRouter.receiveAdvertisement(
+        CapabilityAdvertisement(
+          nodeId: 'remote-1',
+          capabilityIds: ['agent.chat'],
+          pluginId: 'agent',
+          timestamp: runtime.clock.tick().physicalTime,
+        ),
+      );
 
       expect(runtime.capabilityRouter.route('agent.chat').isRemote, isTrue);
 
       runtime.handleNodeFailure('remote-1');
 
-      expect(runtime.capabilityRouter.route('agent.chat').decision, RouteDecision.unavailable);
+      expect(
+        runtime.capabilityRouter.route('agent.chat').decision,
+        RouteDecision.unavailable,
+      );
 
       await runtime.stop();
       runtime.dispose();
     });
 
     test('partition detection and healing', () async {
-      final runtime = DistributedRuntime(const DistributedRuntimeConfig(
-        nodeId: 'test-node',
-      ));
+      final runtime = DistributedRuntime(
+        const DistributedRuntimeConfig(nodeId: 'test-node'),
+      );
 
       await runtime.start();
 
-      runtime.nodeDiscovery.join(NodeDescriptor(
-        nodeId: 'remote-1',
-        address: '10.0.0.1',
-        state: NodeState.alive,
-      ));
+      runtime.nodeDiscovery.join(
+        NodeDescriptor(
+          nodeId: 'remote-1',
+          address: '10.0.0.1',
+          state: NodeState.alive,
+        ),
+      );
 
       runtime.handlePartitionDetected({'remote-1'});
       expect(runtime.nodeDiscovery.get('remote-1')!.state, NodeState.suspect);
@@ -779,9 +871,9 @@ void main() {
     });
 
     test('session lease management in distributed context', () async {
-      final runtime = DistributedRuntime(const DistributedRuntimeConfig(
-        nodeId: 'test-node',
-      ));
+      final runtime = DistributedRuntime(
+        const DistributedRuntimeConfig(nodeId: 'test-node'),
+      );
 
       await runtime.start();
 
@@ -797,13 +889,15 @@ void main() {
     });
 
     test('distributed trace across operations', () async {
-      final runtime = DistributedRuntime(const DistributedRuntimeConfig(
-        nodeId: 'test-node',
-      ));
+      final runtime = DistributedRuntime(
+        const DistributedRuntimeConfig(nodeId: 'test-node'),
+      );
 
       await runtime.start();
 
-      final trace = runtime.traceService.startTrace(tags: {'operation': 'distributed.invoke'});
+      final trace = runtime.traceService.startTrace(
+        tags: {'operation': 'distributed.invoke'},
+      );
       final span = runtime.traceService.startSpan(
         traceId: trace.traceId,
         operation: 'capability.invoke',

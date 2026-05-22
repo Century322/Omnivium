@@ -57,5 +57,6 @@ class CapabilityContext {
 
   bool get shouldAbort => cancellationToken.shouldAbort;
 
-  bool hasCapability(String capabilityId) => permission.hasCapability(capabilityId);
+  bool hasCapability(String capabilityId) =>
+      permission.hasCapability(capabilityId);
 }

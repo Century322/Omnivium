@@ -5,12 +5,7 @@ import 'runtime_law.dart';
 import 'constitutional_trace.dart';
 import 'constitutional_civilization.dart';
 
-enum LawForkResolution {
-  keepLocal,
-  adoptRemote,
-  merge,
-  conflict,
-}
+enum LawForkResolution { keepLocal, adoptRemote, merge, conflict }
 
 class LawManifest {
   final String nodeId;
@@ -35,7 +30,12 @@ class LawManifest {
       hash = ((hash << 5) - hash) + entry.key.index + entry.value;
       hash = hash & 0xFFFFFFFF;
     }
-    return LawManifest(nodeId: nodeId, epoch: epoch, lawVersions: versions, hash: hash);
+    return LawManifest(
+      nodeId: nodeId,
+      epoch: epoch,
+      lawVersions: versions,
+      hash: hash,
+    );
   }
 
   LawManifest bumpVersion(RuntimeLawId lawId) {
@@ -46,7 +46,12 @@ class LawManifest {
       hash = ((hash << 5) - hash) + entry.key.index + entry.value;
       hash = hash & 0xFFFFFFFF;
     }
-    return LawManifest(nodeId: nodeId, epoch: epoch + 1, lawVersions: newVersions, hash: hash);
+    return LawManifest(
+      nodeId: nodeId,
+      epoch: epoch + 1,
+      lawVersions: newVersions,
+      hash: hash,
+    );
   }
 
   bool isCompatibleWith(LawManifest other) {
@@ -59,11 +64,11 @@ class LawManifest {
   }
 
   Map<String, dynamic> toJson() => {
-        'node': nodeId,
-        'epoch': epoch,
-        'versions': lawVersions.map((k, v) => MapEntry(k.name, v)),
-        'hash': hash,
-      };
+    'node': nodeId,
+    'epoch': epoch,
+    'versions': lawVersions.map((k, v) => MapEntry(k.name, v)),
+    'hash': hash,
+  };
 }
 
 class ConsensusVote {
@@ -82,12 +87,12 @@ class ConsensusVote {
   });
 
   Map<String, dynamic> toJson() => {
-        'voter': voterId,
-        'amendment': amendmentId,
-        'support': support,
-        'reason': reason,
-        'ts': timestamp,
-      };
+    'voter': voterId,
+    'amendment': amendmentId,
+    'support': support,
+    'reason': reason,
+    'ts': timestamp,
+  };
 }
 
 class ConsensusResult {
@@ -110,14 +115,14 @@ class ConsensusResult {
   });
 
   Map<String, dynamic> toJson() => {
-        'amendment': amendmentId,
-        'total': totalVotes,
-        'support': supportVotes,
-        'oppose': opposeVotes,
-        'ratio': supportRatio.toStringAsFixed(3),
-        'passed': passed,
-        'decided': decidedAt,
-      };
+    'amendment': amendmentId,
+    'total': totalVotes,
+    'support': supportVotes,
+    'oppose': opposeVotes,
+    'ratio': supportRatio.toStringAsFixed(3),
+    'passed': passed,
+    'decided': decidedAt,
+  };
 }
 
 class LawFork {
@@ -138,13 +143,13 @@ class LawFork {
   });
 
   Map<String, dynamic> toJson() => {
-        'id': forkId,
-        'law': lawId.name,
-        'local': localManifest.toJson(),
-        'remote': remoteManifest.toJson(),
-        'resolution': resolution.name,
-        'detected': detectedAt,
-      };
+    'id': forkId,
+    'law': lawId.name,
+    'local': localManifest.toJson(),
+    'remote': remoteManifest.toJson(),
+    'resolution': resolution.name,
+    'detected': detectedAt,
+  };
 }
 
 class ConstitutionalConsensus {
@@ -163,12 +168,13 @@ class ConstitutionalConsensus {
     int initialEpoch = 0,
     double passThreshold = 0.6,
     ConstitutionalTraceGraph? traceGraph,
-  })  : _localManifest = LawManifest.forNode(localNodeId, initialEpoch),
-        _passThreshold = passThreshold,
-        _traceGraph = traceGraph;
+  }) : _localManifest = LawManifest.forNode(localNodeId, initialEpoch),
+       _passThreshold = passThreshold,
+       _traceGraph = traceGraph;
 
   LawManifest get localManifest => _localManifest;
-  Map<String, LawManifest> get remoteManifests => Map.unmodifiable(_remoteManifests);
+  Map<String, LawManifest> get remoteManifests =>
+      Map.unmodifiable(_remoteManifests);
   List<LawFork> get forks => List.unmodifiable(_forks);
   double get passThreshold => _passThreshold;
 
@@ -204,7 +210,9 @@ class ConstitutionalConsensus {
 
     final fork = LawFork(
       forkId: 'fork-${_forkSeq++}',
-      lawId: conflictingLaws.isNotEmpty ? conflictingLaws.first : RuntimeLawId.noBypassCapabilityRouter,
+      lawId: conflictingLaws.isNotEmpty
+          ? conflictingLaws.first
+          : RuntimeLawId.noBypassCapabilityRouter,
       localManifest: _localManifest,
       remoteManifest: remoteManifest,
       resolution: resolution,
@@ -237,7 +245,9 @@ class ConstitutionalConsensus {
   }
 
   ConsensusResult tallyVotes(String amendmentId, int timestamp) {
-    final amendmentVotes = _votes.where((v) => v.amendmentId == amendmentId).toList();
+    final amendmentVotes = _votes
+        .where((v) => v.amendmentId == amendmentId)
+        .toList();
     final support = amendmentVotes.where((v) => v.support).length;
     final oppose = amendmentVotes.where((v) => !v.support).length;
     final total = amendmentVotes.length;
@@ -292,20 +302,29 @@ class TrustPassport {
   bool get isValid => DateTime.now().millisecondsSinceEpoch < expiresAt;
 
   Map<String, dynamic> toJson() => {
-        'entity': entityId,
-        'issuer': issuingRuntime,
-        'score': reputationScore.toStringAsFixed(2),
-        'trust': trustLevel.name,
-        'interactions': totalInteractions,
-        'ratio': complianceRatio.toStringAsFixed(3),
-        'issued': issuedAt,
-        'expires': expiresAt,
-        'sig': signature,
-      };
+    'entity': entityId,
+    'issuer': issuingRuntime,
+    'score': reputationScore.toStringAsFixed(2),
+    'trust': trustLevel.name,
+    'interactions': totalInteractions,
+    'ratio': complianceRatio.toStringAsFixed(3),
+    'issued': issuedAt,
+    'expires': expiresAt,
+    'sig': signature,
+  };
 
-  factory TrustPassport.fromReputation(ReputationScore score, String issuingRuntime, int ttl) {
+  factory TrustPassport.fromReputation(
+    ReputationScore score,
+    String issuingRuntime,
+    int ttl,
+  ) {
     final now = DateTime.now().millisecondsSinceEpoch;
-    final sig = _computeSignature(score.entityId, issuingRuntime, score.score, now);
+    final sig = _computeSignature(
+      score.entityId,
+      issuingRuntime,
+      score.score,
+      now,
+    );
     return TrustPassport(
       entityId: score.entityId,
       issuingRuntime: issuingRuntime,
@@ -319,8 +338,15 @@ class TrustPassport {
     );
   }
 
-  static String _computeSignature(String entityId, String issuer, double score, int issuedAt) {
-    final input = utf8.encode('$entityId|$issuer|${score.toStringAsFixed(2)}|$issuedAt');
+  static String _computeSignature(
+    String entityId,
+    String issuer,
+    double score,
+    int issuedAt,
+  ) {
+    final input = utf8.encode(
+      '$entityId|$issuer|${score.toStringAsFixed(2)}|$issuedAt',
+    );
     final digest = sha256.convert(input);
     return 'passport_${digest.toString().substring(0, 32)}';
   }
@@ -332,7 +358,10 @@ class FederatedReputation {
   final Map<String, TrustPassport> _passports = {};
   final Map<String, double> _federatedScores = {};
 
-  FederatedReputation({required this.localRuntimeId, ConstitutionalTraceGraph? traceGraph}) : _traceGraph = traceGraph;
+  FederatedReputation({
+    required this.localRuntimeId,
+    ConstitutionalTraceGraph? traceGraph,
+  }) : _traceGraph = traceGraph;
 
   Map<String, TrustPassport> get passports => Map.unmodifiable(_passports);
   int get passportCount => _passports.length;
@@ -375,7 +404,8 @@ class FederatedReputation {
     return TrustLevel.blocked;
   }
 
-  Map<String, double> allFederatedScores() => Map.unmodifiable(_federatedScores);
+  Map<String, double> allFederatedScores() =>
+      Map.unmodifiable(_federatedScores);
 
   void _updateFederatedScore(String entityId) {
     final relevantPassports = _passports.entries
@@ -397,7 +427,9 @@ class FederatedReputation {
       totalWeight += weight;
     }
 
-    _federatedScores[entityId] = totalWeight > 0 ? totalScore / totalWeight : 100.0;
+    _federatedScores[entityId] = totalWeight > 0
+        ? totalScore / totalWeight
+        : 100.0;
   }
 }
 
@@ -447,36 +479,35 @@ class LegislativeProposal {
     Map<String, dynamic>? impactAnalysis,
     Map<String, dynamic>? judiciaryReview,
     ConsensusResult? consensusResult,
-  }) =>
-      LegislativeProposal(
-        proposalId: proposalId,
-        description: description,
-        targetLaw: targetLaw,
-        proposedChange: proposedChange,
-        stage: stage ?? this.stage,
-        rationale: rationale,
-        proposedAt: proposedAt,
-        enactedAt: enactedAt ?? this.enactedAt,
-        simulationResult: simulationResult ?? this.simulationResult,
-        impactAnalysis: impactAnalysis ?? this.impactAnalysis,
-        judiciaryReview: judiciaryReview ?? this.judiciaryReview,
-        consensusResult: consensusResult ?? this.consensusResult,
-      );
+  }) => LegislativeProposal(
+    proposalId: proposalId,
+    description: description,
+    targetLaw: targetLaw,
+    proposedChange: proposedChange,
+    stage: stage ?? this.stage,
+    rationale: rationale,
+    proposedAt: proposedAt,
+    enactedAt: enactedAt ?? this.enactedAt,
+    simulationResult: simulationResult ?? this.simulationResult,
+    impactAnalysis: impactAnalysis ?? this.impactAnalysis,
+    judiciaryReview: judiciaryReview ?? this.judiciaryReview,
+    consensusResult: consensusResult ?? this.consensusResult,
+  );
 
   Map<String, dynamic> toJson() => {
-        'id': proposalId,
-        'desc': description,
-        'law': targetLaw.name,
-        'change': proposedChange,
-        'stage': stage.name,
-        'rationale': rationale,
-        'proposed': proposedAt,
-        'enacted': enactedAt,
-        'simulation': simulationResult,
-        'impact': impactAnalysis,
-        'judiciary': judiciaryReview,
-        'consensus': consensusResult?.toJson(),
-      };
+    'id': proposalId,
+    'desc': description,
+    'law': targetLaw.name,
+    'change': proposedChange,
+    'stage': stage.name,
+    'rationale': rationale,
+    'proposed': proposedAt,
+    'enacted': enactedAt,
+    'simulation': simulationResult,
+    'impact': impactAnalysis,
+    'judiciary': judiciaryReview,
+    'consensus': consensusResult?.toJson(),
+  };
 }
 
 class AutonomousLegislature {
@@ -492,10 +523,10 @@ class AutonomousLegislature {
     required ConstitutionalTraceGraph traceGraph,
     required ReputationEconomy reputationEconomy,
     required RuntimeJudiciary judiciary,
-  })  : _consensus = consensus,
-        _traceGraph = traceGraph,
-        _reputationEconomy = reputationEconomy,
-        _judiciary = judiciary;
+  }) : _consensus = consensus,
+       _traceGraph = traceGraph,
+       _reputationEconomy = reputationEconomy,
+       _judiciary = judiciary;
 
   List<LegislativeProposal> get proposals => List.unmodifiable(_proposals);
   LegislativeProposal? activeProposal;
@@ -527,14 +558,24 @@ class AutonomousLegislature {
     final stats = _traceGraph.computeStatistics();
     final lawViolations = stats.violationCounts[activeProposal!.targetLaw] ?? 0;
     final totalDecisions = stats.totalDecisions;
-    final affectedSandboxes = _traceGraph.violationsForLaw(activeProposal!.targetLaw).map((d) => d.sandboxId).toSet().length;
+    final affectedSandboxes = _traceGraph
+        .violationsForLaw(activeProposal!.targetLaw)
+        .map((d) => d.sandboxId)
+        .toSet()
+        .length;
 
     final simulationResult = {
       'currentViolations': lawViolations,
       'totalDecisions': totalDecisions,
       'affectedSandboxes': affectedSandboxes,
-      'estimatedReduction': lawViolations > 0 ? (lawViolations * 0.7).round() : 0,
-      'riskLevel': lawViolations > 20 ? 'high' : lawViolations > 10 ? 'medium' : 'low',
+      'estimatedReduction': lawViolations > 0
+          ? (lawViolations * 0.7).round()
+          : 0,
+      'riskLevel': lawViolations > 20
+          ? 'high'
+          : lawViolations > 10
+          ? 'medium'
+          : 'low',
     };
 
     final updated = activeProposal!.copyWith(
@@ -550,7 +591,9 @@ class AutonomousLegislature {
 
     final sim = activeProposal!.simulationResult;
     final constitutionalScore = _reputationEconomy.constitutionalScore();
-    final lowestEntities = _reputationEconomy.lowestReputationEntities(limit: 3);
+    final lowestEntities = _reputationEconomy.lowestReputationEntities(
+      limit: 3,
+    );
 
     final impactAnalysis = {
       'constitutionalHealthScore': constitutionalScore.toStringAsFixed(2),
@@ -574,14 +617,18 @@ class AutonomousLegislature {
     final targetLaw = activeProposal!.targetLaw;
     final stats = _traceGraph.computeStatistics();
     final currentViolations = stats.violationCounts[targetLaw] ?? 0;
-    final isConstitutional = currentViolations > 0 || activeProposal!.proposedChange.isNotEmpty;
-    final conflictsWithExisting = _detectLawConflict(targetLaw, activeProposal!.proposedChange);
+    final isConstitutional =
+        currentViolations > 0 || activeProposal!.proposedChange.isNotEmpty;
+    final conflictsWithExisting = _detectLawConflict(
+      targetLaw,
+      activeProposal!.proposedChange,
+    );
 
     final recommendation = isConstitutional && !conflictsWithExisting
         ? 'proceed'
         : conflictsWithExisting
-            ? 'review'
-            : 'reject';
+        ? 'review'
+        : 'reject';
 
     final review = {
       'constitutional': isConstitutional,
@@ -604,7 +651,8 @@ class AutonomousLegislature {
       (p) => p.targetLaw == targetLaw && p.stage != LegislativeStage.rejected,
     );
     for (final p in existingProposals) {
-      if (p.proposedChange == proposedChange && p.proposalId != activeProposal!.proposalId) {
+      if (p.proposedChange == proposedChange &&
+          p.proposalId != activeProposal!.proposalId) {
         return true;
       }
     }
@@ -617,7 +665,9 @@ class AutonomousLegislature {
     final review = activeProposal!.judiciaryReview;
     final recommendation = review['recommendation'];
     if (recommendation == 'reject') {
-      final rejected = activeProposal!.copyWith(stage: LegislativeStage.rejected);
+      final rejected = activeProposal!.copyWith(
+        stage: LegislativeStage.rejected,
+      );
       _updateProposal(rejected);
       return rejected;
     }
@@ -670,7 +720,9 @@ class AutonomousLegislature {
   }
 
   void _updateProposal(LegislativeProposal updated) {
-    final idx = _proposals.indexWhere((p) => p.proposalId == updated.proposalId);
+    final idx = _proposals.indexWhere(
+      (p) => p.proposalId == updated.proposalId,
+    );
     if (idx >= 0) {
       _proposals[idx] = updated;
       activeProposal = updated;

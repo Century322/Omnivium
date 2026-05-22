@@ -11,7 +11,8 @@ class WebSocketTransport implements RuntimeTransport {
   TransportState _state = TransportState.disconnected;
   final StreamController<TransportMessage> _incomingController =
       StreamController<TransportMessage>.broadcast();
-  final List<void Function(TransportState, TransportState)> _stateCallbacks = [];
+  final List<void Function(TransportState, TransportState)> _stateCallbacks =
+      [];
   final Map<String, Completer<TransportMessage>> _pendingRequests = {};
 
   WebSocketChannel? _channel;
@@ -25,10 +26,10 @@ class WebSocketTransport implements RuntimeTransport {
     required String serverUrl,
     Duration reconnectInterval = const Duration(seconds: 5),
     int maxReconnectAttempts = 10,
-  })  : _localNodeId = localNodeId,
-        _serverUrl = serverUrl,
-        _reconnectInterval = reconnectInterval,
-        _maxReconnectAttempts = maxReconnectAttempts;
+  }) : _localNodeId = localNodeId,
+       _serverUrl = serverUrl,
+       _reconnectInterval = reconnectInterval,
+       _maxReconnectAttempts = maxReconnectAttempts;
 
   @override
   TransportState get state => _state;
@@ -100,9 +101,12 @@ class WebSocketTransport implements RuntimeTransport {
     try {
       await send(message);
 
-      final response = await completer.future.timeout(timeout, onTimeout: () {
-        throw TimeoutException('Request ${message.id} timed out');
-      });
+      final response = await completer.future.timeout(
+        timeout,
+        onTimeout: () {
+          throw TimeoutException('Request ${message.id} timed out');
+        },
+      );
       return response;
     } catch (_) {
       return null;
@@ -112,7 +116,9 @@ class WebSocketTransport implements RuntimeTransport {
   }
 
   @override
-  void onStateChange(void Function(TransportState previous, TransportState current) callback) {
+  void onStateChange(
+    void Function(TransportState previous, TransportState current) callback,
+  ) {
     _stateCallbacks.add(callback);
   }
 
@@ -130,7 +136,10 @@ class WebSocketTransport implements RuntimeTransport {
           nodeId: _localNodeId,
         ),
       );
-      final response = await requestResponse(ping, timeout: const Duration(seconds: 5));
+      final response = await requestResponse(
+        ping,
+        timeout: const Duration(seconds: 5),
+      );
       return response != null;
     } catch (_) {
       return false;
@@ -164,7 +173,11 @@ class WebSocketTransport implements RuntimeTransport {
         logicalTime: tsJson['lt'] as int? ?? 0,
         nodeId: tsJson['node'] as String? ?? '',
       ),
-      headers: (json['headers'] as Map<String, dynamic>?)?.map((k, v) => MapEntry(k, v.toString())) ?? {},
+      headers:
+          (json['headers'] as Map<String, dynamic>?)?.map(
+            (k, v) => MapEntry(k, v.toString()),
+          ) ??
+          {},
     );
   }
 
@@ -214,7 +227,9 @@ abstract class WebSocketSink {
 
 class WebSocketChannelConnect {
   static WebSocketChannel connect(Uri uri) {
-    throw UnsupportedError('WebSocketChannel.connect requires a real WebSocket implementation. '
-        'Use package:web_socket_channel in production.');
+    throw UnsupportedError(
+      'WebSocketChannel.connect requires a real WebSocket implementation. '
+      'Use package:web_socket_channel in production.',
+    );
   }
 }

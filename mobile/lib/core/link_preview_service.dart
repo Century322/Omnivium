@@ -24,12 +24,22 @@ class LinkPreviewService {
   static const _maxCacheSize = 100;
 
   static const _blockedHosts = {
-    'localhost', '127.0.0.1', '0.0.0.0', '::1',
-    '169.254.169.254', 'metadata.google.internal',
+    'localhost',
+    '127.0.0.1',
+    '0.0.0.0',
+    '::1',
+    '169.254.169.254',
+    'metadata.google.internal',
     'metadata.internal',
   };
 
-  static const _blockedSchemes = {'file', 'ftp', 'data', 'javascript', 'vbscript'};
+  static const _blockedSchemes = {
+    'file',
+    'ftp',
+    'data',
+    'javascript',
+    'vbscript',
+  };
 
   static bool _isUrlSafe(String url) {
     try {
@@ -63,7 +73,9 @@ class LinkPreviewService {
 
     try {
       final uri = Uri.parse(url);
-      final response = await ApiProxyService.instance.secureClient.get(uri).timeout(const Duration(seconds: 5));
+      final response = await ApiProxyService.instance.secureClient
+          .get(uri)
+          .timeout(const Duration(seconds: 5));
       if (response.statusCode != 200) return null;
 
       final document = html_parser.parse(response.body);
@@ -84,14 +96,21 @@ class LinkPreviewService {
         title = titleEl?.text;
       }
 
-      String? description = getMeta('og:description') ?? getMeta('twitter:description') ?? getMeta('description');
+      String? description =
+          getMeta('og:description') ??
+          getMeta('twitter:description') ??
+          getMeta('description');
 
       String? imageUrl = getMeta('og:image') ?? getMeta('twitter:image');
       if (imageUrl != null && !imageUrl.startsWith('http')) {
         try {
           imageUrl = uri.resolve(imageUrl).toString();
         } catch (e, stackTrace) {
-          AppLogger.instance.warning('Image URL resolve failed', error: e, stackTrace: stackTrace);
+          AppLogger.instance.warning(
+            'Image URL resolve failed',
+            error: e,
+            stackTrace: stackTrace,
+          );
           imageUrl = null;
         }
       }
@@ -130,5 +149,6 @@ class _CacheEntry {
   final LinkPreviewData data;
   final DateTime cachedAt;
   const _CacheEntry(this.data, this.cachedAt);
-  bool get isExpired => DateTime.now().difference(cachedAt) > LinkPreviewService._cacheTtl;
+  bool get isExpired =>
+      DateTime.now().difference(cachedAt) > LinkPreviewService._cacheTtl;
 }

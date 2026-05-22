@@ -9,7 +9,14 @@ class ChatMessageData {
   final String? cardType;
   final Map<String, dynamic>? cardData;
   final List<ThoughtStep> thoughts;
-  const ChatMessageData({required this.role, required this.content, this.isStreaming = false, this.cardType, this.cardData, this.thoughts = const []});
+  const ChatMessageData({
+    required this.role,
+    required this.content,
+    this.isStreaming = false,
+    this.cardType,
+    this.cardData,
+    this.thoughts = const [],
+  });
 }
 
 class ListItemData {
@@ -33,7 +40,14 @@ class FriendMessageData {
   final String? msgType;
   final String? url;
   final int? audioDuration;
-  const FriendMessageData({required this.isMe, required this.content, this.eventId, this.msgType, this.url, this.audioDuration});
+  const FriendMessageData({
+    required this.isMe,
+    required this.content,
+    this.eventId,
+    this.msgType,
+    this.url,
+    this.audioDuration,
+  });
   bool get isVoice => msgType == 'm.audio' || content.startsWith('🎙️');
   bool get isImage => msgType == 'm.image';
   bool get isFile => msgType == 'm.file';
@@ -41,7 +55,11 @@ class FriendMessageData {
 
 class NoScrollbarBehavior extends ScrollBehavior {
   @override
-  Widget buildScrollbar(BuildContext context, Widget child, ScrollableDetails details) {
+  Widget buildScrollbar(
+    BuildContext context,
+    Widget child,
+    ScrollableDetails details,
+  ) {
     return child;
   }
 }
@@ -54,14 +72,18 @@ class SlidingSheet extends StatefulWidget {
   State<SlidingSheet> createState() => _SlidingSheetState();
 }
 
-class _SlidingSheetState extends State<SlidingSheet> with SingleTickerProviderStateMixin {
+class _SlidingSheetState extends State<SlidingSheet>
+    with SingleTickerProviderStateMixin {
   late AnimationController _ctrl;
   late Animation<double> _anim;
 
   @override
   void initState() {
     super.initState();
-    _ctrl = AnimationController(duration: const Duration(milliseconds: 400), vsync: this);
+    _ctrl = AnimationController(
+      duration: const Duration(milliseconds: 400),
+      vsync: this,
+    );
     _anim = CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic);
     _ctrl.forward();
   }
@@ -78,7 +100,10 @@ class _SlidingSheetState extends State<SlidingSheet> with SingleTickerProviderSt
       animation: _anim,
       builder: (context, child) {
         return Transform.translate(
-          offset: Offset(0, MediaQuery.of(context).size.height * (1 - _anim.value)),
+          offset: Offset(
+            0,
+            MediaQuery.of(context).size.height * (1 - _anim.value),
+          ),
           child: child,
         );
       },
@@ -100,13 +125,17 @@ class VoiceBarsIcon extends StatefulWidget {
   State<VoiceBarsIcon> createState() => _VoiceBarsIconState();
 }
 
-class _VoiceBarsIconState extends State<VoiceBarsIcon> with SingleTickerProviderStateMixin {
+class _VoiceBarsIconState extends State<VoiceBarsIcon>
+    with SingleTickerProviderStateMixin {
   late AnimationController _ctrl;
 
   @override
   void initState() {
     super.initState();
-    _ctrl = AnimationController(duration: const Duration(milliseconds: 1200), vsync: this)..repeat();
+    _ctrl = AnimationController(
+      duration: const Duration(milliseconds: 1200),
+      vsync: this,
+    )..repeat();
   }
 
   @override

@@ -1,18 +1,8 @@
 import 'dart:async';
 
-enum TransportState {
-  disconnected,
-  connecting,
-  connected,
-  error,
-}
+enum TransportState { disconnected, connecting, connected, error }
 
-enum TransportType {
-  local,
-  ipc,
-  websocket,
-  mcp,
-}
+enum TransportType { local, ipc, websocket, mcp }
 
 class TransportMessage {
   final String id;
@@ -34,14 +24,14 @@ class TransportMessage {
   });
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'type': type,
-        'sourceNodeId': sourceNodeId,
-        'targetNodeId': targetNodeId,
-        'payload': payload,
-        'timestamp': timestamp.toJson(),
-        'headers': headers,
-      };
+    'id': id,
+    'type': type,
+    'sourceNodeId': sourceNodeId,
+    'targetNodeId': targetNodeId,
+    'payload': payload,
+    'timestamp': timestamp.toJson(),
+    'headers': headers,
+  };
 }
 
 class HybridTimestampLike {
@@ -56,10 +46,10 @@ class HybridTimestampLike {
   });
 
   Map<String, dynamic> toJson() => {
-        'pt': physicalTime,
-        'lt': logicalTime,
-        'node': nodeId,
-      };
+    'pt': physicalTime,
+    'lt': logicalTime,
+    'node': nodeId,
+  };
 }
 
 abstract class RuntimeTransport {
@@ -78,7 +68,9 @@ abstract class RuntimeTransport {
     Duration timeout = const Duration(seconds: 10),
   });
 
-  void onStateChange(void Function(TransportState previous, TransportState current) callback);
+  void onStateChange(
+    void Function(TransportState previous, TransportState current) callback,
+  );
 
   Future<bool> healthCheck();
 }
@@ -88,7 +80,8 @@ class LocalTransport implements RuntimeTransport {
   final StreamController<TransportMessage> _incomingController =
       StreamController<TransportMessage>.broadcast();
   final String _localNodeId;
-  final List<void Function(TransportState, TransportState)> _stateCallbacks = [];
+  final List<void Function(TransportState, TransportState)> _stateCallbacks =
+      [];
   final Map<String, Completer<TransportMessage>> _pendingRequests = {};
 
   LocalTransport({required String localNodeId}) : _localNodeId = localNodeId;
@@ -151,7 +144,9 @@ class LocalTransport implements RuntimeTransport {
   }
 
   @override
-  void onStateChange(void Function(TransportState previous, TransportState current) callback) {
+  void onStateChange(
+    void Function(TransportState previous, TransportState current) callback,
+  ) {
     _stateCallbacks.add(callback);
   }
 

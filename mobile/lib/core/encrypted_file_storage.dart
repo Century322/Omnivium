@@ -32,7 +32,8 @@ class EncryptedFileStorage {
     if (_masterKey == null) await init();
 
     final sourceFile = File(sourcePath);
-    if (!await sourceFile.exists()) throw Exception('Source file not found: $sourcePath');
+    if (!await sourceFile.exists())
+      throw Exception('Source file not found: $sourcePath');
 
     final bytes = await sourceFile.readAsBytes();
     final iv = IV.fromSecureRandom(16);
@@ -55,7 +56,8 @@ class EncryptedFileStorage {
     if (_masterKey == null) await init();
 
     final file = File(encryptedPath);
-    if (!await file.exists()) throw Exception('Encrypted file not found: $encryptedPath');
+    if (!await file.exists())
+      throw Exception('Encrypted file not found: $encryptedPath');
 
     final raw = await file.readAsBytes();
     if (raw.length < 17) throw Exception('Invalid encrypted file: too short');
@@ -64,15 +66,22 @@ class EncryptedFileStorage {
     final data = raw.sublist(16);
     final iv = IV(ivBytes);
     final encrypter = Encrypter(AES(_masterKey!, mode: AESMode.ctr));
-    final decrypted = encrypter.decryptBytes(Encrypted(Uint8List.fromList(data)), iv: iv);
+    final decrypted = encrypter.decryptBytes(
+      Encrypted(Uint8List.fromList(data)),
+      iv: iv,
+    );
     return Uint8List.fromList(decrypted);
   }
 
-  Future<Stream<List<int>>> decryptFileStream(String encryptedPath, {int chunkSize = 65536}) async {
+  Future<Stream<List<int>>> decryptFileStream(
+    String encryptedPath, {
+    int chunkSize = 65536,
+  }) async {
     if (_masterKey == null) await init();
 
     final file = File(encryptedPath);
-    if (!await file.exists()) throw Exception('Encrypted file not found: $encryptedPath');
+    if (!await file.exists())
+      throw Exception('Encrypted file not found: $encryptedPath');
 
     final raw = await file.readAsBytes();
     if (raw.length < 17) throw Exception('Invalid encrypted file: too short');
@@ -81,7 +90,10 @@ class EncryptedFileStorage {
     final data = raw.sublist(16);
     final iv = IV(ivBytes);
     final encrypter = Encrypter(AES(_masterKey!, mode: AESMode.ctr));
-    final decrypted = encrypter.decryptBytes(Encrypted(Uint8List.fromList(data)), iv: iv);
+    final decrypted = encrypter.decryptBytes(
+      Encrypted(Uint8List.fromList(data)),
+      iv: iv,
+    );
 
     return Stream.fromIterable([Uint8List.fromList(decrypted)]);
   }

@@ -1,8 +1,4 @@
-enum MetricType {
-  counter,
-  gauge,
-  histogram,
-}
+enum MetricType { counter, gauge, histogram }
 
 class MetricPoint {
   final String name;
@@ -27,7 +23,11 @@ class MetricsService {
   final List<MetricPoint> _timeline = [];
   int get counterCount => _counters.length;
 
-  void increment(String name, {Map<String, String> labels = const {}, int delta = 1}) {
+  void increment(
+    String name, {
+    Map<String, String> labels = const {},
+    int delta = 1,
+  }) {
     final key = _metricKey(name, labels);
     _counters.putIfAbsent(key, () => _Counter(name, labels));
     _counters[key]!.value += delta;
@@ -40,7 +40,11 @@ class MetricsService {
     _recordTimeline(name, MetricType.gauge, labels, value);
   }
 
-  void observe(String name, num value, {Map<String, String> labels = const {}}) {
+  void observe(
+    String name,
+    num value, {
+    Map<String, String> labels = const {},
+  }) {
     final key = _metricKey(name, labels);
     _histograms.putIfAbsent(key, () => _Histogram(name, labels));
     _histograms[key]!.observe(value);
@@ -53,8 +57,10 @@ class MetricsService {
   num? getGauge(String name, {Map<String, String> labels = const {}}) =>
       _gauges[_metricKey(name, labels)]?.value;
 
-  Map<String, dynamic>? getHistogram(String name, {Map<String, String> labels = const {}}) =>
-      _histograms[_metricKey(name, labels)]?.summary();
+  Map<String, dynamic>? getHistogram(
+    String name, {
+    Map<String, String> labels = const {},
+  }) => _histograms[_metricKey(name, labels)]?.summary();
 
   List<MetricPoint> getTimeline({int limit = 1000}) =>
       _timeline.reversed.take(limit).toList();
@@ -75,11 +81,7 @@ class MetricsService {
       histograms[e.value.name] = e.value.summary();
     }
 
-    return {
-      'counters': counters,
-      'gauges': gauges,
-      'histograms': histograms,
-    };
+    return {'counters': counters, 'gauges': gauges, 'histograms': histograms};
   }
 
   void clear() {
@@ -89,19 +91,27 @@ class MetricsService {
     _timeline.clear();
   }
 
-  void _recordTimeline(String name, MetricType type, Map<String, String> labels, num value) {
-    _timeline.add(MetricPoint(
-      name: name,
-      type: type,
-      labels: labels,
-      value: value,
-      timestamp: DateTime.now().millisecondsSinceEpoch,
-    ));
+  void _recordTimeline(
+    String name,
+    MetricType type,
+    Map<String, String> labels,
+    num value,
+  ) {
+    _timeline.add(
+      MetricPoint(
+        name: name,
+        type: type,
+        labels: labels,
+        value: value,
+        timestamp: DateTime.now().millisecondsSinceEpoch,
+      ),
+    );
   }
 
   String _metricKey(String name, Map<String, String> labels) {
     if (labels.isEmpty) return name;
-    final sorted = labels.entries.toList()..sort((a, b) => a.key.compareTo(b.key));
+    final sorted = labels.entries.toList()
+      ..sort((a, b) => a.key.compareTo(b.key));
     return '$name{${sorted.map((e) => '${e.key}=${e.value}').join(',')}}';
   }
 }
@@ -132,7 +142,8 @@ class _Histogram {
   void observe(num value) => _values.add(value);
 
   Map<String, dynamic> summary() {
-    if (_values.isEmpty) return {'count': 0, 'min': 0, 'max': 0, 'avg': 0, 'p50': 0, 'p99': 0};
+    if (_values.isEmpty)
+      return {'count': 0, 'min': 0, 'max': 0, 'avg': 0, 'p50': 0, 'p99': 0};
     final sorted = _values.toList()..sort();
     return {
       'count': sorted.length,

@@ -23,7 +23,10 @@ class SecureFlagService {
       await _channel.invokeMethod<bool>('setSecureFlag', secure);
       _currentFlag = secure;
     } on PlatformException catch (e) {
-      AppLogger.instance.warning('SecureFlag: failed to set secure flag', error: e);
+      AppLogger.instance.warning(
+        'SecureFlag: failed to set secure flag',
+        error: e,
+      );
     }
   }
 

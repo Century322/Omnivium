@@ -4,7 +4,10 @@ import '../theme/app_colors.dart';
 import '../theme/locale_provider.dart';
 
 class HomeDialogs {
-  static void showMoreMenu(BuildContext context, String content, int index, {
+  static void showMoreMenu(
+    BuildContext context,
+    String content,
+    int index, {
     required VoidCallback onEdit,
     required VoidCallback onDelete,
     required VoidCallback onReport,
@@ -13,28 +16,58 @@ class HomeDialogs {
     showModalBottomSheet(
       context: context,
       backgroundColor: AppColors.sf(context),
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (_) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const SizedBox(height: 8),
-            Container(width: 40, height: 4, decoration: BoxDecoration(color: AppColors.textDisabled(context), borderRadius: BorderRadius.circular(2))),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.textDisabled(context),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
             const SizedBox(height: 12),
             ListTile(
               leading: Icon(LucideIcons.pencil, color: AppColors.sec(context)),
-              title: Text(t('edit_query'), style: TextStyle(color: AppColors.textPrimary(context))),
-              onTap: () { Navigator.pop(context); onEdit(); },
+              title: Text(
+                t('edit_query'),
+                style: TextStyle(color: AppColors.textPrimary(context)),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                onEdit();
+              },
             ),
             ListTile(
               leading: Icon(LucideIcons.trash2, color: AppColors.dng(context)),
-              title: Text(t('delete_message_pair'), style: TextStyle(color: AppColors.dng(context))),
-              onTap: () { Navigator.pop(context); onDelete(); },
+              title: Text(
+                t('delete_message_pair'),
+                style: TextStyle(color: AppColors.dng(context)),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                onDelete();
+              },
             ),
             ListTile(
-              leading: Icon(LucideIcons.thumbsDown, color: AppColors.sec(context)),
-              title: Text(t('report_not_helpful'), style: TextStyle(color: AppColors.textPrimary(context))),
-              onTap: () { Navigator.pop(context); onReport(); },
+              leading: Icon(
+                LucideIcons.thumbsDown,
+                color: AppColors.sec(context),
+              ),
+              title: Text(
+                t('report_not_helpful'),
+                style: TextStyle(color: AppColors.textPrimary(context)),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                onReport();
+              },
             ),
             const SizedBox(height: 8),
           ],
@@ -43,7 +76,9 @@ class HomeDialogs {
     );
   }
 
-  static void showPermissionDialog(BuildContext context, String skillName, {
+  static void showPermissionDialog(
+    BuildContext context,
+    String skillName, {
     required VoidCallback onGrant,
     required VoidCallback onDeny,
   }) {
@@ -54,33 +89,67 @@ class HomeDialogs {
       builder: (_) => AlertDialog(
         backgroundColor: AppColors.sf(context),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Row(children: [
-          Icon(LucideIcons.shieldAlert, color: AppColors.warn(context), size: 20),
-          const SizedBox(width: 8),
-          Text(t('permission_confirm_title'), style: TextStyle(color: AppColors.textPrimary(context), fontSize: 18)),
-        ]),
-        content: Text(localeProvider.t('ai_request_confirm').replaceAll('{action}', skillName),
-            style: TextStyle(color: AppColors.textSecondary(context), fontSize: 14)),
+        title: Row(
+          children: [
+            Icon(
+              LucideIcons.shieldAlert,
+              color: AppColors.warn(context),
+              size: 20,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              t('permission_confirm_title'),
+              style: TextStyle(
+                color: AppColors.textPrimary(context),
+                fontSize: 18,
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          localeProvider
+              .t('ai_request_confirm')
+              .replaceAll('{action}', skillName),
+          style: TextStyle(
+            color: AppColors.textSecondary(context),
+            fontSize: 14,
+          ),
+        ),
         actions: [
           TextButton(
-            onPressed: () { Navigator.pop(context); onDeny(); },
-            child: Text(t('deny'), style: TextStyle(color: AppColors.sec(context))),
+            onPressed: () {
+              Navigator.pop(context);
+              onDeny();
+            },
+            child: Text(
+              t('deny'),
+              style: TextStyle(color: AppColors.sec(context)),
+            ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.accent,
               foregroundColor: AppColors.textPrimary(context),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
-            onPressed: () { Navigator.pop(context); onGrant(); },
-            child: Text(t('allow'), style: TextStyle(fontWeight: FontWeight.w600)),
+            onPressed: () {
+              Navigator.pop(context);
+              onGrant();
+            },
+            child: Text(
+              t('allow'),
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
           ),
         ],
       ),
     );
   }
 
-  static void showCreateGroupChat(BuildContext context, {
+  static void showCreateGroupChat(
+    BuildContext context, {
     required Future<void> Function(String name, List<String> members) onCreate,
   }) {
     String t(String key) => localeProvider.t(key);
@@ -91,7 +160,10 @@ class HomeDialogs {
       builder: (_) => AlertDialog(
         backgroundColor: AppColors.sf(context),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(t('new_group'), style: TextStyle(color: AppColors.textPrimary(context))),
+        title: Text(
+          t('new_group'),
+          style: TextStyle(color: AppColors.textPrimary(context)),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -103,19 +175,31 @@ class HomeDialogs {
                 hintStyle: TextStyle(color: AppColors.textDisabled(context)),
                 filled: true,
                 fillColor: AppColors.sfAlt(context),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
               ),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: membersCtrl,
-              style: TextStyle(color: AppColors.textPrimary(context), fontSize: 14),
+              style: TextStyle(
+                color: AppColors.textPrimary(context),
+                fontSize: 14,
+              ),
               decoration: InputDecoration(
                 labelText: t('enter_matrix_id'),
-                hintStyle: TextStyle(color: AppColors.textDisabled(context), fontSize: 13),
+                hintStyle: TextStyle(
+                  color: AppColors.textDisabled(context),
+                  fontSize: 13,
+                ),
                 filled: true,
                 fillColor: AppColors.sfAlt(context),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
               ),
             ),
           ],
@@ -123,13 +207,20 @@ class HomeDialogs {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(t('cancel'), style: TextStyle(color: AppColors.sec(context))),
+            child: Text(
+              t('cancel'),
+              style: TextStyle(color: AppColors.sec(context)),
+            ),
           ),
           TextButton(
             onPressed: () async {
               final name = nameCtrl.text.trim();
               if (name.isEmpty) return;
-              final members = membersCtrl.text.split(',').map((s) => s.trim()).where((s) => s.isNotEmpty).toList();
+              final members = membersCtrl.text
+                  .split(',')
+                  .map((s) => s.trim())
+                  .where((s) => s.isNotEmpty)
+                  .toList();
               Navigator.pop(context);
               await onCreate(name, members);
             },
@@ -140,7 +231,8 @@ class HomeDialogs {
     );
   }
 
-  static void showAddContact(BuildContext context, {
+  static void showAddContact(
+    BuildContext context, {
     required Future<void> Function(String userId) onAdd,
   }) {
     String t(String key) => localeProvider.t(key);
@@ -150,22 +242,34 @@ class HomeDialogs {
       builder: (_) => AlertDialog(
         backgroundColor: AppColors.sf(context),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(t('add_contact'), style: TextStyle(color: AppColors.textPrimary(context))),
+        title: Text(
+          t('add_contact'),
+          style: TextStyle(color: AppColors.textPrimary(context)),
+        ),
         content: TextField(
           controller: idCtrl,
           style: TextStyle(color: AppColors.textPrimary(context), fontSize: 14),
           decoration: InputDecoration(
             labelText: t('enter_matrix_id'),
-            hintStyle: TextStyle(color: AppColors.textDisabled(context), fontSize: 13),
+            hintStyle: TextStyle(
+              color: AppColors.textDisabled(context),
+              fontSize: 13,
+            ),
             filled: true,
             fillColor: AppColors.sfAlt(context),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(t('cancel'), style: TextStyle(color: AppColors.sec(context))),
+            child: Text(
+              t('cancel'),
+              style: TextStyle(color: AppColors.sec(context)),
+            ),
           ),
           TextButton(
             onPressed: () async {

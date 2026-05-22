@@ -68,10 +68,18 @@ void main() async {
 
   FlutterError.onError = (FlutterErrorDetails details) {
     FlutterError.presentError(details);
-    AppLogger.instance.error('Flutter error', error: details.exception, stackTrace: details.stack);
+    AppLogger.instance.error(
+      'Flutter error',
+      error: details.exception,
+      stackTrace: details.stack,
+    );
   };
   PlatformDispatcher.instance.onError = (error, stack) {
-    AppLogger.instance.error('Uncaught platform error', error: error, stackTrace: stack);
+    AppLogger.instance.error(
+      'Uncaught platform error',
+      error: error,
+      stackTrace: stack,
+    );
     return true;
   };
 
@@ -85,7 +93,10 @@ void main() async {
             children: [
               Icon(Icons.error_outline, color: AppColors.danger, size: 48),
               const SizedBox(height: 16),
-              Text('Error occurred', style: TextStyle(color: AppColors.danger, fontSize: 16)),
+              Text(
+                'Error occurred',
+                style: TextStyle(color: AppColors.danger, fontSize: 16),
+              ),
             ],
           ),
         ),
@@ -100,7 +111,11 @@ void main() async {
     }
   }
   try {
-    final sentryDsn = String.fromEnvironment('SENTRY_DSN', defaultValue: 'https://8c3a67d45a320eff8d5567632224a2bc@o4511395076046848.ingest.us.sentry.io/4511395086139392');
+    final sentryDsn = String.fromEnvironment(
+      'SENTRY_DSN',
+      defaultValue:
+          'https://8c3a67d45a320eff8d5567632224a2bc@o4511395076046848.ingest.us.sentry.io/4511395086139392',
+    );
     if (sentryDsn.isNotEmpty) {
       await SentryFlutter.init(
         (options) {
@@ -135,20 +150,32 @@ final Set<String> _initFailures = {};
 bool _criticalInitFailed = false;
 
 Future<void> _initCritical() async {
-  await _safeInit(() => SecureStorageService.instance.init(), 'SecureStorage', critical: true);
+  await _safeInit(
+    () => SecureStorageService.instance.init(),
+    'SecureStorage',
+    critical: true,
+  );
   if (_criticalInitFailed) return;
 
-  await _safeInit(() => DatabaseService.instance.init(), 'Database', critical: true);
+  await _safeInit(
+    () => DatabaseService.instance.init(),
+    'Database',
+    critical: true,
+  );
   if (_criticalInitFailed) return;
 
-  await _safeInit(() => DatabaseService.instance.migrateFromSharedPreferences(), 'DBMigration');
+  await _safeInit(
+    () => DatabaseService.instance.migrateFromSharedPreferences(),
+    'DBMigration',
+  );
 
   await _safeInit(() async {
     final packageInfo = await PackageInfo.fromPlatform();
     final storage = SecureStorageService.instance;
     String? deviceId = await storage.read('omnivium_device_id');
     if (deviceId == null) {
-      deviceId = 'dev_${DateTime.now().millisecondsSinceEpoch}_${packageInfo.buildNumber}';
+      deviceId =
+          'dev_${DateTime.now().millisecondsSinceEpoch}_${packageInfo.buildNumber}';
       await storage.write('omnivium_device_id', deviceId);
     }
     ApiProxyService.instance.setDeviceInfo(
@@ -158,7 +185,10 @@ Future<void> _initCritical() async {
   }, 'DeviceInfo');
 
   await setupLocator();
-  await _safeInit(() => OmniviumSDK.init(persistence: DatabasePersistenceBackend()), 'RuntimeSDK');
+  await _safeInit(
+    () => OmniviumSDK.init(persistence: DatabasePersistenceBackend()),
+    'RuntimeSDK',
+  );
   AppDataGateway.instance.init();
 }
 
@@ -167,7 +197,10 @@ void _initDeferred() {
     _safeInit(() => VoiceService.instance.init(), 'Voice'),
     _safeInit(() => ReminderService.instance.init(), 'Reminder'),
     _safeInit(() => ApiProxyService.instance.init(), 'ApiProxy'),
-    _safeInit(() => NetworkSecurityService.instance.initWithDynamicPins(), 'NetworkSecurity'),
+    _safeInit(
+      () => NetworkSecurityService.instance.initWithDynamicPins(),
+      'NetworkSecurity',
+    ),
     _safeInit(() => EncryptionService.instance.init(), 'Encryption'),
     _safeInit(() => LiteMode.instance.init(), 'LiteMode'),
     _safeInit(() => FileLog.instance.init(), 'FileLog'),
@@ -175,20 +208,29 @@ void _initDeferred() {
     _safeInit(() => AppLockService.instance.init(), 'AppLock'),
     _safeInit(() => BiometricService.instance.init(), 'Biometric'),
     _safeInit(() => SecureFlagService.instance.init(), 'SecureFlag'),
-    _safeInit(() => EncryptedFileStorage.instance.init(), 'EncryptedFileStorage'),
+    _safeInit(
+      () => EncryptedFileStorage.instance.init(),
+      'EncryptedFileStorage',
+    ),
     _safeInit(() => SrpService.instance.init(), 'SRP'),
     _safeInit(() => ConnectivityService.instance.init(), 'Connectivity'),
-    _safeInit(() => PushNotificationService.instance.init(), 'PushNotification'),
+    _safeInit(
+      () => PushNotificationService.instance.init(),
+      'PushNotification',
+    ),
     _safeInit(() => AgentMemoryService.instance.init(), 'AgentMemory'),
     _safeInit(() => EmbeddingService.instance.init(), 'Embedding'),
     _safeInit(() => RemoteConfigService.instance.init(), 'RemoteConfig'),
     _safeInit(() => AuthService.instance.initFromBackend(), 'Auth'),
     _safeInit(() => SupabaseSyncService.instance.init(), 'SupabaseSync'),
-  ]).then((_) {
-  });
+  ]).then((_) {});
 }
 
-Future<bool> _safeInit(Future<void> Function() init, String name, {bool critical = false}) async {
+Future<bool> _safeInit(
+  Future<void> Function() init,
+  String name, {
+  bool critical = false,
+}) async {
   try {
     await init();
     return true;
@@ -234,7 +276,10 @@ class _AppLockDialogState extends State<_AppLockDialog> {
   String? _error;
 
   @override
-  void dispose() { _controller.dispose(); super.dispose(); }
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   void _submit() async {
     final input = _controller.text;
@@ -243,7 +288,10 @@ class _AppLockDialogState extends State<_AppLockDialog> {
       widget.lock.recordUnlock();
       widget.onUnlocked();
     } else {
-      setState(() { _error = 'Incorrect PIN'; _controller.clear(); });
+      setState(() {
+        _error = 'Incorrect PIN';
+        _controller.clear();
+      });
     }
   }
 
@@ -254,12 +302,27 @@ class _AppLockDialogState extends State<_AppLockDialog> {
       child: AlertDialog(
         backgroundColor: AppColors.sf(context),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('🔒', style: TextStyle(color: AppColors.textPrimary(context)), textAlign: TextAlign.center),
-        content: Column(mainAxisSize: MainAxisSize.min, children: [
-          TextField(controller: _controller, obscureText: true, keyboardType: TextInputType.number,
-            autofocus: true, onSubmitted: (_) => _submit(),
-            decoration: InputDecoration(hintText: 'Enter PIN', errorText: _error)),
-        ]),
+        title: Text(
+          '🔒',
+          style: TextStyle(color: AppColors.textPrimary(context)),
+          textAlign: TextAlign.center,
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _controller,
+              obscureText: true,
+              keyboardType: TextInputType.number,
+              autofocus: true,
+              onSubmitted: (_) => _submit(),
+              decoration: InputDecoration(
+                hintText: 'Enter PIN',
+                errorText: _error,
+              ),
+            ),
+          ],
+        ),
         actions: [FilledButton(onPressed: _submit, child: Text('Unlock'))],
       ),
     );
@@ -288,7 +351,12 @@ class OmniviumApp extends StatelessWidget {
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          supportedLocales: const [Locale('zh'), Locale('en'), Locale('ja'), Locale('ko')],
+          supportedLocales: const [
+            Locale('zh'),
+            Locale('en'),
+            Locale('ja'),
+            Locale('ko'),
+          ],
           onGenerateRoute: AppNavigator.onGenerateRoute,
           home: const _AppShell(),
         );
@@ -306,7 +374,8 @@ class _AppShell extends StatefulWidget {
   State<_AppShell> createState() => _AppShellState();
 }
 
-class _AppShellState extends State<_AppShell> with TickerProviderStateMixin, WidgetsBindingObserver {
+class _AppShellState extends State<_AppShell>
+    with TickerProviderStateMixin, WidgetsBindingObserver {
   final AppProvider _provider = AppProvider();
   final _privacyService = PrivacyConsentService();
   StreamSubscription<AuthEvent>? _authEventSub;
@@ -335,12 +404,33 @@ class _AppShellState extends State<_AppShell> with TickerProviderStateMixin, Wid
           barrierDismissible: !forceUpdate,
           builder: (_) => AlertDialog(
             backgroundColor: AppColors.sf(context),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            title: Text(localeProvider.t('update_available'), style: TextStyle(color: AppColors.textPrimary(context))),
-            content: Text('${localeProvider.t('new_version')}: $latestVersion${minVersion != null ? '\n${localeProvider.t('min_version_required')}: $minVersion' : ''}', style: TextStyle(color: AppColors.textSecondary(context))),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: Text(
+              localeProvider.t('update_available'),
+              style: TextStyle(color: AppColors.textPrimary(context)),
+            ),
+            content: Text(
+              '${localeProvider.t('new_version')}: $latestVersion${minVersion != null ? '\n${localeProvider.t('min_version_required')}: $minVersion' : ''}',
+              style: TextStyle(color: AppColors.textSecondary(context)),
+            ),
             actions: [
-              if (!forceUpdate) TextButton(onPressed: () => Navigator.pop(context), child: Text(localeProvider.t('later'), style: TextStyle(color: AppColors.sec(context)))),
-              TextButton(onPressed: () => Navigator.pop(context), child: Text(localeProvider.t('update_now'), style: TextStyle(color: AppColors.accent))),
+              if (!forceUpdate)
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(
+                    localeProvider.t('later'),
+                    style: TextStyle(color: AppColors.sec(context)),
+                  ),
+                ),
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(
+                  localeProvider.t('update_now'),
+                  style: TextStyle(color: AppColors.accent),
+                ),
+              ),
             ],
           ),
         );
@@ -368,7 +458,9 @@ class _AppShellState extends State<_AppShell> with TickerProviderStateMixin, Wid
       if (!_provider.matrix.isLoggedIn) {
         _provider.matrix.tryRestoreSession().then((restored) {
           if (restored && mounted) {
-            setState(() { _showLogin = false; });
+            setState(() {
+              _showLogin = false;
+            });
           }
         });
       }
@@ -385,7 +477,8 @@ class _AppShellState extends State<_AppShell> with TickerProviderStateMixin, Wid
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => _AppLockDialog(lock: lock, onUnlocked: () => Navigator.pop(context)),
+      builder: (_) =>
+          _AppLockDialog(lock: lock, onUnlocked: () => Navigator.pop(context)),
     );
   }
 
@@ -398,7 +491,10 @@ class _AppShellState extends State<_AppShell> with TickerProviderStateMixin, Wid
     try {
       NetworkSecurityService.instance.enablePinning();
     } catch (e) {
-      AppLogger.instance.warning('NetworkSecurity enablePinning failed', error: e);
+      AppLogger.instance.warning(
+        'NetworkSecurity enablePinning failed',
+        error: e,
+      );
     }
     bool restored = false;
     try {
@@ -467,17 +563,36 @@ class _AppShellState extends State<_AppShell> with TickerProviderStateMixin, Wid
         barrierDismissible: false,
         builder: (_) => AlertDialog(
           backgroundColor: AppColors.sf(context),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: Row(children: [
-            Icon(Icons.security, color: AppColors.warn(context), size: 24),
-            const SizedBox(width: 8),
-            Text(localeProvider.t('security_warning'), style: TextStyle(color: AppColors.textPrimary(context), fontSize: 17)),
-          ]),
-          content: Text(localeProvider.t('security_warning_desc'), style: TextStyle(color: AppColors.textSecondary(context), fontSize: 14)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Row(
+            children: [
+              Icon(Icons.security, color: AppColors.warn(context), size: 24),
+              const SizedBox(width: 8),
+              Text(
+                localeProvider.t('security_warning'),
+                style: TextStyle(
+                  color: AppColors.textPrimary(context),
+                  fontSize: 17,
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            localeProvider.t('security_warning_desc'),
+            style: TextStyle(
+              color: AppColors.textSecondary(context),
+              fontSize: 14,
+            ),
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text(localeProvider.t('understand'), style: TextStyle(color: AppColors.accent)),
+              child: Text(
+                localeProvider.t('understand'),
+                style: TextStyle(color: AppColors.accent),
+              ),
             ),
           ],
         ),
@@ -506,7 +621,9 @@ class _AppShellState extends State<_AppShell> with TickerProviderStateMixin, Wid
         themeMode: themeProvider.mode,
         home: Scaffold(
           backgroundColor: AppColors.background,
-          body: Center(child: CircularProgressIndicator(color: AppColors.accent)),
+          body: Center(
+            child: CircularProgressIndicator(color: AppColors.accent),
+          ),
         ),
       );
     }
@@ -519,7 +636,12 @@ class _AppShellState extends State<_AppShell> with TickerProviderStateMixin, Wid
     }
 
     return ListenableBuilder(
-      listenable: Listenable.merge([_provider.navigation, _provider.matrix, localeProvider, themeProvider]),
+      listenable: Listenable.merge([
+        _provider.navigation,
+        _provider.matrix,
+        localeProvider,
+        themeProvider,
+      ]),
       builder: (context, _) {
         final isLoggedIn = _provider.matrix.isLoggedIn;
         if (!isLoggedIn && !_showLogin) {
@@ -529,39 +651,48 @@ class _AppShellState extends State<_AppShell> with TickerProviderStateMixin, Wid
         return AnnotatedRegion<SystemUiOverlayStyle>(
           value: themeProvider.overlayStyle,
           child: PopScope(
-          canPop: !_provider.navigation.isSettingsOpen && _provider.navigation.currentView == ViewState.home,
-          onPopInvokedWithResult: (didPop, _) {
-            if (didPop) return;
-            if (_provider.navigation.isSettingsOpen) {
-              _provider.navigation.closeSettingsAndReturnToDrawer();
-            } else if (_provider.navigation.currentView != ViewState.home) {
-              _provider.navigation.goBack();
-            }
-          },
-          child: AppErrorBoundary(child: Stack(
-          children: [
-            HomeView(provider: _provider),
-            if (_showLogin && !isLoggedIn)
-              MatrixLoginView(provider: _provider, onLoginSuccess: _onLoginSuccess),
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 350),
-              switchInCurve: Curves.easeOutCubic,
-              switchOutCurve: Curves.easeInCubic,
-              transitionBuilder: (child, animation) {
-                if (child is VoiceView) {
-                  return FadeTransition(opacity: animation, child: child);
-                }
-                return SlideTransition(
-                  position: Tween<Offset>(begin: const Offset(1, 0), end: Offset.zero).animate(animation),
-                  child: child,
-                );
-              },
-              child: _buildCurrentOverlay(),
+            canPop:
+                !_provider.navigation.isSettingsOpen &&
+                _provider.navigation.currentView == ViewState.home,
+            onPopInvokedWithResult: (didPop, _) {
+              if (didPop) return;
+              if (_provider.navigation.isSettingsOpen) {
+                _provider.navigation.closeSettingsAndReturnToDrawer();
+              } else if (_provider.navigation.currentView != ViewState.home) {
+                _provider.navigation.goBack();
+              }
+            },
+            child: AppErrorBoundary(
+              child: Stack(
+                children: [
+                  HomeView(provider: _provider),
+                  if (_showLogin && !isLoggedIn)
+                    MatrixLoginView(
+                      provider: _provider,
+                      onLoginSuccess: _onLoginSuccess,
+                    ),
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 350),
+                    switchInCurve: Curves.easeOutCubic,
+                    switchOutCurve: Curves.easeInCubic,
+                    transitionBuilder: (child, animation) {
+                      if (child is VoiceView) {
+                        return FadeTransition(opacity: animation, child: child);
+                      }
+                      return SlideTransition(
+                        position: Tween<Offset>(
+                          begin: const Offset(1, 0),
+                          end: Offset.zero,
+                        ).animate(animation),
+                        child: child,
+                      );
+                    },
+                    child: _buildCurrentOverlay(),
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
-        ),
-        ),
+          ),
         );
       },
     );
@@ -575,7 +706,10 @@ class _AppShellState extends State<_AppShell> with TickerProviderStateMixin, Wid
       case ViewState.voice:
         return VoiceView(key: const ValueKey('voice'), provider: _provider);
       case ViewState.discover:
-        return DiscoverView(key: const ValueKey('discover'), provider: _provider);
+        return DiscoverView(
+          key: const ValueKey('discover'),
+          provider: _provider,
+        );
       case ViewState.search:
         return SearchView(key: const ValueKey('search'), provider: _provider);
       default:

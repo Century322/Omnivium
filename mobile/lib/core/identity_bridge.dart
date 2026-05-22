@@ -36,13 +36,17 @@ class IdentityBridge {
         _identity = existing.joinFederation(matrixId);
         await _persistToStorage(_identity!);
       }
-      AppLogger.instance.info('IdentityBridge: restored identity ${_identity!.did}');
+      AppLogger.instance.info(
+        'IdentityBridge: restored identity ${_identity!.did}',
+      );
       return;
     }
 
     _identity = SovereignIdentity.generate(userId, federationId: matrixId);
     await _persistToStorage(_identity!);
-    AppLogger.instance.info('IdentityBridge: generated identity ${_identity!.did}');
+    AppLogger.instance.info(
+      'IdentityBridge: generated identity ${_identity!.did}',
+    );
   }
 
   Future<void> onMatrixLinked(String matrixId) async {
@@ -64,7 +68,9 @@ class IdentityBridge {
 
   SovereignIdentity? requireIdentity() {
     if (_identity == null) {
-      AppLogger.instance.warning('IdentityBridge: identity required but not bound');
+      AppLogger.instance.warning(
+        'IdentityBridge: identity required but not bound',
+      );
     }
     return _identity;
   }
@@ -87,7 +93,10 @@ class IdentityBridge {
       final json = jsonDecode(raw) as Map<String, dynamic>;
       return _deserializeIdentity(json);
     } catch (e) {
-      AppLogger.instance.warning('IdentityBridge: failed to load identity', error: e);
+      AppLogger.instance.warning(
+        'IdentityBridge: failed to load identity',
+        error: e,
+      );
       return null;
     }
   }
@@ -97,7 +106,10 @@ class IdentityBridge {
       final storage = SecureStorageService.instance;
       await storage.write(_storageKey, jsonEncode(identity.toJson()));
     } catch (e) {
-      AppLogger.instance.warning('IdentityBridge: failed to persist identity', error: e);
+      AppLogger.instance.warning(
+        'IdentityBridge: failed to persist identity',
+        error: e,
+      );
     }
   }
 
@@ -122,7 +134,8 @@ class IdentityBridge {
         (t) => t.name == json['trust'],
         orElse: () => TrustLevel.untrusted,
       ),
-      constitutionalAncestry: (json['ancestry'] as List<dynamic>).cast<String>(),
+      constitutionalAncestry: (json['ancestry'] as List<dynamic>)
+          .cast<String>(),
       createdAt: json['created'] as int,
       selfSignature: SovereignSignature(
         data: sigJson['data'] as String,
@@ -131,7 +144,9 @@ class IdentityBridge {
         timestamp: sigJson['timestamp'] as int,
         verificationTag: sigJson['verificationTag'] as String,
       ),
-      credentials: credsJson.map((c) => _deserializeCredential(c as Map<String, dynamic>)).toList(),
+      credentials: credsJson
+          .map((c) => _deserializeCredential(c as Map<String, dynamic>))
+          .toList(),
     );
   }
 

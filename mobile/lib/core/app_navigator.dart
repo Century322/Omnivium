@@ -26,7 +26,9 @@ class AppNavigator {
   static AppProvider? _provider;
   static AppProvider get provider => _provider!;
 
-  static void init(AppProvider p) { _provider = p; }
+  static void init(AppProvider p) {
+    _provider = p;
+  }
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     final uri = Uri.parse(settings.name ?? '/');
@@ -52,7 +54,8 @@ class AppNavigator {
       case '/add-friend':
         page = AddFriendView(provider: provider);
       case '/chat':
-        final roomId = args?['roomId'] as String? ?? uri.queryParameters['roomId'] ?? '';
+        final roomId =
+            args?['roomId'] as String? ?? uri.queryParameters['roomId'] ?? '';
         page = FriendProfileView(provider: provider, roomId: roomId);
       case '/key-verification':
         page = KeyVerificationView(verification: args?['verification']);
@@ -73,7 +76,10 @@ class AppNavigator {
       case '/storage':
         page = StorageView(provider: provider);
       case '/files':
-        final tab = args?['tab'] as int? ?? int.tryParse(uri.queryParameters['tab'] ?? '') ?? 0;
+        final tab =
+            args?['tab'] as int? ??
+            int.tryParse(uri.queryParameters['tab'] ?? '') ??
+            0;
         page = FileManagerView(provider: provider, initialTab: tab);
       case '/my-id':
         page = MyIdView(provider: provider);
@@ -92,12 +98,24 @@ class AppNavigator {
     );
   }
 
-  static Future<T?> go<T>(BuildContext context, String route, {Map<String, dynamic>? args}) {
+  static Future<T?> go<T>(
+    BuildContext context,
+    String route, {
+    Map<String, dynamic>? args,
+  }) {
     return Navigator.pushNamed<T>(context, route, arguments: args);
   }
 
-  static Future<T?> replace<T>(BuildContext context, String route, {Map<String, dynamic>? args}) {
-    return Navigator.pushReplacementNamed<T, void>(context, route, arguments: args);
+  static Future<T?> replace<T>(
+    BuildContext context,
+    String route, {
+    Map<String, dynamic>? args,
+  }) {
+    return Navigator.pushReplacementNamed<T, void>(
+      context,
+      route,
+      arguments: args,
+    );
   }
 
   static void back<T>(BuildContext context, [T? result]) {

@@ -83,7 +83,8 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
 
     final isRinging = call.state == CallState.ringing;
     final isConnected = call.state == CallState.connected;
-    final isConnecting = call.state == CallState.connecting || call.state == CallState.inviting;
+    final isConnecting =
+        call.state == CallState.connecting || call.state == CallState.inviting;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -106,7 +107,9 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
               _getStateText(call.state),
               style: TextStyle(
                 fontSize: 16,
-                color: isConnected ? AppColors.success : AppColors.textSecondary,
+                color: isConnected
+                    ? AppColors.success
+                    : AppColors.textSecondary,
               ),
             ),
             const Spacer(flex: 3),
@@ -232,13 +235,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
           ),
         ),
         const SizedBox(height: 8),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: color,
-          ),
-        ),
+        Text(label, style: TextStyle(fontSize: 12, color: color)),
       ],
     );
   }

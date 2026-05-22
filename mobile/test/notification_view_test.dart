@@ -6,7 +6,9 @@ import 'package:omnivium/presentation/views/notification_view.dart';
 void main() {
   group('NotificationView', () {
     testWidgets('renders notification list', (tester) async {
-      await tester.pumpWidget(MaterialApp(home: NotificationView(provider: AppProvider())));
+      await tester.pumpWidget(
+        MaterialApp(home: NotificationView(provider: AppProvider())),
+      );
       expect(find.byType(NotificationView), findsOneWidget);
     });
   });

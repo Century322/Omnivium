@@ -67,7 +67,9 @@ class AgentOrchestrator extends ChangeNotifier {
   bool _enabled = true;
 
   bool get isEnabled => _enabled;
-  void setEnabled(bool v) { _enabled = v; }
+  void setEnabled(bool v) {
+    _enabled = v;
+  }
 
   AgentOrchestrator() {
     _eventHandler = StreamEventHandler(
@@ -106,7 +108,10 @@ class AgentOrchestrator extends ChangeNotifier {
     _hasPendingNotify = false;
     _lastNotifyTime = DateTime.now();
     notifyListeners();
-    nc.NotificationCenter.post(nc.Event.agentStateChanged, data: {'state': _stateMachine.state.name});
+    nc.NotificationCenter.post(
+      nc.Event.agentStateChanged,
+      data: {'state': _stateMachine.state.name},
+    );
   }
 
   AgentState get state => _stateMachine.state;
@@ -123,7 +128,8 @@ class AgentOrchestrator extends ChangeNotifier {
   bool get isReflecting => state == AgentState.reflecting;
   bool get isMemorizing => state == AgentState.memorizing;
   bool get isStreaming => _streamingController.isStreaming;
-  bool get isWaitingPermission => _permissionCompleter != null && !_permissionCompleter!.isCompleted;
+  bool get isWaitingPermission =>
+      _permissionCompleter != null && !_permissionCompleter!.isCompleted;
   String? get pendingSkillName => _pendingSkillName;
 
   void stopStreaming() {
@@ -179,7 +185,10 @@ class AgentOrchestrator extends ChangeNotifier {
       sdk.container.registerPlugin(descriptor, _SkillPluginHandler(skill));
       sdk.container.activatePlugin(descriptor.id);
     } catch (e) {
-      AppLogger.instance.warning('Skill registration: failed to register skill as runtime capability', error: e);
+      AppLogger.instance.warning(
+        'Skill registration: failed to register skill as runtime capability',
+        error: e,
+      );
     }
   }
 
@@ -234,7 +243,9 @@ class AgentOrchestrator extends ChangeNotifier {
 
   Future<void> _streamAIResponse(String input) async {
     if (!ApiProxyService.instance.isConfigured) {
-      _conversation.addStaticAssistant('AI is not configured. Please check your settings.');
+      _conversation.addStaticAssistant(
+        'AI is not configured. Please check your settings.',
+      );
       _immediateNotify();
       return;
     }
@@ -249,27 +260,37 @@ class AgentOrchestrator extends ChangeNotifier {
       final systemPrompt = _buildSystemPrompt();
       final hasSystemMsg = contextMessages.any((m) => m.role == 'system');
       if (!hasSystemMsg) {
-        contextMessages.insert(0, ChatMessage(role: 'system', content: systemPrompt));
+        contextMessages.insert(
+          0,
+          ChatMessage(role: 'system', content: systemPrompt),
+        );
       }
 
-      final skillsList = _skillRegistry.all.map((s) => {
-            'id': s.id,
-            'name': s.name,
-            'description': s.description,
-            'channel': s.channel.name,
-          }).toList();
+      final skillsList = _skillRegistry.all
+          .map(
+            (s) => {
+              'id': s.id,
+              'name': s.name,
+              'description': s.description,
+              'channel': s.channel.name,
+            },
+          )
+          .toList();
 
       final capResult = await AppCapabilityService.instance.invoke(
         'agent.chat',
         params: {
-          'messages': contextMessages.map((m) => {'role': m.role, 'content': m.content}).toList(),
+          'messages': contextMessages
+              .map((m) => {'role': m.role, 'content': m.content})
+              .toList(),
           'model': _currentModel,
           'skills': skillsList,
         },
         timeoutMs: 30000,
       );
 
-      if (capResult.status == CapabilityStatus.success && capResult.data != null) {
+      if (capResult.status == CapabilityStatus.success &&
+          capResult.data != null) {
         final data = capResult.data!;
         if (data.containsKey('stream')) {
           final agentStream = data['stream'] as AgentStream;
@@ -279,7 +300,10 @@ class AgentOrchestrator extends ChangeNotifier {
             if (result.isComplete) break;
           }
         } else if (data.containsKey('content')) {
-          _conversation.updateStreamingContent(msgIndex, data['content'] as String);
+          _conversation.updateStreamingContent(
+            msgIndex,
+            data['content'] as String,
+          );
         }
       } else {
         await _streamAIDirect(contextMessages, skillsList, msgIndex);
@@ -292,7 +316,11 @@ class AgentOrchestrator extends ChangeNotifier {
     _immediateNotify();
   }
 
-  Future<void> _streamAIDirect(List<ChatMessage> contextMessages, List<Map<String, dynamic>> skillsList, int msgIndex) async {
+  Future<void> _streamAIDirect(
+    List<ChatMessage> contextMessages,
+    List<Map<String, dynamic>> skillsList,
+    int msgIndex,
+  ) async {
     final agentStream = await ChatService.instance.agentChat(
       contextMessages,
       model: _currentModel,
@@ -307,21 +335,35 @@ class AgentOrchestrator extends ChangeNotifier {
     _eventHandler.completeStream(msgIndex);
   }
 
-  Future<void> _streamAIDirectFallback(String input, int msgIndex, Object error) async {
-    AppLogger.instance.warning('Runtime capability failed, falling back to direct call', error: error);
+  Future<void> _streamAIDirectFallback(
+    String input,
+    int msgIndex,
+    Object error,
+  ) async {
+    AppLogger.instance.warning(
+      'Runtime capability failed, falling back to direct call',
+      error: error,
+    );
     try {
       final contextMessages = List<ChatMessage>.from(_conversation.chatHistory);
       final systemPrompt = _buildSystemPrompt();
       final hasSystemMsg = contextMessages.any((m) => m.role == 'system');
       if (!hasSystemMsg) {
-        contextMessages.insert(0, ChatMessage(role: 'system', content: systemPrompt));
+        contextMessages.insert(
+          0,
+          ChatMessage(role: 'system', content: systemPrompt),
+        );
       }
-      final skillsList = _skillRegistry.all.map((s) => {
-            'id': s.id,
-            'name': s.name,
-            'description': s.description,
-            'channel': s.channel.name,
-          }).toList();
+      final skillsList = _skillRegistry.all
+          .map(
+            (s) => {
+              'id': s.id,
+              'name': s.name,
+              'description': s.description,
+              'channel': s.channel.name,
+            },
+          )
+          .toList();
       await _streamAIDirect(contextMessages, skillsList, msgIndex);
     } catch (e2) {
       _eventHandler.completeStreamWithError(msgIndex, e2);
@@ -329,13 +371,23 @@ class AgentOrchestrator extends ChangeNotifier {
   }
 
   String _buildSystemPrompt() {
-    final remotePrompt = RemoteConfigService.instance.getValue<String>('system_prompt');
+    final remotePrompt = RemoteConfigService.instance.getValue<String>(
+      'system_prompt',
+    );
     final skills = _skillRegistry.all;
-    final skillList = skills.map((s) => '- ${s.name} (${s.id}): ${s.description}').join('\n');
-    final langSuffix = _agentLanguage != null && _agentLanguage!.isNotEmpty ? '\n- Respond in ${_agentLanguage!}' : '';
+    final skillList = skills
+        .map((s) => '- ${s.name} (${s.id}): ${s.description}')
+        .join('\n');
+    final langSuffix = _agentLanguage != null && _agentLanguage!.isNotEmpty
+        ? '\n- Respond in ${_agentLanguage!}'
+        : '';
 
     if (remotePrompt != null && remotePrompt.isNotEmpty) {
-      return remotePrompt.replaceAll('{skills}', skillList.isNotEmpty ? skillList : 'No tools currently available.') + langSuffix;
+      return remotePrompt.replaceAll(
+            '{skills}',
+            skillList.isNotEmpty ? skillList : 'No tools currently available.',
+          ) +
+          langSuffix;
     }
 
     return '''You are OMNI, the AI assistant for Omnivium. You are helpful, accurate, and transparent about your reasoning.
@@ -351,7 +403,9 @@ Guidelines:
   }
 
   String? _agentLanguage;
-  void setAgentLanguage(String lang) { _agentLanguage = lang; }
+  void setAgentLanguage(String lang) {
+    _agentLanguage = lang;
+  }
 
   void interrupt() {
     _stateMachine.interrupt();
@@ -387,36 +441,65 @@ class _SkillPluginHandler implements PluginHandler {
   _SkillPluginHandler(this._skill);
 
   @override
-  Future<HandlerResult> handleMessage(RuntimeMessage message, CapabilityContext context) async {
+  Future<HandlerResult> handleMessage(
+    RuntimeMessage message,
+    CapabilityContext context,
+  ) async {
     return HandlerResult.ok();
   }
 
   @override
-  Future<HandlerResult> handleEvent(RuntimeEvent event, CapabilityContext context) async {
+  Future<HandlerResult> handleEvent(
+    RuntimeEvent event,
+    CapabilityContext context,
+  ) async {
     return HandlerResult.ok();
   }
 
   @override
-  Future<CapabilityResult> invokeCapability(String capabilityId, dynamic params, CapabilityContext context) async {
+  Future<CapabilityResult> invokeCapability(
+    String capabilityId,
+    dynamic params,
+    CapabilityContext context,
+  ) async {
     if (capabilityId == 'skill.${_skill.id}.execute') {
       final permission = await _checkPermission(capabilityId);
       if (permission == 'deny') {
-        return CapabilityResult.fail(RuntimeError(code: 'PERMISSION_DENIED', message: 'Capability $capabilityId is denied by user'));
+        return CapabilityResult.fail(
+          RuntimeError(
+            code: 'PERMISSION_DENIED',
+            message: 'Capability $capabilityId is denied by user',
+          ),
+        );
       }
       if (permission == 'confirm') {
         final granted = await _requestConfirmation(capabilityId);
         if (!granted) {
-          return CapabilityResult.fail(RuntimeError(code: 'PERMISSION_DENIED', message: 'User denied $capabilityId'));
+          return CapabilityResult.fail(
+            RuntimeError(
+              code: 'PERMISSION_DENIED',
+              message: 'User denied $capabilityId',
+            ),
+          );
         }
       }
       try {
-        final result = await _skill.execute(params is Map<String, dynamic> ? params : {'input': params});
+        final result = await _skill.execute(
+          params is Map<String, dynamic> ? params : {'input': params},
+        );
         return CapabilityResult.ok(result);
       } catch (e) {
-        return CapabilityResult.fail(RuntimeError(code: 'SKILL_ERROR', message: e.toString()));
+        return CapabilityResult.fail(
+          RuntimeError(code: 'SKILL_ERROR', message: e.toString()),
+        );
       }
     }
-    return CapabilityResult.fail(RuntimeError(code: 'UNKNOWN_CAPABILITY', message: 'Unknown: $capabilityId'));
+    return CapabilityResult.fail(
+      RuntimeError(
+        code: 'UNKNOWN_CAPABILITY',
+        message: 'Unknown: $capabilityId',
+      ),
+    );
   }
 
   static Future<String> _checkPermission(String capabilityId) async {
@@ -431,10 +514,20 @@ class _SkillPluginHandler implements PluginHandler {
     void handler(Map<String, dynamic>? data) {
       final granted = data?['granted'] as bool? ?? false;
       if (!completer.isCompleted) completer.complete(granted);
-      NotificationCenter.removeObserver(Event.capabilityConfirm, callback: handler);
+      NotificationCenter.removeObserver(
+        Event.capabilityConfirm,
+        callback: handler,
+      );
     }
+
     NotificationCenter.observe(Event.capabilityConfirm, handler);
-    NotificationCenter.post(Event.capabilityConfirm, data: {'capabilityId': capabilityId, 'pending': true});
-    return completer.future.timeout(const Duration(seconds: 30), onTimeout: () => false);
+    NotificationCenter.post(
+      Event.capabilityConfirm,
+      data: {'capabilityId': capabilityId, 'pending': true},
+    );
+    return completer.future.timeout(
+      const Duration(seconds: 30),
+      onTimeout: () => false,
+    );
   }
 }

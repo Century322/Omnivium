@@ -59,7 +59,10 @@ void main() {
 
       final loopholes = engine.scanForLoopholes();
 
-      expect(loopholes.any((l) => l.severity == PolicyLoopholeSeverity.critical), isTrue);
+      expect(
+        loopholes.any((l) => l.severity == PolicyLoopholeSeverity.critical),
+        isTrue,
+      );
     });
 
     test('detects systemic low compliance', () {
@@ -88,7 +91,10 @@ void main() {
 
       final loopholes = engine.scanForLoopholes();
 
-      expect(loopholes.any((l) => l.loopholeId == 'systemic-low-compliance'), isTrue);
+      expect(
+        loopholes.any((l) => l.loopholeId == 'systemic-low-compliance'),
+        isTrue,
+      );
     });
 
     test('auto-proposes amendments from critical loopholes', () {
@@ -117,7 +123,8 @@ void main() {
         description: 'Add side-channel scanning for all sandbox operations',
         targetLaw: RuntimeLawId.noSideChannels,
         rationale: 'Side-channel violations increasing',
-        proposedChange: 'Add mandatory side-channel proof at every state access',
+        proposedChange:
+            'Add mandatory side-channel proof at every state access',
         timestamp: 1000,
       );
 
@@ -237,8 +244,16 @@ void main() {
     });
 
     test('bypass attempt has 3x penalty', () {
-      economy.recordViolation('plugin-bypass', 1000, type: SandboxViolationType.bypassAttempt);
-      economy.recordViolation('plugin-budget', 1000, type: SandboxViolationType.budgetExceeded);
+      economy.recordViolation(
+        'plugin-bypass',
+        1000,
+        type: SandboxViolationType.bypassAttempt,
+      );
+      economy.recordViolation(
+        'plugin-budget',
+        1000,
+        type: SandboxViolationType.budgetExceeded,
+      );
 
       final bypassScore = economy.scoreFor('plugin-bypass');
       final budgetScore = economy.scoreFor('plugin-budget');
@@ -254,14 +269,21 @@ void main() {
       }
 
       final score = economy.scoreFor(entity);
-      expect(score.effectiveTrustLevel.index, greaterThan(TrustLevel.verified.index));
+      expect(
+        score.effectiveTrustLevel.index,
+        greaterThan(TrustLevel.verified.index),
+      );
     });
 
     test('blocked trust level for very low score', () {
       final entity = 'plugin-hostile';
 
       for (var i = 0; i < 50; i++) {
-        economy.recordViolation(entity, 1000 + i, type: SandboxViolationType.bypassAttempt);
+        economy.recordViolation(
+          entity,
+          1000 + i,
+          type: SandboxViolationType.bypassAttempt,
+        );
       }
 
       final score = economy.scoreFor(entity);
@@ -301,8 +323,26 @@ void main() {
     test('sync from trace graph', () {
       final traceGraph = ConstitutionalTraceGraph();
 
-      traceGraph.record(sandboxId: 'sb-1', operationType: 'capability', violatedLaw: null, compliant: true, callerId: 'plugin-1', escalationBefore: EscalationLevel.warning, escalationAfter: EscalationLevel.warning, timestamp: 1);
-      traceGraph.record(sandboxId: 'sb-1', operationType: 'capability', violatedLaw: RuntimeLawId.noBypassCapabilityRouter, compliant: false, callerId: 'plugin-2', escalationBefore: EscalationLevel.warning, escalationAfter: EscalationLevel.warning, timestamp: 2);
+      traceGraph.record(
+        sandboxId: 'sb-1',
+        operationType: 'capability',
+        violatedLaw: null,
+        compliant: true,
+        callerId: 'plugin-1',
+        escalationBefore: EscalationLevel.warning,
+        escalationAfter: EscalationLevel.warning,
+        timestamp: 1,
+      );
+      traceGraph.record(
+        sandboxId: 'sb-1',
+        operationType: 'capability',
+        violatedLaw: RuntimeLawId.noBypassCapabilityRouter,
+        compliant: false,
+        callerId: 'plugin-2',
+        escalationBefore: EscalationLevel.warning,
+        escalationAfter: EscalationLevel.warning,
+        timestamp: 2,
+      );
 
       final economy = ReputationEconomy(traceGraph);
       economy.syncFromTraceGraph();
@@ -313,11 +353,14 @@ void main() {
 
     test('custom trust decay policy', () {
       final traceGraph = ConstitutionalTraceGraph();
-      final economy = ReputationEconomy(traceGraph, policy: const TrustDecayPolicy(
-        violationPenalty: 20.0,
-        complianceReward: 0.5,
-        decayRate: 0.1,
-      ));
+      final economy = ReputationEconomy(
+        traceGraph,
+        policy: const TrustDecayPolicy(
+          violationPenalty: 20.0,
+          complianceReward: 0.5,
+          decayRate: 0.1,
+        ),
+      );
 
       economy.recordViolation('plugin-1', 1000);
       expect(economy.scoreFor('plugin-1').score, 80.0);
@@ -444,7 +487,11 @@ void main() {
         timestamp: 2000,
       );
 
-      final reviewed = judiciary.reviewAppeal('appeal-0', overturn: true, partial: true);
+      final reviewed = judiciary.reviewAppeal(
+        'appeal-0',
+        overturn: true,
+        partial: true,
+      );
 
       expect(reviewed.status, AppealStatus.partiallyOverturned);
     });
@@ -463,16 +510,50 @@ void main() {
     });
 
     test('highestActiveSanction returns most severe', () {
-      judiciary.imposeSanction(sandboxId: 'sb-1', type: SanctionType.warning, reason: 'R1', timestamp: 1000);
-      judiciary.imposeSanction(sandboxId: 'sb-1', type: SanctionType.termination, reason: 'R2', timestamp: 1001);
+      judiciary.imposeSanction(
+        sandboxId: 'sb-1',
+        type: SanctionType.warning,
+        reason: 'R1',
+        timestamp: 1000,
+      );
+      judiciary.imposeSanction(
+        sandboxId: 'sb-1',
+        type: SanctionType.termination,
+        reason: 'R2',
+        timestamp: 1001,
+      );
 
       expect(judiciary.highestActiveSanction('sb-1'), SanctionType.termination);
     });
 
     test('gatherEvidence collects violations from trace graph', () {
-      traceGraph.record(sandboxId: 'sb-1', operationType: 'capability', violatedLaw: RuntimeLawId.noBypassCapabilityRouter, compliant: false, escalationBefore: EscalationLevel.warning, escalationAfter: EscalationLevel.warning, timestamp: 1);
-      traceGraph.record(sandboxId: 'sb-1', operationType: 'task', violatedLaw: RuntimeLawId.noBypassScheduler, compliant: false, escalationBefore: EscalationLevel.warning, escalationAfter: EscalationLevel.warning, timestamp: 2);
-      traceGraph.record(sandboxId: 'sb-2', operationType: 'capability', violatedLaw: null, compliant: true, escalationBefore: EscalationLevel.warning, escalationAfter: EscalationLevel.warning, timestamp: 3);
+      traceGraph.record(
+        sandboxId: 'sb-1',
+        operationType: 'capability',
+        violatedLaw: RuntimeLawId.noBypassCapabilityRouter,
+        compliant: false,
+        escalationBefore: EscalationLevel.warning,
+        escalationAfter: EscalationLevel.warning,
+        timestamp: 1,
+      );
+      traceGraph.record(
+        sandboxId: 'sb-1',
+        operationType: 'task',
+        violatedLaw: RuntimeLawId.noBypassScheduler,
+        compliant: false,
+        escalationBefore: EscalationLevel.warning,
+        escalationAfter: EscalationLevel.warning,
+        timestamp: 2,
+      );
+      traceGraph.record(
+        sandboxId: 'sb-2',
+        operationType: 'capability',
+        violatedLaw: null,
+        compliant: true,
+        escalationBefore: EscalationLevel.warning,
+        escalationAfter: EscalationLevel.warning,
+        timestamp: 3,
+      );
 
       final evidence = judiciary.gatherEvidence('sb-1');
 
@@ -503,7 +584,10 @@ void main() {
     setUp(() {
       final clock = HybridLogicalClock(nodeId: 'civ-test');
       final securityManager = SecurityManager();
-      final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
+      final enforcer = RuntimeLawEnforcer(
+        clock: clock,
+        securityManager: securityManager,
+      );
       guard = ConstitutionalGuard.withSharedState(
         enforcer: enforcer,
         traceGraph: ConstitutionalTraceGraph(),
@@ -554,67 +638,73 @@ void main() {
       expect(score.compliantActions, 1);
     });
 
-    test('full civilization loop: violation → detection → escalation → sanction → appeal', () {
-      final clock = HybridLogicalClock(nodeId: 'civ-test');
-      final securityManager = SecurityManager();
-      final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
-      final guard = ConstitutionalGuard.withSharedState(
-        enforcer: enforcer,
-        traceGraph: ConstitutionalTraceGraph(),
-        ledger: ImmutableAuditLedger(),
-        escalationPolicy: const ViolationEscalationPolicy(
-          warningThreshold: 3,
-          restrictedThreshold: 20,
-          terminationThreshold: 50,
-        ),
-      );
-
-      for (var i = 0; i < 10; i++) {
-        guard.checkCapabilityInvocation(
-          sandboxId: 'sb-hostile',
-          capabilityId: 'storage.delete',
-          callerId: 'plugin.rogue',
-          callerTrust: TrustLevel.untrusted,
-          requiredTrust: TrustLevel.verified,
-          wasRoutedThroughRouter: false,
-          hasTraceSpan: true,
+    test(
+      'full civilization loop: violation → detection → escalation → sanction → appeal',
+      () {
+        final clock = HybridLogicalClock(nodeId: 'civ-test');
+        final securityManager = SecurityManager();
+        final enforcer = RuntimeLawEnforcer(
+          clock: clock,
+          securityManager: securityManager,
         );
-      }
+        final guard = ConstitutionalGuard.withSharedState(
+          enforcer: enforcer,
+          traceGraph: ConstitutionalTraceGraph(),
+          ledger: ImmutableAuditLedger(),
+          escalationPolicy: const ViolationEscalationPolicy(
+            warningThreshold: 3,
+            restrictedThreshold: 20,
+            terminationThreshold: 50,
+          ),
+        );
 
-      expect(guard.traceGraph.totalDecisions, 10);
+        for (var i = 0; i < 10; i++) {
+          guard.checkCapabilityInvocation(
+            sandboxId: 'sb-hostile',
+            capabilityId: 'storage.delete',
+            callerId: 'plugin.rogue',
+            callerTrust: TrustLevel.untrusted,
+            requiredTrust: TrustLevel.verified,
+            wasRoutedThroughRouter: false,
+            hasTraceSpan: true,
+          );
+        }
 
-      guard.judiciary.imposeSanction(
-        sandboxId: 'sb-hostile',
-        type: SanctionType.termination,
-        reason: 'Constitutional violation escalation',
-        violatedLaw: RuntimeLawId.noBypassCapabilityRouter,
-        timestamp: 5000,
-      );
+        expect(guard.traceGraph.totalDecisions, 10);
 
-      expect(guard.judiciary.isSanctioned('sb-hostile'), isTrue);
+        guard.judiciary.imposeSanction(
+          sandboxId: 'sb-hostile',
+          type: SanctionType.termination,
+          reason: 'Constitutional violation escalation',
+          violatedLaw: RuntimeLawId.noBypassCapabilityRouter,
+          timestamp: 5000,
+        );
 
-      guard.judiciary.fileAppeal(
-        sandboxId: 'sb-hostile',
-        sanctionId: 'sanction-0',
-        grounds: 'Testing environment — false positives',
-        evidence: 'All violations were in test mode',
-        timestamp: 6000,
-      );
+        expect(guard.judiciary.isSanctioned('sb-hostile'), isTrue);
 
-      guard.judiciary.reviewAppeal('appeal-0', overturn: true);
+        guard.judiciary.fileAppeal(
+          sandboxId: 'sb-hostile',
+          sanctionId: 'sanction-0',
+          grounds: 'Testing environment — false positives',
+          evidence: 'All violations were in test mode',
+          timestamp: 6000,
+        );
 
-      expect(guard.judiciary.sanctions[0].isLifted, isTrue);
+        guard.judiciary.reviewAppeal('appeal-0', overturn: true);
 
-      final loopholes = guard.evolutionEngine.scanForLoopholes();
-      expect(loopholes.length, greaterThanOrEqualTo(1));
+        expect(guard.judiciary.sanctions[0].isLifted, isTrue);
 
-      final stats = guard.traceGraph.computeStatistics();
-      expect(stats.totalViolations, greaterThanOrEqualTo(5));
+        final loopholes = guard.evolutionEngine.scanForLoopholes();
+        expect(loopholes.length, greaterThanOrEqualTo(1));
 
-      final reputation = guard.reputationEconomy.scoreFor('sb-hostile');
-      expect(reputation.violations, greaterThan(0));
+        final stats = guard.traceGraph.computeStatistics();
+        expect(stats.totalViolations, greaterThanOrEqualTo(5));
 
-      expect(guard.ledger.verifyIntegrity(), isTrue);
-    });
+        final reputation = guard.reputationEconomy.scoreFor('sb-hostile');
+        expect(reputation.violations, greaterThan(0));
+
+        expect(guard.ledger.verifyIntegrity(), isTrue);
+      },
+    );
   });
 }

@@ -17,7 +17,10 @@ void main() {
     setUp(() {
       clock = HybridLogicalClock(nodeId: 'guard-test');
       securityManager = SecurityManager();
-      enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
+      enforcer = RuntimeLawEnforcer(
+        clock: clock,
+        securityManager: securityManager,
+      );
       guard = ConstitutionalGuard(enforcer: enforcer);
     });
 
@@ -108,7 +111,10 @@ void main() {
     setUp(() {
       final clock = HybridLogicalClock(nodeId: 'guard-test');
       final securityManager = SecurityManager();
-      final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
+      final enforcer = RuntimeLawEnforcer(
+        clock: clock,
+        securityManager: securityManager,
+      );
       guard = ConstitutionalGuard(enforcer: enforcer);
     });
 
@@ -166,7 +172,10 @@ void main() {
     setUp(() {
       final clock = HybridLogicalClock(nodeId: 'guard-test');
       final securityManager = SecurityManager();
-      final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
+      final enforcer = RuntimeLawEnforcer(
+        clock: clock,
+        securityManager: securityManager,
+      );
       guard = ConstitutionalGuard(enforcer: enforcer);
     });
 
@@ -395,7 +404,10 @@ void main() {
     setUp(() {
       final clock = HybridLogicalClock(nodeId: 'escalation-test');
       final securityManager = SecurityManager();
-      final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
+      final enforcer = RuntimeLawEnforcer(
+        clock: clock,
+        securityManager: securityManager,
+      );
       guard = ConstitutionalGuard(
         enforcer: enforcer,
         escalationPolicy: const ViolationEscalationPolicy(
@@ -458,7 +470,10 @@ void main() {
       final regularState = guard.escalationFor('sb-regular');
       final criticalState = guard.escalationFor('sb-critical');
 
-      expect(criticalState.weightedScore, greaterThan(regularState.weightedScore));
+      expect(
+        criticalState.weightedScore,
+        greaterThan(regularState.weightedScore),
+      );
     });
 
     test('escalation is tracked per sandbox independently', () {
@@ -491,7 +506,10 @@ void main() {
       clock = HybridLogicalClock(nodeId: 'integration-test');
       securityManager = SecurityManager();
       policyEngine = PolicyEngine.defaultPolicy();
-      final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
+      final enforcer = RuntimeLawEnforcer(
+        clock: clock,
+        securityManager: securityManager,
+      );
       guard = ConstitutionalGuard(
         enforcer: enforcer,
         escalationPolicy: const ViolationEscalationPolicy(
@@ -518,7 +536,11 @@ void main() {
           createdAt: clock.tick().physicalTime,
         ),
         resources: SandboxResources(
-          budget: const ResourceBudget(maxTokens: 1000, maxStreams: 5, maxTasks: 10),
+          budget: const ResourceBudget(
+            maxTokens: 1000,
+            maxStreams: 5,
+            maxTasks: 10,
+          ),
           usage: ResourceUsage(),
           allowedCapabilities: allowedCapabilities,
           deniedCapabilities: deniedCapabilities,
@@ -549,7 +571,12 @@ void main() {
       );
 
       expect(result.allowed, isFalse);
-      expect(sandbox.violations.any((v) => v.type == SandboxViolationType.bypassAttempt), isTrue);
+      expect(
+        sandbox.violations.any(
+          (v) => v.type == SandboxViolationType.bypassAttempt,
+        ),
+        isTrue,
+      );
     });
 
     test('guarded sandbox — untraced capability access is blocked', () {
@@ -564,14 +591,24 @@ void main() {
       expect(result.allowed, isFalse);
     });
 
-    test('guarded sandbox — bypassing Scheduler for task creation is blocked', () {
-      final sandbox = createGuardedSandbox();
-      sandbox.start();
+    test(
+      'guarded sandbox — bypassing Scheduler for task creation is blocked',
+      () {
+        final sandbox = createGuardedSandbox();
+        sandbox.start();
 
-      final result = sandbox.tryAcquireTask(wasScheduledThroughScheduler: false);
-      expect(result, isFalse);
-      expect(sandbox.violations.any((v) => v.type == SandboxViolationType.bypassAttempt), isTrue);
-    });
+        final result = sandbox.tryAcquireTask(
+          wasScheduledThroughScheduler: false,
+        );
+        expect(result, isFalse);
+        expect(
+          sandbox.violations.any(
+            (v) => v.type == SandboxViolationType.bypassAttempt,
+          ),
+          isTrue,
+        );
+      },
+    );
 
     test('guarded sandbox — repeated violations trigger escalation', () {
       final sandbox = createGuardedSandbox();
@@ -608,7 +645,11 @@ void main() {
           createdAt: clock.tick().physicalTime,
         ),
         resources: SandboxResources(
-          budget: const ResourceBudget(maxTokens: 1000, maxStreams: 5, maxTasks: 10),
+          budget: const ResourceBudget(
+            maxTokens: 1000,
+            maxStreams: 5,
+            maxTasks: 10,
+          ),
           usage: ResourceUsage(),
           trustBoundary: const TrustBoundary(boundaryId: 'default'),
         ),
@@ -630,7 +671,10 @@ void main() {
     setUp(() {
       final clock = HybridLogicalClock(nodeId: 'log-test');
       final securityManager = SecurityManager();
-      final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
+      final enforcer = RuntimeLawEnforcer(
+        clock: clock,
+        securityManager: securityManager,
+      );
       guard = ConstitutionalGuard(enforcer: enforcer);
     });
 
@@ -645,7 +689,10 @@ void main() {
         hasTraceSpan: true,
       );
 
-      expect(guard.guardLog.any((e) => e.action == 'capability.approved'), isTrue);
+      expect(
+        guard.guardLog.any((e) => e.action == 'capability.approved'),
+        isTrue,
+      );
     });
 
     test('guard logs capability blocks', () {
@@ -659,13 +706,19 @@ void main() {
         hasTraceSpan: true,
       );
 
-      expect(guard.guardLog.any((e) => e.action == 'capability.blocked'), isTrue);
+      expect(
+        guard.guardLog.any((e) => e.action == 'capability.blocked'),
+        isTrue,
+      );
     });
 
     test('guard logs escalation events', () {
       guard.updateEscalation('sb-1', SandboxViolationType.bypassAttempt);
 
-      expect(guard.guardLog.any((e) => e.action.startsWith('escalation.')), isTrue);
+      expect(
+        guard.guardLog.any((e) => e.action.startsWith('escalation.')),
+        isTrue,
+      );
     });
   });
 
@@ -675,7 +728,10 @@ void main() {
     setUp(() {
       final clock = HybridLogicalClock(nodeId: 'bypass-test');
       final securityManager = SecurityManager();
-      final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
+      final enforcer = RuntimeLawEnforcer(
+        clock: clock,
+        securityManager: securityManager,
+      );
       guard = ConstitutionalGuard(enforcer: enforcer);
     });
 
@@ -784,58 +840,91 @@ void main() {
       final violations = <RuntimeLawId>{};
 
       var result = guard.checkCapabilityInvocation(
-        sandboxId: 'sb-1', capabilityId: 'c', callerId: 'p',
-        callerTrust: TrustLevel.untrusted, requiredTrust: TrustLevel.system,
-        wasRoutedThroughRouter: false, hasTraceSpan: true,
+        sandboxId: 'sb-1',
+        capabilityId: 'c',
+        callerId: 'p',
+        callerTrust: TrustLevel.untrusted,
+        requiredTrust: TrustLevel.system,
+        wasRoutedThroughRouter: false,
+        hasTraceSpan: true,
       );
-      if (!result.allowed && result.violatedLaw != null) violations.add(result.violatedLaw!);
+      if (!result.allowed && result.violatedLaw != null)
+        violations.add(result.violatedLaw!);
 
       result = guard.checkCapabilityInvocation(
-        sandboxId: 'sb-2', capabilityId: 'c', callerId: 'p',
-        callerTrust: TrustLevel.verified, requiredTrust: TrustLevel.verified,
-        wasRoutedThroughRouter: true, hasTraceSpan: false,
+        sandboxId: 'sb-2',
+        capabilityId: 'c',
+        callerId: 'p',
+        callerTrust: TrustLevel.verified,
+        requiredTrust: TrustLevel.verified,
+        wasRoutedThroughRouter: true,
+        hasTraceSpan: false,
       );
-      if (!result.allowed && result.violatedLaw != null) violations.add(result.violatedLaw!);
+      if (!result.allowed && result.violatedLaw != null)
+        violations.add(result.violatedLaw!);
 
       var taskResult = guard.checkTaskCreation(
-        sandboxId: 'sb-3', wasScheduledThroughScheduler: false,
-        budgetApproved: true, hasTraceSpan: true,
+        sandboxId: 'sb-3',
+        wasScheduledThroughScheduler: false,
+        budgetApproved: true,
+        hasTraceSpan: true,
       );
-      if (!taskResult.allowed && taskResult.violatedLaw != null) violations.add(taskResult.violatedLaw!);
+      if (!taskResult.allowed && taskResult.violatedLaw != null)
+        violations.add(taskResult.violatedLaw!);
 
       taskResult = guard.checkTaskCreation(
-        sandboxId: 'sb-4', wasScheduledThroughScheduler: true,
-        budgetApproved: false, hasTraceSpan: true,
+        sandboxId: 'sb-4',
+        wasScheduledThroughScheduler: true,
+        budgetApproved: false,
+        hasTraceSpan: true,
       );
-      if (!taskResult.allowed && taskResult.violatedLaw != null) violations.add(taskResult.violatedLaw!);
+      if (!taskResult.allowed && taskResult.violatedLaw != null)
+        violations.add(taskResult.violatedLaw!);
 
       var stateResult = guard.checkStateAccess(
-        sandboxId: 'sb-5', accessedGlobalState: true,
-        usedSideChannel: false, hasTraceSpan: true,
+        sandboxId: 'sb-5',
+        accessedGlobalState: true,
+        usedSideChannel: false,
+        hasTraceSpan: true,
       );
-      if (!stateResult.allowed && stateResult.violatedLaw != null) violations.add(stateResult.violatedLaw!);
+      if (!stateResult.allowed && stateResult.violatedLaw != null)
+        violations.add(stateResult.violatedLaw!);
 
       stateResult = guard.checkStateAccess(
-        sandboxId: 'sb-6', accessedGlobalState: false,
-        usedSideChannel: true, hasTraceSpan: true,
+        sandboxId: 'sb-6',
+        accessedGlobalState: false,
+        usedSideChannel: true,
+        hasTraceSpan: true,
       );
-      if (!stateResult.allowed && stateResult.violatedLaw != null) violations.add(stateResult.violatedLaw!);
+      if (!stateResult.allowed && stateResult.violatedLaw != null)
+        violations.add(stateResult.violatedLaw!);
 
       result = guard.checkCapabilityInvocation(
-        sandboxId: 'sb-7', capabilityId: 'c', callerId: 'p',
-        callerTrust: TrustLevel.untrusted, requiredTrust: TrustLevel.system,
-        wasRoutedThroughRouter: true, hasTraceSpan: true,
+        sandboxId: 'sb-7',
+        capabilityId: 'c',
+        callerId: 'p',
+        callerTrust: TrustLevel.untrusted,
+        requiredTrust: TrustLevel.system,
+        wasRoutedThroughRouter: true,
+        hasTraceSpan: true,
       );
-      if (!result.allowed && result.violatedLaw != null) violations.add(result.violatedLaw!);
+      if (!result.allowed && result.violatedLaw != null)
+        violations.add(result.violatedLaw!);
 
       expect(violations.length, 7);
-      expect(violations.contains(RuntimeLawId.noBypassCapabilityRouter), isTrue);
+      expect(
+        violations.contains(RuntimeLawId.noBypassCapabilityRouter),
+        isTrue,
+      );
       expect(violations.contains(RuntimeLawId.allOpsMustBeTraced), isTrue);
       expect(violations.contains(RuntimeLawId.noBypassScheduler), isTrue);
       expect(violations.contains(RuntimeLawId.noBudgetBypass), isTrue);
       expect(violations.contains(RuntimeLawId.noGlobalStateSharing), isTrue);
       expect(violations.contains(RuntimeLawId.noSideChannels), isTrue);
-      expect(violations.contains(RuntimeLawId.trustLevelMustBeRespected), isTrue);
+      expect(
+        violations.contains(RuntimeLawId.trustLevelMustBeRespected),
+        isTrue,
+      );
     });
   });
 }

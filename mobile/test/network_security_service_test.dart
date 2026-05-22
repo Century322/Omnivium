@@ -31,7 +31,9 @@ void main() {
 
     test('setPinnedHashes replaces all hashes', () {
       service.addPinnedHash('old.com', 'old_hash');
-      service.setPinnedHashes({'new.com': ['new_hash']});
+      service.setPinnedHashes({
+        'new.com': ['new_hash'],
+      });
     });
 
     test('verifyPinning returns true when pinning disabled', () async {

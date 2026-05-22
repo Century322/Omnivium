@@ -23,10 +23,15 @@ class NotificationCenter {
       removeObserver(event, callback: wrapper);
       callback(data);
     }
+
     observe(event, wrapper);
   }
 
-  static void removeObserver(Event event, {int id = 0, EventCallback? callback}) {
+  static void removeObserver(
+    Event event, {
+    int id = 0,
+    EventCallback? callback,
+  }) {
     final observers = instance._observers[event];
     if (observers == null) return;
     if (callback != null) {

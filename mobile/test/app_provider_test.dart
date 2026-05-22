@@ -32,7 +32,10 @@ void main() {
 
     test('getFeatureFlag returns default value', () {
       expect(provider.getFeatureFlag('nonexistent', defaultValue: true), true);
-      expect(provider.getFeatureFlag('nonexistent', defaultValue: false), false);
+      expect(
+        provider.getFeatureFlag('nonexistent', defaultValue: false),
+        false,
+      );
     });
 
     test('dispose does not throw', () {
@@ -46,7 +49,10 @@ void main() {
     });
 
     test('model and session share same orchestrator', () {
-      expect(identical(provider.model.orchestrator, provider.orchestrator), true);
+      expect(
+        identical(provider.model.orchestrator, provider.orchestrator),
+        true,
+      );
     });
   });
 }

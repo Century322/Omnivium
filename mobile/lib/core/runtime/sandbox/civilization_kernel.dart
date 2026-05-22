@@ -32,11 +32,7 @@ class KernelResult {
   final String? error;
   final Map<String, dynamic> data;
 
-  const KernelResult({
-    required this.success,
-    this.error,
-    this.data = const {},
-  });
+  const KernelResult({required this.success, this.error, this.data = const {}});
 
   factory KernelResult.ok(Map<String, dynamic> data) =>
       KernelResult(success: true, data: data);
@@ -79,19 +75,19 @@ class CivilizationKernel {
     required ResourceEconomy economy,
     required CivilizationNetwork? network,
     required SovereignIdentity identity,
-  })  : _enforcer = enforcer,
-        _traceGraph = traceGraph,
-        _ledger = ledger,
-        _evolutionEngine = evolutionEngine,
-        _reputationEconomy = reputationEconomy,
-        _judiciary = judiciary,
-        _consensus = consensus,
-        _federatedReputation = federatedReputation,
-        _legislature = legislature,
-        _transport = transport,
-        _economy = economy,
-        _network = network,
-        _identity = identity;
+  }) : _enforcer = enforcer,
+       _traceGraph = traceGraph,
+       _ledger = ledger,
+       _evolutionEngine = evolutionEngine,
+       _reputationEconomy = reputationEconomy,
+       _judiciary = judiciary,
+       _consensus = consensus,
+       _federatedReputation = federatedReputation,
+       _legislature = legislature,
+       _transport = transport,
+       _economy = economy,
+       _network = network,
+       _identity = identity;
 
   factory CivilizationKernel({
     required String nodeId,
@@ -203,24 +199,53 @@ class CivilizationKernel {
     final callerLevel = _parseTrustLevel(callerTrust);
     final requiredLevel = _parseTrustLevel(requiredTrust);
 
-    final result = _enforcer.enforceCapabilityRouting(sandboxId, capabilityId, routed);
+    final result = _enforcer.enforceCapabilityRouting(
+      sandboxId,
+      capabilityId,
+      routed,
+    );
     if (!result.compliant) {
-      _reputationEconomy.recordViolation(sandboxId, _enforcer.clock.tick().physicalTime);
-      return KernelResult.ok({'compliant': false, 'violation': result.violation, 'law': 'noBypassCapabilityRouter'});
+      _reputationEconomy.recordViolation(
+        sandboxId,
+        _enforcer.clock.tick().physicalTime,
+      );
+      return KernelResult.ok({
+        'compliant': false,
+        'violation': result.violation,
+        'law': 'noBypassCapabilityRouter',
+      });
     }
 
-    final trustResult = _enforcer.enforceTrustLevel(sandboxId, requiredLevel, callerLevel);
+    final trustResult = _enforcer.enforceTrustLevel(
+      sandboxId,
+      requiredLevel,
+      callerLevel,
+    );
     if (!trustResult.compliant) {
-      _reputationEconomy.recordViolation(sandboxId, _enforcer.clock.tick().physicalTime);
-      return KernelResult.ok({'compliant': false, 'violation': trustResult.violation, 'law': 'trustLevelMustBeRespected'});
+      _reputationEconomy.recordViolation(
+        sandboxId,
+        _enforcer.clock.tick().physicalTime,
+      );
+      return KernelResult.ok({
+        'compliant': false,
+        'violation': trustResult.violation,
+        'law': 'trustLevelMustBeRespected',
+      });
     }
 
     final traceResult = _enforcer.enforceTracing(sandboxId, traced);
     if (!traceResult.compliant) {
-      return KernelResult.ok({'compliant': false, 'violation': traceResult.violation, 'law': 'allOpsMustBeTraced'});
+      return KernelResult.ok({
+        'compliant': false,
+        'violation': traceResult.violation,
+        'law': 'allOpsMustBeTraced',
+      });
     }
 
-    _reputationEconomy.recordCompliance(sandboxId, _enforcer.clock.tick().physicalTime);
+    _reputationEconomy.recordCompliance(
+      sandboxId,
+      _enforcer.clock.tick().physicalTime,
+    );
     return KernelResult.ok({'compliant': true, 'capability': capabilityId});
   }
 
@@ -228,7 +253,11 @@ class CivilizationKernel {
     final entityId = params['entityId'] as String?;
     if (entityId == null) return KernelResult.fail('entityId required');
     final score = _reputationEconomy.scoreFor(entityId);
-    return KernelResult.ok({'entityId': entityId, 'score': score.score.toStringAsFixed(2), 'trustLevel': score.effectiveTrustLevel.name});
+    return KernelResult.ok({
+      'entityId': entityId,
+      'score': score.score.toStringAsFixed(2),
+      'trustLevel': score.effectiveTrustLevel.name,
+    });
   }
 
   KernelResult _syscallGovernanceAdjudicate(Map<String, dynamic> params) {
@@ -247,15 +276,27 @@ class CivilizationKernel {
       reason: violationType,
       timestamp: _enforcer.clock.tick().physicalTime,
     );
-    return KernelResult.ok({'sandboxId': sandboxId, 'sanctionType': sanction.type.name, 'severity': sanction.reason});
+    return KernelResult.ok({
+      'sandboxId': sandboxId,
+      'sanctionType': sanction.type.name,
+      'severity': sanction.reason,
+    });
   }
 
   KernelResult _syscallDiplomacySync(Map<String, dynamic> params) {
     final targetId = params['targetId'] as String?;
     if (targetId == null) return KernelResult.fail('targetId required');
     final manifest = _consensus.localManifest;
-    final msg = _transport.sendConstitutionSync(targetId, manifest, _enforcer.clock.tick().physicalTime);
-    return KernelResult.ok({'messageId': msg.epoch, 'target': targetId, 'epoch': manifest.epoch});
+    final msg = _transport.sendConstitutionSync(
+      targetId,
+      manifest,
+      _enforcer.clock.tick().physicalTime,
+    );
+    return KernelResult.ok({
+      'messageId': msg.epoch,
+      'target': targetId,
+      'epoch': manifest.epoch,
+    });
   }
 
   KernelResult _syscallEvolutionPropose(Map<String, dynamic> params) {
@@ -277,7 +318,10 @@ class CivilizationKernel {
       rationale: rationale ?? '',
       timestamp: _enforcer.clock.tick().physicalTime,
     );
-    return KernelResult.ok({'proposalId': proposal.proposalId, 'stage': proposal.stage.name});
+    return KernelResult.ok({
+      'proposalId': proposal.proposalId,
+      'stage': proposal.stage.name,
+    });
   }
 
   KernelResult _syscallEconomicsTransact(Map<String, dynamic> params) {
@@ -291,14 +335,23 @@ class CivilizationKernel {
     switch (action) {
       case 'earn':
         final result = _economy.earn(entityId, amount, timestamp);
-        return KernelResult.ok({'balance': result.balance.toStringAsFixed(2), 'action': 'earn'});
+        return KernelResult.ok({
+          'balance': result.balance.toStringAsFixed(2),
+          'action': 'earn',
+        });
       case 'spend':
         final result = _economy.spend(entityId, amount, timestamp);
         if (result == null) return KernelResult.fail('insufficient balance');
-        return KernelResult.ok({'balance': result.balance.toStringAsFixed(2), 'action': 'spend'});
+        return KernelResult.ok({
+          'balance': result.balance.toStringAsFixed(2),
+          'action': 'spend',
+        });
       case 'penalty':
         _economy.imposePenalty(entityId, amount, 'kernel_penalty', timestamp);
-        return KernelResult.ok({'action': 'penalty', 'amount': amount.toStringAsFixed(2)});
+        return KernelResult.ok({
+          'action': 'penalty',
+          'amount': amount.toStringAsFixed(2),
+        });
       default:
         return KernelResult.fail('unknown action: $action');
     }
@@ -328,7 +381,11 @@ class CivilizationKernel {
       reason: reason,
       timestamp: _enforcer.clock.tick().physicalTime,
     );
-    return KernelResult.ok({'voter': vote.voterId, 'amendment': vote.amendmentId, 'support': vote.support});
+    return KernelResult.ok({
+      'voter': vote.voterId,
+      'amendment': vote.amendmentId,
+      'support': vote.support,
+    });
   }
 
   KernelResult _syscallJudiciaryTry(Map<String, dynamic> params) {
@@ -377,7 +434,11 @@ class CivilizationKernel {
   KernelResult _syscallFederationJoin(Map<String, dynamic> params) {
     final federationId = params['federationId'] as String?;
     if (federationId == null) return KernelResult.fail('federationId required');
-    final msg = _transport.sendFederationAccept(federationId, federationId, _enforcer.clock.tick().physicalTime);
+    final msg = _transport.sendFederationAccept(
+      federationId,
+      federationId,
+      _enforcer.clock.tick().physicalTime,
+    );
     return KernelResult.ok({'federationId': federationId, 'accepted': true});
   }
 
@@ -408,16 +469,31 @@ class CivilizationKernel {
     final accusedId = params['accusedId'] as String?;
     final reason = params['reason'] as String?;
     if (accusedId == null) return KernelResult.fail('accusedId required');
-    _network.byzantine.reportInconsistentMessage(accusedId, 'kernel_report', _enforcer.clock.tick().physicalTime);
-    return KernelResult.ok({'accusedId': accusedId, 'reported': true, 'verdict': _network.byzantine.verdictFor(accusedId).name});
+    _network.byzantine.reportInconsistentMessage(
+      accusedId,
+      'kernel_report',
+      _enforcer.clock.tick().physicalTime,
+    );
+    return KernelResult.ok({
+      'accusedId': accusedId,
+      'reported': true,
+      'verdict': _network.byzantine.verdictFor(accusedId).name,
+    });
   }
 
   KernelResult _syscallHeartbeat(Map<String, dynamic> params) {
     final targetId = params['targetId'] as String?;
     if (targetId == null) return KernelResult.fail('targetId required');
     if (_network == null) return KernelResult.fail('network not enabled');
-    _network.sendHeartbeat(targetId, _consensus.localManifest.epoch, _enforcer.clock.tick().physicalTime);
-    return KernelResult.ok({'target': targetId, 'epoch': _consensus.localManifest.epoch});
+    _network.sendHeartbeat(
+      targetId,
+      _consensus.localManifest.epoch,
+      _enforcer.clock.tick().physicalTime,
+    );
+    return KernelResult.ok({
+      'target': targetId,
+      'epoch': _consensus.localManifest.epoch,
+    });
   }
 
   void _recordCall(KernelCall call) {

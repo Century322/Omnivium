@@ -31,18 +31,18 @@ class RuntimeSpan {
   }
 
   Map<String, dynamic> toJson() => {
-        'spanId': spanId,
-        'parentSpanId': parentSpanId,
-        'traceId': traceId,
-        'operation': operation,
-        'pluginId': pluginId,
-        'capabilityId': capabilityId,
-        'startTimeMs': startTimeMs,
-        'endTimeMs': endTimeMs,
-        'durationMs': durationMs,
-        'status': status,
-        'tags': tags,
-      };
+    'spanId': spanId,
+    'parentSpanId': parentSpanId,
+    'traceId': traceId,
+    'operation': operation,
+    'pluginId': pluginId,
+    'capabilityId': capabilityId,
+    'startTimeMs': startTimeMs,
+    'endTimeMs': endTimeMs,
+    'durationMs': durationMs,
+    'status': status,
+    'tags': tags,
+  };
 }
 
 class RuntimeTrace {
@@ -58,14 +58,17 @@ class RuntimeTrace {
 
   void addSpan(RuntimeSpan span) => spans.add(span);
 
-  RuntimeSpan? get rootSpan => spans.where((s) => s.parentSpanId == null).firstOrNull;
+  RuntimeSpan? get rootSpan =>
+      spans.where((s) => s.parentSpanId == null).firstOrNull;
 
   List<RuntimeSpan> childrenOf(String spanId) =>
       spans.where((s) => s.parentSpanId == spanId).toList();
 
   int get totalDurationMs {
     if (spans.isEmpty) return 0;
-    final endTimes = spans.where((s) => s.endTimeMs != null).map((s) => s.endTimeMs!);
+    final endTimes = spans
+        .where((s) => s.endTimeMs != null)
+        .map((s) => s.endTimeMs!);
     if (endTimes.isEmpty) return 0;
     return endTimes.reduce((a, b) => a > b ? a : b) - spans.first.startTimeMs;
   }
@@ -76,8 +79,13 @@ class TraceService {
   int _spanCounter = 0;
 
   RuntimeTrace startTrace({String? traceId}) {
-    final id = traceId ?? 'trace_${DateTime.now().millisecondsSinceEpoch}_${_spanCounter++}';
-    final trace = RuntimeTrace(traceId: id, createdAt: DateTime.now().millisecondsSinceEpoch);
+    final id =
+        traceId ??
+        'trace_${DateTime.now().millisecondsSinceEpoch}_${_spanCounter++}';
+    final trace = RuntimeTrace(
+      traceId: id,
+      createdAt: DateTime.now().millisecondsSinceEpoch,
+    );
     _traces[id] = trace;
     return trace;
   }

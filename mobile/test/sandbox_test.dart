@@ -34,7 +34,11 @@ void main() {
           createdAt: clock.tick().physicalTime,
         ),
         resources: SandboxResources(
-          budget: const ResourceBudget(maxTokens: 1000, maxStreams: 5, maxTasks: 10),
+          budget: const ResourceBudget(
+            maxTokens: 1000,
+            maxStreams: 5,
+            maxTasks: 10,
+          ),
           usage: ResourceUsage(),
           allowedCapabilities: allowedCapabilities,
           deniedCapabilities: deniedCapabilities,
@@ -85,9 +89,7 @@ void main() {
     });
 
     test('capability access denied for denied capabilities', () {
-      final sandbox = createSandbox(
-        deniedCapabilities: {'storage.delete'},
-      );
+      final sandbox = createSandbox(deniedCapabilities: {'storage.delete'});
       sandbox.start();
 
       final result = sandbox.checkCapabilityAccess('storage.delete');
@@ -115,7 +117,11 @@ void main() {
       final agentSandbox = SandboxIsolate(
         identity: identity,
         resources: SandboxResources(
-          budget: const ResourceBudget(maxTokens: 1000, maxStreams: 5, maxTasks: 10),
+          budget: const ResourceBudget(
+            maxTokens: 1000,
+            maxStreams: 5,
+            maxTasks: 10,
+          ),
           usage: ResourceUsage(),
           allowedCapabilities: {'*'},
           trustBoundary: const TrustBoundary(boundaryId: 'agent'),
@@ -131,10 +137,12 @@ void main() {
     });
 
     test('trust level insufficient blocks capability', () {
-      securityManager.registerCapabilityAuth(const CapabilityAuth(
-        capabilityId: 'admin.wipe',
-        requiredTrustLevel: TrustLevel.system,
-      ));
+      securityManager.registerCapabilityAuth(
+        const CapabilityAuth(
+          capabilityId: 'admin.wipe',
+          requiredTrustLevel: TrustLevel.system,
+        ),
+      );
 
       final sandbox = createSandbox(trustLevel: TrustLevel.untrusted);
       sandbox.start();
@@ -150,7 +158,10 @@ void main() {
       sandbox.checkCapabilityAccess('storage.delete');
 
       expect(sandbox.violations.length, 1);
-      expect(sandbox.violations.first.type, SandboxViolationType.capabilityDenied);
+      expect(
+        sandbox.violations.first.type,
+        SandboxViolationType.capabilityDenied,
+      );
     });
 
     test('token budget check', () {
@@ -201,7 +212,11 @@ void main() {
           createdAt: clock.tick().physicalTime,
         ),
         resources: SandboxResources(
-          budget: const ResourceBudget(maxTokens: 1000, maxStreams: 5, maxTasks: 10),
+          budget: const ResourceBudget(
+            maxTokens: 1000,
+            maxStreams: 5,
+            maxTasks: 10,
+          ),
           usage: ResourceUsage(),
           trustBoundary: const TrustBoundary(boundaryId: 'test'),
           maxExecutionTime: const Duration(milliseconds: 50),
@@ -225,14 +240,21 @@ void main() {
     test('create and manage sandboxes', () {
       final clock = HybridLogicalClock(nodeId: 'gov');
       final securityManager = SecurityManager();
-      final governor = ExecutionGovernor(securityManager: securityManager, clock: clock);
+      final governor = ExecutionGovernor(
+        securityManager: securityManager,
+        clock: clock,
+      );
 
       final sandbox = governor.create(
         type: SandboxType.plugin,
         pluginId: 'test-plugin',
         trustLevel: TrustLevel.verified,
         resources: SandboxResources(
-          budget: const ResourceBudget(maxTokens: 1000, maxStreams: 5, maxTasks: 10),
+          budget: const ResourceBudget(
+            maxTokens: 1000,
+            maxStreams: 5,
+            maxTasks: 10,
+          ),
           usage: ResourceUsage(),
           trustBoundary: const TrustBoundary(boundaryId: 'default'),
         ),
@@ -248,14 +270,21 @@ void main() {
     test('terminate sandbox', () {
       final clock = HybridLogicalClock(nodeId: 'gov');
       final securityManager = SecurityManager();
-      final governor = ExecutionGovernor(securityManager: securityManager, clock: clock);
+      final governor = ExecutionGovernor(
+        securityManager: securityManager,
+        clock: clock,
+      );
 
       final sandbox = governor.create(
         type: SandboxType.plugin,
         pluginId: 'test-plugin',
         trustLevel: TrustLevel.verified,
         resources: SandboxResources(
-          budget: const ResourceBudget(maxTokens: 1000, maxStreams: 5, maxTasks: 10),
+          budget: const ResourceBudget(
+            maxTokens: 1000,
+            maxStreams: 5,
+            maxTasks: 10,
+          ),
           usage: ResourceUsage(),
           trustBoundary: const TrustBoundary(boundaryId: 'default'),
         ),
@@ -270,14 +299,21 @@ void main() {
     test('cleanup terminated sandboxes', () {
       final clock = HybridLogicalClock(nodeId: 'gov');
       final securityManager = SecurityManager();
-      final governor = ExecutionGovernor(securityManager: securityManager, clock: clock);
+      final governor = ExecutionGovernor(
+        securityManager: securityManager,
+        clock: clock,
+      );
 
       final sandbox = governor.create(
         type: SandboxType.plugin,
         pluginId: 'test-plugin',
         trustLevel: TrustLevel.verified,
         resources: SandboxResources(
-          budget: const ResourceBudget(maxTokens: 1000, maxStreams: 5, maxTasks: 10),
+          budget: const ResourceBudget(
+            maxTokens: 1000,
+            maxStreams: 5,
+            maxTasks: 10,
+          ),
           usage: ResourceUsage(),
           trustBoundary: const TrustBoundary(boundaryId: 'default'),
         ),
@@ -293,14 +329,21 @@ void main() {
     test('collect violations from all sandboxes', () {
       final clock = HybridLogicalClock(nodeId: 'gov');
       final securityManager = SecurityManager();
-      final governor = ExecutionGovernor(securityManager: securityManager, clock: clock);
+      final governor = ExecutionGovernor(
+        securityManager: securityManager,
+        clock: clock,
+      );
 
       final sandbox = governor.create(
         type: SandboxType.plugin,
         pluginId: 'test-plugin',
         trustLevel: TrustLevel.verified,
         resources: SandboxResources(
-          budget: const ResourceBudget(maxTokens: 1000, maxStreams: 5, maxTasks: 10),
+          budget: const ResourceBudget(
+            maxTokens: 1000,
+            maxStreams: 5,
+            maxTasks: 10,
+          ),
           usage: ResourceUsage(),
           deniedCapabilities: {'storage.delete'},
           trustBoundary: const TrustBoundary(boundaryId: 'default'),
@@ -317,14 +360,21 @@ void main() {
     test('different sandbox types', () {
       final clock = HybridLogicalClock(nodeId: 'gov');
       final securityManager = SecurityManager();
-      final governor = ExecutionGovernor(securityManager: securityManager, clock: clock);
+      final governor = ExecutionGovernor(
+        securityManager: securityManager,
+        clock: clock,
+      );
 
       governor.create(
         type: SandboxType.plugin,
         pluginId: 'p1',
         trustLevel: TrustLevel.verified,
         resources: SandboxResources(
-          budget: const ResourceBudget(maxTokens: 1000, maxStreams: 5, maxTasks: 10),
+          budget: const ResourceBudget(
+            maxTokens: 1000,
+            maxStreams: 5,
+            maxTasks: 10,
+          ),
           usage: ResourceUsage(),
           trustBoundary: const TrustBoundary(boundaryId: 'default'),
         ),
@@ -335,7 +385,11 @@ void main() {
         pluginId: 'a1',
         trustLevel: TrustLevel.signed,
         resources: SandboxResources(
-          budget: const ResourceBudget(maxTokens: 5000, maxStreams: 10, maxTasks: 20),
+          budget: const ResourceBudget(
+            maxTokens: 5000,
+            maxStreams: 10,
+            maxTasks: 20,
+          ),
           usage: ResourceUsage(),
           trustBoundary: const TrustBoundary(boundaryId: 'agent'),
         ),
@@ -346,7 +400,11 @@ void main() {
         pluginId: 'm1',
         trustLevel: TrustLevel.untrusted,
         resources: SandboxResources(
-          budget: const ResourceBudget(maxTokens: 500, maxStreams: 2, maxTasks: 5),
+          budget: const ResourceBudget(
+            maxTokens: 500,
+            maxStreams: 2,
+            maxTasks: 5,
+          ),
           usage: ResourceUsage(),
           trustBoundary: const TrustBoundary(
             boundaryId: 'miniapp',
@@ -386,16 +444,27 @@ void main() {
     setUp(() {
       clock = HybridLogicalClock(nodeId: 'enforcer');
       securityManager = SecurityManager();
-      enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
+      enforcer = RuntimeLawEnforcer(
+        clock: clock,
+        securityManager: securityManager,
+      );
     });
 
     test('enforce capability routing - compliant', () {
-      final result = enforcer.enforceCapabilityRouting('sb-1', 'storage.read', true);
+      final result = enforcer.enforceCapabilityRouting(
+        'sb-1',
+        'storage.read',
+        true,
+      );
       expect(result.compliant, isTrue);
     });
 
     test('enforce capability routing - violation', () {
-      final result = enforcer.enforceCapabilityRouting('sb-1', 'storage.read', false);
+      final result = enforcer.enforceCapabilityRouting(
+        'sb-1',
+        'storage.read',
+        false,
+      );
       expect(result.compliant, isFalse);
       expect(result.lawId, RuntimeLawId.noBypassCapabilityRouter);
     });
@@ -428,12 +497,20 @@ void main() {
     });
 
     test('enforce trust level - compliant', () {
-      final result = enforcer.enforceTrustLevel('sb-1', TrustLevel.verified, TrustLevel.system);
+      final result = enforcer.enforceTrustLevel(
+        'sb-1',
+        TrustLevel.verified,
+        TrustLevel.system,
+      );
       expect(result.compliant, isTrue);
     });
 
     test('enforce trust level - violation', () {
-      final result = enforcer.enforceTrustLevel('sb-1', TrustLevel.system, TrustLevel.untrusted);
+      final result = enforcer.enforceTrustLevel(
+        'sb-1',
+        TrustLevel.system,
+        TrustLevel.untrusted,
+      );
       expect(result.compliant, isFalse);
     });
 
@@ -533,7 +610,11 @@ void main() {
 
     test('hasBudgetRemaining', () {
       final resources = SandboxResources(
-        budget: const ResourceBudget(maxTokens: 100, maxStreams: 2, maxTasks: 5),
+        budget: const ResourceBudget(
+          maxTokens: 100,
+          maxStreams: 2,
+          maxTasks: 5,
+        ),
         usage: ResourceUsage(),
         trustBoundary: const TrustBoundary(boundaryId: 'test'),
       );

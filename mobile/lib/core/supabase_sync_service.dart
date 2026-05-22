@@ -26,10 +26,15 @@ class SupabaseSyncService {
         return await operation();
       } catch (e) {
         if (attempt < _maxRetries) {
-          AppLogger.instance.info('Supabase operation failed (attempt ${attempt + 1}/$_maxRetries): $e');
+          AppLogger.instance.info(
+            'Supabase operation failed (attempt ${attempt + 1}/$_maxRetries): $e',
+          );
           await Future.delayed(_retryDelay * (attempt + 1));
         } else {
-          AppLogger.instance.error('Supabase operation failed after $_maxRetries retries', error: e);
+          AppLogger.instance.error(
+            'Supabase operation failed after $_maxRetries retries',
+            error: e,
+          );
           rethrow;
         }
       }
@@ -53,7 +58,11 @@ class SupabaseSyncService {
       return await _withRetry(() async {
         final client = AuthService.instance.client;
         if (client == null) return <Map<String, dynamic>>[];
-        final response = await client.from('sessions').select().eq('user_id', _userId!).order('created_at', ascending: false);
+        final response = await client
+            .from('sessions')
+            .select()
+            .eq('user_id', _userId!)
+            .order('created_at', ascending: false);
         return List<Map<String, dynamic>>.from(response);
       });
     } catch (e) {
@@ -83,7 +92,11 @@ class SupabaseSyncService {
       await _withRetry(() async {
         final client = AuthService.instance.client;
         if (client == null) return;
-        await client.from('sessions').delete().eq('id', id).eq('user_id', _userId!);
+        await client
+            .from('sessions')
+            .delete()
+            .eq('id', id)
+            .eq('user_id', _userId!);
       });
     } catch (e) {
       AppLogger.instance.info('Delete session failed: $e');
@@ -96,7 +109,11 @@ class SupabaseSyncService {
       return await _withRetry(() async {
         final client = AuthService.instance.client;
         if (client == null) return <Map<String, dynamic>>[];
-        final response = await client.from('notes').select().eq('user_id', _userId!).order('updated_at', ascending: false);
+        final response = await client
+            .from('notes')
+            .select()
+            .eq('user_id', _userId!)
+            .order('updated_at', ascending: false);
         return List<Map<String, dynamic>>.from(response);
       });
     } catch (e) {
@@ -126,7 +143,11 @@ class SupabaseSyncService {
       await _withRetry(() async {
         final client = AuthService.instance.client;
         if (client == null) return;
-        await client.from('notes').delete().eq('id', id).eq('user_id', _userId!);
+        await client
+            .from('notes')
+            .delete()
+            .eq('id', id)
+            .eq('user_id', _userId!);
       });
     } catch (e) {
       AppLogger.instance.info('Delete note failed: $e');
@@ -139,7 +160,11 @@ class SupabaseSyncService {
       return await _withRetry(() async {
         final client = AuthService.instance.client;
         if (client == null) return <Map<String, dynamic>>[];
-        final response = await client.from('memories').select().eq('user_id', _userId!).order('created_at', ascending: false);
+        final response = await client
+            .from('memories')
+            .select()
+            .eq('user_id', _userId!)
+            .order('created_at', ascending: false);
         return List<Map<String, dynamic>>.from(response);
       });
     } catch (e) {
@@ -169,7 +194,11 @@ class SupabaseSyncService {
       return await _withRetry(() async {
         final client = AuthService.instance.client;
         if (client == null) return <Map<String, dynamic>>[];
-        final response = await client.from('quick_commands').select().eq('user_id', _userId!).order('sort_order', ascending: true);
+        final response = await client
+            .from('quick_commands')
+            .select()
+            .eq('user_id', _userId!)
+            .order('sort_order', ascending: true);
         return List<Map<String, dynamic>>.from(response);
       });
     } catch (e) {
@@ -199,7 +228,11 @@ class SupabaseSyncService {
       await _withRetry(() async {
         final client = AuthService.instance.client;
         if (client == null) return;
-        await client.from('quick_commands').delete().eq('id', id).eq('user_id', _userId!);
+        await client
+            .from('quick_commands')
+            .delete()
+            .eq('id', id)
+            .eq('user_id', _userId!);
       });
     } catch (e) {
       AppLogger.instance.info('Delete quick command failed: $e');

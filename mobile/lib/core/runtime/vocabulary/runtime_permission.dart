@@ -55,5 +55,6 @@ class RuntimePermission {
     this.storage = const StoragePermission(),
   });
 
-  bool hasCapability(String capabilityId) => capabilities.contains(capabilityId) || capabilities.contains('*');
+  bool hasCapability(String capabilityId) =>
+      capabilities.contains(capabilityId) || capabilities.contains('*');
 }

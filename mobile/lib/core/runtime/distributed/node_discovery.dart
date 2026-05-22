@@ -36,9 +36,9 @@ class NodeDiscovery {
     required String localNodeId,
     required HybridLogicalClock clock,
     GossipConfig config = const GossipConfig(),
-  })  : _localNodeId = localNodeId,
-        _clock = clock,
-        _config = config;
+  }) : _localNodeId = localNodeId,
+       _clock = clock,
+       _config = config;
 
   String get localNodeId => _localNodeId;
   List<NodeDescriptor> get aliveNodes =>
@@ -58,7 +58,8 @@ class NodeDiscovery {
 
   void join(NodeDescriptor descriptor) {
     final existing = _members[descriptor.nodeId];
-    if (existing != null && existing.incarnation >= descriptor.incarnation) return;
+    if (existing != null && existing.incarnation >= descriptor.incarnation)
+      return;
 
     _members[descriptor.nodeId] = descriptor;
     _emitEvent(ClusterEventType.nodeJoined, descriptor.nodeId, {
@@ -156,27 +157,32 @@ class NodeDiscovery {
 
   void receiveGossip(List<ClusterEvent> remoteEvents) {
     for (final event in remoteEvents) {
-      _clock.receive(HybridTimestamp(
-        physicalTime: event.hlcTime,
-        nodeId: event.sourceNodeId,
-      ));
+      _clock.receive(
+        HybridTimestamp(
+          physicalTime: event.hlcTime,
+          nodeId: event.sourceNodeId,
+        ),
+      );
 
       switch (event.type) {
         case ClusterEventType.nodeJoined:
-          final nodeId = event.payload['nodeId'] as String? ?? event.sourceNodeId;
+          final nodeId =
+              event.payload['nodeId'] as String? ?? event.sourceNodeId;
           if (!_members.containsKey(nodeId)) {
-            join(NodeDescriptor(
-              nodeId: nodeId,
-              address: event.payload['address'] as String? ?? '',
-              role: NodeRole.values.firstWhere(
-                (r) => r.name == event.payload['role'],
-                orElse: () => NodeRole.worker,
+            join(
+              NodeDescriptor(
+                nodeId: nodeId,
+                address: event.payload['address'] as String? ?? '',
+                role: NodeRole.values.firstWhere(
+                  (r) => r.name == event.payload['role'],
+                  orElse: () => NodeRole.worker,
+                ),
+                state: NodeState.alive,
+                incarnation: event.payload['incarnation'] as int? ?? 0,
+                joinedAt: event.timestamp,
+                lastHeartbeatAt: event.timestamp,
               ),
-              state: NodeState.alive,
-              incarnation: event.payload['incarnation'] as int? ?? 0,
-              joinedAt: event.timestamp,
-              lastHeartbeatAt: event.timestamp,
-            ));
+            );
           }
           break;
         case ClusterEventType.nodeLeft:
@@ -232,7 +238,11 @@ class NodeDiscovery {
     updateSelf();
   }
 
-  void _emitEvent(ClusterEventType type, String targetNodeId, Map<String, dynamic> extra) {
+  void _emitEvent(
+    ClusterEventType type,
+    String targetNodeId,
+    Map<String, dynamic> extra,
+  ) {
     final now = _clock.tick();
     final event = ClusterEvent(
       id: 'ce_${_eventSeq++}',
@@ -249,7 +259,10 @@ class NodeDiscovery {
     }
 
     if (_eventQueue.length > _config.maxPiggybackEvents * 2) {
-      _eventQueue.removeRange(0, _eventQueue.length - _config.maxPiggybackEvents);
+      _eventQueue.removeRange(
+        0,
+        _eventQueue.length - _config.maxPiggybackEvents,
+      );
     }
   }
 

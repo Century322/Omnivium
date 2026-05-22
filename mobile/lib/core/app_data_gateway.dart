@@ -61,9 +61,7 @@ class AppDataGateway {
     final sdk = OmniviumSDK.instance;
     if (!sdk.isInitialized) return;
     try {
-      sdk.container.eventJournal.append('data.delete', {
-        'key': key,
-      });
+      sdk.container.eventJournal.append('data.delete', {'key': key});
     } catch (_) {}
   }
 
@@ -71,9 +69,7 @@ class AppDataGateway {
     final sdk = OmniviumSDK.instance;
     if (!sdk.isInitialized) return;
     try {
-      sdk.container.eventJournal.append('data.clear', {
-        'prefix': prefix,
-      });
+      sdk.container.eventJournal.append('data.clear', {'prefix': prefix});
     } catch (_) {}
   }
 }

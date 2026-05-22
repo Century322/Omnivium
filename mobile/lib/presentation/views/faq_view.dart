@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../theme/app_colors.dart';
 import '../theme/locale_provider.dart';
@@ -36,7 +36,14 @@ class _FaqViewState extends State<FaqView> {
           icon: Icon(LucideIcons.arrowLeft, color: AppColors.sec(context)),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(localeProvider.t('help_faq'), style: TextStyle(color: AppColors.textPrimary(context), fontSize: 18, fontWeight: FontWeight.w600)),
+        title: Text(
+          localeProvider.t('help_faq'),
+          style: TextStyle(
+            color: AppColors.textPrimary(context),
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ),
       body: ListView.separated(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
@@ -49,20 +56,46 @@ class _FaqViewState extends State<FaqView> {
             decoration: BoxDecoration(
               color: AppColors.sf(context),
               borderRadius: BorderRadius.circular(14),
-              border: isExpanded ? Border.all(color: AppColors.accent.withValues(alpha: 0.2)) : null,
+              border: isExpanded
+                  ? Border.all(color: AppColors.accent.withValues(alpha: 0.2))
+                  : null,
             ),
             child: Theme(
-              data: Theme.of(context).copyWith(dividerTheme: const DividerThemeData(color: Colors.transparent)),
+              data: Theme.of(context).copyWith(
+                dividerTheme: const DividerThemeData(color: Colors.transparent),
+              ),
               child: ExpansionTile(
                 initiallyExpanded: isExpanded,
-                onExpansionChanged: (expanded) => setState(() => _expandedIndex = expanded ? i : null),
-                tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                trailing: Icon(isExpanded ? LucideIcons.chevronUp : LucideIcons.chevronDown, size: 18, color: AppColors.sec(context)),
-                title: Text(question, style: TextStyle(color: AppColors.textPrimary(context), fontSize: 14, fontWeight: FontWeight.w500)),
+                onExpansionChanged: (expanded) =>
+                    setState(() => _expandedIndex = expanded ? i : null),
+                tilePadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 4,
+                ),
+                trailing: Icon(
+                  isExpanded ? LucideIcons.chevronUp : LucideIcons.chevronDown,
+                  size: 18,
+                  color: AppColors.sec(context),
+                ),
+                title: Text(
+                  question,
+                  style: TextStyle(
+                    color: AppColors.textPrimary(context),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
                 children: [
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
-                    child: Text(answer, style: TextStyle(color: AppColors.textHint(context), fontSize: 13, height: 1.5)),
+                    child: Text(
+                      answer,
+                      style: TextStyle(
+                        color: AppColors.textHint(context),
+                        fontSize: 13,
+                        height: 1.5,
+                      ),
+                    ),
                   ),
                 ],
               ),

@@ -41,7 +41,11 @@ void main() {
       expect(updated.prompt, '翻译成英文：');
       expect(updated.category, 'tool');
       expect(updated.createdAt, cmd.createdAt);
-      expect(updated.updatedAt.isAfter(cmd.updatedAt) || updated.updatedAt == cmd.updatedAt, isTrue);
+      expect(
+        updated.updatedAt.isAfter(cmd.updatedAt) ||
+            updated.updatedAt == cmd.updatedAt,
+        isTrue,
+      );
     });
 
     test('fromJson handles missing optional fields', () {

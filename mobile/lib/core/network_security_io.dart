@@ -8,18 +8,19 @@ http.Client? createPinnedClient(Map<String, List<String>> pinnedHashes) {
   final securityContext = SecurityContext(withTrustedRoots: true);
   final httpClient = HttpClient(context: securityContext);
 
-  httpClient.badCertificateCallback = (X509Certificate cert, String host, int port) {
-    final hostHashes = pinnedHashes[host];
-    if (hostHashes == null || hostHashes.isEmpty) {
-      return false;
-    }
+  httpClient.badCertificateCallback =
+      (X509Certificate cert, String host, int port) {
+        final hostHashes = pinnedHashes[host];
+        if (hostHashes == null || hostHashes.isEmpty) {
+          return false;
+        }
 
-    final certHash = sha256.convert(cert.der);
-    final certHashStr = 'sha256/${base64.encode(certHash.bytes)}';
+        final certHash = sha256.convert(cert.der);
+        final certHashStr = 'sha256/${base64.encode(certHash.bytes)}';
 
-    final matches = hostHashes.any((pinned) => pinned == certHashStr);
-    return matches;
-  };
+        final matches = hostHashes.any((pinned) => pinned == certHashStr);
+        return matches;
+      };
 
   return IOClient(httpClient);
 }

@@ -36,13 +36,23 @@ class SettingItem extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(title, style: TextStyle(fontSize: 16, color: effectiveTextColor)),
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: effectiveTextColor,
+                        ),
+                      ),
                       if (subtitle != null)
                         Padding(
                           padding: const EdgeInsets.only(top: 4),
                           child: Text(
                             subtitle!,
-                            style: TextStyle(fontSize: 13, color: AppColors.mut(context), height: 1.4),
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: AppColors.mut(context),
+                              height: 1.4,
+                            ),
                           ),
                         ),
                     ],

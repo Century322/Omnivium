@@ -45,28 +45,44 @@ class AppColors {
     return isLightMode(context) ? light : dark;
   }
 
-  static Color bg(BuildContext context) => of(context, background, lightBackground);
+  static Color bg(BuildContext context) =>
+      of(context, background, lightBackground);
   static Color sf(BuildContext context) => of(context, surface, lightSurface);
-  static Color sfAlt(BuildContext context) => of(context, surfaceAlt, lightSurfaceAlt);
-  static Color sfHover(BuildContext context) => of(context, surfaceHover, lightSurfaceHover);
-  static Color sfActive(BuildContext context) => of(context, surfaceActive, lightSurfaceActive);
+  static Color sfAlt(BuildContext context) =>
+      of(context, surfaceAlt, lightSurfaceAlt);
+  static Color sfHover(BuildContext context) =>
+      of(context, surfaceHover, lightSurfaceHover);
+  static Color sfActive(BuildContext context) =>
+      of(context, surfaceActive, lightSurfaceActive);
   static Color tab(BuildContext context) => of(context, tabBg, lightTabBg);
   static Color acc(BuildContext context) => of(context, accent, lightAccent);
-  static Color accDark(BuildContext context) => of(context, accentDark, lightAccentDark);
-  static Color accBg(BuildContext context) => of(context, accentBg, lightAccentBg);
-  static Color accLight(BuildContext context) => of(context, accentLight, lightAccentLight);
-  static Color sec(BuildContext context) => of(context, secondary, lightSecondary);
+  static Color accDark(BuildContext context) =>
+      of(context, accentDark, lightAccentDark);
+  static Color accBg(BuildContext context) =>
+      of(context, accentBg, lightAccentBg);
+  static Color accLight(BuildContext context) =>
+      of(context, accentLight, lightAccentLight);
+  static Color sec(BuildContext context) =>
+      of(context, secondary, lightSecondary);
   static Color mut(BuildContext context) => of(context, muted, lightMuted);
-  static Color tabIn(BuildContext context) => of(context, tabInactive, lightTabInactive);
+  static Color tabIn(BuildContext context) =>
+      of(context, tabInactive, lightTabInactive);
   static Color dng(BuildContext context) => of(context, danger, lightDanger);
   static Color warn(BuildContext context) => of(context, warning, lightWarning);
   static Color ok(BuildContext context) => of(context, success, lightSuccess);
 
-  static Color textPrimary(BuildContext context) => of(context, Colors.white, const Color(0xFF1C1C1E));
-  static Color textSecondary(BuildContext context) => of(context, Colors.white70, const Color(0xFF444444));
-  static Color textTertiary(BuildContext context) => of(context, Colors.white54, const Color(0xFF666666));
-  static Color textHint(BuildContext context) => of(context, Colors.white38, const Color(0xFF888888));
-  static Color textDisabled(BuildContext context) => of(context, Colors.white24, const Color(0xFFAAAAAA));
-  static Color iconGray(BuildContext context) => of(context, const Color(0xFF555555), const Color(0xFF999999));
-  static Color divider(BuildContext context) => of(context, const Color(0xFF2A2A2A), const Color(0xFFE0E0E0));
+  static Color textPrimary(BuildContext context) =>
+      of(context, Colors.white, const Color(0xFF1C1C1E));
+  static Color textSecondary(BuildContext context) =>
+      of(context, Colors.white70, const Color(0xFF444444));
+  static Color textTertiary(BuildContext context) =>
+      of(context, Colors.white54, const Color(0xFF666666));
+  static Color textHint(BuildContext context) =>
+      of(context, Colors.white38, const Color(0xFF888888));
+  static Color textDisabled(BuildContext context) =>
+      of(context, Colors.white24, const Color(0xFFAAAAAA));
+  static Color iconGray(BuildContext context) =>
+      of(context, const Color(0xFF555555), const Color(0xFF999999));
+  static Color divider(BuildContext context) =>
+      of(context, const Color(0xFF2A2A2A), const Color(0xFFE0E0E0));
 }

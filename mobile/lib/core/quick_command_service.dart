@@ -85,7 +85,11 @@ class QuickCommandService {
             .map((item) => QuickCommand.fromJson(item as Map<String, dynamic>))
             .toList();
       } catch (e, stackTrace) {
-    AppLogger.instance.warning('Operation failed', error: e, stackTrace: stackTrace);
+        AppLogger.instance.warning(
+          'Operation failed',
+          error: e,
+          stackTrace: stackTrace,
+        );
         _commands = [];
       }
     }
@@ -100,7 +104,9 @@ class QuickCommandService {
 
   List<QuickCommand> _defaultCommands() {
     final now = DateTime.now();
-    final remote = RemoteConfigService.instance.getValue<List<dynamic>>('default_quick_commands');
+    final remote = RemoteConfigService.instance.getValue<List<dynamic>>(
+      'default_quick_commands',
+    );
     if (remote != null && remote.isNotEmpty) {
       return remote.map((item) {
         final m = item as Map<String, dynamic>;
@@ -116,12 +122,60 @@ class QuickCommandService {
       }).toList();
     }
     return [
-      QuickCommand(id: 'qc_search', name: '搜索', emoji: '🔍', prompt: '帮我搜索最新的', category: 'tool', createdAt: now, updatedAt: now),
-      QuickCommand(id: 'qc_summarize', name: '总结', emoji: '📝', prompt: '请总结一下我们之前的对话', category: 'tool', createdAt: now, updatedAt: now),
-      QuickCommand(id: 'qc_translate', name: '翻译', emoji: '🌐', prompt: '请将以下内容翻译成英文：', category: 'tool', createdAt: now, updatedAt: now),
-      QuickCommand(id: 'qc_draw', name: '画图', emoji: '🎨', prompt: '请生成一张图片：', category: 'creative', createdAt: now, updatedAt: now),
-      QuickCommand(id: 'qc_email', name: '邮件', emoji: '📧', prompt: '帮我写一封邮件：', category: 'creative', createdAt: now, updatedAt: now),
-      QuickCommand(id: 'qc_explain', name: '解释', emoji: '💡', prompt: '请用简单的话解释一下：', category: 'tool', createdAt: now, updatedAt: now),
+      QuickCommand(
+        id: 'qc_search',
+        name: '搜索',
+        emoji: '🔍',
+        prompt: '帮我搜索最新的',
+        category: 'tool',
+        createdAt: now,
+        updatedAt: now,
+      ),
+      QuickCommand(
+        id: 'qc_summarize',
+        name: '总结',
+        emoji: '📝',
+        prompt: '请总结一下我们之前的对话',
+        category: 'tool',
+        createdAt: now,
+        updatedAt: now,
+      ),
+      QuickCommand(
+        id: 'qc_translate',
+        name: '翻译',
+        emoji: '🌐',
+        prompt: '请将以下内容翻译成英文：',
+        category: 'tool',
+        createdAt: now,
+        updatedAt: now,
+      ),
+      QuickCommand(
+        id: 'qc_draw',
+        name: '画图',
+        emoji: '🎨',
+        prompt: '请生成一张图片：',
+        category: 'creative',
+        createdAt: now,
+        updatedAt: now,
+      ),
+      QuickCommand(
+        id: 'qc_email',
+        name: '邮件',
+        emoji: '📧',
+        prompt: '帮我写一封邮件：',
+        category: 'creative',
+        createdAt: now,
+        updatedAt: now,
+      ),
+      QuickCommand(
+        id: 'qc_explain',
+        name: '解释',
+        emoji: '💡',
+        prompt: '请用简单的话解释一下：',
+        category: 'tool',
+        createdAt: now,
+        updatedAt: now,
+      ),
     ];
   }
 

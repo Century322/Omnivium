@@ -5,7 +5,9 @@ void main() {
   group('NavigationProvider', () {
     late NavigationProvider provider;
 
-    setUp(() { provider = NavigationProvider(); });
+    setUp(() {
+      provider = NavigationProvider();
+    });
 
     test('initial state is home', () {
       expect(provider.currentView, ViewState.home);
@@ -81,12 +83,15 @@ void main() {
       expect(notified, true);
     });
 
-    test('closeSettingsAndReturnToDrawer clears settings and sets drawer flag', () {
-      provider.openSettingsFromDrawer();
-      provider.closeSettingsAndReturnToDrawer();
-      expect(provider.isSettingsOpen, false);
-      expect(provider.shouldShowDrawerAfterSettings, true);
-    });
+    test(
+      'closeSettingsAndReturnToDrawer clears settings and sets drawer flag',
+      () {
+        provider.openSettingsFromDrawer();
+        provider.closeSettingsAndReturnToDrawer();
+        expect(provider.isSettingsOpen, false);
+        expect(provider.shouldShowDrawerAfterSettings, true);
+      },
+    );
 
     test('closeSettingsAndReturnToDrawer notifies listeners', () {
       var notified = false;
@@ -160,10 +165,16 @@ void main() {
 
   group('ViewState', () {
     test('all ViewState values exist', () {
-      expect(ViewState.values, containsAll([
-        ViewState.home, ViewState.voice, ViewState.discover,
-        ViewState.settings, ViewState.search,
-      ]));
+      expect(
+        ViewState.values,
+        containsAll([
+          ViewState.home,
+          ViewState.voice,
+          ViewState.discover,
+          ViewState.settings,
+          ViewState.search,
+        ]),
+      );
     });
 
     test('ViewState has exactly 5 values', () {

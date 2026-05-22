@@ -19,7 +19,9 @@ class FileDownloadService {
     required String fileName,
     String? subfolder,
   }) async {
-    if (fileName.contains('/') || fileName.contains('\\') || fileName.contains('..')) {
+    if (fileName.contains('/') ||
+        fileName.contains('\\') ||
+        fileName.contains('..')) {
       AppLogger.instance.warning('Invalid file name rejected: $fileName');
       return null;
     }
@@ -31,7 +33,9 @@ class FileDownloadService {
       final segments = subfolder.split('/');
       for (final seg in segments) {
         if (seg.isEmpty || seg == '.' || seg == '..') {
-          AppLogger.instance.warning('Invalid subfolder segment rejected: $subfolder');
+          AppLogger.instance.warning(
+            'Invalid subfolder segment rejected: $subfolder',
+          );
           return null;
         }
       }
@@ -46,7 +50,9 @@ class FileDownloadService {
       final dir = await _getDownloadDirectory();
       if (dir == null) return null;
 
-      final saveDir = subfolder != null ? Directory('${dir.path}/$subfolder') : dir;
+      final saveDir = subfolder != null
+          ? Directory('${dir.path}/$subfolder')
+          : dir;
       if (!await saveDir.exists()) {
         await saveDir.create(recursive: true);
       }
@@ -68,7 +74,9 @@ class FileDownloadService {
       _progress[url] = 0;
 
       final request = http.Request('GET', Uri.parse(url));
-      final response = await ApiProxyService.instance.secureClient.send(request);
+      final response = await ApiProxyService.instance.secureClient.send(
+        request,
+      );
 
       if (response.statusCode != 200) {
         _progress.remove(url);
@@ -80,13 +88,15 @@ class FileDownloadService {
 
       final sink = file.openWrite();
       try {
-        await response.stream.map((chunk) {
-          downloadedBytes += chunk.length;
-          if (contentLength > 0) {
-            _progress[url] = downloadedBytes / contentLength;
-          }
-          return chunk;
-        }).pipe(sink);
+        await response.stream
+            .map((chunk) {
+              downloadedBytes += chunk.length;
+              if (contentLength > 0) {
+                _progress[url] = downloadedBytes / contentLength;
+              }
+              return chunk;
+            })
+            .pipe(sink);
       } catch (e) {
         await sink.close();
         if (await file.exists()) await file.delete();
@@ -108,12 +118,18 @@ class FileDownloadService {
   }) async {
     final uri = Uri.parse(mxcUrl);
     final httpUrl = uri.replace(scheme: 'https');
-    return downloadFile(url: httpUrl.toString(), fileName: fileName, subfolder: 'Omnivium');
+    return downloadFile(
+      url: httpUrl.toString(),
+      fileName: fileName,
+      subfolder: 'Omnivium',
+    );
   }
 
   Future<Directory?> _getDownloadDirectory() async {
     if (Platform.isAndroid) {
-      final dirs = await getExternalStorageDirectories(type: StorageDirectory.downloads);
+      final dirs = await getExternalStorageDirectories(
+        type: StorageDirectory.downloads,
+      );
       if (dirs != null && dirs.isNotEmpty) return dirs.first;
       return await getApplicationDocumentsDirectory();
     } else if (Platform.isIOS) {

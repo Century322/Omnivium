@@ -9,7 +9,8 @@ class _MockSkill extends Skill {
   final String _desc;
   final bool _isDestructive;
 
-  _MockSkill(this._id, this._name, this._desc, {bool isDestructive = false}) : _isDestructive = isDestructive;
+  _MockSkill(this._id, this._name, this._desc, {bool isDestructive = false})
+    : _isDestructive = isDestructive;
 
   @override
   String get id => _id;
@@ -29,14 +30,17 @@ class _MockSkill extends Skill {
   bool get isDestructive => _isDestructive;
 
   @override
-  Future<SkillResult> execute(Map<String, dynamic> params) async => SkillResult.ok('mock result');
+  Future<SkillResult> execute(Map<String, dynamic> params) async =>
+      SkillResult.ok('mock result');
 }
 
 void main() {
   group('SkillRegistry', () {
     late SkillRegistry registry;
 
-    setUp(() { registry = SkillRegistry(); });
+    setUp(() {
+      registry = SkillRegistry();
+    });
 
     test('starts empty', () {
       expect(registry.all, isEmpty);
@@ -98,7 +102,12 @@ void main() {
 
   group('RemoteSkill', () {
     test('properties', () {
-      final skill = RemoteSkill(id: 'remote1', name: 'Remote', description: 'A remote skill', endpoint: '/api/skill');
+      final skill = RemoteSkill(
+        id: 'remote1',
+        name: 'Remote',
+        description: 'A remote skill',
+        endpoint: '/api/skill',
+      );
       expect(skill.id, 'remote1');
       expect(skill.name, 'Remote');
       expect(skill.channel, IntentChannel.slow);

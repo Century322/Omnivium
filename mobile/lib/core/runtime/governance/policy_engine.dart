@@ -1,14 +1,6 @@
-enum PolicyEffect {
-  allow,
-  deny,
-}
+enum PolicyEffect { allow, deny }
 
-enum PolicyScope {
-  own,
-  session,
-  node,
-  cluster,
-}
+enum PolicyScope { own, session, node, cluster }
 
 class PolicyRule {
   final String id;
@@ -32,7 +24,8 @@ class PolicyRule {
   });
 
   bool matchesCaller(String callerId) => _match(callerPattern, callerId);
-  bool matchesTarget(String capabilityId) => _match(targetPattern, capabilityId);
+  bool matchesTarget(String capabilityId) =>
+      _match(targetPattern, capabilityId);
 
   bool _match(String pattern, String value) {
     if (pattern == '*') return true;
@@ -54,14 +47,23 @@ class PolicyDecision {
     this.reason = '',
   });
 
-  factory PolicyDecision.allow(String ruleId) =>
-      PolicyDecision(allowed: true, matchedRuleId: ruleId, reason: 'Allowed by rule: $ruleId');
+  factory PolicyDecision.allow(String ruleId) => PolicyDecision(
+    allowed: true,
+    matchedRuleId: ruleId,
+    reason: 'Allowed by rule: $ruleId',
+  );
 
-  factory PolicyDecision.deny(String ruleId) =>
-      PolicyDecision(allowed: false, matchedRuleId: ruleId, reason: 'Denied by rule: $ruleId');
+  factory PolicyDecision.deny(String ruleId) => PolicyDecision(
+    allowed: false,
+    matchedRuleId: ruleId,
+    reason: 'Denied by rule: $ruleId',
+  );
 
   factory PolicyDecision.implicitDeny(String caller, String target) =>
-      PolicyDecision(allowed: false, reason: 'No matching policy for $caller -> $target');
+      PolicyDecision(
+        allowed: false,
+        reason: 'No matching policy for $caller -> $target',
+      );
 }
 
 class PolicyEngine {
@@ -107,58 +109,76 @@ class PolicyEngine {
     return lastMatch ?? PolicyDecision.implicitDeny(callerId, targetCapability);
   }
 
-  bool isAllowed(String callerId, String targetCapability, {PolicyScope scope = PolicyScope.own}) {
-    return evaluate(callerId: callerId, targetCapability: targetCapability, scope: scope).allowed;
+  bool isAllowed(
+    String callerId,
+    String targetCapability, {
+    PolicyScope scope = PolicyScope.own,
+  }) {
+    return evaluate(
+      callerId: callerId,
+      targetCapability: targetCapability,
+      scope: scope,
+    ).allowed;
   }
 
   static PolicyEngine defaultPolicy() {
     final engine = PolicyEngine();
 
-    engine.addRule(const PolicyRule(
-      id: 'deny-agent-delete-storage',
-      description: 'agent.* cannot storage.delete',
-      effect: PolicyEffect.deny,
-      callerPattern: 'agent.*',
-      targetPattern: 'storage.delete',
-      priority: 100,
-    ));
+    engine.addRule(
+      const PolicyRule(
+        id: 'deny-agent-delete-storage',
+        description: 'agent.* cannot storage.delete',
+        effect: PolicyEffect.deny,
+        callerPattern: 'agent.*',
+        targetPattern: 'storage.delete',
+        priority: 100,
+      ),
+    );
 
-    engine.addRule(const PolicyRule(
-      id: 'deny-background-network',
-      description: 'background plugins cannot access network.*',
-      effect: PolicyEffect.deny,
-      callerPattern: 'background.*',
-      targetPattern: 'network.*',
-      priority: 100,
-    ));
+    engine.addRule(
+      const PolicyRule(
+        id: 'deny-background-network',
+        description: 'background plugins cannot access network.*',
+        effect: PolicyEffect.deny,
+        callerPattern: 'background.*',
+        targetPattern: 'network.*',
+        priority: 100,
+      ),
+    );
 
-    engine.addRule(const PolicyRule(
-      id: 'deny-sandbox-runtime',
-      description: 'Level 2+ plugins cannot access runtime.*',
-      effect: PolicyEffect.deny,
-      callerPattern: 'sandbox.*',
-      targetPattern: 'runtime.*',
-      priority: 100,
-    ));
+    engine.addRule(
+      const PolicyRule(
+        id: 'deny-sandbox-runtime',
+        description: 'Level 2+ plugins cannot access runtime.*',
+        effect: PolicyEffect.deny,
+        callerPattern: 'sandbox.*',
+        targetPattern: 'runtime.*',
+        priority: 100,
+      ),
+    );
 
-    engine.addRule(const PolicyRule(
-      id: 'deny-chaos-production',
-      description: 'chaos-agent cannot run in production',
-      effect: PolicyEffect.deny,
-      callerPattern: 'chaos-agent',
-      targetPattern: '*',
-      priority: 200,
-      conditions: {'environment': 'production'},
-    ));
+    engine.addRule(
+      const PolicyRule(
+        id: 'deny-chaos-production',
+        description: 'chaos-agent cannot run in production',
+        effect: PolicyEffect.deny,
+        callerPattern: 'chaos-agent',
+        targetPattern: '*',
+        priority: 200,
+        conditions: {'environment': 'production'},
+      ),
+    );
 
-    engine.addRule(const PolicyRule(
-      id: 'allow-all-default',
-      description: 'Default allow all',
-      effect: PolicyEffect.allow,
-      callerPattern: '*',
-      targetPattern: '*',
-      priority: 0,
-    ));
+    engine.addRule(
+      const PolicyRule(
+        id: 'allow-all-default',
+        description: 'Default allow all',
+        effect: PolicyEffect.allow,
+        callerPattern: '*',
+        targetPattern: '*',
+        priority: 0,
+      ),
+    );
 
     return engine;
   }

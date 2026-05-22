@@ -12,20 +12,29 @@ import 'package:omnivium/core/runtime/plugins/storage_plugin.dart';
 
 class SdkTestPlugin extends PluginHandler {
   @override
-  Future<HandlerResult> handleMessage(RuntimeMessage message, CapabilityContext context) async =>
-      HandlerResult.ok('handled');
+  Future<HandlerResult> handleMessage(
+    RuntimeMessage message,
+    CapabilityContext context,
+  ) async => HandlerResult.ok('handled');
 
   @override
-  Future<HandlerResult> handleEvent(RuntimeEvent event, CapabilityContext context) async =>
-      HandlerResult.ok('event');
+  Future<HandlerResult> handleEvent(
+    RuntimeEvent event,
+    CapabilityContext context,
+  ) async => HandlerResult.ok('event');
 
   @override
   Future<CapabilityResult> invokeCapability(
-      String capabilityId, dynamic params, CapabilityContext context) async {
+    String capabilityId,
+    dynamic params,
+    CapabilityContext context,
+  ) async {
     if (capabilityId == 'test.echo') {
       return CapabilityResult.ok({'echo': params});
     }
-    return CapabilityResult.fail(RuntimeError.notFound(message: 'Unknown: $capabilityId'));
+    return CapabilityResult.fail(
+      RuntimeError.notFound(message: 'Unknown: $capabilityId'),
+    );
   }
 }
 
@@ -54,11 +63,9 @@ void main() {
     test('create plugin with builder', () async {
       final sdk = await OmniviumSDK.init();
 
-      final cap = CapabilityBuilder('test.echo')
-          .name('Echo')
-          .description('Echo capability')
-          .channel('fast')
-          .build();
+      final cap = CapabilityBuilder(
+        'test.echo',
+      ).name('Echo').description('Echo capability').channel('fast').build();
 
       final descriptor = sdk
           .createPlugin('test-plugin')
@@ -84,7 +91,9 @@ void main() {
           .version('1.0.0')
           .description('Test')
           .addCapability(
-            CapabilityBuilder('test.echo').name('Echo').description('Echo').permission('auto').build(),
+            CapabilityBuilder(
+              'test.echo',
+            ).name('Echo').description('Echo').permission('auto').build(),
           )
           .register(SdkTestPlugin());
 
@@ -102,7 +111,9 @@ void main() {
           .version('1.0.0')
           .description('Test')
           .addCapability(
-            CapabilityBuilder('test.echo').name('Echo').description('Echo').permission('auto').build(),
+            CapabilityBuilder(
+              'test.echo',
+            ).name('Echo').description('Echo').permission('auto').build(),
           )
           .register(SdkTestPlugin());
 
@@ -124,7 +135,10 @@ void main() {
     test('list plugins', () async {
       final sdk = await OmniviumSDK.init();
 
-      await sdk.container.registerPlugin(StoragePlugin.descriptor(), StoragePlugin());
+      await sdk.container.registerPlugin(
+        StoragePlugin.descriptor(),
+        StoragePlugin(),
+      );
 
       final plugins = sdk.listPlugins();
       expect(plugins, isNotEmpty);
@@ -136,7 +150,10 @@ void main() {
     test('list capabilities', () async {
       final sdk = await OmniviumSDK.init();
 
-      await sdk.container.registerPlugin(StoragePlugin.descriptor(), StoragePlugin());
+      await sdk.container.registerPlugin(
+        StoragePlugin.descriptor(),
+        StoragePlugin(),
+      );
 
       final caps = sdk.listCapabilities();
       expect(caps, isNotEmpty);
@@ -214,7 +231,10 @@ void main() {
 
     test('plugins command', () async {
       final container = await RuntimeContainer.boot();
-      await container.registerPlugin(StoragePlugin.descriptor(), StoragePlugin());
+      await container.registerPlugin(
+        StoragePlugin.descriptor(),
+        StoragePlugin(),
+      );
       final cli = RuntimeCLI(container: container);
 
       final output = cli.execute('plugins');
@@ -225,7 +245,10 @@ void main() {
 
     test('plugin detail command', () async {
       final container = await RuntimeContainer.boot();
-      await container.registerPlugin(StoragePlugin.descriptor(), StoragePlugin());
+      await container.registerPlugin(
+        StoragePlugin.descriptor(),
+        StoragePlugin(),
+      );
       final cli = RuntimeCLI(container: container);
 
       final output = cli.execute('plugin', args: ['storage']);
@@ -237,7 +260,10 @@ void main() {
 
     test('capabilities command', () async {
       final container = await RuntimeContainer.boot();
-      await container.registerPlugin(StoragePlugin.descriptor(), StoragePlugin());
+      await container.registerPlugin(
+        StoragePlugin.descriptor(),
+        StoragePlugin(),
+      );
       final cli = RuntimeCLI(container: container);
 
       final output = cli.execute('capabilities');
@@ -341,7 +367,10 @@ void main() {
 
     test('getPluginGraph returns nodes and edges', () async {
       final container = await RuntimeContainer.boot();
-      await container.registerPlugin(StoragePlugin.descriptor(), StoragePlugin());
+      await container.registerPlugin(
+        StoragePlugin.descriptor(),
+        StoragePlugin(),
+      );
       final observatory = RuntimeObservatory(container: container);
 
       final graph = observatory.getPluginGraph();
@@ -409,7 +438,10 @@ void main() {
 
     test('event buffer respects size limit', () async {
       final container = await RuntimeContainer.boot();
-      final observatory = RuntimeObservatory(container: container, bufferSize: 5);
+      final observatory = RuntimeObservatory(
+        container: container,
+        bufferSize: 5,
+      );
 
       for (var i = 0; i < 10; i++) {
         observatory.notifyPluginStateChange('p-$i', 'a', 'b');

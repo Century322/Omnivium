@@ -8,7 +8,9 @@ class LocaleProvider extends ChangeNotifier {
   Map<String, String>? _cachedMap;
   Locale? _cachedLocale;
 
-  LocaleProvider() { _load(); }
+  LocaleProvider() {
+    _load();
+  }
 
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
@@ -27,19 +29,33 @@ class LocaleProvider extends ChangeNotifier {
 
   void setLocaleFromLabel(String labelOrCode) {
     switch (labelOrCode) {
-      case 'en': case 'English': setLocale(const Locale('en')); break;
-      case 'ja': case '日本語': setLocale(const Locale('ja')); break;
-      case 'ko': case '한국어': setLocale(const Locale('ko')); break;
-      default: setLocale(const Locale('zh'));
+      case 'en':
+      case 'English':
+        setLocale(const Locale('en'));
+        break;
+      case 'ja':
+      case '日本語':
+        setLocale(const Locale('ja'));
+        break;
+      case 'ko':
+      case '한국어':
+        setLocale(const Locale('ko'));
+        break;
+      default:
+        setLocale(const Locale('zh'));
     }
   }
 
   String get currentLabel {
     switch (_locale.languageCode) {
-      case 'en': return 'English';
-      case 'ja': return '日本語';
-      case 'ko': return '한국어';
-      default: return '中文';
+      case 'en':
+        return 'English';
+      case 'ja':
+        return '日本語';
+      case 'ko':
+        return '한국어';
+      default:
+        return '中文';
     }
   }
 
@@ -58,6 +74,7 @@ class LocaleProvider extends ChangeNotifier {
       return key;
     }
   }
+
   Map<String, String> _buildMap(S s) {
     return {
       'server_address': s.server_address,
@@ -699,7 +716,12 @@ class LocaleProvider extends ChangeNotifier {
     };
   }
 
-  static const supportedLocales = [Locale('zh'), Locale('en'), Locale('ja'), Locale('ko')];
+  static const supportedLocales = [
+    Locale('zh'),
+    Locale('en'),
+    Locale('ja'),
+    Locale('ko'),
+  ];
 }
 
 final localeProvider = LocaleProvider();

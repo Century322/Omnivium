@@ -10,17 +10,27 @@ class MetricsPlugin implements PluginHandler {
   final Map<String, List<num>> _histograms = {};
 
   @override
-  Future<HandlerResult> handleMessage(RuntimeMessage message, CapabilityContext context) async {
+  Future<HandlerResult> handleMessage(
+    RuntimeMessage message,
+    CapabilityContext context,
+  ) async {
     return HandlerResult.ok();
   }
 
   @override
-  Future<HandlerResult> handleEvent(RuntimeEvent event, CapabilityContext context) async {
+  Future<HandlerResult> handleEvent(
+    RuntimeEvent event,
+    CapabilityContext context,
+  ) async {
     return HandlerResult.ok();
   }
 
   @override
-  Future<CapabilityResult> invokeCapability(String capabilityId, dynamic params, CapabilityContext context) async {
+  Future<CapabilityResult> invokeCapability(
+    String capabilityId,
+    dynamic params,
+    CapabilityContext context,
+  ) async {
     switch (capabilityId) {
       case 'metrics.counter':
         if (params is Map) {
@@ -29,7 +39,12 @@ class MetricsPlugin implements PluginHandler {
           _counters[name] = (_counters[name] ?? 0) + delta;
           return CapabilityResult.ok(_counters[name]);
         }
-        return CapabilityResult.fail(const RuntimeError(code: 'INVALID_PARAMS', message: 'Expected {name, delta}'));
+        return CapabilityResult.fail(
+          const RuntimeError(
+            code: 'INVALID_PARAMS',
+            message: 'Expected {name, delta}',
+          ),
+        );
       case 'metrics.histogram':
         if (params is Map) {
           final name = params['name'] as String;
@@ -38,7 +53,12 @@ class MetricsPlugin implements PluginHandler {
           _histograms[name]!.add(value);
           return CapabilityResult.ok(_histograms[name]!.length);
         }
-        return CapabilityResult.fail(const RuntimeError(code: 'INVALID_PARAMS', message: 'Expected {name, value}'));
+        return CapabilityResult.fail(
+          const RuntimeError(
+            code: 'INVALID_PARAMS',
+            message: 'Expected {name, value}',
+          ),
+        );
       case 'metrics.trace':
         return CapabilityResult.ok({
           'counters': Map<String, int>.from(_counters),
@@ -56,35 +76,38 @@ class MetricsPlugin implements PluginHandler {
         });
       default:
         return CapabilityResult.fail(
-          RuntimeError(code: 'UNKNOWN_CAPABILITY', message: 'Unknown capability: $capabilityId'),
+          RuntimeError(
+            code: 'UNKNOWN_CAPABILITY',
+            message: 'Unknown capability: $capabilityId',
+          ),
         );
     }
   }
 
   static PluginDescriptor descriptor() => PluginDescriptor(
-        id: 'metrics',
-        name: 'Metrics Plugin',
-        version: '1.0.0',
-        description: 'Runtime metrics collection',
-        capabilities: const [
-          CapabilityDeclaration(
-            id: 'metrics.counter',
-            name: 'Counter',
-            description: 'Increment a counter metric',
-            permission: 'auto',
-          ),
-          CapabilityDeclaration(
-            id: 'metrics.histogram',
-            name: 'Histogram',
-            description: 'Record a histogram observation',
-            permission: 'auto',
-          ),
-          CapabilityDeclaration(
-            id: 'metrics.trace',
-            name: 'Trace',
-            description: 'Get all metrics snapshot',
-            permission: 'auto',
-          ),
-        ],
-      );
+    id: 'metrics',
+    name: 'Metrics Plugin',
+    version: '1.0.0',
+    description: 'Runtime metrics collection',
+    capabilities: const [
+      CapabilityDeclaration(
+        id: 'metrics.counter',
+        name: 'Counter',
+        description: 'Increment a counter metric',
+        permission: 'auto',
+      ),
+      CapabilityDeclaration(
+        id: 'metrics.histogram',
+        name: 'Histogram',
+        description: 'Record a histogram observation',
+        permission: 'auto',
+      ),
+      CapabilityDeclaration(
+        id: 'metrics.trace',
+        name: 'Trace',
+        description: 'Get all metrics snapshot',
+        permission: 'auto',
+      ),
+    ],
+  );
 }

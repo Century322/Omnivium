@@ -71,8 +71,7 @@ class HomeHeader extends StatelessWidget {
         Semantics(
           label: localeProvider.t('close_conversation'),
           child: GestureDetector(
-
-      behavior: HitTestBehavior.opaque,
+            behavior: HitTestBehavior.opaque,
             onTap: onCloseConversation,
             child: Container(
               width: 32,
@@ -81,14 +80,17 @@ class HomeHeader extends StatelessWidget {
                 color: AppColors.sfAlt(context),
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: Icon(LucideIcons.x, size: 18, color: AppColors.sec(context)),
+              child: Icon(
+                LucideIcons.x,
+                size: 18,
+                color: AppColors.sec(context),
+              ),
             ),
           ),
         ),
         const Spacer(),
         GestureDetector(
-
-      behavior: HitTestBehavior.opaque,
+          behavior: HitTestBehavior.opaque,
           onTap: onShowConversationMenu,
           child: Container(
             width: 32,
@@ -97,7 +99,11 @@ class HomeHeader extends StatelessWidget {
               color: AppColors.sfAlt(context),
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Icon(LucideIcons.moreVertical, size: 18, color: AppColors.sec(context)),
+            child: Icon(
+              LucideIcons.moreVertical,
+              size: 18,
+              color: AppColors.sec(context),
+            ),
           ),
         ),
       ],
@@ -110,8 +116,7 @@ class HomeHeader extends StatelessWidget {
       child: Row(
         children: [
           GestureDetector(
-
-      behavior: HitTestBehavior.opaque,
+            behavior: HitTestBehavior.opaque,
             onTap: isLibraryMode ? onToggleContacts : onOpenDrawer,
             child: Container(
               width: 30,
@@ -123,21 +128,26 @@ class HomeHeader extends StatelessWidget {
               child: isLibraryMode
                   ? Center(
                       child: Icon(
-                          showContacts ? LucideIcons.messageCircle : LucideIcons.users,
-                          size: 16, color: AppColors.sec(context)))
+                        showContacts
+                            ? LucideIcons.messageCircle
+                            : LucideIcons.users,
+                        size: 16,
+                        color: AppColors.sec(context),
+                      ),
+                    )
                   : isIncognito
-                      ? Center(child: IncognitoIcon(size: 18, color: AppColors.textPrimary(context)))
-                      : userAvatar,
+                  ? Center(
+                      child: IncognitoIcon(
+                        size: 18,
+                        color: AppColors.textPrimary(context),
+                      ),
+                    )
+                  : userAvatar,
             ),
           ),
-          Expanded(
-            child: Center(
-              child: _buildTabSwitcher(context),
-            ),
-          ),
+          Expanded(child: Center(child: _buildTabSwitcher(context))),
           GestureDetector(
-
-      behavior: HitTestBehavior.opaque,
+            behavior: HitTestBehavior.opaque,
             onTap: isLibraryMode ? onToggleSearch : onOpenDiscover,
             child: isLibraryMode
                 ? Container(
@@ -147,7 +157,11 @@ class HomeHeader extends StatelessWidget {
                       color: AppColors.sfAlt(context),
                       borderRadius: BorderRadius.circular(15),
                     ),
-                    child: Icon(LucideIcons.search, size: 16, color: AppColors.sec(context)),
+                    child: Icon(
+                      LucideIcons.search,
+                      size: 16,
+                      color: AppColors.sec(context),
+                    ),
                   )
                 : Transform.rotate(
                     angle: 0.17,
@@ -158,7 +172,11 @@ class HomeHeader extends StatelessWidget {
                         color: AppColors.accent.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Icon(LucideIcons.flame, size: 16, color: AppColors.accent),
+                      child: Icon(
+                        LucideIcons.flame,
+                        size: 16,
+                        color: AppColors.accent,
+                      ),
                     ),
                   ),
           ),
@@ -180,46 +198,56 @@ class HomeHeader extends StatelessWidget {
         animation: tabSwitch,
         builder: (context, _) {
           final t = tabSwitch.value;
-          return Stack(children: [
-            Positioned(
-              left: t * 66,
-              top: 0,
-              bottom: 0,
-              child: Container(
-                width: 66,
-                decoration: BoxDecoration(
-                  color: AppColors.sfActive(context),
-                  borderRadius: BorderRadius.circular(19),
-                ),
-              ),
-            ),
-            Row(children: [
-              Expanded(
-                child: GestureDetector(
-
-      behavior: HitTestBehavior.opaque,
-                  onTap: onSwitchToChat,
-                  child: Center(
-                    child: Icon(LucideIcons.messageCircle,
-                        size: 18,
-                        color: t < 0.5 ? AppColors.textPrimary(context) : AppColors.tabIn(context)),
+          return Stack(
+            children: [
+              Positioned(
+                left: t * 66,
+                top: 0,
+                bottom: 0,
+                child: Container(
+                  width: 66,
+                  decoration: BoxDecoration(
+                    color: AppColors.sfActive(context),
+                    borderRadius: BorderRadius.circular(19),
                   ),
                 ),
               ),
-              Expanded(
-                child: GestureDetector(
-
-      behavior: HitTestBehavior.opaque,
-                  onTap: onSwitchToLibrary,
-                  child: Center(
-                    child: Icon(LucideIcons.monitor,
-                        size: 18,
-                        color: t >= 0.5 ? AppColors.textPrimary(context) : AppColors.tabIn(context)),
+              Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: onSwitchToChat,
+                      child: Center(
+                        child: Icon(
+                          LucideIcons.messageCircle,
+                          size: 18,
+                          color: t < 0.5
+                              ? AppColors.textPrimary(context)
+                              : AppColors.tabIn(context),
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                  Expanded(
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: onSwitchToLibrary,
+                      child: Center(
+                        child: Icon(
+                          LucideIcons.monitor,
+                          size: 18,
+                          color: t >= 0.5
+                              ? AppColors.textPrimary(context)
+                              : AppColors.tabIn(context),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ]),
-          ]);
+            ],
+          );
         },
       ),
     );

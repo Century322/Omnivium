@@ -31,45 +31,46 @@ class DistributedSpan {
     this.remoteNodeId,
   });
 
-  int get durationHlc =>
-      endTimeHlc != null ? endTimeHlc! - startTimeHlc : 0;
+  int get durationHlc => endTimeHlc != null ? endTimeHlc! - startTimeHlc : 0;
 
   bool get isRemote => remoteNodeId != null;
 
   bool get isCrossNode => remoteParentSpanId != null;
 
   Map<String, dynamic> toJson() => {
-        'spanId': spanId,
-        'parentSpanId': parentSpanId,
-        'traceId': traceId,
-        'operation': operation,
-        'nodeId': nodeId,
-        'pluginId': pluginId,
-        'capabilityId': capabilityId,
-        'startTimeHlc': startTimeHlc,
-        'endTimeHlc': endTimeHlc,
-        'durationHlc': durationHlc,
-        'status': status,
-        'tags': tags,
-        'remoteParentSpanId': remoteParentSpanId,
-        'remoteNodeId': remoteNodeId,
-      };
+    'spanId': spanId,
+    'parentSpanId': parentSpanId,
+    'traceId': traceId,
+    'operation': operation,
+    'nodeId': nodeId,
+    'pluginId': pluginId,
+    'capabilityId': capabilityId,
+    'startTimeHlc': startTimeHlc,
+    'endTimeHlc': endTimeHlc,
+    'durationHlc': durationHlc,
+    'status': status,
+    'tags': tags,
+    'remoteParentSpanId': remoteParentSpanId,
+    'remoteNodeId': remoteNodeId,
+  };
 
-  factory DistributedSpan.fromJson(Map<String, dynamic> json) => DistributedSpan(
-        spanId: json['spanId'] as String,
-        parentSpanId: json['parentSpanId'] as String?,
-        traceId: json['traceId'] as String,
-        operation: json['operation'] as String,
-        nodeId: json['nodeId'] as String,
-        pluginId: json['pluginId'] as String? ?? '',
-        capabilityId: json['capabilityId'] as String? ?? '',
-        startTimeHlc: json['startTimeHlc'] as int,
-        endTimeHlc: json['endTimeHlc'] as int?,
-        status: json['status'] as String? ?? 'ok',
-        tags: (json['tags'] as Map<String, dynamic>?)?.cast<String, String>() ?? {},
-        remoteParentSpanId: json['remoteParentSpanId'] as String?,
-        remoteNodeId: json['remoteNodeId'] as String?,
-      );
+  factory DistributedSpan.fromJson(
+    Map<String, dynamic> json,
+  ) => DistributedSpan(
+    spanId: json['spanId'] as String,
+    parentSpanId: json['parentSpanId'] as String?,
+    traceId: json['traceId'] as String,
+    operation: json['operation'] as String,
+    nodeId: json['nodeId'] as String,
+    pluginId: json['pluginId'] as String? ?? '',
+    capabilityId: json['capabilityId'] as String? ?? '',
+    startTimeHlc: json['startTimeHlc'] as int,
+    endTimeHlc: json['endTimeHlc'] as int?,
+    status: json['status'] as String? ?? 'ok',
+    tags: (json['tags'] as Map<String, dynamic>?)?.cast<String, String>() ?? {},
+    remoteParentSpanId: json['remoteParentSpanId'] as String?,
+    remoteNodeId: json['remoteNodeId'] as String?,
+  );
 }
 
 class DistributedTrace {
@@ -89,26 +90,26 @@ class DistributedTrace {
 
   void addSpan(DistributedSpan span) => spans.add(span);
 
-  DistributedSpan? get rootSpan =>
-      spans.where((s) => s.parentSpanId == null && s.remoteParentSpanId == null).firstOrNull;
+  DistributedSpan? get rootSpan => spans
+      .where((s) => s.parentSpanId == null && s.remoteParentSpanId == null)
+      .firstOrNull;
 
   List<DistributedSpan> spansOnNode(String nodeId) =>
       spans.where((s) => s.nodeId == nodeId).toList();
 
-  List<String> get involvedNodes =>
-      spans.map((s) => s.nodeId).toSet().toList();
+  List<String> get involvedNodes => spans.map((s) => s.nodeId).toSet().toList();
 
   List<DistributedSpan> crossNodeSpans() =>
       spans.where((s) => s.isCrossNode).toList();
 
   Map<String, dynamic> toJson() => {
-        'traceId': traceId,
-        'rootNodeId': rootNodeId,
-        'spans': spans.map((s) => s.toJson()).toList(),
-        'createdAt': createdAt,
-        'tags': tags,
-        'involvedNodes': involvedNodes,
-      };
+    'traceId': traceId,
+    'rootNodeId': rootNodeId,
+    'spans': spans.map((s) => s.toJson()).toList(),
+    'createdAt': createdAt,
+    'tags': tags,
+    'involvedNodes': involvedNodes,
+  };
 }
 
 class TracePropagationContext {
@@ -127,12 +128,12 @@ class TracePropagationContext {
   });
 
   Map<String, String> toHeaders() => {
-        'x-trace-id': traceId,
-        'x-parent-span-id': parentSpanId,
-        'x-origin-node': originNodeId,
-        'x-hlc-time': hlcTime.toString(),
-        ...baggage.map((k, v) => MapEntry('x-baggage-$k', v)),
-      };
+    'x-trace-id': traceId,
+    'x-parent-span-id': parentSpanId,
+    'x-origin-node': originNodeId,
+    'x-hlc-time': hlcTime.toString(),
+    ...baggage.map((k, v) => MapEntry('x-baggage-$k', v)),
+  };
 
   factory TracePropagationContext.fromHeaders(Map<String, String> headers) =>
       TracePropagationContext(
@@ -157,12 +158,15 @@ class DistributedTraceService {
   DistributedTraceService({
     required String localNodeId,
     required HybridLogicalClock clock,
-  })  : _localNodeId = localNodeId,
-        _clock = clock;
+  }) : _localNodeId = localNodeId,
+       _clock = clock;
 
   String get localNodeId => _localNodeId;
 
-  DistributedTrace startTrace({String? traceId, Map<String, String> tags = const {}}) {
+  DistributedTrace startTrace({
+    String? traceId,
+    Map<String, String> tags = const {},
+  }) {
     final now = _clock.tick();
     final id = traceId ?? 'dtrace_${now.physicalTime}_${_spanCounter++}';
     final trace = DistributedTrace(
@@ -235,7 +239,10 @@ class DistributedTraceService {
     }
   }
 
-  DistributedSpan startRemoteSpan(TracePropagationContext context, {required String operation}) {
+  DistributedSpan startRemoteSpan(
+    TracePropagationContext context, {
+    required String operation,
+  }) {
     return startSpan(
       traceId: context.traceId,
       remoteParentSpanId: context.parentSpanId,

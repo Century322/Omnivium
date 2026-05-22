@@ -1,8 +1,4 @@
-enum SessionState {
-  active,
-  suspended,
-  closed,
-}
+enum SessionState { active, suspended, closed }
 
 class RuntimeSession {
   final String id;
@@ -28,15 +24,14 @@ class RuntimeSession {
     int? lastActiveAt,
     SessionState? state,
     Map<String, dynamic>? metadata,
-  }) =>
-      RuntimeSession(
-        id: id ?? this.id,
-        userId: userId ?? this.userId,
-        createdAt: createdAt ?? this.createdAt,
-        lastActiveAt: lastActiveAt ?? this.lastActiveAt,
-        state: state ?? this.state,
-        metadata: metadata ?? this.metadata,
-      );
+  }) => RuntimeSession(
+    id: id ?? this.id,
+    userId: userId ?? this.userId,
+    createdAt: createdAt ?? this.createdAt,
+    lastActiveAt: lastActiveAt ?? this.lastActiveAt,
+    state: state ?? this.state,
+    metadata: metadata ?? this.metadata,
+  );
 
   bool get isActive => state == SessionState.active;
 }

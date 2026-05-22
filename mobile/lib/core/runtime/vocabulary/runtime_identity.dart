@@ -9,8 +9,11 @@ class RuntimeIdentity {
     this.node = 'local',
   });
 
-  static RuntimeIdentity forPlugin(String pluginId, {String instance = 'default', String node = 'local'}) =>
-      RuntimeIdentity(identity: pluginId, instance: instance, node: node);
+  static RuntimeIdentity forPlugin(
+    String pluginId, {
+    String instance = 'default',
+    String node = 'local',
+  }) => RuntimeIdentity(identity: pluginId, instance: instance, node: node);
 
   static RuntimeIdentity forRuntime(String nodeId) =>
       RuntimeIdentity(identity: 'runtime', instance: 'kernel', node: nodeId);

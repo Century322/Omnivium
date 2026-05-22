@@ -6,7 +6,9 @@ void main() {
   group('AgentStateMachine', () {
     late AgentStateMachine fsm;
 
-    setUp(() { fsm = AgentStateMachine(); });
+    setUp(() {
+      fsm = AgentStateMachine();
+    });
 
     test('initial state is idle', () {
       expect(fsm.state, AgentState.idle);
@@ -226,18 +228,21 @@ void main() {
       expect(fsm.state, AgentState.executing);
     });
 
-    test('reflection-rethink path: reflecting -> thinking -> planning -> ...', () {
-      fsm.transition(AgentState.thinking);
-      fsm.transition(AgentState.planning);
-      fsm.transition(AgentState.executing);
-      fsm.transition(AgentState.waitingTool);
-      fsm.transition(AgentState.checking);
-      fsm.transition(AgentState.reflecting);
-      fsm.transition(AgentState.thinking);
-      fsm.transition(AgentState.planning);
-      fsm.transition(AgentState.executing);
-      expect(fsm.state, AgentState.executing);
-    });
+    test(
+      'reflection-rethink path: reflecting -> thinking -> planning -> ...',
+      () {
+        fsm.transition(AgentState.thinking);
+        fsm.transition(AgentState.planning);
+        fsm.transition(AgentState.executing);
+        fsm.transition(AgentState.waitingTool);
+        fsm.transition(AgentState.checking);
+        fsm.transition(AgentState.reflecting);
+        fsm.transition(AgentState.thinking);
+        fsm.transition(AgentState.planning);
+        fsm.transition(AgentState.executing);
+        expect(fsm.state, AgentState.executing);
+      },
+    );
 
     test('forceState bypasses rules', () {
       fsm.forceState(AgentState.executing);
@@ -342,20 +347,23 @@ void main() {
 
   group('AgentState', () {
     test('all states exist', () {
-      expect(AgentState.values, containsAll([
-        AgentState.idle,
-        AgentState.thinking,
-        AgentState.planning,
-        AgentState.executing,
-        AgentState.waitingTool,
-        AgentState.checking,
-        AgentState.reflecting,
-        AgentState.memorizing,
-        AgentState.recovering,
-        AgentState.interrupted,
-        AgentState.failed,
-        AgentState.completed,
-      ]));
+      expect(
+        AgentState.values,
+        containsAll([
+          AgentState.idle,
+          AgentState.thinking,
+          AgentState.planning,
+          AgentState.executing,
+          AgentState.waitingTool,
+          AgentState.checking,
+          AgentState.reflecting,
+          AgentState.memorizing,
+          AgentState.recovering,
+          AgentState.interrupted,
+          AgentState.failed,
+          AgentState.completed,
+        ]),
+      );
     });
 
     test('all states are distinct', () {

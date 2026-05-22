@@ -40,19 +40,21 @@ class RuntimeConfig {
     int? defaultRetryBackoffMs,
     double? defaultRetryBackoffMultiplier,
     int? defaultRetryMaxBackoffMs,
-  }) =>
-      RuntimeConfig(
-        runtimeVersion: runtimeVersion ?? this.runtimeVersion,
-        nodeId: nodeId ?? this.nodeId,
-        defaultTimeoutMs: defaultTimeoutMs ?? this.defaultTimeoutMs,
-        maxConcurrentTasks: maxConcurrentTasks ?? this.maxConcurrentTasks,
-        maxPlugins: maxPlugins ?? this.maxPlugins,
-        enableHotReload: enableHotReload ?? this.enableHotReload,
-        enableAsyncDiscovery: enableAsyncDiscovery ?? this.enableAsyncDiscovery,
-        maxEventBusCapacity: maxEventBusCapacity ?? this.maxEventBusCapacity,
-        defaultRetryMaxAttempts: defaultRetryMaxAttempts ?? this.defaultRetryMaxAttempts,
-        defaultRetryBackoffMs: defaultRetryBackoffMs ?? this.defaultRetryBackoffMs,
-        defaultRetryBackoffMultiplier: defaultRetryBackoffMultiplier ?? this.defaultRetryBackoffMultiplier,
-        defaultRetryMaxBackoffMs: defaultRetryMaxBackoffMs ?? this.defaultRetryMaxBackoffMs,
-      );
+  }) => RuntimeConfig(
+    runtimeVersion: runtimeVersion ?? this.runtimeVersion,
+    nodeId: nodeId ?? this.nodeId,
+    defaultTimeoutMs: defaultTimeoutMs ?? this.defaultTimeoutMs,
+    maxConcurrentTasks: maxConcurrentTasks ?? this.maxConcurrentTasks,
+    maxPlugins: maxPlugins ?? this.maxPlugins,
+    enableHotReload: enableHotReload ?? this.enableHotReload,
+    enableAsyncDiscovery: enableAsyncDiscovery ?? this.enableAsyncDiscovery,
+    maxEventBusCapacity: maxEventBusCapacity ?? this.maxEventBusCapacity,
+    defaultRetryMaxAttempts:
+        defaultRetryMaxAttempts ?? this.defaultRetryMaxAttempts,
+    defaultRetryBackoffMs: defaultRetryBackoffMs ?? this.defaultRetryBackoffMs,
+    defaultRetryBackoffMultiplier:
+        defaultRetryBackoffMultiplier ?? this.defaultRetryBackoffMultiplier,
+    defaultRetryMaxBackoffMs:
+        defaultRetryMaxBackoffMs ?? this.defaultRetryMaxBackoffMs,
+  );
 }

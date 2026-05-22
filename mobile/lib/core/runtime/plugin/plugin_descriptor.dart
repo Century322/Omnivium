@@ -1,13 +1,6 @@
 import '../vocabulary/runtime_permission.dart';
 
-enum TransportType {
-  inProcess,
-  isolate,
-  wasm,
-  http,
-  websocket,
-  mcp,
-}
+enum TransportType { inProcess, isolate, wasm, http, websocket, mcp }
 
 class CapabilityDeclaration {
   final String id;

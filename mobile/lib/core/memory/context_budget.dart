@@ -14,7 +14,9 @@ int estimateTokens(String text) {
       i++;
     } else {
       final wordStart = i;
-      while (i < text.length && !_isWhitespace(text.codeUnitAt(i)) && text.codeUnitAt(i) <= 0x7F) {
+      while (i < text.length &&
+          !_isWhitespace(text.codeUnitAt(i)) &&
+          text.codeUnitAt(i) <= 0x7F) {
         i++;
       }
       final wordLen = i - wordStart;
@@ -25,7 +27,10 @@ int estimateTokens(String text) {
 }
 
 bool _isWhitespace(int codeUnit) =>
-    codeUnit == 0x20 || codeUnit == 0x09 || codeUnit == 0x0A || codeUnit == 0x0D;
+    codeUnit == 0x20 ||
+    codeUnit == 0x09 ||
+    codeUnit == 0x0A ||
+    codeUnit == 0x0D;
 
 class ContextBudget {
   final int maxTokens;
@@ -46,7 +51,8 @@ class ContextBudget {
     final rc = RemoteConfigService.instance;
     return ContextBudget(
       maxTokens: rc.getValue<int>('context_max_tokens') ?? 128000,
-      reservedForResponse: rc.getValue<int>('context_reserved_response') ?? 4096,
+      reservedForResponse:
+          rc.getValue<int>('context_reserved_response') ?? 4096,
       reservedForTools: rc.getValue<int>('context_reserved_tools') ?? 2048,
       reservedForMemory: rc.getValue<int>('context_reserved_memory') ?? 4096,
       reservedForSystem: rc.getValue<int>('context_reserved_system') ?? 1024,
@@ -54,7 +60,12 @@ class ContextBudget {
   }
 
   int get availableForHistory {
-    final available = maxTokens - reservedForResponse - reservedForTools - reservedForMemory - reservedForSystem;
+    final available =
+        maxTokens -
+        reservedForResponse -
+        reservedForTools -
+        reservedForMemory -
+        reservedForSystem;
     return available < 0 ? 0 : available;
   }
 }
@@ -63,14 +74,17 @@ class ContextBudgetManager {
   final ContextBudget _budget;
   int _usedTokens = 0;
 
-  ContextBudgetManager([ContextBudget? budget]) : _budget = budget ?? ContextBudget.fromRemote();
+  ContextBudgetManager([ContextBudget? budget])
+    : _budget = budget ?? ContextBudget.fromRemote();
 
   ContextBudget get budget => _budget;
   int get usedTokens => _usedTokens;
-  int get remainingTokens => (_budget.maxTokens - _usedTokens).clamp(0, _budget.maxTokens);
+  int get remainingTokens =>
+      (_budget.maxTokens - _usedTokens).clamp(0, _budget.maxTokens);
   double get usageRatio => _usedTokens / _budget.maxTokens;
 
-  bool canFit(int tokens) => _usedTokens + tokens <= _budget.availableForHistory;
+  bool canFit(int tokens) =>
+      _usedTokens + tokens <= _budget.availableForHistory;
 
   bool allocate(int tokens) {
     if (_usedTokens + tokens > _budget.availableForHistory) return false;

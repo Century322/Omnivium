@@ -6,8 +6,8 @@ class RuntimeCLI {
   final DistributedRuntime? _distributed;
 
   RuntimeCLI({RuntimeContainer? container, DistributedRuntime? distributed})
-      : _container = container,
-        _distributed = distributed;
+    : _container = container,
+      _distributed = distributed;
 
   String execute(String command, {List<String> args = const []}) {
     try {
@@ -77,7 +77,9 @@ Runtime Inspect
     final buffer = StringBuffer('Plugins\n═══════\n');
     for (final d in descriptors) {
       final state = c.pluginRegistry.pluginStates[d.id]?.name ?? 'unknown';
-      buffer.writeln('  ${d.id.padRight(20)} ${d.version.padRight(8)} [$state] ${d.name}');
+      buffer.writeln(
+        '  ${d.id.padRight(20)} ${d.version.padRight(8)} [$state] ${d.name}',
+      );
     }
     return buffer.toString();
   }
@@ -129,11 +131,17 @@ Plugin: ${d.name}
 
     final limit = int.tryParse(limitStr) ?? 20;
     final entries = c.eventJournal.replay();
-    final limited = entries.length > limit ? entries.sublist(entries.length - limit) : entries;
+    final limited = entries.length > limit
+        ? entries.sublist(entries.length - limit)
+        : entries;
 
-    final buffer = StringBuffer('Event Journal (last $limit)\n════════════════════════\n');
+    final buffer = StringBuffer(
+      'Event Journal (last $limit)\n════════════════════════\n',
+    );
     for (final e in limited) {
-      buffer.writeln('  #${e.sequence.toString().padRight(6)} ${e.type.padRight(25)} @${e.timestamp}');
+      buffer.writeln(
+        '  #${e.sequence.toString().padRight(6)} ${e.type.padRight(25)} @${e.timestamp}',
+      );
     }
     return buffer.toString();
   }
@@ -200,7 +208,9 @@ Node: ${node.nodeId}
 
     final snap = c.stateSnapshot;
     final dist = _distributed;
-    final distStatus = dist != null ? 'distributed (${dist.state.name})' : 'local only';
+    final distStatus = dist != null
+        ? 'distributed (${dist.state.name})'
+        : 'local only';
 
     return '''
 Runtime Status

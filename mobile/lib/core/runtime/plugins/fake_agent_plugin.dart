@@ -15,17 +15,27 @@ class FakeAgentPlugin implements PluginHandler {
   int _cancelCount = 0;
 
   @override
-  Future<HandlerResult> handleMessage(RuntimeMessage message, CapabilityContext context) async {
+  Future<HandlerResult> handleMessage(
+    RuntimeMessage message,
+    CapabilityContext context,
+  ) async {
     return HandlerResult.ok();
   }
 
   @override
-  Future<HandlerResult> handleEvent(RuntimeEvent event, CapabilityContext context) async {
+  Future<HandlerResult> handleEvent(
+    RuntimeEvent event,
+    CapabilityContext context,
+  ) async {
     return HandlerResult.ok();
   }
 
   @override
-  Future<CapabilityResult> invokeCapability(String capabilityId, dynamic params, CapabilityContext context) async {
+  Future<CapabilityResult> invokeCapability(
+    String capabilityId,
+    dynamic params,
+    CapabilityContext context,
+  ) async {
     switch (capabilityId) {
       case 'agent.chat':
         return _handleChat(params, context);
@@ -37,20 +47,32 @@ class FakeAgentPlugin implements PluginHandler {
         return _handleExecute(params, context);
       default:
         return CapabilityResult.fail(
-          RuntimeError(code: 'UNKNOWN_CAPABILITY', message: 'Unknown capability: $capabilityId'),
+          RuntimeError(
+            code: 'UNKNOWN_CAPABILITY',
+            message: 'Unknown capability: $capabilityId',
+          ),
         );
     }
   }
 
-  Future<CapabilityResult> _handleChat(dynamic params, CapabilityContext context) async {
+  Future<CapabilityResult> _handleChat(
+    dynamic params,
+    CapabilityContext context,
+  ) async {
     _chatCount++;
-    final message = params is Map ? params['message'] as String? : params?.toString() ?? '';
+    final message = params is Map
+        ? params['message'] as String?
+        : params?.toString() ?? '';
 
     await Future.delayed(const Duration(milliseconds: 100));
 
     if (context.shouldAbort) {
       return CapabilityResult.fail(
-        const RuntimeError(code: 'CANCELLED', message: 'Chat cancelled', recoverable: false),
+        const RuntimeError(
+          code: 'CANCELLED',
+          message: 'Chat cancelled',
+          recoverable: false,
+        ),
       );
     }
 
@@ -63,9 +85,14 @@ class FakeAgentPlugin implements PluginHandler {
 
   CapabilityResult _handleStream(dynamic params, CapabilityContext context) {
     _streamCount++;
-    final message = params is Map ? params['message'] as String? : params?.toString() ?? '';
+    final message = params is Map
+        ? params['message'] as String?
+        : params?.toString() ?? '';
     final words = 'Streaming fake response to: $message'.split(' ');
-    final meta = RuntimeMetadata(traceId: 'fake', spanId: 'stream_$_streamCount');
+    final meta = RuntimeMetadata(
+      traceId: 'fake',
+      spanId: 'stream_$_streamCount',
+    );
 
     final (stream, controller) = RuntimeStream.create(
       id: 'stream_$_streamCount',
@@ -77,21 +104,25 @@ class FakeAgentPlugin implements PluginHandler {
     () async {
       for (var i = 0; i < words.length; i++) {
         if (context.shouldAbort) {
-          controller.add(StreamChunk(
-            index: i,
-            data: '[CANCELLED]',
-            metadata: meta,
-            isFinal: true,
-          ));
+          controller.add(
+            StreamChunk(
+              index: i,
+              data: '[CANCELLED]',
+              metadata: meta,
+              isFinal: true,
+            ),
+          );
           await controller.close();
           return;
         }
-        controller.add(StreamChunk(
-          index: i,
-          data: '${words[i]} ',
-          metadata: meta,
-          isFinal: i == words.length - 1,
-        ));
+        controller.add(
+          StreamChunk(
+            index: i,
+            data: '${words[i]} ',
+            metadata: meta,
+            isFinal: i == words.length - 1,
+          ),
+        );
         await Future.delayed(const Duration(milliseconds: 50));
       }
       await controller.close();
@@ -100,7 +131,10 @@ class FakeAgentPlugin implements PluginHandler {
     return CapabilityResult.streaming(stream);
   }
 
-  Future<CapabilityResult> _handleCancel(dynamic params, CapabilityContext context) async {
+  Future<CapabilityResult> _handleCancel(
+    dynamic params,
+    CapabilityContext context,
+  ) async {
     _cancelCount++;
     return CapabilityResult.ok({
       'cancelled': true,
@@ -108,7 +142,10 @@ class FakeAgentPlugin implements PluginHandler {
     });
   }
 
-  Future<CapabilityResult> _handleExecute(dynamic params, CapabilityContext context) async {
+  Future<CapabilityResult> _handleExecute(
+    dynamic params,
+    CapabilityContext context,
+  ) async {
     _executeCount++;
     final toolName = params is Map ? params['tool'] as String? : 'unknown';
     final toolParams = params is Map ? params['params'] : null;
@@ -117,13 +154,21 @@ class FakeAgentPlugin implements PluginHandler {
 
     if (context.shouldAbort) {
       return CapabilityResult.fail(
-        const RuntimeError(code: 'CANCELLED', message: 'Execute cancelled', recoverable: false),
+        const RuntimeError(
+          code: 'CANCELLED',
+          message: 'Execute cancelled',
+          recoverable: false,
+        ),
       );
     }
 
     if (toolName == 'fail') {
       return CapabilityResult.fail(
-        const RuntimeError(code: 'TOOL_FAILED', message: 'Tool execution failed', recoverable: true),
+        const RuntimeError(
+          code: 'TOOL_FAILED',
+          message: 'Tool execution failed',
+          recoverable: true,
+        ),
       );
     }
 
@@ -153,39 +198,41 @@ class FakeAgentPlugin implements PluginHandler {
   }
 
   static PluginDescriptor descriptor() => PluginDescriptor(
-        id: 'fake-agent',
-        name: 'Fake Agent Plugin',
-        version: '1.0.0',
-        description: 'Fake agent for Runtime testing - simulates streaming, timeout, cancellation, retry, tool call, parallel task',
-        capabilities: const [
-          CapabilityDeclaration(
-            id: 'agent.chat',
-            name: 'Chat',
-            description: 'Simulate agent chat',
-            permission: 'auto',
-            timeoutMs: 5000,
-          ),
-          CapabilityDeclaration(
-            id: 'agent.stream',
-            name: 'Stream',
-            description: 'Simulate streaming response',
-            permission: 'auto',
-            timeoutMs: 10000,
-          ),
-          CapabilityDeclaration(
-            id: 'agent.cancel',
-            name: 'Cancel',
-            description: 'Cancel ongoing operation',
-            permission: 'auto',
-          ),
-          CapabilityDeclaration(
-            id: 'agent.execute',
-            name: 'Execute',
-            description: 'Simulate tool execution (use tool=fail/timeout/parallel for testing)',
-            permission: 'confirm',
-            timeoutMs: 5000,
-            maxRetries: 2,
-          ),
-        ],
-      );
+    id: 'fake-agent',
+    name: 'Fake Agent Plugin',
+    version: '1.0.0',
+    description:
+        'Fake agent for Runtime testing - simulates streaming, timeout, cancellation, retry, tool call, parallel task',
+    capabilities: const [
+      CapabilityDeclaration(
+        id: 'agent.chat',
+        name: 'Chat',
+        description: 'Simulate agent chat',
+        permission: 'auto',
+        timeoutMs: 5000,
+      ),
+      CapabilityDeclaration(
+        id: 'agent.stream',
+        name: 'Stream',
+        description: 'Simulate streaming response',
+        permission: 'auto',
+        timeoutMs: 10000,
+      ),
+      CapabilityDeclaration(
+        id: 'agent.cancel',
+        name: 'Cancel',
+        description: 'Cancel ongoing operation',
+        permission: 'auto',
+      ),
+      CapabilityDeclaration(
+        id: 'agent.execute',
+        name: 'Execute',
+        description:
+            'Simulate tool execution (use tool=fail/timeout/parallel for testing)',
+        permission: 'confirm',
+        timeoutMs: 5000,
+        maxRetries: 2,
+      ),
+    ],
+  );
 }

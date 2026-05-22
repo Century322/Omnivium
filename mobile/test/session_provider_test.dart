@@ -47,7 +47,11 @@ void main() {
 
   group('ConversationSession', () {
     test('creates with required fields', () {
-      final session = ConversationSession(id: 's1', title: 'Test', createdAt: DateTime(2024));
+      final session = ConversationSession(
+        id: 's1',
+        title: 'Test',
+        createdAt: DateTime(2024),
+      );
       expect(session.id, 's1');
       expect(session.title, 'Test');
       expect(session.messages, isEmpty);
@@ -57,9 +61,12 @@ void main() {
 
     test('creates with all fields', () {
       final session = ConversationSession(
-        id: 's1', title: 'Test', createdAt: DateTime(2024),
+        id: 's1',
+        title: 'Test',
+        createdAt: DateTime(2024),
         messages: const [SessionMessage(role: 'user', content: 'Hi')],
-        isArchived: true, isFavorite: true,
+        isArchived: true,
+        isFavorite: true,
       );
       expect(session.messages.length, 1);
       expect(session.isArchived, true);
@@ -67,34 +74,55 @@ void main() {
     });
 
     test('copyWith updates title', () {
-      final session = ConversationSession(id: 's1', title: 'Old', createdAt: DateTime(2024));
+      final session = ConversationSession(
+        id: 's1',
+        title: 'Old',
+        createdAt: DateTime(2024),
+      );
       final updated = session.copyWith(title: 'New');
       expect(updated.title, 'New');
       expect(updated.id, 's1');
     });
 
     test('copyWith updates messages', () {
-      final session = ConversationSession(id: 's1', title: 'Test', createdAt: DateTime(2024));
-      final updated = session.copyWith(messages: const [SessionMessage(role: 'user', content: 'Hi')]);
+      final session = ConversationSession(
+        id: 's1',
+        title: 'Test',
+        createdAt: DateTime(2024),
+      );
+      final updated = session.copyWith(
+        messages: const [SessionMessage(role: 'user', content: 'Hi')],
+      );
       expect(updated.messages.length, 1);
     });
 
     test('copyWith updates isArchived', () {
-      final session = ConversationSession(id: 's1', title: 'Test', createdAt: DateTime(2024));
+      final session = ConversationSession(
+        id: 's1',
+        title: 'Test',
+        createdAt: DateTime(2024),
+      );
       final updated = session.copyWith(isArchived: true);
       expect(updated.isArchived, true);
     });
 
     test('copyWith updates isFavorite', () {
-      final session = ConversationSession(id: 's1', title: 'Test', createdAt: DateTime(2024));
+      final session = ConversationSession(
+        id: 's1',
+        title: 'Test',
+        createdAt: DateTime(2024),
+      );
       final updated = session.copyWith(isFavorite: true);
       expect(updated.isFavorite, true);
     });
 
     test('copyWith preserves unchanged fields', () {
       final session = ConversationSession(
-        id: 's1', title: 'Test', createdAt: DateTime(2024),
-        isArchived: true, isFavorite: true,
+        id: 's1',
+        title: 'Test',
+        createdAt: DateTime(2024),
+        isArchived: true,
+        isFavorite: true,
       );
       final updated = session.copyWith(title: 'New');
       expect(updated.isArchived, true);
@@ -104,9 +132,12 @@ void main() {
 
     test('toJson returns correct map', () {
       final session = ConversationSession(
-        id: 's1', title: 'Test', createdAt: DateTime(2024, 1, 15),
+        id: 's1',
+        title: 'Test',
+        createdAt: DateTime(2024, 1, 15),
         messages: const [SessionMessage(role: 'user', content: 'Hi')],
-        isArchived: true, isFavorite: false,
+        isArchived: true,
+        isFavorite: false,
       );
       final json = session.toJson();
       expect(json['id'], 's1');
@@ -118,10 +149,14 @@ void main() {
 
     test('fromJson creates correct object', () {
       final json = {
-        'id': 's1', 'title': 'Test',
+        'id': 's1',
+        'title': 'Test',
         'createdAt': '2024-01-15T00:00:00.000',
-        'messages': [{'role': 'user', 'content': 'Hi'}],
-        'isArchived': true, 'isFavorite': false,
+        'messages': [
+          {'role': 'user', 'content': 'Hi'},
+        ],
+        'isArchived': true,
+        'isFavorite': false,
       };
       final session = ConversationSession.fromJson(json);
       expect(session.id, 's1');
@@ -131,7 +166,11 @@ void main() {
     });
 
     test('fromJson handles missing optional fields', () {
-      final json = {'id': 's1', 'title': 'Test', 'createdAt': '2024-01-15T00:00:00.000'};
+      final json = {
+        'id': 's1',
+        'title': 'Test',
+        'createdAt': '2024-01-15T00:00:00.000',
+      };
       final session = ConversationSession.fromJson(json);
       expect(session.messages, isEmpty);
       expect(session.isArchived, false);
@@ -140,9 +179,12 @@ void main() {
 
     test('toJson and fromJson round-trip', () {
       final session = ConversationSession(
-        id: 's1', title: 'Test', createdAt: DateTime(2024, 1, 15),
+        id: 's1',
+        title: 'Test',
+        createdAt: DateTime(2024, 1, 15),
         messages: const [SessionMessage(role: 'user', content: 'Hi')],
-        isArchived: true, isFavorite: true,
+        isArchived: true,
+        isFavorite: true,
       );
       final json = session.toJson();
       final restored = ConversationSession.fromJson(json);
@@ -164,8 +206,12 @@ void main() {
     });
 
     tearDown(() {
-      try { provider.dispose(); } catch (_) {}
-      try { orchestrator.dispose(); } catch (_) {}
+      try {
+        provider.dispose();
+      } catch (_) {}
+      try {
+        orchestrator.dispose();
+      } catch (_) {}
     });
 
     test('starts with no sessions', () {
@@ -354,11 +400,21 @@ void main() {
     });
 
     test('sessions list is unmodifiable', () {
-      expect(() => provider.sessions.add(ConversationSession(id: 'x', title: 'X', createdAt: DateTime.now())), throwsUnsupportedError);
+      expect(
+        () => provider.sessions.add(
+          ConversationSession(id: 'x', title: 'X', createdAt: DateTime.now()),
+        ),
+        throwsUnsupportedError,
+      );
     });
 
     test('archivedSessions list is unmodifiable', () {
-      expect(() => provider.archivedSessions.add(ConversationSession(id: 'x', title: 'X', createdAt: DateTime.now())), throwsUnsupportedError);
+      expect(
+        () => provider.archivedSessions.add(
+          ConversationSession(id: 'x', title: 'X', createdAt: DateTime.now()),
+        ),
+        throwsUnsupportedError,
+      );
     });
 
     test('startAutoSave does not throw', () {

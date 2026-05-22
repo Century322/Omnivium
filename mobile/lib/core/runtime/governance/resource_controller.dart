@@ -42,15 +42,15 @@ class ResourceUsage {
   });
 
   Map<String, dynamic> toJson() => {
-        'tokensUsed': tokensUsed,
-        'activeStreams': activeStreams,
-        'memoryUsedMb': memoryUsedMb,
-        'activeTasks': activeTasks,
-        'totalRetries': totalRetries,
-        'eventsPerSec': eventsPerSec,
-        'retryAmplification': retryAmplification,
-        'eventAmplification': eventAmplification,
-      };
+    'tokensUsed': tokensUsed,
+    'activeStreams': activeStreams,
+    'memoryUsedMb': memoryUsedMb,
+    'activeTasks': activeTasks,
+    'totalRetries': totalRetries,
+    'eventsPerSec': eventsPerSec,
+    'retryAmplification': retryAmplification,
+    'eventAmplification': eventAmplification,
+  };
 }
 
 enum ResourceLimitType {
@@ -78,7 +78,8 @@ class ResourceLimitExceeded {
   });
 
   @override
-  String toString() => 'ResourceLimitExceeded: $message (current=$current, limit=$limit)';
+  String toString() =>
+      'ResourceLimitExceeded: $message (current=$current, limit=$limit)';
 }
 
 class ResourceController {
@@ -87,19 +88,25 @@ class ResourceController {
   final Map<String, ResourceUsage> _perPlugin = {};
   final List<ResourceLimitExceeded> _violations = [];
 
-  ResourceController({ResourceBudget? budget}) : _budget = budget ?? const ResourceBudget();
+  ResourceController({ResourceBudget? budget})
+    : _budget = budget ?? const ResourceBudget();
 
   ResourceBudget get budget => _budget;
   ResourceUsage get usage => _usage;
   List<ResourceLimitExceeded> get violations => List.unmodifiable(_violations);
   int get violationCount => _violations.length;
 
-  ResourceUsage usageFor(String pluginId) => _perPlugin[pluginId] ?? ResourceUsage();
+  ResourceUsage usageFor(String pluginId) =>
+      _perPlugin[pluginId] ?? ResourceUsage();
 
   bool tryAcquireTokens(int count, {String? pluginId}) {
     if (_usage.tokensUsed + count > _budget.maxTokens) {
-      _recordViolation(ResourceLimitType.tokens, _usage.tokensUsed + count, _budget.maxTokens,
-          'Token budget exceeded');
+      _recordViolation(
+        ResourceLimitType.tokens,
+        _usage.tokensUsed + count,
+        _budget.maxTokens,
+        'Token budget exceeded',
+      );
       return false;
     }
     _usage.tokensUsed += count;
@@ -112,8 +119,12 @@ class ResourceController {
 
   bool tryAcquireStream({String? pluginId}) {
     if (_usage.activeStreams >= _budget.maxStreams) {
-      _recordViolation(ResourceLimitType.streams, _usage.activeStreams, _budget.maxStreams,
-          'Stream budget exceeded');
+      _recordViolation(
+        ResourceLimitType.streams,
+        _usage.activeStreams,
+        _budget.maxStreams,
+        'Stream budget exceeded',
+      );
       return false;
     }
     _usage.activeStreams++;
@@ -134,8 +145,12 @@ class ResourceController {
 
   bool tryAcquireTask({String? pluginId}) {
     if (_usage.activeTasks >= _budget.maxTasks) {
-      _recordViolation(ResourceLimitType.tasks, _usage.activeTasks, _budget.maxTasks,
-          'Task budget exceeded');
+      _recordViolation(
+        ResourceLimitType.tasks,
+        _usage.activeTasks,
+        _budget.maxTasks,
+        'Task budget exceeded',
+      );
       return false;
     }
     _usage.activeTasks++;
@@ -161,15 +176,22 @@ class ResourceController {
         : 1.0;
 
     if (_usage.totalRetries > _budget.maxRetries) {
-      _recordViolation(ResourceLimitType.retries, _usage.totalRetries, _budget.maxRetries,
-          'Retry budget exceeded');
+      _recordViolation(
+        ResourceLimitType.retries,
+        _usage.totalRetries,
+        _budget.maxRetries,
+        'Retry budget exceeded',
+      );
       return false;
     }
 
     if (_usage.retryAmplification > _budget.maxRetryAmplification) {
-      _recordViolation(ResourceLimitType.retryAmplification,
-          _usage.retryAmplification.toInt(), _budget.maxRetryAmplification.toInt(),
-          'Retry amplification exceeded');
+      _recordViolation(
+        ResourceLimitType.retryAmplification,
+        _usage.retryAmplification.toInt(),
+        _budget.maxRetryAmplification.toInt(),
+        'Retry amplification exceeded',
+      );
       return false;
     }
 
@@ -182,18 +204,27 @@ class ResourceController {
 
   bool recordEvents(int count, {String? pluginId}) {
     _usage.eventsPerSec = count;
-    _usage.eventAmplification = count > 0 ? count / (_usage.activeTasks + 1) : 1.0;
+    _usage.eventAmplification = count > 0
+        ? count / (_usage.activeTasks + 1)
+        : 1.0;
 
     if (count > _budget.maxEventsPerSec) {
-      _recordViolation(ResourceLimitType.eventsPerSec, count, _budget.maxEventsPerSec,
-          'Events per second exceeded');
+      _recordViolation(
+        ResourceLimitType.eventsPerSec,
+        count,
+        _budget.maxEventsPerSec,
+        'Events per second exceeded',
+      );
       return false;
     }
 
     if (_usage.eventAmplification > _budget.maxEventAmplification) {
-      _recordViolation(ResourceLimitType.eventAmplification,
-          _usage.eventAmplification.toInt(), _budget.maxEventAmplification.toInt(),
-          'Event amplification exceeded');
+      _recordViolation(
+        ResourceLimitType.eventAmplification,
+        _usage.eventAmplification.toInt(),
+        _budget.maxEventAmplification.toInt(),
+        'Event amplification exceeded',
+      );
       return false;
     }
 
@@ -210,8 +241,12 @@ class ResourceController {
 
   bool checkMemoryLimit(int additionalMb) {
     if (_usage.memoryUsedMb + additionalMb > _budget.maxMemoryMb) {
-      _recordViolation(ResourceLimitType.memory, _usage.memoryUsedMb + additionalMb, _budget.maxMemoryMb,
-          'Memory budget exceeded');
+      _recordViolation(
+        ResourceLimitType.memory,
+        _usage.memoryUsedMb + additionalMb,
+        _budget.maxMemoryMb,
+        'Memory budget exceeded',
+      );
       return false;
     }
     return true;
@@ -230,12 +265,19 @@ class ResourceController {
     _violations.clear();
   }
 
-  void _recordViolation(ResourceLimitType type, int current, int limit, String message) {
-    _violations.add(ResourceLimitExceeded(
-      type: type,
-      current: current,
-      limit: limit,
-      message: message,
-    ));
+  void _recordViolation(
+    ResourceLimitType type,
+    int current,
+    int limit,
+    String message,
+  ) {
+    _violations.add(
+      ResourceLimitExceeded(
+        type: type,
+        current: current,
+        limit: limit,
+        message: message,
+      ),
+    );
   }
 }

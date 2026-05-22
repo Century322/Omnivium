@@ -6,7 +6,9 @@ import 'package:omnivium/presentation/views/search_view.dart';
 void main() {
   group('SearchView', () {
     testWidgets('renders search view', (tester) async {
-      await tester.pumpWidget(MaterialApp(home: SearchView(provider: AppProvider())));
+      await tester.pumpWidget(
+        MaterialApp(home: SearchView(provider: AppProvider())),
+      );
       expect(find.byType(SearchView), findsOneWidget);
     });
   });

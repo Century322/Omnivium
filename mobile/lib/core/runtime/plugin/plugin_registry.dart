@@ -29,12 +29,10 @@ class PluginRegistry {
   final RuntimeConfig _config;
   final int _maxPlugins;
 
-  PluginRegistry({
-    required RuntimeClock clock,
-    required RuntimeConfig config,
-  })  : _clock = clock,
-        _config = config,
-        _maxPlugins = config.maxPlugins;
+  PluginRegistry({required RuntimeClock clock, required RuntimeConfig config})
+    : _clock = clock,
+      _config = config,
+      _maxPlugins = config.maxPlugins;
 
   Map<String, PluginState> get pluginStates =>
       _plugins.map((id, entry) => MapEntry(id, entry.lifecycle.state));
@@ -43,16 +41,20 @@ class PluginRegistry {
       _plugins.values.map((e) => e.descriptor).toList();
 
   int get pluginCount => _plugins.length;
-  int get activeCount => _plugins.values.where((e) => e.lifecycle.state == PluginState.active).length;
+  int get activeCount => _plugins.values
+      .where((e) => e.lifecycle.state == PluginState.active)
+      .length;
   int get capabilityCount => _capabilityToPlugin.length;
 
-  PluginDescriptor? descriptor(String pluginId) => _plugins[pluginId]?.descriptor;
+  PluginDescriptor? descriptor(String pluginId) =>
+      _plugins[pluginId]?.descriptor;
 
   PluginState? state(String pluginId) => _plugins[pluginId]?.lifecycle.state;
 
   PluginHandler? handler(String pluginId) => _plugins[pluginId]?.handler;
 
-  String? pluginForCapability(String capabilityId) => _capabilityToPlugin[capabilityId];
+  String? pluginForCapability(String capabilityId) =>
+      _capabilityToPlugin[capabilityId];
 
   List<String> capabilitiesOf(String pluginId) {
     final entry = _plugins[pluginId];
@@ -60,14 +62,21 @@ class PluginRegistry {
     return entry.descriptor.capabilityIds;
   }
 
-  Future<bool> register(PluginDescriptor descriptor, PluginHandler handler) async {
+  Future<bool> register(
+    PluginDescriptor descriptor,
+    PluginHandler handler,
+  ) async {
     if (_plugins.containsKey(descriptor.id)) {
-      AppLogger.instance.warning('Plugin "${descriptor.id}" already registered, unloading previous');
+      AppLogger.instance.warning(
+        'Plugin "${descriptor.id}" already registered, unloading previous',
+      );
       await unload(descriptor.id);
     }
 
     if (_plugins.length >= _maxPlugins) {
-      AppLogger.instance.error('Plugin limit reached ($_maxPlugins), cannot register "${descriptor.id}"');
+      AppLogger.instance.error(
+        'Plugin limit reached ($_maxPlugins), cannot register "${descriptor.id}"',
+      );
       return false;
     }
 
@@ -80,7 +89,10 @@ class PluginRegistry {
       registeredAt: _clock.now(),
     );
 
-    if (!entry.lifecycle.transitionTo(PluginState.loaded, reason: 'registered')) {
+    if (!entry.lifecycle.transitionTo(
+      PluginState.loaded,
+      reason: 'registered',
+    )) {
       return false;
     }
 
@@ -90,7 +102,9 @@ class PluginRegistry {
       _capabilityToPlugin[cap.id] = descriptor.id;
     }
 
-    AppLogger.instance.info('Plugin "${descriptor.id}" registered with ${descriptor.capabilities.length} capabilities');
+    AppLogger.instance.info(
+      'Plugin "${descriptor.id}" registered with ${descriptor.capabilities.length} capabilities',
+    );
 
     if (descriptor.lifecycle.autoActivate) {
       await activate(descriptor.id);
@@ -104,7 +118,9 @@ class PluginRegistry {
     if (entry == null) return false;
 
     if (!entry.lifecycle.canTransitionTo(PluginState.active)) {
-      AppLogger.instance.warning('Plugin "$pluginId" cannot activate from ${entry.lifecycle.state}');
+      AppLogger.instance.warning(
+        'Plugin "$pluginId" cannot activate from ${entry.lifecycle.state}',
+      );
       return false;
     }
 
@@ -113,7 +129,10 @@ class PluginRegistry {
       AppLogger.instance.info('Plugin "$pluginId" activated');
       return true;
     } catch (e) {
-      entry.lifecycle.transitionTo(PluginState.failed, reason: 'activate error: $e');
+      entry.lifecycle.transitionTo(
+        PluginState.failed,
+        reason: 'activate error: $e',
+      );
       AppLogger.instance.error('Plugin "$pluginId" activation failed: $e');
       return false;
     }
@@ -123,7 +142,10 @@ class PluginRegistry {
     final entry = _plugins[pluginId];
     if (entry == null) return false;
 
-    if (!entry.lifecycle.transitionTo(PluginState.suspended, reason: 'suspended')) {
+    if (!entry.lifecycle.transitionTo(
+      PluginState.suspended,
+      reason: 'suspended',
+    )) {
       return false;
     }
 
@@ -154,7 +176,9 @@ class PluginRegistry {
     if (entry == null) return false;
 
     if (!_config.enableHotReload) {
-      AppLogger.instance.warning('Hot reload disabled, cannot reload "$pluginId"');
+      AppLogger.instance.warning(
+        'Hot reload disabled, cannot reload "$pluginId"',
+      );
       return false;
     }
 

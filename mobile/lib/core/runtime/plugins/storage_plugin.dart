@@ -25,17 +25,27 @@ class StoragePlugin implements PluginHandler {
   }
 
   @override
-  Future<HandlerResult> handleMessage(RuntimeMessage message, CapabilityContext context) async {
+  Future<HandlerResult> handleMessage(
+    RuntimeMessage message,
+    CapabilityContext context,
+  ) async {
     return HandlerResult.ok();
   }
 
   @override
-  Future<HandlerResult> handleEvent(RuntimeEvent event, CapabilityContext context) async {
+  Future<HandlerResult> handleEvent(
+    RuntimeEvent event,
+    CapabilityContext context,
+  ) async {
     return HandlerResult.ok();
   }
 
   @override
-  Future<CapabilityResult> invokeCapability(String capabilityId, dynamic params, CapabilityContext context) async {
+  Future<CapabilityResult> invokeCapability(
+    String capabilityId,
+    dynamic params,
+    CapabilityContext context,
+  ) async {
     if (!_loaded) await loadFromPersistence();
     switch (capabilityId) {
       case 'storage.read':
@@ -68,42 +78,45 @@ class StoragePlugin implements PluginHandler {
         return CapabilityResult.ok(_store.keys.toList());
       default:
         return CapabilityResult.fail(
-          RuntimeError(code: 'UNKNOWN_CAPABILITY', message: 'Unknown capability: $capabilityId'),
+          RuntimeError(
+            code: 'UNKNOWN_CAPABILITY',
+            message: 'Unknown capability: $capabilityId',
+          ),
         );
     }
   }
 
   static PluginDescriptor descriptor() => PluginDescriptor(
-        id: 'storage',
-        name: 'Storage Plugin',
-        version: '1.0.0',
-        description: 'Key-value storage',
-        capabilities: const [
-          CapabilityDeclaration(
-            id: 'storage.read',
-            name: 'Read',
-            description: 'Read a value by key',
-            permission: 'auto',
-          ),
-          CapabilityDeclaration(
-            id: 'storage.write',
-            name: 'Write',
-            description: 'Write a key-value pair',
-            permission: 'confirm',
-          ),
-          CapabilityDeclaration(
-            id: 'storage.delete',
-            name: 'Delete',
-            description: 'Delete a key',
-            permission: 'confirm',
-            isDestructive: true,
-          ),
-          CapabilityDeclaration(
-            id: 'storage.list',
-            name: 'List',
-            description: 'List all keys',
-            permission: 'auto',
-          ),
-        ],
-      );
+    id: 'storage',
+    name: 'Storage Plugin',
+    version: '1.0.0',
+    description: 'Key-value storage',
+    capabilities: const [
+      CapabilityDeclaration(
+        id: 'storage.read',
+        name: 'Read',
+        description: 'Read a value by key',
+        permission: 'auto',
+      ),
+      CapabilityDeclaration(
+        id: 'storage.write',
+        name: 'Write',
+        description: 'Write a key-value pair',
+        permission: 'confirm',
+      ),
+      CapabilityDeclaration(
+        id: 'storage.delete',
+        name: 'Delete',
+        description: 'Delete a key',
+        permission: 'confirm',
+        isDestructive: true,
+      ),
+      CapabilityDeclaration(
+        id: 'storage.list',
+        name: 'List',
+        description: 'List all keys',
+        permission: 'auto',
+      ),
+    ],
+  );
 }

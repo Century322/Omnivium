@@ -30,7 +30,10 @@ class AppCapabilityService {
       );
       return result;
     } catch (e) {
-      AppLogger.instance.warning('AppCapability: $capabilityId failed', error: e);
+      AppLogger.instance.warning(
+        'AppCapability: $capabilityId failed',
+        error: e,
+      );
       return CapabilityResult.fail(
         RuntimeError(code: 'CAPABILITY_ERROR', message: e.toString()),
       );
@@ -53,8 +56,13 @@ class AppCapabilityService {
     return route != null;
   }
 
-  Map<String, dynamic> _fallback(String capabilityId, Map<String, dynamic>? params) {
-    AppLogger.instance.info('AppCapability: fallback for $capabilityId (SDK not available)');
+  Map<String, dynamic> _fallback(
+    String capabilityId,
+    Map<String, dynamic>? params,
+  ) {
+    AppLogger.instance.info(
+      'AppCapability: fallback for $capabilityId (SDK not available)',
+    );
     return {'capabilityId': capabilityId, 'fallback': true, ...?params};
   }
 }

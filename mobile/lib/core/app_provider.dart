@@ -18,7 +18,8 @@ import 'identity_bridge.dart';
 
 class AppProvider {
   RemoteConfigService get remoteConfig => RemoteConfigService.instance;
-  bool getFeatureFlag(String key, {bool defaultValue = false}) => remoteConfig.getFeatureFlag(key, defaultValue: defaultValue);
+  bool getFeatureFlag(String key, {bool defaultValue = false}) =>
+      remoteConfig.getFeatureFlag(key, defaultValue: defaultValue);
 
   final NavigationProvider _navigation = NavigationProvider();
   final AgentOrchestrator _orchestrator = AgentOrchestrator();
@@ -35,7 +36,8 @@ class AppProvider {
     _connectRuntime();
   }
 
-  OmniviumSDK? get _sdk => OmniviumSDK.instance.isInitialized ? OmniviumSDK.instance : null;
+  OmniviumSDK? get _sdk =>
+      OmniviumSDK.instance.isInitialized ? OmniviumSDK.instance : null;
 
   bool _runtimeConnected = false;
 
@@ -60,21 +62,26 @@ class AppProvider {
   void _bridgeEventBus(OmniviumSDK sdk) {
     final eventTypes = ['plugin', 'sandbox', 'capability'];
     for (final prefix in eventTypes) {
-      sdk.container.eventBus.subscribe(
-        prefix,
-        (RuntimeEvent event) async {
-          final eventType = event.type;
-          final data = event.payload;
-          if (eventType.startsWith('plugin.')) {
-            nc.NotificationCenter.post(nc.Event.settingsUpdated, data: {'source': 'runtime', 'type': eventType});
-          } else if (eventType.startsWith('sandbox.')) {
-            nc.NotificationCenter.post(nc.Event.securityAlert, data: {'source': 'runtime', 'type': eventType, ...?data});
-          } else if (eventType.startsWith('capability.')) {
-            nc.NotificationCenter.post(nc.Event.agentSkillInvoked, data: {'source': 'runtime', 'type': eventType, ...?data});
-          }
-        },
-        permission: EventPermission.observe,
-      );
+      sdk.container.eventBus.subscribe(prefix, (RuntimeEvent event) async {
+        final eventType = event.type;
+        final data = event.payload;
+        if (eventType.startsWith('plugin.')) {
+          nc.NotificationCenter.post(
+            nc.Event.settingsUpdated,
+            data: {'source': 'runtime', 'type': eventType},
+          );
+        } else if (eventType.startsWith('sandbox.')) {
+          nc.NotificationCenter.post(
+            nc.Event.securityAlert,
+            data: {'source': 'runtime', 'type': eventType, ...?data},
+          );
+        } else if (eventType.startsWith('capability.')) {
+          nc.NotificationCenter.post(
+            nc.Event.agentSkillInvoked,
+            data: {'source': 'runtime', 'type': eventType, ...?data},
+          );
+        }
+      }, permission: EventPermission.observe);
     }
   }
 
@@ -96,27 +103,47 @@ class AppProvider {
     try {
       await _notification.init();
     } catch (e, stackTrace) {
-      AppLogger.instance.error('NotificationProvider init failed', error: e, stackTrace: stackTrace);
+      AppLogger.instance.error(
+        'NotificationProvider init failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
     try {
       await _model.loadModels();
     } catch (e, stackTrace) {
-      AppLogger.instance.error('ModelProvider init failed', error: e, stackTrace: stackTrace);
+      AppLogger.instance.error(
+        'ModelProvider init failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
     try {
       await _session.loadSessions();
     } catch (e, stackTrace) {
-      AppLogger.instance.error('SessionProvider init failed', error: e, stackTrace: stackTrace);
+      AppLogger.instance.error(
+        'SessionProvider init failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
     try {
       await _quickCommands.init();
     } catch (e, stackTrace) {
-      AppLogger.instance.error('QuickCommandProvider init failed', error: e, stackTrace: stackTrace);
+      AppLogger.instance.error(
+        'QuickCommandProvider init failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
     try {
       await _notes.init();
     } catch (e, stackTrace) {
-      AppLogger.instance.error('NoteProvider init failed', error: e, stackTrace: stackTrace);
+      AppLogger.instance.error(
+        'NoteProvider init failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
     _notification.listenToMatrix(_matrix);
   }

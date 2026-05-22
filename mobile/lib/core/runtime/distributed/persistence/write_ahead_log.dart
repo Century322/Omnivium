@@ -48,27 +48,27 @@ class WalEntry {
   bool get isValid => checksum == 0 || computeChecksum() == checksum;
 
   Map<String, dynamic> toJson() => {
-        'lsn': lsn,
-        'type': type.name,
-        'hlc': hlcTime,
-        'src': sourceNodeId,
-        'tx': transactionId,
-        'data': data,
-        'cksum': checksum,
-      };
+    'lsn': lsn,
+    'type': type.name,
+    'hlc': hlcTime,
+    'src': sourceNodeId,
+    'tx': transactionId,
+    'data': data,
+    'cksum': checksum,
+  };
 
   factory WalEntry.fromJson(Map<String, dynamic> json) => WalEntry(
-        lsn: json['lsn'] as int,
-        type: WalEntryType.values.firstWhere(
-          (t) => t.name == json['type'],
-          orElse: () => WalEntryType.checkpoint,
-        ),
-        hlcTime: json['hlc'] as int,
-        sourceNodeId: json['src'] as String,
-        transactionId: json['tx'] as String? ?? '',
-        data: json['data'] as Map<String, dynamic>? ?? {},
-        checksum: json['cksum'] as int? ?? 0,
-      );
+    lsn: json['lsn'] as int,
+    type: WalEntryType.values.firstWhere(
+      (t) => t.name == json['type'],
+      orElse: () => WalEntryType.checkpoint,
+    ),
+    hlcTime: json['hlc'] as int,
+    sourceNodeId: json['src'] as String,
+    transactionId: json['tx'] as String? ?? '',
+    data: json['data'] as Map<String, dynamic>? ?? {},
+    checksum: json['cksum'] as int? ?? 0,
+  );
 }
 
 class WalTransaction {
@@ -104,9 +104,9 @@ class WriteAheadLog {
     required String nodeId,
     required HybridLogicalClock clock,
     PersistenceBackend? persistence,
-  })  : _nodeId = nodeId,
-        _clock = clock,
-        _persistence = persistence;
+  }) : _nodeId = nodeId,
+       _clock = clock,
+       _persistence = persistence;
 
   String get nodeId => _nodeId;
   int get currentLsn => _lsn;
@@ -115,7 +115,11 @@ class WriteAheadLog {
   int get activeTransactionCount => _activeTransactions.length;
   List<WalEntry> get entries => List.unmodifiable(_log);
 
-  WalEntry append(WalEntryType type, Map<String, dynamic> data, {String transactionId = ''}) {
+  WalEntry append(
+    WalEntryType type,
+    Map<String, dynamic> data, {
+    String transactionId = '',
+  }) {
     final now = _clock.tick();
     final entry = WalEntry(
       lsn: _lsn++,
@@ -178,7 +182,9 @@ class WriteAheadLog {
     final tx = _activeTransactions[txId];
     if (tx == null) return false;
 
-    append(WalEntryType.rollbackTransaction, {'txId': txId}, transactionId: txId);
+    append(WalEntryType.rollbackTransaction, {
+      'txId': txId,
+    }, transactionId: txId);
     _activeTransactions.remove(txId);
     return true;
   }
@@ -211,9 +217,7 @@ class WriteAheadLog {
   }
 
   List<WalEntry> replayTransaction(String txId) {
-    return _log
-        .where((e) => e.transactionId == txId && e.isValid)
-        .toList();
+    return _log.where((e) => e.transactionId == txId && e.isValid).toList();
   }
 
   List<WalEntry> replaySinceCheckpoint() {
@@ -224,11 +228,17 @@ class WriteAheadLog {
     final keep = keepLastN ?? 10000;
     if (_log.length <= keep) return;
 
-    final checkpointEntries = _log.where((e) => e.type == WalEntryType.checkpoint).toList();
-    final lastCheckpoint = checkpointEntries.isNotEmpty ? checkpointEntries.last : null;
+    final checkpointEntries = _log
+        .where((e) => e.type == WalEntryType.checkpoint)
+        .toList();
+    final lastCheckpoint = checkpointEntries.isNotEmpty
+        ? checkpointEntries.last
+        : null;
 
     final cutoffLsn = lastCheckpoint?.lsn ?? (_log.last.lsn - keep);
-    _log.removeWhere((e) => e.lsn < cutoffLsn && e.type != WalEntryType.checkpoint);
+    _log.removeWhere(
+      (e) => e.lsn < cutoffLsn && e.type != WalEntryType.checkpoint,
+    );
   }
 
   void truncate(int toLsn) {
@@ -281,7 +291,11 @@ class EventStore {
   WriteAheadLog get wal => _wal;
   int get streamCount => _streams.length;
 
-  WalEntry appendToStream(String streamId, WalEntryType type, Map<String, dynamic> data) {
+  WalEntry appendToStream(
+    String streamId,
+    WalEntryType type,
+    Map<String, dynamic> data,
+  ) {
     final version = _streamVersions[streamId] ?? 0;
     final entry = _wal.append(type, {
       'streamId': streamId,
@@ -298,7 +312,9 @@ class EventStore {
   List<WalEntry> readStream(String streamId, {int? fromVersion}) {
     final entries = _streams[streamId] ?? [];
     if (fromVersion == null) return List.unmodifiable(entries);
-    return entries.where((e) => (e.data['version'] as int? ?? 0) >= fromVersion).toList();
+    return entries
+        .where((e) => (e.data['version'] as int? ?? 0) >= fromVersion)
+        .toList();
   }
 
   int streamVersion(String streamId) => _streamVersions[streamId] ?? 0;

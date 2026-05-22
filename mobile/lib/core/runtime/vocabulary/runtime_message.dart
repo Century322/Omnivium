@@ -35,28 +35,27 @@ class RuntimeMessage {
     RuntimeMetadata? metadata,
     PropagationScope? scope,
     int? timestamp,
-  }) =>
-      RuntimeMessage(
-        id: id ?? this.id,
-        version: version ?? this.version,
-        type: type ?? this.type,
-        source: source ?? this.source,
-        target: target ?? this.target,
-        payload: payload ?? this.payload,
-        metadata: metadata ?? this.metadata,
-        scope: scope ?? this.scope,
-        timestamp: timestamp ?? this.timestamp,
-      );
+  }) => RuntimeMessage(
+    id: id ?? this.id,
+    version: version ?? this.version,
+    type: type ?? this.type,
+    source: source ?? this.source,
+    target: target ?? this.target,
+    payload: payload ?? this.payload,
+    metadata: metadata ?? this.metadata,
+    scope: scope ?? this.scope,
+    timestamp: timestamp ?? this.timestamp,
+  );
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'version': version,
-        'type': type,
-        'source': source.toJson(),
-        'target': target.toJson(),
-        'payload': payload,
-        'metadata': metadata.toJson(),
-        'scope': scope.name,
-        'timestamp': timestamp,
-      };
+    'id': id,
+    'version': version,
+    'type': type,
+    'source': source.toJson(),
+    'target': target.toJson(),
+    'payload': payload,
+    'metadata': metadata.toJson(),
+    'scope': scope.name,
+    'timestamp': timestamp,
+  };
 }

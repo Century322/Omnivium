@@ -3,18 +3,9 @@ import '../vocabulary/runtime_event.dart';
 import '../vocabulary/runtime_stream.dart';
 import '../vocabulary/capability_context.dart';
 
-enum HandlerStatus {
-  success,
-  failure,
-  deferred,
-}
+enum HandlerStatus { success, failure, deferred }
 
-enum CapabilityStatus {
-  success,
-  failure,
-  partial,
-  streaming,
-}
+enum CapabilityStatus { success, failure, partial, streaming }
 
 class RuntimeError {
   final String code;
@@ -31,20 +22,35 @@ class RuntimeError {
     this.details,
   });
 
-  factory RuntimeError.timeout({String? message}) =>
-      RuntimeError(code: 'TIMEOUT', message: message ?? 'Operation timed out', recoverable: true);
+  factory RuntimeError.timeout({String? message}) => RuntimeError(
+    code: 'TIMEOUT',
+    message: message ?? 'Operation timed out',
+    recoverable: true,
+  );
 
-  factory RuntimeError.cancelled({String? message}) =>
-      RuntimeError(code: 'CANCELLED', message: message ?? 'Operation cancelled', recoverable: false);
+  factory RuntimeError.cancelled({String? message}) => RuntimeError(
+    code: 'CANCELLED',
+    message: message ?? 'Operation cancelled',
+    recoverable: false,
+  );
 
-  factory RuntimeError.permissionDenied({String? message}) =>
-      RuntimeError(code: 'PERMISSION_DENIED', message: message ?? 'Permission denied', recoverable: false);
+  factory RuntimeError.permissionDenied({String? message}) => RuntimeError(
+    code: 'PERMISSION_DENIED',
+    message: message ?? 'Permission denied',
+    recoverable: false,
+  );
 
-  factory RuntimeError.notFound({String? message}) =>
-      RuntimeError(code: 'NOT_FOUND', message: message ?? 'Capability not found', recoverable: true);
+  factory RuntimeError.notFound({String? message}) => RuntimeError(
+    code: 'NOT_FOUND',
+    message: message ?? 'Capability not found',
+    recoverable: true,
+  );
 
-  factory RuntimeError.unavailable({String? message}) =>
-      RuntimeError(code: 'UNAVAILABLE', message: message ?? 'Service unavailable', recoverable: true);
+  factory RuntimeError.unavailable({String? message}) => RuntimeError(
+    code: 'UNAVAILABLE',
+    message: message ?? 'Service unavailable',
+    recoverable: true,
+  );
 }
 
 class HandlerResult {
@@ -52,11 +58,7 @@ class HandlerResult {
   final dynamic payload;
   final RuntimeError? error;
 
-  const HandlerResult({
-    required this.status,
-    this.payload,
-    this.error,
-  });
+  const HandlerResult({required this.status, this.payload, this.error});
 
   factory HandlerResult.ok([dynamic payload]) =>
       HandlerResult(status: HandlerStatus.success, payload: payload);
@@ -95,7 +97,17 @@ class CapabilityResult {
 }
 
 abstract class PluginHandler {
-  Future<HandlerResult> handleMessage(RuntimeMessage message, CapabilityContext context);
-  Future<HandlerResult> handleEvent(RuntimeEvent event, CapabilityContext context);
-  Future<CapabilityResult> invokeCapability(String capabilityId, dynamic params, CapabilityContext context);
+  Future<HandlerResult> handleMessage(
+    RuntimeMessage message,
+    CapabilityContext context,
+  );
+  Future<HandlerResult> handleEvent(
+    RuntimeEvent event,
+    CapabilityContext context,
+  );
+  Future<CapabilityResult> invokeCapability(
+    String capabilityId,
+    dynamic params,
+    CapabilityContext context,
+  );
 }

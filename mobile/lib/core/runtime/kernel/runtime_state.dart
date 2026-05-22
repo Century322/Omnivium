@@ -1,10 +1,4 @@
-enum RuntimeStatus {
-  booting,
-  running,
-  suspending,
-  shuttingDown,
-  crashed,
-}
+enum RuntimeStatus { booting, running, suspending, shuttingDown, crashed }
 
 class RuntimeStateSnapshot {
   final RuntimeStatus status;
@@ -36,15 +30,14 @@ class RuntimeStateSnapshot {
     int? capabilityCount,
     int? bootTimeMs,
     int? uptimeMs,
-  }) =>
-      RuntimeStateSnapshot(
-        status: status ?? this.status,
-        activeSessionCount: activeSessionCount ?? this.activeSessionCount,
-        activeTaskCount: activeTaskCount ?? this.activeTaskCount,
-        loadedPluginCount: loadedPluginCount ?? this.loadedPluginCount,
-        activePluginCount: activePluginCount ?? this.activePluginCount,
-        capabilityCount: capabilityCount ?? this.capabilityCount,
-        bootTimeMs: bootTimeMs ?? this.bootTimeMs,
-        uptimeMs: uptimeMs ?? this.uptimeMs,
-      );
+  }) => RuntimeStateSnapshot(
+    status: status ?? this.status,
+    activeSessionCount: activeSessionCount ?? this.activeSessionCount,
+    activeTaskCount: activeTaskCount ?? this.activeTaskCount,
+    loadedPluginCount: loadedPluginCount ?? this.loadedPluginCount,
+    activePluginCount: activePluginCount ?? this.activePluginCount,
+    capabilityCount: capabilityCount ?? this.capabilityCount,
+    bootTimeMs: bootTimeMs ?? this.bootTimeMs,
+    uptimeMs: uptimeMs ?? this.uptimeMs,
+  );
 }

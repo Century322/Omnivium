@@ -34,14 +34,22 @@ void main() {
     });
 
     test('computeSignature is deterministic', () {
-      final sig1 = WireMessage.computeSignature('A', 'B', 1000, 1, {'key': 'val'});
-      final sig2 = WireMessage.computeSignature('A', 'B', 1000, 1, {'key': 'val'});
+      final sig1 = WireMessage.computeSignature('A', 'B', 1000, 1, {
+        'key': 'val',
+      });
+      final sig2 = WireMessage.computeSignature('A', 'B', 1000, 1, {
+        'key': 'val',
+      });
       expect(sig1, sig2);
     });
 
     test('computeSignature differs for different inputs', () {
-      final sig1 = WireMessage.computeSignature('A', 'B', 1000, 1, {'key': 'val1'});
-      final sig2 = WireMessage.computeSignature('A', 'B', 1000, 1, {'key': 'val2'});
+      final sig1 = WireMessage.computeSignature('A', 'B', 1000, 1, {
+        'key': 'val1',
+      });
+      final sig2 = WireMessage.computeSignature('A', 'B', 1000, 1, {
+        'key': 'val2',
+      });
       expect(sig1, isNot(equals(sig2)));
     });
 
@@ -70,10 +78,18 @@ void main() {
         messageId: 'msg-1',
         signature: 'sig-1',
       );
-      final relayed = gossip.gossip(msg, ['node-B', 'node-C', 'node-D', 'node-E']);
+      final relayed = gossip.gossip(msg, [
+        'node-B',
+        'node-C',
+        'node-D',
+        'node-E',
+      ]);
       expect(relayed.length, 2);
       expect(relayed.every((r) => r.senderId == 'node-A'), isTrue);
-      expect(relayed.every((r) => r.type == WireMessageType.legislativeGossip), isTrue);
+      expect(
+        relayed.every((r) => r.type == WireMessageType.legislativeGossip),
+        isTrue,
+      );
     });
 
     test('gossip does not relay to sender or self', () {
@@ -180,7 +196,10 @@ void main() {
     });
 
     test('replicateFrom detects fork on version mismatch', () {
-      final remote = LawManifest.forNode('node-B', 0).bumpVersion(RuntimeLawId.noBypassCapabilityRouter);
+      final remote = LawManifest.forNode(
+        'node-B',
+        0,
+      ).bumpVersion(RuntimeLawId.noBypassCapabilityRouter);
       final result = repl.replicateFrom('node-B', remote, 1000);
       expect(result.forkDetected, isTrue);
       expect(result.fork, isNotNull);
@@ -188,7 +207,10 @@ void main() {
     });
 
     test('replicateFrom detects conflict on same epoch different versions', () {
-      final remote = LawManifest.forNode('node-B', 0).bumpVersion(RuntimeLawId.noBypassScheduler);
+      final remote = LawManifest.forNode(
+        'node-B',
+        0,
+      ).bumpVersion(RuntimeLawId.noBypassScheduler);
       final result = repl.replicateFrom('node-B', remote, 1000);
       expect(result.forkDetected, isTrue);
     });
@@ -218,7 +240,10 @@ void main() {
     late ByzantineDetector detector;
 
     setUp(() {
-      detector = ByzantineDetector(localNodeId: 'node-A', accusationThreshold: 3);
+      detector = ByzantineDetector(
+        localNodeId: 'node-A',
+        accusationThreshold: 3,
+      );
     });
 
     test('no accusation below threshold', () {
@@ -297,7 +322,10 @@ void main() {
         connectedAt: 1000,
         trustLevel: TrustLevel.verified,
       );
-      final updated = node.copyWith(status: NodeStatus.connected, lastSeen: 2000);
+      final updated = node.copyWith(
+        status: NodeStatus.connected,
+        lastSeen: 2000,
+      );
       expect(updated.status, NodeStatus.connected);
       expect(updated.lastSeen, 2000);
       expect(updated.nodeId, 'node-A');
@@ -305,12 +333,20 @@ void main() {
 
     test('isAlive returns true for connected nodes', () {
       final alive = NetworkNode(
-        nodeId: 'A', endpoint: '', status: NodeStatus.connected,
-        lastSeen: 0, connectedAt: 0, trustLevel: TrustLevel.verified,
+        nodeId: 'A',
+        endpoint: '',
+        status: NodeStatus.connected,
+        lastSeen: 0,
+        connectedAt: 0,
+        trustLevel: TrustLevel.verified,
       );
       final dead = NetworkNode(
-        nodeId: 'B', endpoint: '', status: NodeStatus.disconnected,
-        lastSeen: 0, connectedAt: 0, trustLevel: TrustLevel.verified,
+        nodeId: 'B',
+        endpoint: '',
+        status: NodeStatus.disconnected,
+        lastSeen: 0,
+        connectedAt: 0,
+        trustLevel: TrustLevel.verified,
       );
       expect(alive.isAlive, isTrue);
       expect(dead.isAlive, isFalse);
@@ -318,12 +354,20 @@ void main() {
 
     test('isTrusted returns true for verified and above', () {
       final verified = NetworkNode(
-        nodeId: 'A', endpoint: '', status: NodeStatus.connected,
-        lastSeen: 0, connectedAt: 0, trustLevel: TrustLevel.verified,
+        nodeId: 'A',
+        endpoint: '',
+        status: NodeStatus.connected,
+        lastSeen: 0,
+        connectedAt: 0,
+        trustLevel: TrustLevel.verified,
       );
       final untrusted = NetworkNode(
-        nodeId: 'B', endpoint: '', status: NodeStatus.connected,
-        lastSeen: 0, connectedAt: 0, trustLevel: TrustLevel.untrusted,
+        nodeId: 'B',
+        endpoint: '',
+        status: NodeStatus.connected,
+        lastSeen: 0,
+        connectedAt: 0,
+        trustLevel: TrustLevel.untrusted,
       );
       expect(verified.isTrusted, isTrue);
       expect(untrusted.isTrusted, isFalse);
@@ -392,7 +436,13 @@ void main() {
     });
 
     test('sendConsensusVote creates wire message', () {
-      final msg = netA.sendConsensusVote('node-B', 'amend-1', true, 'good law', 1000);
+      final msg = netA.sendConsensusVote(
+        'node-B',
+        'amend-1',
+        true,
+        'good law',
+        1000,
+      );
       expect(msg.type, WireMessageType.consensusVote);
       expect(msg.payload['amendmentId'], 'amend-1');
       expect(msg.payload['support'], isTrue);
@@ -417,7 +467,10 @@ void main() {
         signature: 'sig-1',
       );
       netA.receive(msg);
-      expect(netA.replication.replicatedManifests.containsKey('node-B'), isTrue);
+      expect(
+        netA.replication.replicatedManifests.containsKey('node-B'),
+        isTrue,
+      );
       expect(netA.receiveQueue.length, 1);
     });
 
@@ -495,11 +548,21 @@ void main() {
       netA.addNode('node-B', 'tcp://b:9000', TrustLevel.verified, 1000);
       netA.connectNode('node-B', 1000);
 
-      final manifestA = LawManifest.forNode('node-A', 0).bumpVersion(RuntimeLawId.noBypassScheduler);
+      final manifestA = LawManifest.forNode(
+        'node-A',
+        0,
+      ).bumpVersion(RuntimeLawId.noBypassScheduler);
       netA.sendConstitutionSync('node-B', manifestA, 1000);
 
-      final remoteManifest = LawManifest.forNode('node-B', 0).bumpVersion(RuntimeLawId.noBudgetBypass);
-      final result = netA.replication.replicateFrom('node-B', remoteManifest, 1000);
+      final remoteManifest = LawManifest.forNode(
+        'node-B',
+        0,
+      ).bumpVersion(RuntimeLawId.noBudgetBypass);
+      final result = netA.replication.replicateFrom(
+        'node-B',
+        remoteManifest,
+        1000,
+      );
       expect(result.forkDetected, isTrue);
     });
 
@@ -514,7 +577,10 @@ void main() {
         consensus: consensus,
         traceGraph: ConstitutionalTraceGraph(),
         reputationEconomy: ReputationEconomy(ConstitutionalTraceGraph()),
-        judiciary: RuntimeJudiciary(ConstitutionalTraceGraph(), ImmutableAuditLedger()),
+        judiciary: RuntimeJudiciary(
+          ConstitutionalTraceGraph(),
+          ImmutableAuditLedger(),
+        ),
       );
       legislature.propose(
         description: 'Test law',
@@ -527,7 +593,12 @@ void main() {
       legislature.analyzeImpact();
       legislature.judiciaryCheck();
       legislature.submitToVote(1000);
-      consensus.castVote(voterId: 'node-A', amendmentId: legislature.proposals.first.proposalId, support: true, timestamp: 1000);
+      consensus.castVote(
+        voterId: 'node-A',
+        amendmentId: legislature.proposals.first.proposalId,
+        support: true,
+        timestamp: 1000,
+      );
       final enacted = legislature.enact(1000);
 
       final msg = netA.sendLawEnactment('node-B', enacted, 1000);
@@ -555,7 +626,10 @@ void main() {
     test('guard without network has null network getter', () {
       final clock = HybridLogicalClock(nodeId: 'test');
       final securityManager = SecurityManager();
-      final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
+      final enforcer = RuntimeLawEnforcer(
+        clock: clock,
+        securityManager: securityManager,
+      );
       final guard = ConstitutionalGuard(enforcer: enforcer);
       expect(guard.network, isNull);
     });
@@ -563,7 +637,10 @@ void main() {
     test('guard with nodeId but no network has null network getter', () {
       final clock = HybridLogicalClock(nodeId: 'test');
       final securityManager = SecurityManager();
-      final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
+      final enforcer = RuntimeLawEnforcer(
+        clock: clock,
+        securityManager: securityManager,
+      );
       final guard = ConstitutionalGuard(enforcer: enforcer, nodeId: 'node-A');
       expect(guard.network, isNull);
     });
@@ -571,8 +648,15 @@ void main() {
     test('guard with enableNetwork has network getter', () {
       final clock = HybridLogicalClock(nodeId: 'test');
       final securityManager = SecurityManager();
-      final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
-      final guard = ConstitutionalGuard(enforcer: enforcer, nodeId: 'node-A', enableNetwork: true);
+      final enforcer = RuntimeLawEnforcer(
+        clock: clock,
+        securityManager: securityManager,
+      );
+      final guard = ConstitutionalGuard(
+        enforcer: enforcer,
+        nodeId: 'node-A',
+        enableNetwork: true,
+      );
       expect(guard.network, isNotNull);
       expect(guard.network!.localNodeId, 'node-A');
     });
@@ -580,8 +664,15 @@ void main() {
     test('guard with network can send constitution sync', () {
       final clock = HybridLogicalClock(nodeId: 'test');
       final securityManager = SecurityManager();
-      final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
-      final guard = ConstitutionalGuard(enforcer: enforcer, nodeId: 'node-A', enableNetwork: true);
+      final enforcer = RuntimeLawEnforcer(
+        clock: clock,
+        securityManager: securityManager,
+      );
+      final guard = ConstitutionalGuard(
+        enforcer: enforcer,
+        nodeId: 'node-A',
+        enableNetwork: true,
+      );
       final manifest = LawManifest.forNode('node-A', 0);
       guard.network!.sendConstitutionSync('node-B', manifest, 1000);
       expect(guard.network!.sendQueue.length, 1);
@@ -590,19 +681,51 @@ void main() {
     test('full stack: guard + network + byzantine detection', () {
       final clock = HybridLogicalClock(nodeId: 'test');
       final securityManager = SecurityManager();
-      final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
-      final guard = ConstitutionalGuard(enforcer: enforcer, nodeId: 'node-A', enableNetwork: true);
+      final enforcer = RuntimeLawEnforcer(
+        clock: clock,
+        securityManager: securityManager,
+      );
+      final guard = ConstitutionalGuard(
+        enforcer: enforcer,
+        nodeId: 'node-A',
+        enableNetwork: true,
+      );
 
-      guard.network!.addNode('node-B', 'tcp://b:9000', TrustLevel.verified, 1000);
+      guard.network!.addNode(
+        'node-B',
+        'tcp://b:9000',
+        TrustLevel.verified,
+        1000,
+      );
       guard.network!.connectNode('node-B', 1000);
-      guard.network!.addNode('node-C', 'tcp://c:9000', TrustLevel.verified, 1000);
+      guard.network!.addNode(
+        'node-C',
+        'tcp://c:9000',
+        TrustLevel.verified,
+        1000,
+      );
       guard.network!.connectNode('node-C', 1000);
 
-      guard.network!.byzantine.reportInconsistentMessage('node-C', 'msg-1', 1000);
-      guard.network!.byzantine.reportInconsistentMessage('node-C', 'msg-2', 1001);
-      guard.network!.byzantine.reportInconsistentMessage('node-C', 'msg-3', 1002);
+      guard.network!.byzantine.reportInconsistentMessage(
+        'node-C',
+        'msg-1',
+        1000,
+      );
+      guard.network!.byzantine.reportInconsistentMessage(
+        'node-C',
+        'msg-2',
+        1001,
+      );
+      guard.network!.byzantine.reportInconsistentMessage(
+        'node-C',
+        'msg-3',
+        1002,
+      );
 
-      expect(guard.network!.byzantine.verdictFor('node-C'), ByzantineVerdict.suspected);
+      expect(
+        guard.network!.byzantine.verdictFor('node-C'),
+        ByzantineVerdict.suspected,
+      );
 
       guard.network!.banNode('node-C', 2000);
       expect(guard.network!.byzantine.isByzantine('node-C'), isTrue);

@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/locale_provider.dart';
 
@@ -16,10 +16,13 @@ class IncognitoIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(label: localeProvider.t('incognito_mode'), child: CustomPaint(
-      size: Size(size, size),
-      painter: _IncognitoPainter(strokeWidth: strokeWidth, color: color),
-    ));
+    return Semantics(
+      label: localeProvider.t('incognito_mode'),
+      child: CustomPaint(
+        size: Size(size, size),
+        painter: _IncognitoPainter(strokeWidth: strokeWidth, color: color),
+      ),
+    );
   }
 }
 
@@ -61,8 +64,12 @@ class _IncognitoPainter extends CustomPainter {
       ..cubicTo(4.9 * s, 16 * s, 4 * s, 15.1 * s, 4 * s, 14 * s)
       ..lineTo(4 * s, 10 * s);
 
-    final path2 = Path()..moveTo(2 * s, 10 * s)..lineTo(22 * s, 10 * s);
-    final path3 = Path()..moveTo(12 * s, 10 * s)..lineTo(12 * s, 14 * s);
+    final path2 = Path()
+      ..moveTo(2 * s, 10 * s)
+      ..lineTo(22 * s, 10 * s);
+    final path3 = Path()
+      ..moveTo(12 * s, 10 * s)
+      ..lineTo(12 * s, 14 * s);
 
     canvas.drawPath(path1, paint);
     canvas.drawPath(path2, paint);

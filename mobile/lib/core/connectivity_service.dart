@@ -11,7 +11,8 @@ class ConnectivityService {
 
   final Connectivity _connectivity = Connectivity();
   final StreamController<bool> _controller = StreamController<bool>.broadcast();
-  final StreamController<NetworkQuality> _qualityController = StreamController<NetworkQuality>.broadcast();
+  final StreamController<NetworkQuality> _qualityController =
+      StreamController<NetworkQuality>.broadcast();
   StreamSubscription? _subscription;
   bool _isOnline = true;
   bool _initialized = false;
@@ -26,7 +27,9 @@ class ConnectivityService {
   ConnectivityResult get connectionType => _connectionType;
   DateTime? get lastOnlineTime => _lastOnlineTime;
   DateTime? get lastOfflineTime => _lastOfflineTime;
-  Duration? get offlineDuration => _lastOfflineTime != null ? DateTime.now().difference(_lastOfflineTime!) : null;
+  Duration? get offlineDuration => _lastOfflineTime != null
+      ? DateTime.now().difference(_lastOfflineTime!)
+      : null;
 
   Stream<bool> get onConnectivityChanged => _controller.stream;
   Stream<NetworkQuality> get onQualityChanged => _qualityController.stream;
@@ -40,7 +43,9 @@ class ConnectivityService {
 
     try {
       final initialResult = await _connectivity.checkConnectivity();
-      _connectionType = initialResult.isNotEmpty ? initialResult.first : ConnectivityResult.none;
+      _connectionType = initialResult.isNotEmpty
+          ? initialResult.first
+          : ConnectivityResult.none;
       _isOnline = initialResult.any((r) => r != ConnectivityResult.none);
       _quality = _inferQuality(_connectionType);
       if (_isOnline) _lastOnlineTime = DateTime.now();
@@ -48,14 +53,19 @@ class ConnectivityService {
       _qualityController.add(_quality);
       _initialized = true;
     } catch (e) {
-      AppLogger.instance.warning('Initial connectivity check failed, assuming offline', error: e);
+      AppLogger.instance.warning(
+        'Initial connectivity check failed, assuming offline',
+        error: e,
+      );
       _isOnline = false;
       _initialized = true;
     }
 
     _subscription = _connectivity.onConnectivityChanged.listen((results) {
       final online = results.any((r) => r != ConnectivityResult.none);
-      final newType = results.isNotEmpty ? results.first : ConnectivityResult.none;
+      final newType = results.isNotEmpty
+          ? results.first
+          : ConnectivityResult.none;
       final newQuality = _inferQuality(newType);
 
       _connectionType = newType;
@@ -68,7 +78,9 @@ class ConnectivityService {
           _lastOfflineTime = DateTime.now();
         }
         _controller.add(online);
-        AppLogger.instance.info('Connectivity changed: ${online ? 'online' : 'offline'}');
+        AppLogger.instance.info(
+          'Connectivity changed: ${online ? 'online' : 'offline'}',
+        );
       }
 
       if (newQuality != _quality) {
@@ -99,7 +111,9 @@ class ConnectivityService {
     try {
       final result = await _connectivity.checkConnectivity();
       final online = result.any((r) => r != ConnectivityResult.none);
-      _connectionType = result.isNotEmpty ? result.first : ConnectivityResult.none;
+      _connectionType = result.isNotEmpty
+          ? result.first
+          : ConnectivityResult.none;
       final newQuality = _inferQuality(_connectionType);
       if (online != _isOnline) {
         _isOnline = online;

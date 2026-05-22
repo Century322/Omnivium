@@ -3,12 +3,7 @@ import 'runtime_metadata.dart';
 import 'runtime_route.dart';
 import 'runtime_event.dart';
 
-enum BackpressureStrategy {
-  buffer,
-  dropOldest,
-  dropNewest,
-  pause,
-}
+enum BackpressureStrategy { buffer, dropOldest, dropNewest, pause }
 
 class StreamChunk {
   final int index;

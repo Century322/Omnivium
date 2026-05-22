@@ -1,4 +1,3 @@
-
 enum ClusterEventType {
   nodeJoined,
   nodeLeft,
@@ -38,34 +37,33 @@ class ClusterEvent {
     int? timestamp,
     int? hlcTime,
     Map<String, dynamic>? payload,
-  }) =>
-      ClusterEvent(
-        id: id ?? this.id,
-        type: type ?? this.type,
-        sourceNodeId: sourceNodeId ?? this.sourceNodeId,
-        timestamp: timestamp ?? this.timestamp,
-        hlcTime: hlcTime ?? this.hlcTime,
-        payload: payload ?? this.payload,
-      );
+  }) => ClusterEvent(
+    id: id ?? this.id,
+    type: type ?? this.type,
+    sourceNodeId: sourceNodeId ?? this.sourceNodeId,
+    timestamp: timestamp ?? this.timestamp,
+    hlcTime: hlcTime ?? this.hlcTime,
+    payload: payload ?? this.payload,
+  );
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'type': type.name,
-        'sourceNodeId': sourceNodeId,
-        'timestamp': timestamp,
-        'hlcTime': hlcTime,
-        'payload': payload,
-      };
+    'id': id,
+    'type': type.name,
+    'sourceNodeId': sourceNodeId,
+    'timestamp': timestamp,
+    'hlcTime': hlcTime,
+    'payload': payload,
+  };
 
   factory ClusterEvent.fromJson(Map<String, dynamic> json) => ClusterEvent(
-        id: json['id'] as String,
-        type: ClusterEventType.values.firstWhere(
-          (t) => t.name == json['type'],
-          orElse: () => ClusterEventType.nodeJoined,
-        ),
-        sourceNodeId: json['sourceNodeId'] as String,
-        timestamp: json['timestamp'] as int,
-        hlcTime: json['hlcTime'] as int? ?? 0,
-        payload: json['payload'] as Map<String, dynamic>? ?? {},
-      );
+    id: json['id'] as String,
+    type: ClusterEventType.values.firstWhere(
+      (t) => t.name == json['type'],
+      orElse: () => ClusterEventType.nodeJoined,
+    ),
+    sourceNodeId: json['sourceNodeId'] as String,
+    timestamp: json['timestamp'] as int,
+    hlcTime: json['hlcTime'] as int? ?? 0,
+    payload: json['payload'] as Map<String, dynamic>? ?? {},
+  );
 }

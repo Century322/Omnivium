@@ -72,10 +72,22 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     _scrollController.addListener(_onScrollChanged);
     widget.provider.orchestrator.addListener(_onOrchestratorChanged);
     widget.provider.matrix.addListener(_onMatrixChanged);
-    _listeningGlow = AnimationController(duration: const Duration(milliseconds: 300), vsync: this);
-    _headerSwitch = AnimationController(duration: const Duration(milliseconds: 250), vsync: this);
-    _tabSwitch = AnimationController(duration: const Duration(milliseconds: 250), vsync: this);
-    nc.NotificationCenter.observe(nc.Event.capabilityConfirm, _onCapabilityConfirm);
+    _listeningGlow = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _headerSwitch = AnimationController(
+      duration: const Duration(milliseconds: 250),
+      vsync: this,
+    );
+    _tabSwitch = AnimationController(
+      duration: const Duration(milliseconds: 250),
+      vsync: this,
+    );
+    nc.NotificationCenter.observe(
+      nc.Event.capabilityConfirm,
+      _onCapabilityConfirm,
+    );
   }
 
   @override
@@ -89,7 +101,10 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     _searchController.dispose();
     widget.provider.orchestrator.removeListener(_onOrchestratorChanged);
     widget.provider.matrix.removeListener(_onMatrixChanged);
-    nc.NotificationCenter.removeObserver(nc.Event.capabilityConfirm, callback: _onCapabilityConfirm);
+    nc.NotificationCenter.removeObserver(
+      nc.Event.capabilityConfirm,
+      callback: _onCapabilityConfirm,
+    );
     super.dispose();
   }
 
@@ -103,12 +118,21 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
           title: Text(localeProvider.t('capability_confirm_title')),
           content: Text('${localeProvider.t('capability_confirm_msg')} $capId'),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(localeProvider.t('deny'))),
-            FilledButton(onPressed: () => Navigator.pop(ctx, true), child: Text(localeProvider.t('allow'))),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: Text(localeProvider.t('deny')),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text(localeProvider.t('allow')),
+            ),
           ],
         ),
       ).then((granted) {
-        nc.NotificationCenter.post(nc.Event.capabilityConfirm, data: {'granted': granted ?? false});
+        nc.NotificationCenter.post(
+          nc.Event.capabilityConfirm,
+          data: {'granted': granted ?? false},
+        );
       });
     }
   }
@@ -119,15 +143,32 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
 
     _messages.clear();
     for (final msg in orchMessages) {
-      _messages.add(ChatMessageData(role: msg.role, content: msg.content, isStreaming: msg.isStreaming, thoughts: msg.thoughts));
+      _messages.add(
+        ChatMessageData(
+          role: msg.role,
+          content: msg.content,
+          isStreaming: msg.isStreaming,
+          thoughts: msg.thoughts,
+        ),
+      );
     }
 
     final cards = orchestrator.cardRuntime.cards;
     for (final card in cards.values) {
-      if (card.lifecycle == CardLifecycle.created || card.lifecycle == CardLifecycle.streaming) {
-        final exists = _messages.any((m) => m.cardType != null && m.cardData?['cardId'] == card.id);
+      if (card.lifecycle == CardLifecycle.created ||
+          card.lifecycle == CardLifecycle.streaming) {
+        final exists = _messages.any(
+          (m) => m.cardType != null && m.cardData?['cardId'] == card.id,
+        );
         if (!exists) {
-          _messages.add(ChatMessageData(role: 'assistant', content: '', cardType: card.type, cardData: {...card.data, 'cardId': card.id}));
+          _messages.add(
+            ChatMessageData(
+              role: 'assistant',
+              content: '',
+              cardType: card.type,
+              cardData: {...card.data, 'cardId': card.id},
+            ),
+          );
         }
       }
     }
@@ -182,7 +223,8 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     }
     if (_maxScrollOffset <= 0) return;
     final shouldShow = _scrollController.offset < _maxScrollOffset - 10;
-    if (_showScrollBtn != shouldShow) setState(() => _showScrollBtn = shouldShow);
+    if (_showScrollBtn != shouldShow)
+      setState(() => _showScrollBtn = shouldShow);
   }
 
   void _calcMaxScrollOffset() {
@@ -196,19 +238,34 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
   }
 
   void _scrollToLatest() {
-    final target = _maxScrollOffset > 0 ? _maxScrollOffset : _scrollController.position.maxScrollExtent;
+    final target = _maxScrollOffset > 0
+        ? _maxScrollOffset
+        : _scrollController.position.maxScrollExtent;
     if (target <= 0) return;
     _isAutoScrolling = true;
-    _scrollController.animateTo(target, duration: const Duration(milliseconds: 300), curve: Curves.easeOut).then((_) {
-      if (mounted) { _isAutoScrolling = false; setState(() => _showScrollBtn = false); }
-    });
+    _scrollController
+        .animateTo(
+          target,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        )
+        .then((_) {
+          if (mounted) {
+            _isAutoScrolling = false;
+            setState(() => _showScrollBtn = false);
+          }
+        });
   }
 
   void _openDrawer() => setState(() => _isLeftDrawerOpen = true);
 
   void _closeDrawer() {
     final state = _drawerKey.currentState;
-    if (state != null) { state.close(); } else { setState(() => _isLeftDrawerOpen = false); }
+    if (state != null) {
+      state.close();
+    } else {
+      setState(() => _isLeftDrawerOpen = false);
+    }
   }
 
   void _openSettingsFromDrawer() {
@@ -218,14 +275,23 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
 
   void _toggleListening() {
     setState(() => _isListening = !_isListening);
-    if (_isListening) { _listeningGlow.forward(); } else { _listeningGlow.reverse(); }
+    if (_isListening) {
+      _listeningGlow.forward();
+    } else {
+      _listeningGlow.reverse();
+    }
   }
 
   void _sendMessage() {
     final text = _textController.text.trim();
     if (text.isEmpty) return;
     if (text.length > 32000) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(localeProvider.t('message_too_long')), backgroundColor: AppColors.warn(context)));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(localeProvider.t('message_too_long')),
+          backgroundColor: AppColors.warn(context),
+        ),
+      );
       return;
     }
     HapticService.sendMessage();
@@ -238,7 +304,10 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     }
 
     if (!_hasSentMessage) {
-      setState(() { _hasSentMessage = true; _headerSwitch.forward(from: 0); });
+      setState(() {
+        _hasSentMessage = true;
+        _headerSwitch.forward(from: 0);
+      });
     }
 
     if (widget.provider.session.activeSessionId == null) {
@@ -264,7 +333,14 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     _headerSwitch.reverse().then((_) {
       if (mounted) {
         widget.provider.session.closeActiveSession();
-        setState(() { _hasSentMessage = false; _messages.clear(); _textController.clear(); _focusNode.unfocus(); _showScrollBtn = false; _maxScrollOffset = 0; });
+        setState(() {
+          _hasSentMessage = false;
+          _messages.clear();
+          _textController.clear();
+          _focusNode.unfocus();
+          _showScrollBtn = false;
+          _maxScrollOffset = 0;
+        });
       }
     });
   }
@@ -275,21 +351,31 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     final contentWidth = Responsive.contentMaxWidth(context);
 
     return ListenableBuilder(
-      listenable: Listenable.merge([widget.provider.navigation, widget.provider.orchestrator, widget.provider.session]),
+      listenable: Listenable.merge([
+        widget.provider.navigation,
+        widget.provider.orchestrator,
+        widget.provider.session,
+      ]),
       builder: (context, _) {
-        if (!widget.provider.navigation.isSettingsOpen && widget.provider.navigation.shouldShowDrawerAfterSettings) {
+        if (!widget.provider.navigation.isSettingsOpen &&
+            widget.provider.navigation.shouldShowDrawerAfterSettings) {
           widget.provider.navigation.clearDrawerFlag();
-          WidgetsBinding.instance.addPostFrameCallback((_) { if (mounted) _openDrawer(); });
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) _openDrawer();
+          });
         }
         return GestureDetector(
-
-      behavior: HitTestBehavior.opaque,
+          behavior: HitTestBehavior.opaque,
           onHorizontalDragStart: (d) => _swipeStartX = d.globalPosition.dx,
           onHorizontalDragEnd: (d) {
             final dx = d.globalPosition.dx - _swipeStartX;
-            if (dx > 50 && !_isLeftDrawerOpen) { _openDrawer(); }
-            else if (dx < -50 && _isLeftDrawerOpen) { _closeDrawer(); }
-            else if (dx < -50 && !_isLeftDrawerOpen && !isDesktop) { widget.provider.navigation.setCurrentView(ViewState.discover); }
+            if (dx > 50 && !_isLeftDrawerOpen) {
+              _openDrawer();
+            } else if (dx < -50 && _isLeftDrawerOpen) {
+              _closeDrawer();
+            } else if (dx < -50 && !_isLeftDrawerOpen && !isDesktop) {
+              widget.provider.navigation.setCurrentView(ViewState.discover);
+            }
           },
           child: Scaffold(
             body: Stack(
@@ -300,7 +386,15 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                     child: Column(
                       children: [
                         if (_isFriendChat)
-                          Expanded(child: FriendChatPanel(provider: widget.provider, chatTargetId: _chatTargetId, chatTargetName: _chatTargetName, onClose: _closeFriendChat, maxWidth: contentWidth))
+                          Expanded(
+                            child: FriendChatPanel(
+                              provider: widget.provider,
+                              chatTargetId: _chatTargetId,
+                              chatTargetName: _chatTargetName,
+                              onClose: _closeFriendChat,
+                              maxWidth: contentWidth,
+                            ),
+                          )
                         else ...[
                           HomeHeader(
                             hasSentMessage: _hasSentMessage,
@@ -310,13 +404,32 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                             showContacts: _showContacts,
                             isIncognito: widget.provider.navigation.isIncognito,
                             onCloseConversation: _closeConversation,
-                            onShowConversationMenu: () => _showConversationMenu(context),
+                            onShowConversationMenu: () =>
+                                _showConversationMenu(context),
                             onOpenDrawer: _openDrawer,
-                            onToggleContacts: () => setState(() => _showContacts = !_showContacts),
-                            onSwitchToChat: () { _tabSwitch.reverse(); setState(() { _isLibraryMode = false; _showContacts = false; _showSearchBar = false; }); },
-                            onSwitchToLibrary: () { _tabSwitch.forward(); setState(() { _isLibraryMode = true; _showContacts = false; _showSearchBar = false; }); },
-                            onToggleSearch: () => setState(() => _showSearchBar = !_showSearchBar),
-                            onOpenDiscover: () => widget.provider.navigation.setCurrentView(ViewState.discover),
+                            onToggleContacts: () =>
+                                setState(() => _showContacts = !_showContacts),
+                            onSwitchToChat: () {
+                              _tabSwitch.reverse();
+                              setState(() {
+                                _isLibraryMode = false;
+                                _showContacts = false;
+                                _showSearchBar = false;
+                              });
+                            },
+                            onSwitchToLibrary: () {
+                              _tabSwitch.forward();
+                              setState(() {
+                                _isLibraryMode = true;
+                                _showContacts = false;
+                                _showSearchBar = false;
+                              });
+                            },
+                            onToggleSearch: () => setState(
+                              () => _showSearchBar = !_showSearchBar,
+                            ),
+                            onOpenDiscover: () => widget.provider.navigation
+                                .setCurrentView(ViewState.discover),
                             userAvatar: _buildUserAvatar(size: 30, radius: 15),
                           ),
                           Expanded(child: _buildCenterContent()),
@@ -328,32 +441,40 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
                               hasSentMessage: _hasSentMessage,
                               isListening: _isListening,
                               isEditing: _editingIndex >= 0,
-                              isIncognito: widget.provider.navigation.isIncognito,
+                              isIncognito:
+                                  widget.provider.navigation.isIncognito,
                               isFriendChat: _isFriendChat,
-                              isGenerating: !widget.provider.orchestrator.isIdle,
+                              isGenerating:
+                                  !widget.provider.orchestrator.isIdle,
                               maxWidth: contentWidth,
                               onSend: _sendMessage,
                               onToggleListening: _toggleListening,
                               onCancelEdit: _cancelEdit,
-                              onToggleIncognito: () => widget.provider.navigation.setIsIncognito(!widget.provider.navigation.isIncognito),
+                              onToggleIncognito: () =>
+                                  widget.provider.navigation.setIsIncognito(
+                                    !widget.provider.navigation.isIncognito,
+                                  ),
                               onShowOptions: _showOptionsSheet,
                               onShowModels: _showModelsSheet,
-                              onOpenVoice: () => widget.provider.navigation.setCurrentView(ViewState.voice),
+                              onOpenVoice: () => widget.provider.navigation
+                                  .setCurrentView(ViewState.voice),
                               onChanged: () => setState(() {}),
-                              onStopGeneration: () => widget.provider.orchestrator.interrupt(),
+                              onStopGeneration: () =>
+                                  widget.provider.orchestrator.interrupt(),
                             ),
                         ],
                       ],
                     ),
                   ),
                 ),
-                if (_isLeftDrawerOpen) AppDrawer(
-                  key: _drawerKey,
-                  provider: widget.provider,
-                  onClose: () => setState(() => _isLeftDrawerOpen = false),
-                  onOpenNotifications: _openNotifications,
-                  onOpenSettings: _openSettingsFromDrawer,
-                ),
+                if (_isLeftDrawerOpen)
+                  AppDrawer(
+                    key: _drawerKey,
+                    provider: widget.provider,
+                    onClose: () => setState(() => _isLeftDrawerOpen = false),
+                    onOpenNotifications: _openNotifications,
+                    onOpenSettings: _openSettingsFromDrawer,
+                  ),
               ],
             ),
           ),
@@ -382,17 +503,28 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
         showScrollBtn: _showScrollBtn,
         orchestrator: widget.provider.orchestrator,
         onScrollToLatest: _scrollToLatest,
-        onToggleThought: (i) => setState(() { _expandedThoughts.contains(i) ? _expandedThoughts.remove(i) : _expandedThoughts.add(i); }),
+        onToggleThought: (i) => setState(() {
+          _expandedThoughts.contains(i)
+              ? _expandedThoughts.remove(i)
+              : _expandedThoughts.add(i);
+        }),
         onRegenerate: _regenerateResponse,
         onCopy: _copyContent,
         onSpeak: _speakLastResponse,
-        onShare: (content) => SharePlus.instance.share(ShareParams(text: content)),
-        onMore: (content, index) => HomeDialogs.showMoreMenu(context, content, index,
+        onShare: (content) =>
+            SharePlus.instance.share(ShareParams(text: content)),
+        onMore: (content, index) => HomeDialogs.showMoreMenu(
+          context,
+          content,
+          index,
           onEdit: () => _editQuery(index),
           onDelete: () => _deleteMessagePair(index),
           onReport: () => _reportNotHelpful(index),
         ),
-        onMessageLongPress: (index) => HomeDialogs.showMoreMenu(context, _messages[index].content, index,
+        onMessageLongPress: (index) => HomeDialogs.showMoreMenu(
+          context,
+          _messages[index].content,
+          index,
           onEdit: () => _editQuery(index),
           onDelete: () => _deleteMessagePair(index),
           onReport: () => _reportNotHelpful(index),
@@ -406,38 +538,81 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(t('incognito_mode'), style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500, color: AppColors.textPrimary(context))),
+              Text(
+                t('incognito_mode'),
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.textPrimary(context),
+                ),
+              ),
               const SizedBox(height: 16),
-              Text(localeProvider.t('incognito_notice'), style: TextStyle(fontSize: 15, color: AppColors.mut(context), height: 1.6), textAlign: TextAlign.center),
+              Text(
+                localeProvider.t('incognito_notice'),
+                style: TextStyle(
+                  fontSize: 15,
+                  color: AppColors.mut(context),
+                  height: 1.6,
+                ),
+                textAlign: TextAlign.center,
+              ),
             ],
           ),
         ),
       );
     }
-    return Center(child: Text('Omnivium', style: TextStyle(fontSize: 36, color: AppColors.textPrimary(context), fontFamily: 'serif')));
+    return Center(
+      child: Text(
+        'Omnivium',
+        style: TextStyle(
+          fontSize: 36,
+          color: AppColors.textPrimary(context),
+          fontFamily: 'serif',
+        ),
+      ),
+    );
   }
 
-  void _openFriendChat(String id, String name) => setState(() { _isFriendChat = true; _chatTargetId = id; _chatTargetName = name; });
+  void _openFriendChat(String id, String name) => setState(() {
+    _isFriendChat = true;
+    _chatTargetId = id;
+    _chatTargetName = name;
+  });
 
-  void _closeFriendChat() => setState(() { _isFriendChat = false; _chatTargetId = ''; _chatTargetName = ''; });
+  void _closeFriendChat() => setState(() {
+    _isFriendChat = false;
+    _chatTargetId = '';
+    _chatTargetName = '';
+  });
 
   void _cancelEdit() => setState(() => _editingIndex = -1);
 
   void _editQuery(int index) {
     if (index <= 0 || index >= _messages.length) return;
-    setState(() { _editingIndex = index - 1; _textController.text = _messages[index - 1].content; });
+    setState(() {
+      _editingIndex = index - 1;
+      _textController.text = _messages[index - 1].content;
+    });
     _focusNode.requestFocus();
   }
 
   void _deleteMessagePair(int index) {
     if (index <= 0 || index >= _messages.length) return;
     widget.provider.orchestrator.deleteMessagePair(index);
-    setState(() { _editingIndex = -1; _maxScrollOffset = 0; });
+    setState(() {
+      _editingIndex = -1;
+      _maxScrollOffset = 0;
+    });
     widget.provider.session.saveCurrentSession();
   }
 
   void _reportNotHelpful(int index) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(localeProvider.t('feedback_recorded')), duration: const Duration(seconds: 2)));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(localeProvider.t('feedback_recorded')),
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 
   void _regenerateResponse() {
@@ -447,7 +622,10 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     if (orchMsgs.isEmpty) return;
     String? lastUserMsg;
     for (var i = orchMsgs.length - 1; i >= 0; i--) {
-      if (orchMsgs[i].role == 'user') { lastUserMsg = orchMsgs[i].content; break; }
+      if (orchMsgs[i].role == 'user') {
+        lastUserMsg = orchMsgs[i].content;
+        break;
+      }
     }
     if (lastUserMsg == null) return;
     if (orchMsgs.isNotEmpty && orchMsgs.last.role == 'assistant') {
@@ -459,7 +637,11 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
   void _copyContent(String content) {
     Clipboard.setData(ClipboardData(text: content));
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(t('copied')), backgroundColor: AppColors.accent, duration: const Duration(milliseconds: 1500)),
+      SnackBar(
+        content: Text(t('copied')),
+        backgroundColor: AppColors.accent,
+        duration: const Duration(milliseconds: 1500),
+      ),
     );
   }
 
@@ -468,29 +650,53 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     final msgs = orch.messages;
     if (msgs.isEmpty) return;
     final last = msgs.last;
-    if (last.role == 'assistant' && last.content.isNotEmpty) VoiceService.instance.speak(last.content);
+    if (last.role == 'assistant' && last.content.isNotEmpty)
+      VoiceService.instance.speak(last.content);
   }
 
   void _showPermissionDialog() {
     if (_permissionDialogShown) return;
     _permissionDialogShown = true;
     final orchestrator = widget.provider.orchestrator;
-    final skillName = orchestrator.pendingSkillName ?? localeProvider.t('unknown_action');
-    HomeDialogs.showPermissionDialog(context, skillName,
-      onGrant: () { _permissionDialogShown = false; orchestrator.grantPermission(); },
-      onDeny: () { _permissionDialogShown = false; orchestrator.denyPermission(); },
+    final skillName =
+        orchestrator.pendingSkillName ?? localeProvider.t('unknown_action');
+    HomeDialogs.showPermissionDialog(
+      context,
+      skillName,
+      onGrant: () {
+        _permissionDialogShown = false;
+        orchestrator.grantPermission();
+      },
+      onDeny: () {
+        _permissionDialogShown = false;
+        orchestrator.denyPermission();
+      },
     );
   }
 
   Widget _buildUserAvatar({required double size, required double radius}) {
     final userId = widget.provider.matrix.userId ?? '';
-    final initial = userId.isNotEmpty ? userId.split(':').first.replaceAll('@', '').toUpperCase() : '?';
+    final initial = userId.isNotEmpty
+        ? userId.split(':').first.replaceAll('@', '').toUpperCase()
+        : '?';
     final letter = initial.isNotEmpty ? initial[0] : '?';
     return Container(
       width: size,
       height: size,
-      decoration: BoxDecoration(color: AppColors.accent.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(radius)),
-      child: Center(child: Text(letter, style: TextStyle(color: AppColors.accent, fontSize: size * 0.45, fontWeight: FontWeight.w700))),
+      decoration: BoxDecoration(
+        color: AppColors.accent.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(radius),
+      ),
+      child: Center(
+        child: Text(
+          letter,
+          style: TextStyle(
+            color: AppColors.accent,
+            fontSize: size * 0.45,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
     );
   }
 
@@ -503,33 +709,77 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     final sessionId = widget.provider.session.activeSessionId;
     if (sessionId == null) return;
     widget.provider.session.toggleFavoriteSession(sessionId);
-    final session = widget.provider.session.sessions.where((s) => s.id == sessionId).firstOrNull;
+    final session = widget.provider.session.sessions
+        .where((s) => s.id == sessionId)
+        .firstOrNull;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(session?.isFavorite == true ? localeProvider.t('favorited') : localeProvider.t('unfavorited')), duration: const Duration(seconds: 2)),
+      SnackBar(
+        content: Text(
+          session?.isFavorite == true
+              ? localeProvider.t('favorited')
+              : localeProvider.t('unfavorited'),
+        ),
+        duration: const Duration(seconds: 2),
+      ),
     );
   }
 
   void _showConversationMenu(BuildContext ctx) {
     showMenu(
       context: ctx,
-      position: RelativeRect.fromLTRB(MediaQuery.of(ctx).size.width - 180, MediaQuery.of(ctx).padding.top + 60, 16, 0),
+      position: RelativeRect.fromLTRB(
+        MediaQuery.of(ctx).size.width - 180,
+        MediaQuery.of(ctx).padding.top + 60,
+        16,
+        0,
+      ),
       color: AppColors.sf(context),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       items: [
-        _menuItem(LucideIcons.bookmark, localeProvider.t('favorite_conversation'), key: 'favorite'),
-        _menuItem(LucideIcons.share, localeProvider.t('share_conversation'), key: 'share'),
-        _menuItem(LucideIcons.search, localeProvider.t('search_conversation'), key: 'search'),
-        _menuItem(LucideIcons.shield, widget.provider.navigation.isIncognito ? localeProvider.t('close_incognito') : localeProvider.t('incognito_mode_short'), key: 'incognito'),
-        _menuItem(LucideIcons.trash2, localeProvider.t('delete_conversation'), key: 'delete', isDanger: true),
+        _menuItem(
+          LucideIcons.bookmark,
+          localeProvider.t('favorite_conversation'),
+          key: 'favorite',
+        ),
+        _menuItem(
+          LucideIcons.share,
+          localeProvider.t('share_conversation'),
+          key: 'share',
+        ),
+        _menuItem(
+          LucideIcons.search,
+          localeProvider.t('search_conversation'),
+          key: 'search',
+        ),
+        _menuItem(
+          LucideIcons.shield,
+          widget.provider.navigation.isIncognito
+              ? localeProvider.t('close_incognito')
+              : localeProvider.t('incognito_mode_short'),
+          key: 'incognito',
+        ),
+        _menuItem(
+          LucideIcons.trash2,
+          localeProvider.t('delete_conversation'),
+          key: 'delete',
+          isDanger: true,
+        ),
       ],
     ).then((value) {
       if (value == null || !mounted) return;
       switch (value) {
-        case 'favorite': _toggleFavorite();
-        case 'share': _shareConversation();
-        case 'search': ChatSearchSheet(messages: _messages).show(context);
-        case 'incognito': widget.provider.navigation.setIsIncognito(!widget.provider.navigation.isIncognito);
-        case 'delete': _closeConversation();
+        case 'favorite':
+          _toggleFavorite();
+        case 'share':
+          _shareConversation();
+        case 'search':
+          ChatSearchSheet(messages: _messages).show(context);
+        case 'incognito':
+          widget.provider.navigation.setIsIncognito(
+            !widget.provider.navigation.isIncognito,
+          );
+        case 'delete':
+          _closeConversation();
       }
     });
   }
@@ -537,35 +787,81 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
   void _shareConversation() {
     final msgs = _messages;
     if (msgs.isEmpty) return;
-    final text = msgs.map((m) => m.role == 'user' ? '${localeProvider.t('me')}：${m.content}' : '${localeProvider.t('ai')}：${m.content}').join('\n\n');
+    final text = msgs
+        .map(
+          (m) => m.role == 'user'
+              ? '${localeProvider.t('me')}：${m.content}'
+              : '${localeProvider.t('ai')}：${m.content}',
+        )
+        .join('\n\n');
     SharePlus.instance.share(ShareParams(text: text));
   }
 
-  PopupMenuItem<String> _menuItem(IconData icon, String text, {String? key, bool isDanger = false}) {
+  PopupMenuItem<String> _menuItem(
+    IconData icon,
+    String text, {
+    String? key,
+    bool isDanger = false,
+  }) {
     return PopupMenuItem<String>(
       value: key ?? text,
       height: 44,
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(children: [
-        Icon(icon, size: 16, color: isDanger ? AppColors.dng(context) : AppColors.sec(context)),
-        const SizedBox(width: 12),
-        Text(text, style: TextStyle(color: isDanger ? AppColors.dng(context) : AppColors.textPrimary(context), fontSize: 14, fontWeight: FontWeight.w500)),
-      ]),
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            size: 16,
+            color: isDanger ? AppColors.dng(context) : AppColors.sec(context),
+          ),
+          const SizedBox(width: 12),
+          Text(
+            text,
+            style: TextStyle(
+              color: isDanger
+                  ? AppColors.dng(context)
+                  : AppColors.textPrimary(context),
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   void _showCreateGroupChat() {
-    HomeDialogs.showCreateGroupChat(context, onCreate: (name, members) async {
-      try { await widget.provider.matrix.createGroupChat(name, userIds: members); }
-      catch (e, stackTrace) { AppLogger.instance.error('Operation failed', error: e, stackTrace: stackTrace); }
-    });
+    HomeDialogs.showCreateGroupChat(
+      context,
+      onCreate: (name, members) async {
+        try {
+          await widget.provider.matrix.createGroupChat(name, userIds: members);
+        } catch (e, stackTrace) {
+          AppLogger.instance.error(
+            'Operation failed',
+            error: e,
+            stackTrace: stackTrace,
+          );
+        }
+      },
+    );
   }
 
   void _showAddContact() {
-    HomeDialogs.showAddContact(context, onAdd: (userId) async {
-      try { await widget.provider.matrix.createDirectChat(userId); }
-      catch (e, stackTrace) { AppLogger.instance.error('Operation failed', error: e, stackTrace: stackTrace); }
-    });
+    HomeDialogs.showAddContact(
+      context,
+      onAdd: (userId) async {
+        try {
+          await widget.provider.matrix.createDirectChat(userId);
+        } catch (e, stackTrace) {
+          AppLogger.instance.error(
+            'Operation failed',
+            error: e,
+            stackTrace: stackTrace,
+          );
+        }
+      },
+    );
   }
 
   void _showOptionsSheet() {
@@ -573,7 +869,12 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (context) => SlidingSheet(child: OptionsContent(onClose: () => Navigator.pop(context), provider: widget.provider)),
+      builder: (context) => SlidingSheet(
+        child: OptionsContent(
+          onClose: () => Navigator.pop(context),
+          provider: widget.provider,
+        ),
+      ),
     );
   }
 
@@ -582,7 +883,12 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (context) => SlidingSheet(child: ModelsContent(onClose: () => Navigator.pop(context), provider: widget.provider)),
+      builder: (context) => SlidingSheet(
+        child: ModelsContent(
+          onClose: () => Navigator.pop(context),
+          provider: widget.provider,
+        ),
+      ),
     );
   }
 }

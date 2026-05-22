@@ -33,7 +33,8 @@ class TimeoutPolicy {
     this.perCapability = const {},
   });
 
-  int timeoutFor(String capabilityId) => perCapability[capabilityId] ?? defaultMs;
+  int timeoutFor(String capabilityId) =>
+      perCapability[capabilityId] ?? defaultMs;
 }
 
 class CircuitBreakerPolicy {
@@ -48,13 +49,7 @@ class CircuitBreakerPolicy {
   });
 }
 
-enum FallbackStrategy {
-  cache,
-  defaultValue,
-  delegate,
-  failOpen,
-  failClosed,
-}
+enum FallbackStrategy { cache, defaultValue, delegate, failOpen, failClosed }
 
 class FallbackPolicy {
   final FallbackStrategy strategy;
@@ -82,11 +77,7 @@ class DeadLetterPolicy {
   });
 }
 
-enum PoisonAction {
-  quarantine,
-  drop,
-  alert,
-}
+enum PoisonAction { quarantine, drop, alert }
 
 class FailurePolicy {
   final RetryPolicy retry;

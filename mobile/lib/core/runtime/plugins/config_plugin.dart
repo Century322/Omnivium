@@ -7,7 +7,8 @@ import 'persistence_backend.dart';
 
 class ConfigPlugin implements PluginHandler {
   final Map<String, dynamic> _config = {};
-  final Map<String, List<void Function(String key, dynamic value)>> _watchers = {};
+  final Map<String, List<void Function(String key, dynamic value)>> _watchers =
+      {};
   final PersistenceBackend? _persistence;
   bool _loaded = false;
 
@@ -26,17 +27,27 @@ class ConfigPlugin implements PluginHandler {
   }
 
   @override
-  Future<HandlerResult> handleMessage(RuntimeMessage message, CapabilityContext context) async {
+  Future<HandlerResult> handleMessage(
+    RuntimeMessage message,
+    CapabilityContext context,
+  ) async {
     return HandlerResult.ok();
   }
 
   @override
-  Future<HandlerResult> handleEvent(RuntimeEvent event, CapabilityContext context) async {
+  Future<HandlerResult> handleEvent(
+    RuntimeEvent event,
+    CapabilityContext context,
+  ) async {
     return HandlerResult.ok();
   }
 
   @override
-  Future<CapabilityResult> invokeCapability(String capabilityId, dynamic params, CapabilityContext context) async {
+  Future<CapabilityResult> invokeCapability(
+    String capabilityId,
+    dynamic params,
+    CapabilityContext context,
+  ) async {
     if (!_loaded) await loadFromPersistence();
     switch (capabilityId) {
       case 'config.get':
@@ -63,35 +74,38 @@ class ConfigPlugin implements PluginHandler {
         return CapabilityResult.ok(true);
       default:
         return CapabilityResult.fail(
-          RuntimeError(code: 'UNKNOWN_CAPABILITY', message: 'Unknown capability: $capabilityId'),
+          RuntimeError(
+            code: 'UNKNOWN_CAPABILITY',
+            message: 'Unknown capability: $capabilityId',
+          ),
         );
     }
   }
 
   static PluginDescriptor descriptor() => PluginDescriptor(
-        id: 'config',
-        name: 'Config Plugin',
-        version: '1.0.0',
-        description: 'Runtime configuration management',
-        capabilities: const [
-          CapabilityDeclaration(
-            id: 'config.get',
-            name: 'Get Config',
-            description: 'Get a config value',
-            permission: 'auto',
-          ),
-          CapabilityDeclaration(
-            id: 'config.set',
-            name: 'Set Config',
-            description: 'Set a config value',
-            permission: 'confirm',
-          ),
-          CapabilityDeclaration(
-            id: 'config.watch',
-            name: 'Watch Config',
-            description: 'Watch a config key for changes',
-            permission: 'auto',
-          ),
-        ],
-      );
+    id: 'config',
+    name: 'Config Plugin',
+    version: '1.0.0',
+    description: 'Runtime configuration management',
+    capabilities: const [
+      CapabilityDeclaration(
+        id: 'config.get',
+        name: 'Get Config',
+        description: 'Get a config value',
+        permission: 'auto',
+      ),
+      CapabilityDeclaration(
+        id: 'config.set',
+        name: 'Set Config',
+        description: 'Set a config value',
+        permission: 'confirm',
+      ),
+      CapabilityDeclaration(
+        id: 'config.watch',
+        name: 'Watch Config',
+        description: 'Watch a config key for changes',
+        permission: 'auto',
+      ),
+    ],
+  );
 }

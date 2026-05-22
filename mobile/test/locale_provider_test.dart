@@ -43,14 +43,22 @@ void main() {
 }
 
 const zhTranslations = <String, String>{
-  'settings': '设置', 'security_warning': '安全警告', 'coming_soon': '即将推出',
+  'settings': '设置',
+  'security_warning': '安全警告',
+  'coming_soon': '即将推出',
 };
 const enTranslations = <String, String>{
-  'settings': 'Settings', 'security_warning': 'Security Warning', 'coming_soon': 'Coming soon',
+  'settings': 'Settings',
+  'security_warning': 'Security Warning',
+  'coming_soon': 'Coming soon',
 };
 const jaTranslations = <String, String>{
-  'settings': '設定', 'security_warning': 'セキュリティ警告', 'coming_soon': '近日公開',
+  'settings': '設定',
+  'security_warning': 'セキュリティ警告',
+  'coming_soon': '近日公開',
 };
 const koTranslations = <String, String>{
-  'settings': '설정', 'security_warning': '보안 경고', 'coming_soon': '출시 예정',
+  'settings': '설정',
+  'security_warning': '보안 경고',
+  'coming_soon': '출시 예정',
 };

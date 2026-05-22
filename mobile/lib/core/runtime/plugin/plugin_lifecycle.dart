@@ -1,10 +1,4 @@
-enum PluginState {
-  unloaded,
-  loaded,
-  active,
-  suspended,
-  failed,
-}
+enum PluginState { unloaded, loaded, active, suspended, failed }
 
 class LifecycleTransition {
   final PluginState from;
@@ -34,11 +28,17 @@ class PluginLifecycle {
       case PluginState.unloaded:
         return target == PluginState.loaded;
       case PluginState.loaded:
-        return target == PluginState.active || target == PluginState.unloaded || target == PluginState.failed;
+        return target == PluginState.active ||
+            target == PluginState.unloaded ||
+            target == PluginState.failed;
       case PluginState.active:
-        return target == PluginState.suspended || target == PluginState.unloaded || target == PluginState.failed;
+        return target == PluginState.suspended ||
+            target == PluginState.unloaded ||
+            target == PluginState.failed;
       case PluginState.suspended:
-        return target == PluginState.active || target == PluginState.unloaded || target == PluginState.failed;
+        return target == PluginState.active ||
+            target == PluginState.unloaded ||
+            target == PluginState.failed;
       case PluginState.failed:
         return target == PluginState.loaded || target == PluginState.unloaded;
     }
@@ -47,12 +47,14 @@ class PluginLifecycle {
   bool transitionTo(PluginState target, {String reason = ''}) {
     if (!canTransitionTo(target)) return false;
     final now = DateTime.now().millisecondsSinceEpoch;
-    _transitions.add(LifecycleTransition(
-      from: _state,
-      to: target,
-      timestamp: now,
-      reason: reason,
-    ));
+    _transitions.add(
+      LifecycleTransition(
+        from: _state,
+        to: target,
+        timestamp: now,
+        reason: reason,
+      ),
+    );
     _state = target;
     return true;
   }

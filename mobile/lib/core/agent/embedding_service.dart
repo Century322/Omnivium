@@ -41,10 +41,16 @@ class EmbeddingService {
             }
           }
         } else if (indexData is Map<String, dynamic>) {
-          _cache.addAll(indexData.map((k, v) => MapEntry(k, List<double>.from(v as List))));
+          _cache.addAll(
+            indexData.map((k, v) => MapEntry(k, List<double>.from(v as List))),
+          );
         }
       } catch (e, stackTrace) {
-        AppLogger.instance.error('Embedding cache load failed', error: e, stackTrace: stackTrace);
+        AppLogger.instance.error(
+          'Embedding cache load failed',
+          error: e,
+          stackTrace: stackTrace,
+        );
       }
     }
     _initialized = true;
@@ -64,11 +70,17 @@ class EmbeddingService {
 
     try {
       final uri = Uri.parse('${proxy.backendUrl}/ai/embed');
-      final response = await proxy.secureClient.post(uri, headers: {
-        ...proxy.buildAuthHeaders(),
-        ...proxy.buildDeviceHeaders(),
-        'Content-Type': 'application/json',
-      }, body: jsonEncode({'text': text})).timeout(const Duration(seconds: 10));
+      final response = await proxy.secureClient
+          .post(
+            uri,
+            headers: {
+              ...proxy.buildAuthHeaders(),
+              ...proxy.buildDeviceHeaders(),
+              'Content-Type': 'application/json',
+            },
+            body: jsonEncode({'text': text}),
+          )
+          .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body) as Map<String, dynamic>;
@@ -82,14 +94,20 @@ class EmbeddingService {
             _cache.remove(evictedKey);
             _keyToHash.remove(evictedKey);
             _dirtyKeys.remove(evictedKey);
-            await DatabaseService.instance.deleteCache('$_cacheKey::$evictedKey');
+            await DatabaseService.instance.deleteCache(
+              '$_cacheKey::$evictedKey',
+            );
           }
           await _saveDirtyEntries();
           return embedding;
         }
       }
     } catch (e, stackTrace) {
-      AppLogger.instance.error('Embedding request failed', error: e, stackTrace: stackTrace);
+      AppLogger.instance.error(
+        'Embedding request failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
     return null;
   }
@@ -106,7 +124,11 @@ class EmbeddingService {
     return dotProduct / (sqrt(normA) * sqrt(normB));
   }
 
-  Future<List<MapEntry<String, double>>> searchSimilar(String query, {int maxResults = 5, double threshold = 0.5}) async {
+  Future<List<MapEntry<String, double>>> searchSimilar(
+    String query, {
+    int maxResults = 5,
+    double threshold = 0.5,
+  }) async {
     final queryEmbedding = await getEmbedding(query);
     if (queryEmbedding == null) return [];
 

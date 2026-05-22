@@ -9,7 +9,8 @@ class StreamChunk {
 }
 
 class StreamingController {
-  StreamController<StreamChunk>? _controller = StreamController<StreamChunk>.broadcast();
+  StreamController<StreamChunk>? _controller =
+      StreamController<StreamChunk>.broadcast();
   bool _isStreaming = false;
   String _buffer = '';
   bool _disposed = false;

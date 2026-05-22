@@ -18,12 +18,12 @@ class CapabilityAdvertisement {
   });
 
   Map<String, dynamic> toJson() => {
-        'nodeId': nodeId,
-        'capabilityIds': capabilityIds,
-        'pluginId': pluginId,
-        'version': version,
-        'timestamp': timestamp,
-      };
+    'nodeId': nodeId,
+    'capabilityIds': capabilityIds,
+    'pluginId': pluginId,
+    'version': version,
+    'timestamp': timestamp,
+  };
 
   factory CapabilityAdvertisement.fromJson(Map<String, dynamic> json) =>
       CapabilityAdvertisement(
@@ -35,12 +35,7 @@ class CapabilityAdvertisement {
       );
 }
 
-enum RouteDecision {
-  local,
-  remote,
-  fallback,
-  unavailable,
-}
+enum RouteDecision { local, remote, fallback, unavailable }
 
 class RouteResult {
   final RouteDecision decision;
@@ -73,13 +68,14 @@ class RemoteCapabilityRouter {
   RemoteCapabilityRouter({
     required String localNodeId,
     required HybridLogicalClock clock,
-  })  : _localNodeId = localNodeId,
-        _clock = clock;
+  }) : _localNodeId = localNodeId,
+       _clock = clock;
 
   String get localNodeId => _localNodeId;
   int get localCapabilityCount => _localCapabilities.length;
   int get remoteCapabilityCount => _remoteCapabilities.length;
-  List<RemoteCapabilityBinding> get remoteBindings => _remoteCapabilities.values.toList();
+  List<RemoteCapabilityBinding> get remoteBindings =>
+      _remoteCapabilities.values.toList();
 
   void setTransport(RuntimeTransport transport) {
     _transport = transport;
@@ -120,14 +116,18 @@ class RemoteCapabilityRouter {
 
   void withdrawNodeCapabilities(String nodeId) {
     _advertisements.remove(nodeId);
-    _remoteCapabilities.removeWhere((_, binding) => binding.providerNodeId == nodeId);
+    _remoteCapabilities.removeWhere(
+      (_, binding) => binding.providerNodeId == nodeId,
+    );
   }
 
   void markCapabilityUnreachable(String capabilityId) {
     final binding = _remoteCapabilities[capabilityId];
     if (binding == null) return;
 
-    _remoteCapabilities[capabilityId] = binding.copyWith(state: BindingState.unreachable);
+    _remoteCapabilities[capabilityId] = binding.copyWith(
+      state: BindingState.unreachable,
+    );
   }
 
   RouteResult route(String capabilityId) {
@@ -157,7 +157,10 @@ class RemoteCapabilityRouter {
     );
   }
 
-  RouteResult routeWithFallback(String capabilityId, List<String> fallbackCapabilityIds) {
+  RouteResult routeWithFallback(
+    String capabilityId,
+    List<String> fallbackCapabilityIds,
+  ) {
     final primary = route(capabilityId);
     if (primary.isAvailable) return primary;
 
@@ -177,7 +180,10 @@ class RemoteCapabilityRouter {
     return primary;
   }
 
-  CapabilityAdvertisement createAdvertisement(String pluginId, List<String> capabilityIds) {
+  CapabilityAdvertisement createAdvertisement(
+    String pluginId,
+    List<String> capabilityIds,
+  ) {
     final now = _clock.tick();
     return CapabilityAdvertisement(
       nodeId: _localNodeId,

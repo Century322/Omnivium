@@ -66,10 +66,10 @@ class AppConfig {
   }
 
   static Map<String, dynamic> toDiagnosticMap() => {
-        'environment': environment.name,
-        'appName': appName,
-        'apiBaseUrl': apiBaseUrl,
-        'enableSentry': enableSentry,
-        'enableVerboseLogging': enableVerboseLogging,
-      };
+    'environment': environment.name,
+    'appName': appName,
+    'apiBaseUrl': apiBaseUrl,
+    'enableSentry': enableSentry,
+    'enableVerboseLogging': enableVerboseLogging,
+  };
 }

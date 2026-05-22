@@ -73,11 +73,7 @@ class SemanticVersion implements Comparable<SemanticVersion> {
   }
 }
 
-enum DeprecationLevel {
-  active,
-  deprecated,
-  removed,
-}
+enum DeprecationLevel { active, deprecated, removed }
 
 class DeprecationNotice {
   final String id;
@@ -118,7 +114,8 @@ class ProtocolVersion {
   bool isCompatibleWith(ProtocolVersion other) => major == other.major;
 
   @override
-  String toString() => '$major.$minor${identifier.isNotEmpty ? '-$identifier' : ''}';
+  String toString() =>
+      '$major.$minor${identifier.isNotEmpty ? '-$identifier' : ''}';
 }
 
 class CapabilityVersion {
@@ -166,9 +163,9 @@ class RuntimeVersionRegistry {
   });
 
   static RuntimeVersionRegistry current() => RuntimeVersionRegistry(
-        runtimeVersion: const SemanticVersion(major: 0, minor: 8, patch: 0),
-        protocolVersion: const ProtocolVersion(major: 1, minor: 0),
-      );
+    runtimeVersion: const SemanticVersion(major: 0, minor: 8, patch: 0),
+    protocolVersion: const ProtocolVersion(major: 1, minor: 0),
+  );
 
   void registerCapability(CapabilityVersion cap) {
     _capabilityVersions[cap.capabilityId] = cap;
@@ -187,8 +184,9 @@ class RuntimeVersionRegistry {
   List<DeprecationNotice> get deprecations => List.unmodifiable(_deprecations);
   List<MigrationStep> get migrations => List.unmodifiable(_migrations);
 
-  List<DeprecationNotice> activeDeprecations() =>
-      _deprecations.where((d) => d.level == DeprecationLevel.deprecated).toList();
+  List<DeprecationNotice> activeDeprecations() => _deprecations
+      .where((d) => d.level == DeprecationLevel.deprecated)
+      .toList();
 
   List<DeprecationNotice> removedFeatures() =>
       _deprecations.where((d) => d.level == DeprecationLevel.removed).toList();
@@ -199,55 +197,70 @@ class RuntimeVersionRegistry {
     return !dep.isRemovedIn(targetVersion);
   }
 
-  bool isCapabilityCompatible(String capabilityId, SemanticVersion targetVersion) {
+  bool isCapabilityCompatible(
+    String capabilityId,
+    SemanticVersion targetVersion,
+  ) {
     final cap = _capabilityVersions[capabilityId];
     if (cap == null) return false;
     return cap.version.isBackwardCompatibleWith(targetVersion);
   }
 
-  List<MigrationStep> migrationsBetween(SemanticVersion from, SemanticVersion to) {
-    return _migrations
-        .where((m) {
-          final mFrom = SemanticVersion.parse(m.fromVersion);
-          final mTo = SemanticVersion.parse(m.toVersion);
-          return mFrom >= from && mTo <= to;
-        })
-        .toList();
+  List<MigrationStep> migrationsBetween(
+    SemanticVersion from,
+    SemanticVersion to,
+  ) {
+    return _migrations.where((m) {
+      final mFrom = SemanticVersion.parse(m.fromVersion);
+      final mTo = SemanticVersion.parse(m.toVersion);
+      return mFrom >= from && mTo <= to;
+    }).toList();
   }
 
   CompatibilityResult checkCompatibility(RuntimeVersionRegistry other) {
     final issues = <CompatibilityIssue>[];
 
     if (!runtimeVersion.isCompatibleWith(other.runtimeVersion)) {
-      issues.add(CompatibilityIssue(
-        type: CompatibilityType.runtimeVersion,
-        message: 'Runtime major version mismatch: $runtimeVersion vs ${other.runtimeVersion}',
-        isBreaking: true,
-      ));
+      issues.add(
+        CompatibilityIssue(
+          type: CompatibilityType.runtimeVersion,
+          message:
+              'Runtime major version mismatch: $runtimeVersion vs ${other.runtimeVersion}',
+          isBreaking: true,
+        ),
+      );
     }
 
     if (!protocolVersion.isCompatibleWith(other.protocolVersion)) {
-      issues.add(CompatibilityIssue(
-        type: CompatibilityType.protocolVersion,
-        message: 'Protocol major version mismatch: $protocolVersion vs ${other.protocolVersion}',
-        isBreaking: true,
-      ));
+      issues.add(
+        CompatibilityIssue(
+          type: CompatibilityType.protocolVersion,
+          message:
+              'Protocol major version mismatch: $protocolVersion vs ${other.protocolVersion}',
+          isBreaking: true,
+        ),
+      );
     }
 
     for (final cap in _capabilityVersions.values) {
       final otherCap = other._capabilityVersions[cap.capabilityId];
       if (otherCap == null) {
-        issues.add(CompatibilityIssue(
-          type: CompatibilityType.missingCapability,
-          message: 'Capability ${cap.capabilityId} not found in remote',
-          isBreaking: false,
-        ));
+        issues.add(
+          CompatibilityIssue(
+            type: CompatibilityType.missingCapability,
+            message: 'Capability ${cap.capabilityId} not found in remote',
+            isBreaking: false,
+          ),
+        );
       } else if (!cap.version.isBackwardCompatibleWith(otherCap.version)) {
-        issues.add(CompatibilityIssue(
-          type: CompatibilityType.capabilityVersion,
-          message: 'Capability ${cap.capabilityId} version incompatible: ${cap.version} vs ${otherCap.version}',
-          isBreaking: true,
-        ));
+        issues.add(
+          CompatibilityIssue(
+            type: CompatibilityType.capabilityVersion,
+            message:
+                'Capability ${cap.capabilityId} version incompatible: ${cap.version} vs ${otherCap.version}',
+            isBreaking: true,
+          ),
+        );
       }
     }
 
@@ -282,10 +295,7 @@ class CompatibilityResult {
   final bool isCompatible;
   final List<CompatibilityIssue> issues;
 
-  const CompatibilityResult({
-    required this.isCompatible,
-    required this.issues,
-  });
+  const CompatibilityResult({required this.isCompatible, required this.issues});
 
   List<CompatibilityIssue> get breakingIssues =>
       issues.where((i) => i.isBreaking).toList();

@@ -59,7 +59,11 @@ class _AiOperationLogViewState extends State<AiOperationLogView>
     switch (_tabController.index) {
       case 1:
         return _entries
-            .where((e) => e.type == 'capability.invoked' || e.type == 'capability.denied')
+            .where(
+              (e) =>
+                  e.type == 'capability.invoked' ||
+                  e.type == 'capability.denied',
+            )
             .toList();
       case 2:
         return _entries.where((e) => !e.allowed).toList();
@@ -78,7 +82,10 @@ class _AiOperationLogViewState extends State<AiOperationLogView>
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
           tooltip: t('back'),
-          icon: Icon(LucideIcons.chevronLeft, color: AppColors.textPrimary(context)),
+          icon: Icon(
+            LucideIcons.chevronLeft,
+            color: AppColors.textPrimary(context),
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -133,11 +140,29 @@ class _AiOperationLogViewState extends State<AiOperationLogView>
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
       child: Row(
         children: [
-          _buildStatCard(context, t('total_ops'), total, LucideIcons.activity, AppColors.acc(context)),
+          _buildStatCard(
+            context,
+            t('total_ops'),
+            total,
+            LucideIcons.activity,
+            AppColors.acc(context),
+          ),
           const SizedBox(width: 8),
-          _buildStatCard(context, t('allowed'), allowed, LucideIcons.checkCircle2, AppColors.ok(context)),
+          _buildStatCard(
+            context,
+            t('allowed'),
+            allowed,
+            LucideIcons.checkCircle2,
+            AppColors.ok(context),
+          ),
           const SizedBox(width: 8),
-          _buildStatCard(context, t('denied'), denied, LucideIcons.shieldAlert, AppColors.dng(context)),
+          _buildStatCard(
+            context,
+            t('denied'),
+            denied,
+            LucideIcons.shieldAlert,
+            AppColors.dng(context),
+          ),
         ],
       ),
     );
@@ -167,7 +192,10 @@ class _AiOperationLogViewState extends State<AiOperationLogView>
                 const SizedBox(width: 4),
                 Text(
                   label,
-                  style: TextStyle(color: AppColors.textTertiary(context), fontSize: 11),
+                  style: TextStyle(
+                    color: AppColors.textTertiary(context),
+                    fontSize: 11,
+                  ),
                 ),
               ],
             ),
@@ -191,11 +219,18 @@ class _AiOperationLogViewState extends State<AiOperationLogView>
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(LucideIcons.shieldCheck, size: 48, color: AppColors.iconGray(context)),
+          Icon(
+            LucideIcons.shieldCheck,
+            size: 48,
+            color: AppColors.iconGray(context),
+          ),
           const SizedBox(height: 12),
           Text(
             localeProvider.t('no_operation_logs'),
-            style: TextStyle(color: AppColors.textSecondary(context), fontSize: 15),
+            style: TextStyle(
+              color: AppColors.textSecondary(context),
+              fontSize: 15,
+            ),
           ),
         ],
       ),
@@ -204,8 +239,12 @@ class _AiOperationLogViewState extends State<AiOperationLogView>
 
   Widget _buildLogCard(BuildContext context, AuditLogEntry entry) {
     final isAllowed = entry.allowed;
-    final statusColor = isAllowed ? AppColors.ok(context) : AppColors.dng(context);
-    final statusIcon = isAllowed ? LucideIcons.checkCircle2 : LucideIcons.xCircle;
+    final statusColor = isAllowed
+        ? AppColors.ok(context)
+        : AppColors.dng(context);
+    final statusIcon = isAllowed
+        ? LucideIcons.checkCircle2
+        : LucideIcons.xCircle;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -242,24 +281,50 @@ class _AiOperationLogViewState extends State<AiOperationLogView>
             children: [
               Text(
                 entry.actor,
-                style: TextStyle(color: AppColors.textTertiary(context), fontSize: 11),
+                style: TextStyle(
+                  color: AppColors.textTertiary(context),
+                  fontSize: 11,
+                ),
               ),
               const SizedBox(width: 8),
               Text(
                 _formatTimestamp(entry.timestamp),
-                style: TextStyle(color: AppColors.textDisabled(context), fontSize: 11),
+                style: TextStyle(
+                  color: AppColors.textDisabled(context),
+                  fontSize: 11,
+                ),
               ),
             ],
           ),
           children: [
-            _buildDetailRow(context, localeProvider.t('type'), entry.type, LucideIcons.tag, AppColors.acc(context)),
-            _buildDetailRow(context, localeProvider.t('actor'), entry.actor, LucideIcons.user, AppColors.acc(context)),
+            _buildDetailRow(
+              context,
+              localeProvider.t('type'),
+              entry.type,
+              LucideIcons.tag,
+              AppColors.acc(context),
+            ),
+            _buildDetailRow(
+              context,
+              localeProvider.t('actor'),
+              entry.actor,
+              LucideIcons.user,
+              AppColors.acc(context),
+            ),
             if (entry.target.isNotEmpty)
-              _buildDetailRow(context, localeProvider.t('target'), entry.target, LucideIcons.target, AppColors.sec(context)),
+              _buildDetailRow(
+                context,
+                localeProvider.t('target'),
+                entry.target,
+                LucideIcons.target,
+                AppColors.sec(context),
+              ),
             _buildDetailRow(
               context,
               localeProvider.t('status'),
-              isAllowed ? localeProvider.t('allowed') : localeProvider.t('denied'),
+              isAllowed
+                  ? localeProvider.t('allowed')
+                  : localeProvider.t('denied'),
               isAllowed ? LucideIcons.check : LucideIcons.ban,
               statusColor,
             ),
@@ -267,11 +332,19 @@ class _AiOperationLogViewState extends State<AiOperationLogView>
               const SizedBox(height: 8),
               Row(
                 children: [
-                  Icon(LucideIcons.fileText, size: 12, color: AppColors.textTertiary(context)),
+                  Icon(
+                    LucideIcons.fileText,
+                    size: 12,
+                    color: AppColors.textTertiary(context),
+                  ),
                   const SizedBox(width: 4),
                   Text(
                     localeProvider.t('details'),
-                    style: TextStyle(color: AppColors.textTertiary(context), fontSize: 12, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                      color: AppColors.textTertiary(context),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ],
               ),
@@ -312,12 +385,22 @@ class _AiOperationLogViewState extends State<AiOperationLogView>
         children: [
           Icon(icon, size: 12, color: color),
           const SizedBox(width: 4),
-          Text(label, style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w600)),
+          Text(
+            label,
+            style: TextStyle(
+              color: color,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               value,
-              style: TextStyle(color: AppColors.textSecondary(context), fontSize: 12),
+              style: TextStyle(
+                color: AppColors.textSecondary(context),
+                fontSize: 12,
+              ),
               overflow: TextOverflow.ellipsis,
             ),
           ),

@@ -38,39 +38,74 @@ class ConversationSession {
     this.isPinned = false,
     this.isMuted = false,
   }) : lastActiveAt = lastActiveAt ?? createdAt;
-  ConversationSession copyWith({String? title, List<SessionMessage>? messages, bool? isArchived, bool? isFavorite, bool? isPinned, bool? isMuted, DateTime? lastActiveAt}) =>
-      ConversationSession(id: id, title: title ?? this.title, createdAt: createdAt, lastActiveAt: lastActiveAt ?? this.lastActiveAt, messages: messages ?? this.messages, isArchived: isArchived ?? this.isArchived, isFavorite: isFavorite ?? this.isFavorite, isPinned: isPinned ?? this.isPinned, isMuted: isMuted ?? this.isMuted);
-  Map<String, dynamic> toJson() => {
-    'id': id, 'title': title, 'createdAt': createdAt.toIso8601String(),
-    'lastActiveAt': lastActiveAt.toIso8601String(),
-    'messages': messages.map((m) => m.toJson()).toList(), 'isArchived': isArchived, 'isFavorite': isFavorite, 'isPinned': isPinned, 'isMuted': isMuted,
-  };
-  factory ConversationSession.fromJson(Map<String, dynamic> json) => ConversationSession(
-    id: json['id'], title: json['title'], createdAt: DateTime.parse(json['createdAt']),
-    lastActiveAt: json['lastActiveAt'] != null ? DateTime.parse(json['lastActiveAt']) : (json['createdAt'] != null ? DateTime.parse(json['createdAt']) : DateTime.now()),
-    messages: (json['messages'] as List?)?.map((m) => SessionMessage.fromJson(m as Map<String, dynamic>)).toList() ?? [],
-    isArchived: json['isArchived'] ?? false,
-    isFavorite: json['isFavorite'] ?? false,
-    isPinned: json['isPinned'] ?? false,
-    isMuted: json['isMuted'] ?? false,
+  ConversationSession copyWith({
+    String? title,
+    List<SessionMessage>? messages,
+    bool? isArchived,
+    bool? isFavorite,
+    bool? isPinned,
+    bool? isMuted,
+    DateTime? lastActiveAt,
+  }) => ConversationSession(
+    id: id,
+    title: title ?? this.title,
+    createdAt: createdAt,
+    lastActiveAt: lastActiveAt ?? this.lastActiveAt,
+    messages: messages ?? this.messages,
+    isArchived: isArchived ?? this.isArchived,
+    isFavorite: isFavorite ?? this.isFavorite,
+    isPinned: isPinned ?? this.isPinned,
+    isMuted: isMuted ?? this.isMuted,
   );
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'title': title,
+    'createdAt': createdAt.toIso8601String(),
+    'lastActiveAt': lastActiveAt.toIso8601String(),
+    'messages': messages.map((m) => m.toJson()).toList(),
+    'isArchived': isArchived,
+    'isFavorite': isFavorite,
+    'isPinned': isPinned,
+    'isMuted': isMuted,
+  };
+  factory ConversationSession.fromJson(Map<String, dynamic> json) =>
+      ConversationSession(
+        id: json['id'],
+        title: json['title'],
+        createdAt: DateTime.parse(json['createdAt']),
+        lastActiveAt: json['lastActiveAt'] != null
+            ? DateTime.parse(json['lastActiveAt'])
+            : (json['createdAt'] != null
+                  ? DateTime.parse(json['createdAt'])
+                  : DateTime.now()),
+        messages:
+            (json['messages'] as List?)
+                ?.map((m) => SessionMessage.fromJson(m as Map<String, dynamic>))
+                .toList() ??
+            [],
+        isArchived: json['isArchived'] ?? false,
+        isFavorite: json['isFavorite'] ?? false,
+        isPinned: json['isPinned'] ?? false,
+        isMuted: json['isMuted'] ?? false,
+      );
 }
 
 class SessionProvider extends ChangeNotifier {
   final AgentOrchestrator _orchestrator;
-  SessionProvider({required AgentOrchestrator orchestrator}) : _orchestrator = orchestrator;
+  SessionProvider({required AgentOrchestrator orchestrator})
+    : _orchestrator = orchestrator;
 
   final List<ConversationSession> _sessions = [];
   bool _disposed = false;
   List<ConversationSession> get sessions => List.unmodifiable(
-    _sessions.where((s) => !s.isArchived).toList()
-      ..sort((a, b) {
-        if (a.isPinned != b.isPinned) return a.isPinned ? -1 : 1;
-        if (a.isFavorite != b.isFavorite) return a.isFavorite ? -1 : 1;
-        return b.lastActiveAt.compareTo(a.lastActiveAt);
-      }),
+    _sessions.where((s) => !s.isArchived).toList()..sort((a, b) {
+      if (a.isPinned != b.isPinned) return a.isPinned ? -1 : 1;
+      if (a.isFavorite != b.isFavorite) return a.isFavorite ? -1 : 1;
+      return b.lastActiveAt.compareTo(a.lastActiveAt);
+    }),
   );
-  List<ConversationSession> get archivedSessions => List.unmodifiable(_sessions.where((s) => s.isArchived));
+  List<ConversationSession> get archivedSessions =>
+      List.unmodifiable(_sessions.where((s) => s.isArchived));
   String? _activeSessionId;
   String? get activeSessionId => _activeSessionId;
 
@@ -98,7 +133,9 @@ class SessionProvider extends ChangeNotifier {
     final retention = prefs.getBool('omnivium_data_retention') ?? true;
     if (retention) return;
     final cutoff = DateTime.now().subtract(const Duration(days: 7));
-    _sessions.removeWhere((s) => s.lastActiveAt.isBefore(cutoff) && !s.isPinned && !s.isFavorite);
+    _sessions.removeWhere(
+      (s) => s.lastActiveAt.isBefore(cutoff) && !s.isPinned && !s.isFavorite,
+    );
     _saveSessions();
     if (!_disposed) notifyListeners();
   }
@@ -120,7 +157,12 @@ class SessionProvider extends ChangeNotifier {
   String createSession() {
     final id = 'session_${DateTime.now().millisecondsSinceEpoch}';
     final now = DateTime.now();
-    final session = ConversationSession(id: id, title: 'New Conversation', createdAt: now, lastActiveAt: now);
+    final session = ConversationSession(
+      id: id,
+      title: 'New Conversation',
+      createdAt: now,
+      lastActiveAt: now,
+    );
     _sessions.insert(0, session);
     _activeSessionId = id;
     _orchestrator.clearConversation();
@@ -208,17 +250,24 @@ class SessionProvider extends ChangeNotifier {
     if (idx < 0) return;
     final msgs = _orchestrator.messages;
     if (msgs.isEmpty) return;
-    final title = msgs.first.content.substring(0, msgs.first.content.length.clamp(0, 20));
+    final title = msgs.first.content.substring(
+      0,
+      msgs.first.content.length.clamp(0, 20),
+    );
     _sessions[idx] = _sessions[idx].copyWith(
       title: title,
-      messages: msgs.map((m) => SessionMessage(role: m.role, content: m.content)).toList(),
+      messages: msgs
+          .map((m) => SessionMessage(role: m.role, content: m.content))
+          .toList(),
       lastActiveAt: DateTime.now(),
     );
     _saveSessions();
   }
 
   void _cleanEmptySessions() {
-    _sessions.removeWhere((s) => s.messages.isEmpty && s.id != _activeSessionId);
+    _sessions.removeWhere(
+      (s) => s.messages.isEmpty && s.id != _activeSessionId,
+    );
   }
 
   void _restoreSessionMessages(String id) {
@@ -251,7 +300,13 @@ class SessionProvider extends ChangeNotifier {
       } else {
         await db.deleteCache(_activeSessionKey);
       }
-    } catch (e, stackTrace) { AppLogger.instance.error('Operation failed', error: e, stackTrace: stackTrace); }
+    } catch (e, stackTrace) {
+      AppLogger.instance.error(
+        'Operation failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
+    }
   }
 
   void _syncSessionToCloud(ConversationSession session) {
@@ -290,18 +345,26 @@ class SessionProvider extends ChangeNotifier {
             _sessions.add(session);
             await db.putSession(session.id, session.toJson());
           } catch (e) {
-            AppLogger.instance.warning('Session sync: failed to add cloud session locally', error: e);
+            AppLogger.instance.warning(
+              'Session sync: failed to add cloud session locally',
+              error: e,
+            );
           }
         } else {
           final cloudUpdated = cloud['updated_at'] as String?;
-          final localUpdated = _sessions[localIdx].lastActiveAt.toIso8601String();
-          if (cloudUpdated != null && cloudUpdated.compareTo(localUpdated) > 0) {
+          final localUpdated = _sessions[localIdx].lastActiveAt
+              .toIso8601String();
+          if (cloudUpdated != null &&
+              cloudUpdated.compareTo(localUpdated) > 0) {
             try {
               final session = ConversationSession.fromJson(cloud);
               _sessions[localIdx] = session;
               await db.putSession(session.id, session.toJson());
             } catch (e) {
-              AppLogger.instance.warning('Session sync: failed to overwrite local session with cloud', error: e);
+              AppLogger.instance.warning(
+                'Session sync: failed to overwrite local session with cloud',
+                error: e,
+              );
             }
           }
         }
@@ -317,7 +380,15 @@ class SessionProvider extends ChangeNotifier {
     if (allSessions.isNotEmpty) {
       _sessions.clear();
       for (final data in allSessions) {
-        try { _sessions.add(ConversationSession.fromJson(data)); } catch (e, stackTrace) { AppLogger.instance.error('Operation failed', error: e, stackTrace: stackTrace); }
+        try {
+          _sessions.add(ConversationSession.fromJson(data));
+        } catch (e, stackTrace) {
+          AppLogger.instance.error(
+            'Operation failed',
+            error: e,
+            stackTrace: stackTrace,
+          );
+        }
       }
     } else {
       final prefs = await SharedPreferences.getInstance();
@@ -327,12 +398,20 @@ class SessionProvider extends ChangeNotifier {
           final list = jsonDecode(raw) as List;
           _sessions.clear();
           for (final item in list) {
-            final session = ConversationSession.fromJson(item as Map<String, dynamic>);
+            final session = ConversationSession.fromJson(
+              item as Map<String, dynamic>,
+            );
             _sessions.add(session);
             await db.putSession(session.id, session.toJson());
           }
           await prefs.remove('omnivium_sessions');
-        } catch (e, stackTrace) { AppLogger.instance.error('Operation failed', error: e, stackTrace: stackTrace); }
+        } catch (e, stackTrace) {
+          AppLogger.instance.error(
+            'Operation failed',
+            error: e,
+            stackTrace: stackTrace,
+          );
+        }
       }
     }
     await _mergeCloudSessions();
@@ -347,7 +426,9 @@ class SessionProvider extends ChangeNotifier {
         await prefs.remove(_activeSessionKey);
       }
     }
-    if (_activeSessionId != null) { _restoreSessionMessages(_activeSessionId!); }
+    if (_activeSessionId != null) {
+      _restoreSessionMessages(_activeSessionId!);
+    }
     _notify();
   }
 
@@ -363,7 +444,9 @@ class SessionProvider extends ChangeNotifier {
   void toggleFavoriteSession(String id) {
     final idx = _sessions.indexWhere((s) => s.id == id);
     if (idx < 0) return;
-    _sessions[idx] = _sessions[idx].copyWith(isFavorite: !_sessions[idx].isFavorite);
+    _sessions[idx] = _sessions[idx].copyWith(
+      isFavorite: !_sessions[idx].isFavorite,
+    );
     _saveSessions();
     _notify();
   }
@@ -371,7 +454,9 @@ class SessionProvider extends ChangeNotifier {
   void togglePinSession(String id) {
     final idx = _sessions.indexWhere((s) => s.id == id);
     if (idx < 0) return;
-    _sessions[idx] = _sessions[idx].copyWith(isPinned: !_sessions[idx].isPinned);
+    _sessions[idx] = _sessions[idx].copyWith(
+      isPinned: !_sessions[idx].isPinned,
+    );
     _saveSessions();
     _notify();
   }

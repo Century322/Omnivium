@@ -39,13 +39,15 @@ class NotificationQueue {
       return;
     }
 
-    _pending.add(_PendingNotification(
-      dialogId: dialogId,
-      sender: sender,
-      message: message,
-      channelId: channelId,
-      data: data,
-    ));
+    _pending.add(
+      _PendingNotification(
+        dialogId: dialogId,
+        sender: sender,
+        message: message,
+        channelId: channelId,
+        data: data,
+      ),
+    );
 
     _delayTimer?.cancel();
     _delayTimer = Timer(_delayDuration, _flush);

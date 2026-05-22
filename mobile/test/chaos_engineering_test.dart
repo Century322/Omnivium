@@ -30,8 +30,14 @@ void main() {
 
   Future<RuntimeContainer> bootWithChaos() async {
     final container = await RuntimeContainer.boot();
-    await container.registerPlugin(ChaosAgentPlugin.descriptor(), ChaosAgentPlugin());
-    await container.registerPlugin(FakeAgentPlugin.descriptor(), FakeAgentPlugin());
+    await container.registerPlugin(
+      ChaosAgentPlugin.descriptor(),
+      ChaosAgentPlugin(),
+    );
+    await container.registerPlugin(
+      FakeAgentPlugin.descriptor(),
+      FakeAgentPlugin(),
+    );
     await container.registerPlugin(StoragePlugin.descriptor(), StoragePlugin());
     await container.registerPlugin(LoggerPlugin.descriptor(), LoggerPlugin());
     return container;
@@ -42,23 +48,16 @@ void main() {
       final container = await bootWithChaos();
       final received = <RuntimeEvent>[];
 
-      container.eventBus.subscribe(
-        'storm.event',
-        (event) async {
-          received.add(event);
-        },
-      );
+      container.eventBus.subscribe('storm.event', (event) async {
+        received.add(event);
+      });
 
       final eventCount = 1000;
       final source = RuntimeIdentity.forPlugin('storm-test');
       final start = container.clock.now();
 
       for (var i = 0; i < eventCount; i++) {
-        container.eventBus.publish(
-          'storm.event',
-          {'index': i},
-          source: source,
-        );
+        container.eventBus.publish('storm.event', {'index': i}, source: source);
       }
 
       await Future.delayed(const Duration(milliseconds: 500));
@@ -70,7 +69,10 @@ void main() {
       expect(container.eventBus.deadLetterCount, lessThan(eventCount * 0.1));
 
       container.metricsService.observe('event_storm_qps', qps);
-      container.metricsService.gauge('event_storm_dead_letters', container.eventBus.deadLetterCount);
+      container.metricsService.gauge(
+        'event_storm_dead_letters',
+        container.eventBus.deadLetterCount,
+      );
     });
   });
 
@@ -103,12 +105,14 @@ void main() {
 
       for (var i = 0; i < 6; i++) {
         try {
-          await container.capabilityRouter.invoke(
-            'chaos.timeout',
-            null,
-            caller: RuntimeIdentity.forPlugin('test'),
-            callerPermission: const RuntimePermission(),
-          ).timeout(const Duration(milliseconds: 200));
+          await container.capabilityRouter
+              .invoke(
+                'chaos.timeout',
+                null,
+                caller: RuntimeIdentity.forPlugin('test'),
+                callerPermission: const RuntimePermission(),
+              )
+              .timeout(const Duration(milliseconds: 200));
         } catch (_) {}
       }
 
@@ -168,13 +172,10 @@ void main() {
         createdAt: container.clock.now(),
       );
 
-      final future = container.scheduler.schedule(
-        task,
-        (token) async {
-          await Future.delayed(const Duration(seconds: 30));
-          return 'should not reach';
-        },
-      );
+      final future = container.scheduler.schedule(task, (token) async {
+        await Future.delayed(const Duration(seconds: 30));
+        return 'should not reach';
+      });
 
       await Future.delayed(const Duration(milliseconds: 20));
       final cancelled = container.scheduler.cancel('cancel-prop-test');
@@ -242,7 +243,10 @@ void main() {
           budget: const TaskBudget(maxDurationMs: 5000, maxRetries: 0),
           createdAt: container.clock.now(),
         );
-        final result = await container.scheduler.schedule(task, (token) async => 'critical_$i');
+        final result = await container.scheduler.schedule(
+          task,
+          (token) async => 'critical_$i',
+        );
         criticalResults.add(result as String);
       }
 
@@ -290,7 +294,9 @@ void main() {
       );
 
       final violations = checker.checkAll(ctx);
-      final taskViolations = violations.where((v) => v.invariantId == 'INV-TASK-001').toList();
+      final taskViolations = violations
+          .where((v) => v.invariantId == 'INV-TASK-001')
+          .toList();
       expect(taskViolations, isEmpty);
     });
   });
@@ -301,15 +307,30 @@ void main() {
 
       final baseCount = container.timelineService.entryCount;
 
-      container.timelineService.recordPluginLifecycle('test-plugin', 'load', from: 'unloaded', to: 'loaded');
-      container.timelineService.recordCapabilityInvoke('storage.write', 'storage', status: 'started');
-      container.timelineService.recordCapabilityInvoke('storage.write', 'storage', status: 'completed');
+      container.timelineService.recordPluginLifecycle(
+        'test-plugin',
+        'load',
+        from: 'unloaded',
+        to: 'loaded',
+      );
+      container.timelineService.recordCapabilityInvoke(
+        'storage.write',
+        'storage',
+        status: 'started',
+      );
+      container.timelineService.recordCapabilityInvoke(
+        'storage.write',
+        'storage',
+        status: 'completed',
+      );
       container.timelineService.recordTask('task-1', status: 'scheduled');
       container.timelineService.recordTask('task-1', status: 'completed');
 
       expect(container.timelineService.entryCount, baseCount + 5);
 
-      final capabilityEntries = container.timelineService.replayForCapability('storage.write');
+      final capabilityEntries = container.timelineService.replayForCapability(
+        'storage.write',
+      );
       expect(capabilityEntries.length, 2);
 
       final summary = container.timelineService.timelineSummary();
@@ -321,7 +342,10 @@ void main() {
   group('Benchmark Suite', () {
     test('benchmark produces results', () async {
       final container = await bootWithChaos();
-      await container.registerPlugin(StoragePlugin.descriptor(), StoragePlugin());
+      await container.registerPlugin(
+        StoragePlugin.descriptor(),
+        StoragePlugin(),
+      );
 
       final benchmark = RuntimeBenchmark(container);
       final results = await benchmark.runAll();

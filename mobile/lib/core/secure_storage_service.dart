@@ -5,8 +5,12 @@ class SecureStorageService {
   static SecureStorageService get instance => _instance;
   SecureStorageService._();
 
-  static const _androidOptions = AndroidOptions(encryptedSharedPreferences: true);
-  static const _iosOptions = IOSOptions(accessibility: KeychainAccessibility.first_unlock);
+  static const _androidOptions = AndroidOptions(
+    encryptedSharedPreferences: true,
+  );
+  static const _iosOptions = IOSOptions(
+    accessibility: KeychainAccessibility.first_unlock,
+  );
 
   late final FlutterSecureStorage _storage;
 
@@ -19,7 +23,8 @@ class SecureStorageService {
 
   Future<String?> read(String key) => _storage.read(key: key);
 
-  Future<void> write(String key, String value) => _storage.write(key: key, value: value);
+  Future<void> write(String key, String value) =>
+      _storage.write(key: key, value: value);
 
   Future<void> delete(String key) => _storage.delete(key: key);
 

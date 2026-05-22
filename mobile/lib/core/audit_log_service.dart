@@ -22,15 +22,15 @@ class AuditLogEntry {
   });
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'type': type,
-        'operation': operation,
-        'actor': actor,
-        'target': target,
-        'allowed': allowed,
-        'timestamp': timestamp,
-        'details': details,
-      };
+    'id': id,
+    'type': type,
+    'operation': operation,
+    'actor': actor,
+    'target': target,
+    'allowed': allowed,
+    'timestamp': timestamp,
+    'details': details,
+  };
 }
 
 class AuditLogService {
@@ -51,16 +51,23 @@ class AuditLogService {
     final entries = journal.entries;
 
     return entries
-        .map((e) => AuditLogEntry(
-              id: e.sequence.toRadixString(16),
-              type: e.type,
-              operation: e.data['capability'] as String? ?? e.data['action'] as String? ?? e.type,
-              actor: e.data['caller'] as String? ?? 'system',
-              target: e.data['target'] as String? ?? '',
-              allowed: e.data['allowed'] as bool? ?? true,
-              timestamp: (e.timestamp is DateTime ? (e.timestamp as DateTime).millisecondsSinceEpoch : e.timestamp),
-              details: e.data,
-            ))
+        .map(
+          (e) => AuditLogEntry(
+            id: e.sequence.toRadixString(16),
+            type: e.type,
+            operation:
+                e.data['capability'] as String? ??
+                e.data['action'] as String? ??
+                e.type,
+            actor: e.data['caller'] as String? ?? 'system',
+            target: e.data['target'] as String? ?? '',
+            allowed: e.data['allowed'] as bool? ?? true,
+            timestamp: (e.timestamp is DateTime
+                ? (e.timestamp as DateTime).millisecondsSinceEpoch
+                : e.timestamp),
+            details: e.data,
+          ),
+        )
         .take(limit)
         .toList();
   }
@@ -88,18 +95,25 @@ class AuditLogService {
 
     final journal = sdk.container.eventJournal;
     return journal.entries
-        .where((e) => e.type == 'capability.invoked' || e.type == 'capability.denied')
-        .map((e) => AuditLogEntry(
-              id: e.sequence.toRadixString(16),
-              type: e.type,
-              operation: e.data['capability'] as String? ?? 'unknown',
-              actor: e.data['caller'] as String? ?? 'system',
-              target: e.data['target'] as String? ?? '',
-              allowed: e.type != 'capability.denied',
-              timestamp: (e.timestamp is DateTime ? (e.timestamp as DateTime).millisecondsSinceEpoch : e.timestamp),
-              details: e.data,
-            ))
-            .take(limit)
-            .toList();
+        .where(
+          (e) =>
+              e.type == 'capability.invoked' || e.type == 'capability.denied',
+        )
+        .map(
+          (e) => AuditLogEntry(
+            id: e.sequence.toRadixString(16),
+            type: e.type,
+            operation: e.data['capability'] as String? ?? 'unknown',
+            actor: e.data['caller'] as String? ?? 'system',
+            target: e.data['target'] as String? ?? '',
+            allowed: e.type != 'capability.denied',
+            timestamp: (e.timestamp is DateTime
+                ? (e.timestamp as DateTime).millisecondsSinceEpoch
+                : e.timestamp),
+            details: e.data,
+          ),
+        )
+        .take(limit)
+        .toList();
   }
 }

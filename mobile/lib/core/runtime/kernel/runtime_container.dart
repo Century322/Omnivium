@@ -52,11 +52,9 @@ class RuntimeContainer implements RuntimeContext {
 
   static RuntimeContainer? _instance;
 
-  RuntimeContainer._({
-    required this.clock,
-    required this.config,
-  })  : identity = RuntimeIdentity.forRuntime(config.nodeId),
-        pluginRegistry = PluginRegistry(clock: clock, config: config) {
+  RuntimeContainer._({required this.clock, required this.config})
+    : identity = RuntimeIdentity.forRuntime(config.nodeId),
+      pluginRegistry = PluginRegistry(clock: clock, config: config) {
     capabilityRouter = CapabilityRouter(
       registry: pluginRegistry,
       clock: clock,
@@ -75,12 +73,15 @@ class RuntimeContainer implements RuntimeContext {
 
   static RuntimeContainer get instance {
     if (_instance == null) {
-      throw StateError('RuntimeContainer not initialized. Call RuntimeContainer.boot() first.');
+      throw StateError(
+        'RuntimeContainer not initialized. Call RuntimeContainer.boot() first.',
+      );
     }
     return _instance!;
   }
 
-  static bool get isBooted => _instance != null && _instance!._status == RuntimeStatus.running;
+  static bool get isBooted =>
+      _instance != null && _instance!._status == RuntimeStatus.running;
 
   static Future<RuntimeContainer> boot([RuntimeConfig? config]) async {
     if (_instance != null && _instance!._status == RuntimeStatus.running) {
@@ -97,7 +98,10 @@ class RuntimeContainer implements RuntimeContext {
     _instance = container;
     container._status = RuntimeStatus.running;
 
-    container.metricsService.gauge('runtime.boot_time_ms', container.clock.now());
+    container.metricsService.gauge(
+      'runtime.boot_time_ms',
+      container.clock.now(),
+    );
     container.metricsService.increment('runtime.boot');
     container.eventJournal.append('runtime.boot', {
       'nodeId': effectiveConfig.nodeId,
@@ -156,9 +160,13 @@ class RuntimeContainer implements RuntimeContext {
 
     _instance!.snapshotService.take(
       status: RuntimeStatus.shuttingDown,
-      pluginStates: _instance!.pluginRegistry.pluginStates.map((k, v) => MapEntry(k, v)),
+      pluginStates: _instance!.pluginRegistry.pluginStates.map(
+        (k, v) => MapEntry(k, v),
+      ),
       sessions: _instance!._sessions,
-      capabilityCache: _instance!.pluginRegistry.loadedDescriptors.expand((d) => d.capabilityIds).toList(),
+      capabilityCache: _instance!.pluginRegistry.loadedDescriptors
+          .expand((d) => d.capabilityIds)
+          .toList(),
       resourceUsage: _instance!.resourceController.usage,
     );
 
@@ -168,7 +176,9 @@ class RuntimeContainer implements RuntimeContext {
 
     _instance!.scheduler.cancelAll();
 
-    final pluginIds = _instance!.pluginRegistry.loadedDescriptors.map((d) => d.id).toList();
+    final pluginIds = _instance!.pluginRegistry.loadedDescriptors
+        .map((d) => d.id)
+        .toList();
     for (final id in pluginIds) {
       await _instance!.pluginRegistry.unload(id);
     }
@@ -182,15 +192,15 @@ class RuntimeContainer implements RuntimeContext {
 
   @override
   RuntimeStateSnapshot get stateSnapshot => RuntimeStateSnapshot(
-        status: _status,
-        activeSessionCount: _sessions.values.where((s) => s.isActive).length,
-        activeTaskCount: scheduler.runningCount,
-        loadedPluginCount: pluginRegistry.pluginCount,
-        activePluginCount: pluginRegistry.activeCount,
-        capabilityCount: pluginRegistry.capabilityCount,
-        bootTimeMs: clock.bootTimeMs,
-        uptimeMs: clock.uptimeMs,
-      );
+    status: _status,
+    activeSessionCount: _sessions.values.where((s) => s.isActive).length,
+    activeTaskCount: scheduler.runningCount,
+    loadedPluginCount: pluginRegistry.pluginCount,
+    activePluginCount: pluginRegistry.activeCount,
+    capabilityCount: pluginRegistry.capabilityCount,
+    bootTimeMs: clock.bootTimeMs,
+    uptimeMs: clock.uptimeMs,
+  );
 
   @override
   RuntimeSession currentSession() {
@@ -208,7 +218,10 @@ class RuntimeContainer implements RuntimeContext {
   }
 
   @override
-  Future<bool> registerPlugin(PluginDescriptor descriptor, PluginHandler handler) async {
+  Future<bool> registerPlugin(
+    PluginDescriptor descriptor,
+    PluginHandler handler,
+  ) async {
     final trace = traceService.startTrace();
     final span = traceService.startSpan(
       traceId: trace.traceId,
@@ -219,11 +232,19 @@ class RuntimeContainer implements RuntimeContext {
     final result = await pluginRegistry.register(descriptor, handler);
 
     span.finish(status: result ? 'ok' : 'error');
-    metricsService.increment('plugin.register', labels: {'pluginId': descriptor.id, 'result': result ? 'ok' : 'error'});
+    metricsService.increment(
+      'plugin.register',
+      labels: {'pluginId': descriptor.id, 'result': result ? 'ok' : 'error'},
+    );
 
     if (result) {
       eventJournal.appendPluginTransition(descriptor.id, 'unloaded', 'active');
-      timelineService.recordPluginLifecycle(descriptor.id, 'register', from: 'unloaded', to: 'active');
+      timelineService.recordPluginLifecycle(
+        descriptor.id,
+        'register',
+        from: 'unloaded',
+        to: 'active',
+      );
     }
 
     return result;
@@ -238,10 +259,8 @@ class RuntimeContainer implements RuntimeContext {
       pluginRegistry.suspend(pluginId);
 
   @override
-  Future<bool> unloadPlugin(String pluginId) =>
-      pluginRegistry.unload(pluginId);
+  Future<bool> unloadPlugin(String pluginId) => pluginRegistry.unload(pluginId);
 
   @override
-  Future<bool> reloadPlugin(String pluginId) =>
-      pluginRegistry.reload(pluginId);
+  Future<bool> reloadPlugin(String pluginId) => pluginRegistry.reload(pluginId);
 }

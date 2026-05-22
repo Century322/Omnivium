@@ -6,7 +6,9 @@ import 'package:omnivium/presentation/views/message_list_view.dart';
 void main() {
   group('MessageListView', () {
     testWidgets('renders message list view', (tester) async {
-      await tester.pumpWidget(MaterialApp(home: MessageListView(provider: AppProvider())));
+      await tester.pumpWidget(
+        MaterialApp(home: MessageListView(provider: AppProvider())),
+      );
       expect(find.byType(MessageListView), findsOneWidget);
     });
   });

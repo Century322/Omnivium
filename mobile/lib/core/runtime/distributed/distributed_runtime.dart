@@ -37,26 +37,26 @@ class DistributedRuntime {
   DistributedRuntimeState _state = DistributedRuntimeState.uninitialized;
 
   DistributedRuntime(this._config)
-      : _clock = HybridLogicalClock(nodeId: _config.nodeId),
-        _nodeDiscovery = NodeDiscovery(
-          localNodeId: _config.nodeId,
-          clock: HybridLogicalClock(nodeId: _config.nodeId),
-          config: _config.gossipConfig,
-        ),
-        _capabilityRouter = RemoteCapabilityRouter(
-          localNodeId: _config.nodeId,
-          clock: HybridLogicalClock(nodeId: _config.nodeId),
-        ),
-        _traceService = DistributedTraceService(
-          localNodeId: _config.nodeId,
-          clock: HybridLogicalClock(nodeId: _config.nodeId),
-        ),
-        _leaseManager = SessionLeaseManager(
-          localNodeId: _config.nodeId,
-          clock: HybridLogicalClock(nodeId: _config.nodeId),
-          config: _config.leaseConfig,
-        ),
-        _transportRegistry = TransportRegistry();
+    : _clock = HybridLogicalClock(nodeId: _config.nodeId),
+      _nodeDiscovery = NodeDiscovery(
+        localNodeId: _config.nodeId,
+        clock: HybridLogicalClock(nodeId: _config.nodeId),
+        config: _config.gossipConfig,
+      ),
+      _capabilityRouter = RemoteCapabilityRouter(
+        localNodeId: _config.nodeId,
+        clock: HybridLogicalClock(nodeId: _config.nodeId),
+      ),
+      _traceService = DistributedTraceService(
+        localNodeId: _config.nodeId,
+        clock: HybridLogicalClock(nodeId: _config.nodeId),
+      ),
+      _leaseManager = SessionLeaseManager(
+        localNodeId: _config.nodeId,
+        clock: HybridLogicalClock(nodeId: _config.nodeId),
+        config: _config.leaseConfig,
+      ),
+      _transportRegistry = TransportRegistry();
 
   DistributedRuntimeState get state => _state;
   HybridLogicalClock get clock => _clock;
@@ -73,15 +73,17 @@ class DistributedRuntime {
 
     _state = DistributedRuntimeState.starting;
 
-    _nodeDiscovery.join(NodeDescriptor(
-      nodeId: _config.nodeId,
-      address: _config.address,
-      port: _config.port,
-      role: _config.role,
-      state: NodeState.alive,
-      joinedAt: _clock.tick().physicalTime,
-      lastHeartbeatAt: _clock.tick().physicalTime,
-    ));
+    _nodeDiscovery.join(
+      NodeDescriptor(
+        nodeId: _config.nodeId,
+        address: _config.address,
+        port: _config.port,
+        role: _config.role,
+        state: NodeState.alive,
+        joinedAt: _clock.tick().physicalTime,
+        lastHeartbeatAt: _clock.tick().physicalTime,
+      ),
+    );
 
     _nodeDiscovery.startProbing();
 
@@ -147,9 +149,11 @@ class DistributedRuntime {
   }) async {
     final transport = _transportRegistry.defaultTransport;
     if (transport == null || transport.state != TransportState.connected) {
-      return CapabilityResult.fail(RuntimeError.unavailable(
-        message: 'No transport available for remote invocation',
-      ));
+      return CapabilityResult.fail(
+        RuntimeError.unavailable(
+          message: 'No transport available for remote invocation',
+        ),
+      );
     }
 
     final transportMessage = TransportMessage(
@@ -157,10 +161,7 @@ class DistributedRuntime {
       type: 'capability.invoke',
       sourceNodeId: _config.nodeId,
       targetNodeId: targetNodeId,
-      payload: {
-        'capabilityId': capabilityId,
-        'params': params,
-      },
+      payload: {'capabilityId': capabilityId, 'params': params},
       timestamp: HybridTimestampLike(
         physicalTime: _clock.now.physicalTime,
         logicalTime: _clock.now.logicalTime,
@@ -168,19 +169,26 @@ class DistributedRuntime {
       ),
     );
 
-    final response = await transport.requestResponse(transportMessage, timeout: timeout);
+    final response = await transport.requestResponse(
+      transportMessage,
+      timeout: timeout,
+    );
     if (response == null) {
-      return CapabilityResult.fail(RuntimeError.unavailable(
-        message: 'No response from $targetNodeId within timeout',
-      ));
+      return CapabilityResult.fail(
+        RuntimeError.unavailable(
+          message: 'No response from $targetNodeId within timeout',
+        ),
+      );
     }
 
     final payload = response.payload;
     if (payload.containsKey('error')) {
-      return CapabilityResult.fail(RuntimeError(
-        code: payload['error']['code'] ?? 'REMOTE_ERROR',
-        message: payload['error']['message'] ?? 'Remote invocation failed',
-      ));
+      return CapabilityResult.fail(
+        RuntimeError(
+          code: payload['error']['code'] ?? 'REMOTE_ERROR',
+          message: payload['error']['message'] ?? 'Remote invocation failed',
+        ),
+      );
     }
 
     return CapabilityResult.ok(payload);

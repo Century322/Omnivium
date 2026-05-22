@@ -62,13 +62,12 @@ class EventBus {
   int _eventsDropped = 0;
   int _deadLetterCount = 0;
 
-  EventBus({
-    required RuntimeClock clock,
-    required RuntimeConfig config,
-  })  : _clock = clock,
-        _config = config;
+  EventBus({required RuntimeClock clock, required RuntimeConfig config})
+    : _clock = clock,
+      _config = config;
 
-  int get subscriptionCount => _subscriptions.values.fold(0, (sum, list) => sum + list.length);
+  int get subscriptionCount =>
+      _subscriptions.values.fold(0, (sum, list) => sum + list.length);
   int get eventsProcessed => _eventsProcessed;
   int get eventsDropped => _eventsDropped;
   int get deadLetterCount => _deadLetterCount;
@@ -119,7 +118,10 @@ class EventBus {
     final event = RuntimeEvent(
       id: 'evt_${_clock.now()}',
       type: eventType,
-      source: RuntimeRoute.local(capability: eventType, pluginId: source.identity),
+      source: RuntimeRoute.local(
+        capability: eventType,
+        pluginId: source.identity,
+      ),
       phase: phase,
       payload: payload,
       metadata: RuntimeMetadata(
@@ -133,7 +135,9 @@ class EventBus {
 
     if (_eventQueue.length >= _config.maxEventBusCapacity) {
       _eventsDropped++;
-      AppLogger.instance.warning('EventBus capacity reached, dropping event "$eventType"');
+      AppLogger.instance.warning(
+        'EventBus capacity reached, dropping event "$eventType"',
+      );
       _addToDeadLetter(event, 'capacity_exceeded');
       return;
     }
@@ -153,11 +157,9 @@ class EventBus {
   }
 
   void _addToDeadLetter(RuntimeEvent event, String reason) {
-    _deadLetters.add(DeadLetterEntry(
-      event: event,
-      reason: reason,
-      timestamp: _clock.now(),
-    ));
+    _deadLetters.add(
+      DeadLetterEntry(event: event, reason: reason, timestamp: _clock.now()),
+    );
     _deadLetterCount++;
   }
 
@@ -191,18 +193,25 @@ class EventBus {
     for (final sub in subs) {
       if (!sub.isActive) continue;
       if (!_scopeAllows(sub.maxScope, event.scope)) continue;
-      if (!_permissionAllows(sub.requiredPermission, event.permission)) continue;
+      if (!_permissionAllows(sub.requiredPermission, event.permission))
+        continue;
 
       try {
-        await sub.handler(event).timeout(
-          const Duration(seconds: 10),
-          onTimeout: () {
-            AppLogger.instance.warning('EventBus handler timed out for "${event.type}"');
-            _addToDeadLetter(event, 'handler_timeout');
-          },
-        );
+        await sub
+            .handler(event)
+            .timeout(
+              const Duration(seconds: 10),
+              onTimeout: () {
+                AppLogger.instance.warning(
+                  'EventBus handler timed out for "${event.type}"',
+                );
+                _addToDeadLetter(event, 'handler_timeout');
+              },
+            );
       } catch (e) {
-        AppLogger.instance.error('EventBus handler error for "${event.type}": $e');
+        AppLogger.instance.error(
+          'EventBus handler error for "${event.type}": $e',
+        );
         _addToDeadLetter(event, 'handler_error: $e');
       }
     }
@@ -212,10 +221,17 @@ class EventBus {
     return eventScope.index <= subMaxScope.index;
   }
 
-  bool _permissionAllows(EventPermission subPermission, EventPermission eventPermission) {
+  bool _permissionAllows(
+    EventPermission subPermission,
+    EventPermission eventPermission,
+  ) {
     if (subPermission == EventPermission.mutate) return true;
-    if (subPermission == EventPermission.intercept && eventPermission != EventPermission.mutate) return true;
-    if (subPermission == EventPermission.observe && eventPermission == EventPermission.observe) return true;
+    if (subPermission == EventPermission.intercept &&
+        eventPermission != EventPermission.mutate)
+      return true;
+    if (subPermission == EventPermission.observe &&
+        eventPermission == EventPermission.observe)
+      return true;
     return false;
   }
 }

@@ -2,14 +2,7 @@ import 'dart:async';
 import 'wire_protocol.dart';
 import '../hybrid_logical_clock.dart';
 
-enum ProtocolState {
-  uninitialized,
-  handshaking,
-  ready,
-  closing,
-  closed,
-  error,
-}
+enum ProtocolState { uninitialized, handshaking, ready, closing, closed, error }
 
 class PendingAck {
   final WireFrame frame;
@@ -79,15 +72,16 @@ class ProtocolHandler {
     required String localNodeId,
     required HybridLogicalClock clock,
     WireProtocolConfig config = const WireProtocolConfig(),
-  })  : _localNodeId = localNodeId,
-        _clock = clock,
-        _config = config;
+  }) : _localNodeId = localNodeId,
+       _clock = clock,
+       _config = config;
 
   ProtocolState get state => _state;
   String get localNodeId => _localNodeId;
   String? get remoteNodeId => _remoteNodeId;
   Stream<WireFrame> get outgoing => _outgoingController.stream;
-  Stream<WireEnvelope> get incomingEnvelopes => _incomingEnvelopeController.stream;
+  Stream<WireEnvelope> get incomingEnvelopes =>
+      _incomingEnvelopeController.stream;
   int get pendingAckCount => _pendingAcks.length;
   int get pendingChunkCount => _chunkAssemblies.length;
   bool get isReady => _state == ProtocolState.ready;
@@ -108,10 +102,9 @@ class ProtocolHandler {
     _remoteNodeId = handshake.sourceNodeId;
 
     final negotiatedCompression = handshake.supportedCompression;
-    final negotiatedMaxFrameSize =
-        handshake.maxFrameSize < _config.maxFrameSize
-            ? handshake.maxFrameSize
-            : _config.maxFrameSize;
+    final negotiatedMaxFrameSize = handshake.maxFrameSize < _config.maxFrameSize
+        ? handshake.maxFrameSize
+        : _config.maxFrameSize;
 
     _negotiatedCompression = negotiatedCompression;
     _negotiatedMaxFrameSize = negotiatedMaxFrameSize;
@@ -137,7 +130,11 @@ class ProtocolHandler {
     }
   }
 
-  WireFrame createDataFrame(String targetNodeId, String messageType, List<int> payload) {
+  WireFrame createDataFrame(
+    String targetNodeId,
+    String messageType,
+    List<int> payload,
+  ) {
     final now = _clock.tick();
     final frame = WireFrame(
       frameId: _frameSeq++,
@@ -154,14 +151,16 @@ class ProtocolHandler {
 
   Future<AckFrame> sendWithAck(WireFrame frame) {
     if (_pendingAcks.length >= _config.maxPendingAcks) {
-      return Future.value(AckFrame(
-        ackFrameId: -1,
-        originalFrameId: frame.frameId,
-        sourceNodeId: _localNodeId,
-        success: false,
-        errorCode: 'ACK_QUEUE_FULL',
-        hlcTime: _clock.tick().physicalTime,
-      ));
+      return Future.value(
+        AckFrame(
+          ackFrameId: -1,
+          originalFrameId: frame.frameId,
+          sourceNodeId: _localNodeId,
+          success: false,
+          errorCode: 'ACK_QUEUE_FULL',
+          hlcTime: _clock.tick().physicalTime,
+        ),
+      );
     }
 
     final completer = Completer<AckFrame>();
@@ -172,20 +171,27 @@ class ProtocolHandler {
     );
 
     _outgoingController.add(frame);
-    return completer.future.timeout(_config.ackTimeout, onTimeout: () {
-      _pendingAcks.remove(frame.frameId);
-      return AckFrame(
-        ackFrameId: -1,
-        originalFrameId: frame.frameId,
-        sourceNodeId: _localNodeId,
-        success: false,
-        errorCode: 'ACK_TIMEOUT',
-        hlcTime: _clock.tick().physicalTime,
-      );
-    });
+    return completer.future.timeout(
+      _config.ackTimeout,
+      onTimeout: () {
+        _pendingAcks.remove(frame.frameId);
+        return AckFrame(
+          ackFrameId: -1,
+          originalFrameId: frame.frameId,
+          sourceNodeId: _localNodeId,
+          success: false,
+          errorCode: 'ACK_TIMEOUT',
+          hlcTime: _clock.tick().physicalTime,
+        );
+      },
+    );
   }
 
-  AckFrame createAck(WireFrame originalFrame, {bool success = true, String? errorCode}) {
+  AckFrame createAck(
+    WireFrame originalFrame, {
+    bool success = true,
+    String? errorCode,
+  }) {
     return AckFrame(
       ackFrameId: _frameSeq++,
       originalFrameId: originalFrame.frameId,
@@ -211,10 +217,9 @@ class ProtocolHandler {
   }
 
   void handleHeartbeat(HeartbeatFrame hb) {
-    _clock.receive(HybridTimestamp(
-      physicalTime: hb.hlcTime,
-      nodeId: hb.sourceNodeId,
-    ));
+    _clock.receive(
+      HybridTimestamp(physicalTime: hb.hlcTime, nodeId: hb.sourceNodeId),
+    );
   }
 
   List<WireEnvelope> chunkEnvelope(WireEnvelope envelope) {
@@ -228,19 +233,21 @@ class ProtocolHandler {
     for (var i = 0; i < totalChunks; i++) {
       final start = i * _config.chunkSize;
       final end = (start + _config.chunkSize).clamp(0, envelope.payload.length);
-      chunks.add(WireEnvelope(
-        envelopeId: '${envelope.envelopeId}_$i',
-        correlationId: envelope.correlationId,
-        messageType: envelope.messageType,
-        sourceNodeId: envelope.sourceNodeId,
-        targetNodeId: envelope.targetNodeId,
-        hlcTime: envelope.hlcTime,
-        compression: envelope.compression,
-        totalChunks: totalChunks,
-        chunkIndex: i,
-        payload: envelope.payload.sublist(start, end),
-        metadata: i == 0 ? envelope.metadata : {},
-      ));
+      chunks.add(
+        WireEnvelope(
+          envelopeId: '${envelope.envelopeId}_$i',
+          correlationId: envelope.correlationId,
+          messageType: envelope.messageType,
+          sourceNodeId: envelope.sourceNodeId,
+          targetNodeId: envelope.targetNodeId,
+          hlcTime: envelope.hlcTime,
+          compression: envelope.compression,
+          totalChunks: totalChunks,
+          chunkIndex: i,
+          payload: envelope.payload.sublist(start, end),
+          metadata: i == 0 ? envelope.metadata : {},
+        ),
+      );
     }
 
     return chunks;
@@ -288,7 +295,12 @@ class ProtocolHandler {
     }
   }
 
-  WireEnvelope createEnvelope(String targetNodeId, String messageType, List<int> payload, {Map<String, String> metadata = const {}}) {
+  WireEnvelope createEnvelope(
+    String targetNodeId,
+    String messageType,
+    List<int> payload, {
+    Map<String, String> metadata = const {},
+  }) {
     final now = _clock.tick();
     return WireEnvelope(
       envelopeId: 'env_${_envelopeSeq++}',
@@ -308,14 +320,16 @@ class ProtocolHandler {
     _heartbeatTimer = Timer.periodic(_config.heartbeatInterval, (_) {
       if (_state == ProtocolState.ready) {
         final hb = createHeartbeat();
-        _outgoingController.add(WireFrame(
-          frameId: _frameSeq++,
-          type: FrameType.heartbeat,
-          sourceNodeId: _localNodeId,
-          targetNodeId: _remoteNodeId ?? '',
-          hlcTime: hb.hlcTime,
-          headers: {'incarnation': hb.incarnation.toString()},
-        ));
+        _outgoingController.add(
+          WireFrame(
+            frameId: _frameSeq++,
+            type: FrameType.heartbeat,
+            sourceNodeId: _localNodeId,
+            targetNodeId: _remoteNodeId ?? '',
+            hlcTime: hb.hlcTime,
+            headers: {'incarnation': hb.incarnation.toString()},
+          ),
+        );
       }
     });
   }
@@ -339,14 +353,16 @@ class ProtocolHandler {
         } else {
           _pendingAcks.remove(entry.key);
           if (!pending.completer.isCompleted) {
-            pending.completer.complete(AckFrame(
-              ackFrameId: -1,
-              originalFrameId: pending.frame.frameId,
-              sourceNodeId: _localNodeId,
-              success: false,
-              errorCode: 'RETRY_EXHAUSTED',
-              hlcTime: now,
-            ));
+            pending.completer.complete(
+              AckFrame(
+                ackFrameId: -1,
+                originalFrameId: pending.frame.frameId,
+                sourceNodeId: _localNodeId,
+                success: false,
+                errorCode: 'RETRY_EXHAUSTED',
+                hlcTime: now,
+              ),
+            );
           }
         }
       }
@@ -360,14 +376,16 @@ class ProtocolHandler {
 
     for (final pending in _pendingAcks.values) {
       if (!pending.completer.isCompleted) {
-        pending.completer.complete(AckFrame(
-          ackFrameId: -1,
-          originalFrameId: pending.frame.frameId,
-          sourceNodeId: _localNodeId,
-          success: false,
-          errorCode: 'CONNECTION_CLOSED',
-          hlcTime: _clock.tick().physicalTime,
-        ));
+        pending.completer.complete(
+          AckFrame(
+            ackFrameId: -1,
+            originalFrameId: pending.frame.frameId,
+            sourceNodeId: _localNodeId,
+            success: false,
+            errorCode: 'CONNECTION_CLOSED',
+            hlcTime: _clock.tick().physicalTime,
+          ),
+        );
       }
     }
     _pendingAcks.clear();

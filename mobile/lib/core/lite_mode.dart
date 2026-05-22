@@ -24,8 +24,22 @@ class LiteMode {
 
   static const List<int> _presetFlags = [
     flagSmoothAnimations | flagStreamingPlayback,
-    flagSmoothAnimations | flagStreamingPlayback | flagAnimatedStickers | flagAutoplayVideos | flagAnimatedEmoji | flagPreloadMedia,
-    flagAnimatedStickers | flagAutoplayVideos | flagSmoothAnimations | flagBlurEffects | flagChatBlurs | flagAnimatedEmoji | flagStreamingPlayback | flagPreloadMedia | flagHqVoice | flagShadowEffects,
+    flagSmoothAnimations |
+        flagStreamingPlayback |
+        flagAnimatedStickers |
+        flagAutoplayVideos |
+        flagAnimatedEmoji |
+        flagPreloadMedia,
+    flagAnimatedStickers |
+        flagAutoplayVideos |
+        flagSmoothAnimations |
+        flagBlurEffects |
+        flagChatBlurs |
+        flagAnimatedEmoji |
+        flagStreamingPlayback |
+        flagPreloadMedia |
+        flagHqVoice |
+        flagShadowEffects,
   ];
 
   int _flags = _presetFlags[presetHigh];
@@ -58,7 +72,8 @@ class LiteMode {
     final processors = Platform.numberOfProcessors;
     if (processors <= 2) {
       performanceScore -= 30;
-    } else if (processors <= 4) performanceScore -= 10;
+    } else if (processors <= 4)
+      performanceScore -= 10;
 
     if (performanceScore < 50) {
       _preset = presetLow;
@@ -69,7 +84,9 @@ class LiteMode {
     }
     _flags = _presetFlags[_preset];
 
-    AppLogger.instance.info('LiteMode: preset=$_preset, score=$performanceScore, cores=$processors');
+    AppLogger.instance.info(
+      'LiteMode: preset=$_preset, score=$performanceScore, cores=$processors',
+    );
   }
 
   void setFlag(int flag, bool enabled) {

@@ -29,8 +29,10 @@ class AIWorkbenchTemplate {
     this.remoteUserPrompt,
   });
 
-  String get systemPrompt => remoteSystemPrompt ?? localeProvider.t(systemPromptKey);
-  String get userPromptTemplate => remoteUserPrompt ?? localeProvider.t(userPromptKey);
+  String get systemPrompt =>
+      remoteSystemPrompt ?? localeProvider.t(systemPromptKey);
+  String get userPromptTemplate =>
+      remoteUserPrompt ?? localeProvider.t(userPromptKey);
 }
 
 const _localTemplates = [
@@ -93,22 +95,27 @@ const _localTemplates = [
 ];
 
 List<AIWorkbenchTemplate> get templates {
-  final remoteTemplates = RemoteConfigService.instance.getValue<List<dynamic>>('workbench_templates');
-  if (remoteTemplates == null || remoteTemplates.isEmpty) return _localTemplates;
+  final remoteTemplates = RemoteConfigService.instance.getValue<List<dynamic>>(
+    'workbench_templates',
+  );
+  if (remoteTemplates == null || remoteTemplates.isEmpty)
+    return _localTemplates;
   final result = <AIWorkbenchTemplate>[];
   for (final t in remoteTemplates) {
     final m = t as Map<String, dynamic>;
     final id = m['id'] as String? ?? '';
     final local = _localTemplates.where((l) => l.id == id).firstOrNull;
-    result.add(AIWorkbenchTemplate(
-      id: id,
-      nameKey: local?.nameKey ?? m['name_key'] as String? ?? id,
-      emoji: m['emoji'] as String? ?? local?.emoji ?? '??',
-      systemPromptKey: local?.systemPromptKey ?? '',
-      userPromptKey: local?.userPromptKey ?? '',
-      remoteSystemPrompt: m['system_prompt'] as String?,
-      remoteUserPrompt: m['user_prompt'] as String?,
-    ));
+    result.add(
+      AIWorkbenchTemplate(
+        id: id,
+        nameKey: local?.nameKey ?? m['name_key'] as String? ?? id,
+        emoji: m['emoji'] as String? ?? local?.emoji ?? '??',
+        systemPromptKey: local?.systemPromptKey ?? '',
+        userPromptKey: local?.userPromptKey ?? '',
+        remoteSystemPrompt: m['system_prompt'] as String?,
+        remoteUserPrompt: m['user_prompt'] as String?,
+      ),
+    );
   }
   return result.isNotEmpty ? result : _localTemplates;
 }
@@ -121,7 +128,8 @@ class AIWorkbenchView extends StatefulWidget {
   State<AIWorkbenchView> createState() => _AIWorkbenchViewState();
 }
 
-class _AIWorkbenchViewState extends State<AIWorkbenchView> with SingleTickerProviderStateMixin {
+class _AIWorkbenchViewState extends State<AIWorkbenchView>
+    with SingleTickerProviderStateMixin {
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
 
@@ -143,9 +151,10 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView> with SingleTickerProv
       duration: const Duration(milliseconds: 400),
       vsync: this,
     );
-    _slideAnimation = Tween<Offset>(begin: const Offset(1, 0), end: Offset.zero).animate(
-      CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
-    );
+    _slideAnimation = Tween<Offset>(begin: const Offset(1, 0), end: Offset.zero)
+        .animate(
+          CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+        );
     _slideController.forward();
     _selectedModel = widget.provider.model.activeModel;
   }
@@ -164,7 +173,10 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView> with SingleTickerProv
     if (input.isEmpty || _selectedTemplate == null) return;
     if (_selectedModel == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(t('no_model_configured')), backgroundColor: AppColors.dng(context)),
+        SnackBar(
+          content: Text(t('no_model_configured')),
+          backgroundColor: AppColors.dng(context),
+        ),
       );
       return;
     }
@@ -178,7 +190,10 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView> with SingleTickerProv
 
     final messages = [
       ChatMessage(role: 'system', content: _selectedTemplate!.systemPrompt),
-      ChatMessage(role: 'user', content: _selectedTemplate!.userPromptTemplate + input),
+      ChatMessage(
+        role: 'user',
+        content: _selectedTemplate!.userPromptTemplate + input,
+      ),
     ];
 
     try {
@@ -247,10 +262,20 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView> with SingleTickerProv
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
           tooltip: localeProvider.t('back'),
-          icon: Icon(LucideIcons.chevronLeft, color: AppColors.textPrimary(context)),
+          icon: Icon(
+            LucideIcons.chevronLeft,
+            color: AppColors.textPrimary(context),
+          ),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(t('ai_workbench'), style: TextStyle(color: AppColors.textPrimary(context), fontSize: 17, fontWeight: FontWeight.w600)),
+        title: Text(
+          t('ai_workbench'),
+          style: TextStyle(
+            color: AppColors.textPrimary(context),
+            fontSize: 17,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ),
       body: SlideTransition(
         position: _slideAnimation,
@@ -278,9 +303,21 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView> with SingleTickerProv
         ),
         child: Row(
           children: [
-            Icon(LucideIcons.alertCircle, size: 16, color: AppColors.warn(context)),
+            Icon(
+              LucideIcons.alertCircle,
+              size: 16,
+              color: AppColors.warn(context),
+            ),
             const SizedBox(width: 8),
-            Expanded(child: Text(t('no_model_configured'), style: TextStyle(color: AppColors.textSecondary(context), fontSize: 13))),
+            Expanded(
+              child: Text(
+                t('no_model_configured'),
+                style: TextStyle(
+                  color: AppColors.textSecondary(context),
+                  fontSize: 13,
+                ),
+              ),
+            ),
           ],
         ),
       );
@@ -297,7 +334,11 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView> with SingleTickerProv
         child: DropdownButton<ModelConfig>(
           value: _selectedModel,
           isExpanded: true,
-          icon: Icon(LucideIcons.chevronDown, size: 16, color: AppColors.textSecondary(context)),
+          icon: Icon(
+            LucideIcons.chevronDown,
+            size: 16,
+            color: AppColors.textSecondary(context),
+          ),
           style: TextStyle(color: AppColors.textPrimary(context), fontSize: 14),
           dropdownColor: AppColors.sf(context),
           items: models.map((m) {
@@ -308,12 +349,21 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView> with SingleTickerProv
                   Container(
                     width: 8,
                     height: 8,
-                    decoration: BoxDecoration(color: AppColors.accent, shape: BoxShape.circle),
+                    decoration: BoxDecoration(
+                      color: AppColors.accent,
+                      shape: BoxShape.circle,
+                    ),
                   ),
                   const SizedBox(width: 8),
                   Text(m.name, style: TextStyle(fontSize: 14)),
                   const SizedBox(width: 6),
-                  Text('(${m.provider})', style: TextStyle(color: AppColors.textSecondary(context), fontSize: 11)),
+                  Text(
+                    '(${m.provider})',
+                    style: TextStyle(
+                      color: AppColors.textSecondary(context),
+                      fontSize: 11,
+                    ),
+                  ),
                 ],
               ),
             );
@@ -337,41 +387,52 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView> with SingleTickerProv
         itemBuilder: (context, index) {
           final tpl = templates[index];
           final isSelected = _selectedTemplate?.id == tpl.id;
-          return Semantics(label: t(tpl.nameKey), button: true, child: GestureDetector(
-
-      behavior: HitTestBehavior.opaque,
-            onTap: () {
-              setState(() => _selectedTemplate = tpl);
-              _inputController.text = tpl.userPromptTemplate;
-            },
-            child: Container(
-              width: 76,
-              margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-              decoration: BoxDecoration(
-                color: isSelected ? AppColors.accent.withValues(alpha: 0.12) : AppColors.sf(context),
-                borderRadius: BorderRadius.circular(12),
-                border: isSelected ? Border.all(color: AppColors.accent, width: 1.5) : null,
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(tpl.emoji, style: const TextStyle(fontSize: 22)),
-                  const SizedBox(height: 4),
-                  Text(
-                    t(tpl.nameKey),
-                    style: TextStyle(
-                      color: isSelected ? AppColors.accent : AppColors.textSecondary(context),
-                      fontSize: 11,
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+          return Semantics(
+            label: t(tpl.nameKey),
+            button: true,
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                setState(() => _selectedTemplate = tpl);
+                _inputController.text = tpl.userPromptTemplate;
+              },
+              child: Container(
+                width: 76,
+                margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? AppColors.accent.withValues(alpha: 0.12)
+                      : AppColors.sf(context),
+                  borderRadius: BorderRadius.circular(12),
+                  border: isSelected
+                      ? Border.all(color: AppColors.accent, width: 1.5)
+                      : null,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(tpl.emoji, style: const TextStyle(fontSize: 22)),
+                    const SizedBox(height: 4),
+                    Text(
+                      t(tpl.nameKey),
+                      style: TextStyle(
+                        color: isSelected
+                            ? AppColors.accent
+                            : AppColors.textSecondary(context),
+                        fontSize: 11,
+                        fontWeight: isSelected
+                            ? FontWeight.w600
+                            : FontWeight.normal,
+                      ),
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    textAlign: TextAlign.center,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ));
+          );
         },
       ),
     );
@@ -383,11 +444,27 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView> with SingleTickerProv
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(LucideIcons.sparkles, size: 48, color: AppColors.iconGray(context)),
+            Icon(
+              LucideIcons.sparkles,
+              size: 48,
+              color: AppColors.iconGray(context),
+            ),
             const SizedBox(height: 12),
-            Text(t('workbench_empty'), style: TextStyle(color: AppColors.textSecondary(context), fontSize: 15)),
+            Text(
+              t('workbench_empty'),
+              style: TextStyle(
+                color: AppColors.textSecondary(context),
+                fontSize: 15,
+              ),
+            ),
             const SizedBox(height: 4),
-            Text(t('workbench_empty_hint'), style: TextStyle(color: AppColors.textDisabled(context), fontSize: 13)),
+            Text(
+              t('workbench_empty_hint'),
+              style: TextStyle(
+                color: AppColors.textDisabled(context),
+                fontSize: 13,
+              ),
+            ),
           ],
         ),
       );
@@ -408,32 +485,59 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView> with SingleTickerProv
             if (_selectedTemplate != null) ...[
               Row(
                 children: [
-                  Text(_selectedTemplate!.emoji, style: const TextStyle(fontSize: 16)),
+                  Text(
+                    _selectedTemplate!.emoji,
+                    style: const TextStyle(fontSize: 16),
+                  ),
                   const SizedBox(width: 6),
                   Text(
                     t(_selectedTemplate!.nameKey),
-                    style: TextStyle(color: AppColors.accent, fontSize: 13, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                      color: AppColors.accent,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   const Spacer(),
                   if (!_isGenerating && _generatedContent.isNotEmpty) ...[
-                    Semantics(label: localeProvider.t('copy'), child: GestureDetector(
-
-      behavior: HitTestBehavior.opaque,
-                      onTap: () {
-                        Clipboard.setData(ClipboardData(text: _generatedContent));
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(t('copied')), backgroundColor: AppColors.accent, duration: const Duration(milliseconds: 1500)),
-                        );
-                      },
-                      child: Icon(LucideIcons.copy, size: 16, color: AppColors.textSecondary(context)),
-                    )),
+                    Semantics(
+                      label: localeProvider.t('copy'),
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () {
+                          Clipboard.setData(
+                            ClipboardData(text: _generatedContent),
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(t('copied')),
+                              backgroundColor: AppColors.accent,
+                              duration: const Duration(milliseconds: 1500),
+                            ),
+                          );
+                        },
+                        child: Icon(
+                          LucideIcons.copy,
+                          size: 16,
+                          color: AppColors.textSecondary(context),
+                        ),
+                      ),
+                    ),
                     const SizedBox(width: 12),
-                    Semantics(label: localeProvider.t('share'), child: GestureDetector(
-
-      behavior: HitTestBehavior.opaque,
-                      onTap: () => SharePlus.instance.share(ShareParams(text: _generatedContent)),
-                      child: Icon(LucideIcons.share2, size: 16, color: AppColors.textSecondary(context)),
-                    )),
+                    Semantics(
+                      label: localeProvider.t('share'),
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () => SharePlus.instance.share(
+                          ShareParams(text: _generatedContent),
+                        ),
+                        child: Icon(
+                          LucideIcons.share2,
+                          size: 16,
+                          color: AppColors.textSecondary(context),
+                        ),
+                      ),
+                    ),
                   ],
                 ],
               ),
@@ -453,9 +557,22 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView> with SingleTickerProv
               const SizedBox(height: 16),
               Row(
                 children: [
-                  SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.accent)),
+                  SizedBox(
+                    width: 14,
+                    height: 14,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppColors.accent,
+                    ),
+                  ),
                   const SizedBox(width: 8),
-                  Text(t('generating'), style: TextStyle(color: AppColors.textSecondary(context), fontSize: 13)),
+                  Text(
+                    t('generating'),
+                    style: TextStyle(
+                      color: AppColors.textSecondary(context),
+                      fontSize: 13,
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -470,7 +587,9 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView> with SingleTickerProv
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       decoration: BoxDecoration(
         color: AppColors.bg(context),
-        border: Border(top: BorderSide(color: AppColors.divider(context), width: 0.5)),
+        border: Border(
+          top: BorderSide(color: AppColors.divider(context), width: 0.5),
+        ),
       ),
       child: SafeArea(
         top: false,
@@ -484,53 +603,87 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView> with SingleTickerProv
                   controller: _inputController,
                   maxLines: null,
                   keyboardType: TextInputType.multiline,
-                  style: TextStyle(color: AppColors.textPrimary(context), fontSize: 15),
+                  style: TextStyle(
+                    color: AppColors.textPrimary(context),
+                    fontSize: 15,
+                  ),
                   decoration: InputDecoration(
-                    labelText:  _selectedTemplate != null ? t('workbench_input_hint') : t('workbench_select_template'),
-                    hintStyle: TextStyle(color: AppColors.textDisabled(context), fontSize: 14),
+                    labelText: _selectedTemplate != null
+                        ? t('workbench_input_hint')
+                        : t('workbench_select_template'),
+                    hintStyle: TextStyle(
+                      color: AppColors.textDisabled(context),
+                      fontSize: 14,
+                    ),
                     filled: true,
                     fillColor: AppColors.sf(context),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                    focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 10,
+                    ),
                   ),
                 ),
               ),
             ),
             const SizedBox(width: 8),
             if (_isGenerating)
-              Semantics(label: localeProvider.t('stop_generating'), child: GestureDetector(
-
-      behavior: HitTestBehavior.opaque,
-                onTap: _stopGeneration,
-                child: Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: AppColors.dng(context).withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(12),
+              Semantics(
+                label: localeProvider.t('stop_generating'),
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: _stopGeneration,
+                  child: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: AppColors.dng(context).withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      LucideIcons.square,
+                      color: AppColors.dng(context),
+                      size: 18,
+                    ),
                   ),
-                  child: Icon(LucideIcons.square, color: AppColors.dng(context), size: 18),
                 ),
-              ))
+              )
             else
-              Semantics(label: localeProvider.t('send'), child: GestureDetector(
-
-      behavior: HitTestBehavior.opaque,
-                onTap: _generate,
-                child: Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: _selectedTemplate != null && _inputController.text.trim().isNotEmpty
-                        ? AppColors.accent
-                        : AppColors.accent.withValues(alpha: 0.4),
-                    borderRadius: BorderRadius.circular(12),
+              Semantics(
+                label: localeProvider.t('send'),
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: _generate,
+                  child: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color:
+                          _selectedTemplate != null &&
+                              _inputController.text.trim().isNotEmpty
+                          ? AppColors.accent
+                          : AppColors.accent.withValues(alpha: 0.4),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      LucideIcons.sparkles,
+                      color: AppColors.textPrimary(context),
+                      size: 20,
+                    ),
                   ),
-                  child: Icon(LucideIcons.sparkles, color: AppColors.textPrimary(context), size: 20),
                 ),
-              )),
+              ),
           ],
         ),
       ),

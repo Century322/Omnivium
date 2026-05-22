@@ -13,17 +13,9 @@ enum AgentState {
   completed,
 }
 
-enum IntentChannel {
-  fast,
-  slow,
-  mixed,
-}
+enum IntentChannel { fast, slow, mixed }
 
-enum PermissionLevel {
-  auto,
-  confirm,
-  deny,
-}
+enum PermissionLevel { auto, confirm, deny }
 
 enum ToolCallPhase {
   created,
@@ -61,23 +53,35 @@ class ThoughtStep {
 
   String get icon {
     switch (type) {
-      case ThoughtType.analysis: return '🔍';
-      case ThoughtType.planning: return '📋';
-      case ThoughtType.toolSelection: return '🔧';
-      case ThoughtType.evaluation: return '✅';
-      case ThoughtType.reflection: return '🤔';
-      case ThoughtType.memory: return '🧠';
+      case ThoughtType.analysis:
+        return '🔍';
+      case ThoughtType.planning:
+        return '📋';
+      case ThoughtType.toolSelection:
+        return '🔧';
+      case ThoughtType.evaluation:
+        return '✅';
+      case ThoughtType.reflection:
+        return '🤔';
+      case ThoughtType.memory:
+        return '🧠';
     }
   }
 
   String get label {
     switch (type) {
-      case ThoughtType.analysis: return 'Analysis';
-      case ThoughtType.planning: return 'Planning';
-      case ThoughtType.toolSelection: return 'Tool Selection';
-      case ThoughtType.evaluation: return 'Evaluation';
-      case ThoughtType.reflection: return 'Reflection';
-      case ThoughtType.memory: return 'Memory';
+      case ThoughtType.analysis:
+        return 'Analysis';
+      case ThoughtType.planning:
+        return 'Planning';
+      case ThoughtType.toolSelection:
+        return 'Tool Selection';
+      case ThoughtType.evaluation:
+        return 'Evaluation';
+      case ThoughtType.reflection:
+        return 'Reflection';
+      case ThoughtType.memory:
+        return 'Memory';
     }
   }
 }

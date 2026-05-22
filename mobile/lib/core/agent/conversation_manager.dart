@@ -21,14 +21,13 @@ class ConversationMessage {
     String? content,
     bool? isStreaming,
     List<ThoughtStep>? thoughts,
-  }) =>
-      ConversationMessage(
-        role: role,
-        content: content ?? this.content,
-        timestamp: timestamp,
-        isStreaming: isStreaming ?? this.isStreaming,
-        thoughts: thoughts ?? this.thoughts,
-      );
+  }) => ConversationMessage(
+    role: role,
+    content: content ?? this.content,
+    timestamp: timestamp,
+    isStreaming: isStreaming ?? this.isStreaming,
+    thoughts: thoughts ?? this.thoughts,
+  );
 }
 
 class ConversationManager {
@@ -43,21 +42,25 @@ class ConversationManager {
   List<ThoughtStep> get currentThoughts => List.unmodifiable(_currentThoughts);
 
   void addUserMessage(String content) {
-    _messages.add(ConversationMessage(
-      role: 'user',
-      content: content,
-      timestamp: DateTime.now(),
-    ));
+    _messages.add(
+      ConversationMessage(
+        role: 'user',
+        content: content,
+        timestamp: DateTime.now(),
+      ),
+    );
     _chatHistory.add(ChatMessage(role: 'user', content: content));
   }
 
   int addStreamingAssistant() {
-    _messages.add(ConversationMessage(
-      role: 'assistant',
-      content: '',
-      timestamp: DateTime.now(),
-      isStreaming: true,
-    ));
+    _messages.add(
+      ConversationMessage(
+        role: 'assistant',
+        content: '',
+        timestamp: DateTime.now(),
+        isStreaming: true,
+      ),
+    );
     return _messages.length - 1;
   }
 
@@ -78,11 +81,13 @@ class ConversationManager {
   }
 
   void addStaticAssistant(String content) {
-    _messages.add(ConversationMessage(
-      role: 'assistant',
-      content: content,
-      timestamp: DateTime.now(),
-    ));
+    _messages.add(
+      ConversationMessage(
+        role: 'assistant',
+        content: content,
+        timestamp: DateTime.now(),
+      ),
+    );
     _chatHistory.add(ChatMessage(role: 'assistant', content: content));
   }
 
@@ -91,19 +96,29 @@ class ConversationManager {
     final userContent = _messages[assistantIndex - 1].content;
     _messages.removeAt(assistantIndex);
     _messages.removeAt(assistantIndex - 1);
-    _chatHistory.removeWhere((m) =>
-      m.role == 'user' && m.content == userContent);
-    _chatHistory.removeWhere((m) =>
-      m.role == 'assistant' && _messages.every((cm) => cm.content != m.content));
+    _chatHistory.removeWhere(
+      (m) => m.role == 'user' && m.content == userContent,
+    );
+    _chatHistory.removeWhere(
+      (m) =>
+          m.role == 'assistant' &&
+          _messages.every((cm) => cm.content != m.content),
+    );
   }
 
-  void addThought(ThoughtType type, String content, {Map<String, dynamic>? metadata}) {
-    _currentThoughts.add(ThoughtStep(
-      type: type,
-      content: content,
-      timestamp: DateTime.now(),
-      metadata: metadata,
-    ));
+  void addThought(
+    ThoughtType type,
+    String content, {
+    Map<String, dynamic>? metadata,
+  }) {
+    _currentThoughts.add(
+      ThoughtStep(
+        type: type,
+        content: content,
+        timestamp: DateTime.now(),
+        metadata: metadata,
+      ),
+    );
   }
 
   void clearThoughts() {

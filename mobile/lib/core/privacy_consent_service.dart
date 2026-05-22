@@ -11,7 +11,8 @@ class PrivacyConsentService {
   Future<bool> hasConsented() async {
     final storage = SecureStorageService.instance;
     final consented = await storage.read(_consentKey);
-    final version = int.tryParse(await storage.read(_consentVersionKey) ?? '0') ?? 0;
+    final version =
+        int.tryParse(await storage.read(_consentVersionKey) ?? '0') ?? 0;
     return consented == 'true' && version >= _currentVersion;
   }
 
@@ -40,7 +41,10 @@ class PrivacyConsentDialog {
           children: [
             Icon(Icons.shield_outlined, color: AppColors.accent, size: 24),
             const SizedBox(width: 8),
-            Text(t('privacy_policy'), style: TextStyle(color: AppColors.secondary, fontSize: 18)),
+            Text(
+              t('privacy_policy'),
+              style: TextStyle(color: AppColors.secondary, fontSize: 18),
+            ),
           ],
         ),
         content: SingleChildScrollView(
@@ -53,13 +57,33 @@ class PrivacyConsentDialog {
                 style: TextStyle(color: AppColors.secondary, fontSize: 14),
               ),
               const SizedBox(height: 12),
-              _buildItem(ctx, '🔒', t('privacy_e2e_title'), t('privacy_e2e_desc')),
+              _buildItem(
+                ctx,
+                '🔒',
+                t('privacy_e2e_title'),
+                t('privacy_e2e_desc'),
+              ),
               const SizedBox(height: 8),
-              _buildItem(ctx, '🔑', t('privacy_key_title'), t('privacy_key_desc')),
+              _buildItem(
+                ctx,
+                '🔑',
+                t('privacy_key_title'),
+                t('privacy_key_desc'),
+              ),
               const SizedBox(height: 8),
-              _buildItem(ctx, '📊', t('privacy_no_collect_title'), t('privacy_no_collect_desc')),
+              _buildItem(
+                ctx,
+                '📊',
+                t('privacy_no_collect_title'),
+                t('privacy_no_collect_desc'),
+              ),
               const SizedBox(height: 8),
-              _buildItem(ctx, '🤖', t('privacy_ai_title'), t('privacy_ai_desc')),
+              _buildItem(
+                ctx,
+                '🤖',
+                t('privacy_ai_title'),
+                t('privacy_ai_desc'),
+              ),
               const SizedBox(height: 16),
               Text(
                 t('privacy_agree_notice'),
@@ -71,7 +95,10 @@ class PrivacyConsentDialog {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: Text(t('exit'), style: TextStyle(color: AppColors.mut(context))),
+            child: Text(
+              t('exit'),
+              style: TextStyle(color: AppColors.mut(context)),
+            ),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, true),
@@ -87,7 +114,12 @@ class PrivacyConsentDialog {
     return result ?? false;
   }
 
-  static Widget _buildItem(BuildContext context, String emoji, String title, String desc) {
+  static Widget _buildItem(
+    BuildContext context,
+    String emoji,
+    String title,
+    String desc,
+  ) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -97,8 +129,22 @@ class PrivacyConsentDialog {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: TextStyle(color: AppColors.sec(context), fontSize: 13, fontWeight: FontWeight.w600)),
-              Text(desc, style: TextStyle(color: AppColors.mut(context), fontSize: 12, height: 1.4)),
+              Text(
+                title,
+                style: TextStyle(
+                  color: AppColors.sec(context),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Text(
+                desc,
+                style: TextStyle(
+                  color: AppColors.mut(context),
+                  fontSize: 12,
+                  height: 1.4,
+                ),
+              ),
             ],
           ),
         ),

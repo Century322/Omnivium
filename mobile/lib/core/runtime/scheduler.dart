@@ -2,14 +2,7 @@ import 'dart:async';
 import 'vocabulary/runtime_task.dart';
 import 'kernel/runtime_config.dart';
 
-enum TaskState {
-  pending,
-  running,
-  completed,
-  failed,
-  cancelled,
-  retrying,
-}
+enum TaskState { pending, running, completed, failed, cancelled, retrying }
 
 class ScheduledTask {
   final RuntimeTask task;
@@ -19,15 +12,15 @@ class ScheduledTask {
   final Completer<dynamic> _completer = Completer<dynamic>();
   CancellationToken? _cancellationToken;
 
-  ScheduledTask({
-    required this.task,
-    required this.executor,
-  });
+  ScheduledTask({required this.task, required this.executor});
 
   TaskState get state => _state;
   int get retryCount => _retryCount;
   Completer<dynamic> get completer => _completer;
-  bool get isDone => _state == TaskState.completed || _state == TaskState.failed || _state == TaskState.cancelled;
+  bool get isDone =>
+      _state == TaskState.completed ||
+      _state == TaskState.failed ||
+      _state == TaskState.cancelled;
 }
 
 class CancellationToken {
@@ -73,9 +66,7 @@ class Scheduler {
   int _failedCount = 0;
   int _cancelledCount = 0;
 
-  Scheduler({
-    required RuntimeConfig config,
-  })  : _config = config;
+  Scheduler({required RuntimeConfig config}) : _config = config;
 
   int get pendingCount => _queue.length;
   int get runningCount => _runningCount;
@@ -128,7 +119,8 @@ class Scheduler {
 
   TaskState? taskState(String taskId) => _tasks[taskId]?.state;
 
-  Map<String, TaskState> get taskStates => _tasks.map((id, t) => MapEntry(id, t.state));
+  Map<String, TaskState> get taskStates =>
+      _tasks.map((id, t) => MapEntry(id, t.state));
 
   void _tryRunNext() {
     while (_runningCount < _config.maxConcurrentTasks && _queue.isNotEmpty) {
@@ -145,9 +137,9 @@ class Scheduler {
     scheduled._cancellationToken = token;
 
     try {
-      final result = await scheduled.executor(token).timeout(
-        Duration(milliseconds: scheduled.task.budget.maxDurationMs),
-      );
+      final result = await scheduled
+          .executor(token)
+          .timeout(Duration(milliseconds: scheduled.task.budget.maxDurationMs));
 
       if (token.isCancelled) return;
 
@@ -163,7 +155,9 @@ class Scheduler {
         scheduled._retryCount++;
         scheduled._state = TaskState.retrying;
 
-        final delay = scheduled.task.failurePolicy.retry.delayForAttempt(scheduled._retryCount);
+        final delay = scheduled.task.failurePolicy.retry.delayForAttempt(
+          scheduled._retryCount,
+        );
         await Future.delayed(delay);
 
         if (!token.isCancelled) {

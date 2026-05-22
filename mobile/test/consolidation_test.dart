@@ -5,7 +5,8 @@ import 'package:omnivium/core/runtime/distributed/recovery/recovery_manager.dart
 import 'package:omnivium/core/runtime/distributed/persistence/write_ahead_log.dart';
 import 'package:omnivium/core/runtime/distributed/lease/unified_lease.dart';
 import 'package:omnivium/core/runtime/distributed/hybrid_logical_clock.dart';
-import 'package:omnivium/core/runtime/distributed/session_lease_manager.dart' show SessionLeaseManager;
+import 'package:omnivium/core/runtime/distributed/session_lease_manager.dart'
+    show SessionLeaseManager;
 
 void main() {
   group('Wire Protocol', () {
@@ -110,13 +111,13 @@ void main() {
       final handlerA = ProtocolHandler(
         localNodeId: 'node-A',
         clock: clockA,
-        config: const WireProtocolConfig(authMethod: AuthMethod.token, authToken: 'secret'),
+        config: const WireProtocolConfig(
+          authMethod: AuthMethod.token,
+          authToken: 'secret',
+        ),
       );
 
-      final handlerB = ProtocolHandler(
-        localNodeId: 'node-B',
-        clock: clockB,
-      );
+      final handlerB = ProtocolHandler(localNodeId: 'node-B', clock: clockB);
 
       final handshake = handlerA.createHandshake();
       expect(handlerA.state, ProtocolState.handshaking);
@@ -133,10 +134,17 @@ void main() {
       final handler = ProtocolHandler(localNodeId: 'node-A', clock: clock);
 
       handler.createHandshake();
-      final handshakeAck = HandshakeAckFrame(sourceNodeId: 'node-B', accepted: true);
+      final handshakeAck = HandshakeAckFrame(
+        sourceNodeId: 'node-B',
+        accepted: true,
+      );
       handler.completeHandshake(handshakeAck);
 
-      final frame = handler.createDataFrame('node-B', 'capability.invoke', [1, 2, 3]);
+      final frame = handler.createDataFrame('node-B', 'capability.invoke', [
+        1,
+        2,
+        3,
+      ]);
       expect(frame.type, FrameType.data);
       expect(frame.sourceNodeId, 'node-A');
       expect(frame.targetNodeId, 'node-B');
@@ -183,11 +191,13 @@ void main() {
       );
 
       handler.createHandshake();
-      handler.completeHandshake(HandshakeAckFrame(
-        sourceNodeId: 'node-B',
-        accepted: true,
-        negotiatedMaxFrameSize: 10,
-      ));
+      handler.completeHandshake(
+        HandshakeAckFrame(
+          sourceNodeId: 'node-B',
+          accepted: true,
+          negotiatedMaxFrameSize: 10,
+        ),
+      );
 
       final envelope = WireEnvelope(
         envelopeId: 'env-big',
@@ -257,28 +267,40 @@ void main() {
   group('Recovery Manager', () {
     test('detect node partition failure', () {
       final clock = HybridLogicalClock(nodeId: 'node-A');
-      final leaseManager = SessionLeaseManager(localNodeId: 'node-A', clock: clock);
+      final leaseManager = SessionLeaseManager(
+        localNodeId: 'node-A',
+        clock: clock,
+      );
       final recovery = RecoveryManager(
         localNodeId: 'node-A',
         clock: clock,
         leaseManager: leaseManager,
       );
 
-      final failure = recovery.detectFailure(FailureType.nodePartition, 'node-B');
+      final failure = recovery.detectFailure(
+        FailureType.nodePartition,
+        'node-B',
+      );
       expect(failure.type, FailureType.nodePartition);
       expect(recovery.failureCount, 1);
     });
 
     test('analyze node partition returns markNodeDead', () {
       final clock = HybridLogicalClock(nodeId: 'node-A');
-      final leaseManager = SessionLeaseManager(localNodeId: 'node-A', clock: clock);
+      final leaseManager = SessionLeaseManager(
+        localNodeId: 'node-A',
+        clock: clock,
+      );
       final recovery = RecoveryManager(
         localNodeId: 'node-A',
         clock: clock,
         leaseManager: leaseManager,
       );
 
-      final failure = recovery.detectFailure(FailureType.nodePartition, 'node-B');
+      final failure = recovery.detectFailure(
+        FailureType.nodePartition,
+        'node-B',
+      );
       final decision = recovery.analyze(failure);
 
       expect(decision.action, RecoveryAction.markNodeDead);
@@ -287,7 +309,10 @@ void main() {
 
     test('recover lease orphan', () {
       final clock = HybridLogicalClock(nodeId: 'node-A');
-      final leaseManager = SessionLeaseManager(localNodeId: 'node-A', clock: clock);
+      final leaseManager = SessionLeaseManager(
+        localNodeId: 'node-A',
+        clock: clock,
+      );
       final recovery = RecoveryManager(
         localNodeId: 'node-A',
         clock: clock,
@@ -309,7 +334,10 @@ void main() {
 
     test('replay duplication detection', () {
       final clock = HybridLogicalClock(nodeId: 'node-A');
-      final leaseManager = SessionLeaseManager(localNodeId: 'node-A', clock: clock);
+      final leaseManager = SessionLeaseManager(
+        localNodeId: 'node-A',
+        clock: clock,
+      );
       final recovery = RecoveryManager(
         localNodeId: 'node-A',
         clock: clock,
@@ -323,7 +351,10 @@ void main() {
 
     test('split brain resolution by incarnation', () {
       final clock = HybridLogicalClock(nodeId: 'node-A');
-      final leaseManager = SessionLeaseManager(localNodeId: 'node-A', clock: clock);
+      final leaseManager = SessionLeaseManager(
+        localNodeId: 'node-A',
+        clock: clock,
+      );
       final recovery = RecoveryManager(
         localNodeId: 'node-A',
         clock: clock,
@@ -347,7 +378,10 @@ void main() {
 
     test('half-open session recovery', () {
       final clock = HybridLogicalClock(nodeId: 'node-A');
-      final leaseManager = SessionLeaseManager(localNodeId: 'node-A', clock: clock);
+      final leaseManager = SessionLeaseManager(
+        localNodeId: 'node-A',
+        clock: clock,
+      );
       final recovery = RecoveryManager(
         localNodeId: 'node-A',
         clock: clock,
@@ -367,7 +401,10 @@ void main() {
 
     test('incarnation tracking', () {
       final clock = HybridLogicalClock(nodeId: 'node-A');
-      final leaseManager = SessionLeaseManager(localNodeId: 'node-A', clock: clock);
+      final leaseManager = SessionLeaseManager(
+        localNodeId: 'node-A',
+        clock: clock,
+      );
       final recovery = RecoveryManager(
         localNodeId: 'node-A',
         clock: clock,
@@ -397,8 +434,12 @@ void main() {
       final wal = WriteAheadLog(nodeId: 'node-A', clock: clock);
 
       final txId = wal.beginTransaction();
-      wal.append(WalEntryType.sessionCreate, {'sessionId': 's-1'}, transactionId: txId);
-      wal.append(WalEntryType.leaseAcquire, {'sessionId': 's-1'}, transactionId: txId);
+      wal.append(WalEntryType.sessionCreate, {
+        'sessionId': 's-1',
+      }, transactionId: txId);
+      wal.append(WalEntryType.leaseAcquire, {
+        'sessionId': 's-1',
+      }, transactionId: txId);
       final committed = wal.commitTransaction(txId);
 
       expect(committed, isTrue);
@@ -410,7 +451,9 @@ void main() {
       final wal = WriteAheadLog(nodeId: 'node-A', clock: clock);
 
       final txId = wal.beginTransaction();
-      wal.append(WalEntryType.sessionCreate, {'sessionId': 's-1'}, transactionId: txId);
+      wal.append(WalEntryType.sessionCreate, {
+        'sessionId': 's-1',
+      }, transactionId: txId);
       final rolled = wal.rollbackTransaction(txId);
 
       expect(rolled, isTrue);
@@ -440,8 +483,12 @@ void main() {
       final wal = WriteAheadLog(nodeId: 'node-A', clock: clock);
 
       final txId = wal.beginTransaction();
-      wal.append(WalEntryType.sessionCreate, {'sessionId': 's-1'}, transactionId: txId);
-      wal.append(WalEntryType.leaseAcquire, {'sessionId': 's-1'}, transactionId: txId);
+      wal.append(WalEntryType.sessionCreate, {
+        'sessionId': 's-1',
+      }, transactionId: txId);
+      wal.append(WalEntryType.leaseAcquire, {
+        'sessionId': 's-1',
+      }, transactionId: txId);
       wal.commitTransaction(txId);
 
       final txEntries = wal.replayTransaction(txId);
@@ -490,7 +537,9 @@ void main() {
       final clock = HybridLogicalClock(nodeId: 'node-A');
       final wal = WriteAheadLog(nodeId: 'node-A', clock: clock);
 
-      final entry = wal.append(WalEntryType.sessionCreate, {'sessionId': 's-1'});
+      final entry = wal.append(WalEntryType.sessionCreate, {
+        'sessionId': 's-1',
+      });
       final json = entry.toJson();
       final restored = WalEntry.fromJson(json);
 
@@ -506,8 +555,12 @@ void main() {
       final wal = WriteAheadLog(nodeId: 'node-A', clock: clock);
       final store = EventStore(wal);
 
-      store.appendToStream('session-1', WalEntryType.sessionCreate, {'userId': 'user-A'});
-      store.appendToStream('session-1', WalEntryType.sessionUpdate, {'action': 'activate'});
+      store.appendToStream('session-1', WalEntryType.sessionCreate, {
+        'userId': 'user-A',
+      });
+      store.appendToStream('session-1', WalEntryType.sessionUpdate, {
+        'action': 'activate',
+      });
 
       expect(store.streamVersion('session-1'), 2);
 
@@ -623,7 +676,10 @@ void main() {
 
       final renewed = manager.renew('session-1');
       expect(renewed, isTrue);
-      expect(manager.getLease('session-1')!.expiresAt, greaterThanOrEqualTo(originalExpiry));
+      expect(
+        manager.getLease('session-1')!.expiresAt,
+        greaterThanOrEqualTo(originalExpiry),
+      );
     });
 
     test('lease expiry detection', () {

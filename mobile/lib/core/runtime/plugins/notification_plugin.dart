@@ -8,12 +8,18 @@ class NotificationPlugin implements PluginHandler {
   final List<Map<String, dynamic>> _notifications = [];
 
   @override
-  Future<HandlerResult> handleMessage(RuntimeMessage message, CapabilityContext context) async {
+  Future<HandlerResult> handleMessage(
+    RuntimeMessage message,
+    CapabilityContext context,
+  ) async {
     return HandlerResult.ok();
   }
 
   @override
-  Future<HandlerResult> handleEvent(RuntimeEvent event, CapabilityContext context) async {
+  Future<HandlerResult> handleEvent(
+    RuntimeEvent event,
+    CapabilityContext context,
+  ) async {
     if (event.type == 'notification.push') {
       _notifications.add({
         'payload': event.payload,
@@ -24,7 +30,11 @@ class NotificationPlugin implements PluginHandler {
   }
 
   @override
-  Future<CapabilityResult> invokeCapability(String capabilityId, dynamic params, CapabilityContext context) async {
+  Future<CapabilityResult> invokeCapability(
+    String capabilityId,
+    dynamic params,
+    CapabilityContext context,
+  ) async {
     switch (capabilityId) {
       case 'notification.push':
         _notifications.add({
@@ -40,29 +50,32 @@ class NotificationPlugin implements PluginHandler {
         });
       default:
         return CapabilityResult.fail(
-          RuntimeError(code: 'UNKNOWN_CAPABILITY', message: 'Unknown capability: $capabilityId'),
+          RuntimeError(
+            code: 'UNKNOWN_CAPABILITY',
+            message: 'Unknown capability: $capabilityId',
+          ),
         );
     }
   }
 
   static PluginDescriptor descriptor() => PluginDescriptor(
-        id: 'notification',
-        name: 'Notification Plugin',
-        version: '1.0.0',
-        description: 'Runtime notification management',
-        capabilities: const [
-          CapabilityDeclaration(
-            id: 'notification.push',
-            name: 'Push',
-            description: 'Push a notification',
-            permission: 'auto',
-          ),
-          CapabilityDeclaration(
-            id: 'notification.local',
-            name: 'Local',
-            description: 'Get local notifications',
-            permission: 'auto',
-          ),
-        ],
-      );
+    id: 'notification',
+    name: 'Notification Plugin',
+    version: '1.0.0',
+    description: 'Runtime notification management',
+    capabilities: const [
+      CapabilityDeclaration(
+        id: 'notification.push',
+        name: 'Push',
+        description: 'Push a notification',
+        permission: 'auto',
+      ),
+      CapabilityDeclaration(
+        id: 'notification.local',
+        name: 'Local',
+        description: 'Get local notifications',
+        permission: 'auto',
+      ),
+    ],
+  );
 }

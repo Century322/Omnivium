@@ -78,7 +78,12 @@ class _AddFriendViewState extends State<AddFriendView> {
   Future<void> _addById() async {
     final userId = _idController.text.trim();
     if (userId.isEmpty) return;
-    if (!userId.startsWith('@') || !userId.contains(':') || userId.length < 5 || userId.split(':').length != 2 || userId.split(':')[0].length < 2 || userId.split(':')[1].length < 3) {
+    if (!userId.startsWith('@') ||
+        !userId.contains(':') ||
+        userId.length < 5 ||
+        userId.split(':').length != 2 ||
+        userId.split(':')[0].length < 2 ||
+        userId.split(':')[1].length < 3) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(localeProvider.t('invalid_matrix_id')),
@@ -118,10 +123,20 @@ class _AddFriendViewState extends State<AddFriendView> {
         elevation: 0,
         leading: IconButton(
           tooltip: localeProvider.t('back'),
-          icon: Icon(LucideIcons.arrowLeft, color: AppColors.textSecondary(context)),
+          icon: Icon(
+            LucideIcons.arrowLeft,
+            color: AppColors.textSecondary(context),
+          ),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(localeProvider.t('add_contact'), style: TextStyle(color: AppColors.textPrimary(context), fontSize: 17, fontWeight: FontWeight.w600)),
+        title: Text(
+          localeProvider.t('add_contact'),
+          style: TextStyle(
+            color: AppColors.textPrimary(context),
+            fontSize: 17,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -132,8 +147,13 @@ class _AddFriendViewState extends State<AddFriendView> {
             _buildSearchSection(context),
             if (_isSearching)
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: Column(children: List.generate(3, (_) => const MessageSkeleton())),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                child: Column(
+                  children: List.generate(3, (_) => const MessageSkeleton()),
+                ),
               )
             else if (_searchResults.isNotEmpty)
               ..._buildSearchResults(context)
@@ -155,9 +175,19 @@ class _AddFriendViewState extends State<AddFriendView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(localeProvider.t('add_by_id'), style: TextStyle(color: AppColors.textPrimary(context), fontSize: 15, fontWeight: FontWeight.w600)),
+          Text(
+            localeProvider.t('add_by_id'),
+            style: TextStyle(
+              color: AppColors.textPrimary(context),
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           const SizedBox(height: 4),
-          Text(localeProvider.t('add_by_id_desc'), style: TextStyle(color: AppColors.mut(context), fontSize: 12)),
+          Text(
+            localeProvider.t('add_by_id_desc'),
+            style: TextStyle(color: AppColors.mut(context), fontSize: 12),
+          ),
           const SizedBox(height: 12),
           Row(
             children: [
@@ -171,16 +201,26 @@ class _AddFriendViewState extends State<AddFriendView> {
                       decoration: BoxDecoration(
                         color: AppColors.bg(context),
                         borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: isFocused ? AppColors.accent : AppColors.divider(context)),
+                        border: Border.all(
+                          color: isFocused
+                              ? AppColors.accent
+                              : AppColors.divider(context),
+                        ),
                       ),
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       child: TextField(
                         controller: _idController,
                         focusNode: _idFocus,
-                        style: TextStyle(color: AppColors.textPrimary(context), fontSize: 14),
+                        style: TextStyle(
+                          color: AppColors.textPrimary(context),
+                          fontSize: 14,
+                        ),
                         decoration: InputDecoration(
-                          labelText:  '@user:server.com',
-                          hintStyle: TextStyle(color: AppColors.textDisabled(context), fontSize: 14),
+                          labelText: '@user:server.com',
+                          hintStyle: TextStyle(
+                            color: AppColors.textDisabled(context),
+                            fontSize: 14,
+                          ),
                           border: InputBorder.none,
                           focusedBorder: InputBorder.none,
                           enabledBorder: InputBorder.none,
@@ -198,11 +238,23 @@ class _AddFriendViewState extends State<AddFriendView> {
                   style: FilledButton.styleFrom(
                     backgroundColor: AppColors.accent,
                     foregroundColor: AppColors.bg(context),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                   child: _isAdding
-                      ? SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.bg(context)))
-                      : Text(localeProvider.t('add'), style: const TextStyle(fontWeight: FontWeight.w600)),
+                      ? SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: AppColors.bg(context),
+                          ),
+                        )
+                      : Text(
+                          localeProvider.t('add'),
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
                 ),
               ),
             ],
@@ -222,7 +274,14 @@ class _AddFriendViewState extends State<AddFriendView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(localeProvider.t('search_users'), style: TextStyle(color: AppColors.textPrimary(context), fontSize: 15, fontWeight: FontWeight.w600)),
+          Text(
+            localeProvider.t('search_users'),
+            style: TextStyle(
+              color: AppColors.textPrimary(context),
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           const SizedBox(height: 8),
           AnimatedBuilder(
             animation: Listenable.merge([_searchFocus]),
@@ -233,21 +292,34 @@ class _AddFriendViewState extends State<AddFriendView> {
                 decoration: BoxDecoration(
                   color: AppColors.bg(context),
                   borderRadius: BorderRadius.circular(22),
-                  border: isFocused ? Border.all(color: AppColors.accent) : null,
+                  border: isFocused
+                      ? Border.all(color: AppColors.accent)
+                      : null,
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
                   children: [
-                    Icon(LucideIcons.search, size: 18, color: isFocused ? AppColors.accent : AppColors.textHint(context)),
+                    Icon(
+                      LucideIcons.search,
+                      size: 18,
+                      color: isFocused
+                          ? AppColors.accent
+                          : AppColors.textHint(context),
+                    ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: TextField(
                         controller: _searchController,
                         focusNode: _searchFocus,
-                        style: TextStyle(color: AppColors.textPrimary(context), fontSize: 15),
+                        style: TextStyle(
+                          color: AppColors.textPrimary(context),
+                          fontSize: 15,
+                        ),
                         decoration: InputDecoration(
-                          labelText:  localeProvider.t('search_users_hint'),
-                          hintStyle: TextStyle(color: AppColors.textDisabled(context)),
+                          labelText: localeProvider.t('search_users_hint'),
+                          hintStyle: TextStyle(
+                            color: AppColors.textDisabled(context),
+                          ),
                           border: InputBorder.none,
                           focusedBorder: InputBorder.none,
                           enabledBorder: InputBorder.none,
@@ -256,15 +328,21 @@ class _AddFriendViewState extends State<AddFriendView> {
                       ),
                     ),
                     if (_searchController.text.isNotEmpty)
-                      Semantics(label: localeProvider.t('clear_search'), child: GestureDetector(
-
-      behavior: HitTestBehavior.opaque,
-                        onTap: () {
-                          _searchController.clear();
-                          setState(() => _searchResults = []);
-                        },
-                        child: Icon(LucideIcons.x, size: 16, color: AppColors.textHint(context)),
-                      )),
+                      Semantics(
+                        label: localeProvider.t('clear_search'),
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () {
+                            _searchController.clear();
+                            setState(() => _searchResults = []);
+                          },
+                          child: Icon(
+                            LucideIcons.x,
+                            size: 16,
+                            color: AppColors.textHint(context),
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               );
@@ -278,9 +356,17 @@ class _AddFriendViewState extends State<AddFriendView> {
               onPressed: _doSearch,
               style: OutlinedButton.styleFrom(
                 side: BorderSide(color: AppColors.accent),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
-              child: Text(localeProvider.t('search'), style: TextStyle(color: AppColors.accent, fontWeight: FontWeight.w600)),
+              child: Text(
+                localeProvider.t('search'),
+                style: TextStyle(
+                  color: AppColors.accent,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
           ),
         ],
@@ -292,29 +378,64 @@ class _AddFriendViewState extends State<AddFriendView> {
     return [
       Padding(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-        child: Text('${localeProvider.t('search_results')} (${_searchResults.length})', style: TextStyle(color: AppColors.mut(context), fontSize: 12, fontWeight: FontWeight.w600)),
+        child: Text(
+          '${localeProvider.t('search_results')} (${_searchResults.length})',
+          style: TextStyle(
+            color: AppColors.mut(context),
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ),
       ..._searchResults.asMap().entries.map((entry) {
         final index = entry.key;
         final profile = entry.value;
-        final displayName = profile.displayName ?? profile.userId.split(':').first.replaceFirst('@', '');
+        final displayName =
+            profile.displayName ??
+            profile.userId.split(':').first.replaceFirst('@', '');
         final isAddingThis = _isAdding && _addingIndex == index;
         return Container(
           decoration: BoxDecoration(
             color: AppColors.sf(context),
-            border: Border(bottom: BorderSide(color: AppColors.divider(context))),
+            border: Border(
+              bottom: BorderSide(color: AppColors.divider(context)),
+            ),
           ),
           child: ListTile(
             leading: CircleAvatar(
               backgroundColor: AppColors.accBg(context),
-              child: Text(displayName[0].toUpperCase(), style: const TextStyle(color: AppColors.accent, fontWeight: FontWeight.w600)),
+              child: Text(
+                displayName[0].toUpperCase(),
+                style: const TextStyle(
+                  color: AppColors.accent,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
-            title: Text(displayName, style: TextStyle(color: AppColors.textPrimary(context), fontWeight: FontWeight.w500)),
-            subtitle: Text(profile.userId, style: TextStyle(color: AppColors.mut(context), fontSize: 12)),
+            title: Text(
+              displayName,
+              style: TextStyle(
+                color: AppColors.textPrimary(context),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            subtitle: Text(
+              profile.userId,
+              style: TextStyle(color: AppColors.mut(context), fontSize: 12),
+            ),
             trailing: isAddingThis
-                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.accent))
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppColors.accent,
+                    ),
+                  )
                 : Icon(LucideIcons.userPlus, color: AppColors.accent, size: 22),
-            onTap: isAddingThis ? null : () => _startChatWith(profile.userId, index),
+            onTap: isAddingThis
+                ? null
+                : () => _startChatWith(profile.userId, index),
           ),
         );
       }),
@@ -327,11 +448,27 @@ class _AddFriendViewState extends State<AddFriendView> {
       child: Center(
         child: Column(
           children: [
-            Icon(LucideIcons.userX, size: 40, color: AppColors.textDisabled(context)),
+            Icon(
+              LucideIcons.userX,
+              size: 40,
+              color: AppColors.textDisabled(context),
+            ),
             const SizedBox(height: 12),
-            Text(localeProvider.t('no_users_found'), style: TextStyle(color: AppColors.textHint(context), fontWeight: FontWeight.w500)),
+            Text(
+              localeProvider.t('no_users_found'),
+              style: TextStyle(
+                color: AppColors.textHint(context),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
             const SizedBox(height: 4),
-            Text(localeProvider.t('try_different_search'), style: TextStyle(color: AppColors.textDisabled(context), fontSize: 12)),
+            Text(
+              localeProvider.t('try_different_search'),
+              style: TextStyle(
+                color: AppColors.textDisabled(context),
+                fontSize: 12,
+              ),
+            ),
           ],
         ),
       ),

@@ -50,11 +50,13 @@ class _LibraryPanelState extends State<LibraryPanel> {
             children: [
               Expanded(
                 child: GestureDetector(
-
-      behavior: HitTestBehavior.opaque,
+                  behavior: HitTestBehavior.opaque,
                   onTap: widget.onCreateGroupChat,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 10,
+                      horizontal: 14,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.sf(context),
                       borderRadius: BorderRadius.circular(12),
@@ -63,9 +65,20 @@ class _LibraryPanelState extends State<LibraryPanel> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(LucideIcons.users, size: 16, color: AppColors.sec(context)),
+                        Icon(
+                          LucideIcons.users,
+                          size: 16,
+                          color: AppColors.sec(context),
+                        ),
                         const SizedBox(width: 6),
-                        Text(localeProvider.t('new_group'), style: TextStyle(color: AppColors.sec(context), fontSize: 13, fontWeight: FontWeight.w500)),
+                        Text(
+                          localeProvider.t('new_group'),
+                          style: TextStyle(
+                            color: AppColors.sec(context),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -74,11 +87,13 @@ class _LibraryPanelState extends State<LibraryPanel> {
               const SizedBox(width: 8),
               Expanded(
                 child: GestureDetector(
-
-      behavior: HitTestBehavior.opaque,
+                  behavior: HitTestBehavior.opaque,
                   onTap: widget.onAddContact,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 10,
+                      horizontal: 14,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.sf(context),
                       borderRadius: BorderRadius.circular(12),
@@ -87,9 +102,20 @@ class _LibraryPanelState extends State<LibraryPanel> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(LucideIcons.userPlus, size: 16, color: AppColors.sec(context)),
+                        Icon(
+                          LucideIcons.userPlus,
+                          size: 16,
+                          color: AppColors.sec(context),
+                        ),
                         const SizedBox(width: 6),
-                        Text(localeProvider.t('add_contact'), style: TextStyle(color: AppColors.sec(context), fontSize: 13, fontWeight: FontWeight.w500)),
+                        Text(
+                          localeProvider.t('add_contact'),
+                          style: TextStyle(
+                            color: AppColors.sec(context),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -98,13 +124,15 @@ class _LibraryPanelState extends State<LibraryPanel> {
               const SizedBox(width: 8),
               Expanded(
                 child: GestureDetector(
-
-      behavior: HitTestBehavior.opaque,
+                  behavior: HitTestBehavior.opaque,
                   onTap: () {
                     AppNavigator.go(context, '/contacts');
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 10,
+                      horizontal: 14,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.sf(context),
                       borderRadius: BorderRadius.circular(12),
@@ -113,9 +141,20 @@ class _LibraryPanelState extends State<LibraryPanel> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(LucideIcons.contact, size: 16, color: AppColors.sec(context)),
+                        Icon(
+                          LucideIcons.contact,
+                          size: 16,
+                          color: AppColors.sec(context),
+                        ),
                         const SizedBox(width: 6),
-                        Text(localeProvider.t('contacts'), style: TextStyle(color: AppColors.sec(context), fontSize: 13, fontWeight: FontWeight.w500)),
+                        Text(
+                          localeProvider.t('contacts'),
+                          style: TextStyle(
+                            color: AppColors.sec(context),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -135,16 +174,26 @@ class _LibraryPanelState extends State<LibraryPanel> {
                 decoration: BoxDecoration(
                   color: AppColors.sf(context),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: isFocused ? AppColors.accent : AppColors.divider(context)),
+                  border: Border.all(
+                    color: isFocused
+                        ? AppColors.accent
+                        : AppColors.divider(context),
+                  ),
                 ),
                 child: TextField(
                   controller: _searchController,
                   focusNode: _searchFocus,
                   autofocus: true,
-                  style: TextStyle(color: AppColors.textPrimary(context), fontSize: 14),
+                  style: TextStyle(
+                    color: AppColors.textPrimary(context),
+                    fontSize: 14,
+                  ),
                   decoration: InputDecoration(
-                    labelText:  localeProvider.t('search_id'),
-                    hintStyle: TextStyle(color: AppColors.textTertiary(context), fontSize: 14),
+                    labelText: localeProvider.t('search_id'),
+                    hintStyle: TextStyle(
+                      color: AppColors.textTertiary(context),
+                      fontSize: 14,
+                    ),
                     border: InputBorder.none,
                     focusedBorder: InputBorder.none,
                     enabledBorder: InputBorder.none,
@@ -156,9 +205,7 @@ class _LibraryPanelState extends State<LibraryPanel> {
               );
             },
           ),
-        Expanded(
-          child: _buildChatList(),
-        ),
+        Expanded(child: _buildChatList()),
       ],
     );
   }
@@ -170,24 +217,42 @@ class _LibraryPanelState extends State<LibraryPanel> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(LucideIcons.messageCircle, size: 48, color: AppColors.textDisabled(context)),
+            Icon(
+              LucideIcons.messageCircle,
+              size: 48,
+              color: AppColors.textDisabled(context),
+            ),
             const SizedBox(height: 16),
-            Text(localeProvider.t('not_logged_in'), style: TextStyle(color: AppColors.textTertiary(context), fontSize: 15)),
+            Text(
+              localeProvider.t('not_logged_in'),
+              style: TextStyle(
+                color: AppColors.textTertiary(context),
+                fontSize: 15,
+              ),
+            ),
             const SizedBox(height: 8),
             GestureDetector(
-
-      behavior: HitTestBehavior.opaque,
+              behavior: HitTestBehavior.opaque,
               onTap: () async {
                 await AppNavigator.go(context, '/login');
               },
-              child: Text(localeProvider.t('go_login'), style: TextStyle(color: AppColors.accent, fontSize: 15, fontWeight: FontWeight.w500)),
+              child: Text(
+                localeProvider.t('go_login'),
+                style: TextStyle(
+                  color: AppColors.accent,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             ),
           ],
         ),
       );
     }
     var rooms = matrix.rooms;
-    final query = widget.showSearchBar ? _searchController.text.toLowerCase() : '';
+    final query = widget.showSearchBar
+        ? _searchController.text.toLowerCase()
+        : '';
     if (query.isNotEmpty) {
       rooms = rooms.where((r) {
         final name = r.getLocalizedDisplayname().toLowerCase();
@@ -196,29 +261,42 @@ class _LibraryPanelState extends State<LibraryPanel> {
       }).toList();
     }
     if (rooms.isEmpty) {
-      return Center(child: Text(query.isEmpty ? localeProvider.t('no_chats') : localeProvider.t('no_match_chat'), style: TextStyle(color: AppColors.textTertiary(context), fontSize: 15)));
+      return Center(
+        child: Text(
+          query.isEmpty
+              ? localeProvider.t('no_chats')
+              : localeProvider.t('no_match_chat'),
+          style: TextStyle(
+            color: AppColors.textTertiary(context),
+            fontSize: 15,
+          ),
+        ),
+      );
     }
     return RefreshIndicator(
       color: AppColors.accent,
-      onRefresh: () async { setState(() {}); },
-      child: ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      itemCount: rooms.length,
-      itemBuilder: (_, i) {
-        final room = rooms[i];
-        final lastEvent = room.lastEvent;
-        final lastMsg = lastEvent?.body ?? '';
-        final time = lastEvent != null ? formatRelativeTime(lastEvent.originServerTs) : '';
-        final name = room.getLocalizedDisplayname();
-        return _buildChatItem(ChatItemData(room.id, name, lastMsg, time));
+      onRefresh: () async {
+        setState(() {});
       },
-    ),
+      child: ListView.builder(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        itemCount: rooms.length,
+        itemBuilder: (_, i) {
+          final room = rooms[i];
+          final lastEvent = room.lastEvent;
+          final lastMsg = lastEvent?.body ?? '';
+          final time = lastEvent != null
+              ? formatRelativeTime(lastEvent.originServerTs)
+              : '';
+          final name = room.getLocalizedDisplayname();
+          return _buildChatItem(ChatItemData(room.id, name, lastMsg, time));
+        },
+      ),
     );
   }
 
   Widget _buildChatItem(ChatItemData data) {
     return GestureDetector(
-
       behavior: HitTestBehavior.opaque,
       onTap: () {
         final room = widget.provider.matrix.client?.getRoomById(data.id);
@@ -233,29 +311,64 @@ class _LibraryPanelState extends State<LibraryPanel> {
           color: AppColors.sf(context),
           borderRadius: BorderRadius.circular(14),
         ),
-        child: Row(children: [
-          Container(
-            width: 40, height: 40,
-            decoration: BoxDecoration(
-              color: AppColors.accent.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(20),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: AppColors.accent.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Center(
+                child: Text(
+                  data.name.isNotEmpty ? data.name[0].toUpperCase() : '?',
+                  style: TextStyle(
+                    color: AppColors.accent,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
             ),
-            child: Center(child: Text(data.name.isNotEmpty ? data.name[0].toUpperCase() : '?', style: TextStyle(color: AppColors.accent, fontSize: 16, fontWeight: FontWeight.w600))),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(data.name, style: TextStyle(color: AppColors.textPrimary(context), fontSize: 14, fontWeight: FontWeight.w500), maxLines: 1, overflow: TextOverflow.ellipsis),
-                if (data.lastMsg.isNotEmpty)
-                  Text(data.lastMsg, style: TextStyle(color: AppColors.textTertiary(context), fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis),
-              ],
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    data.name,
+                    style: TextStyle(
+                      color: AppColors.textPrimary(context),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (data.lastMsg.isNotEmpty)
+                    Text(
+                      data.lastMsg,
+                      style: TextStyle(
+                        color: AppColors.textTertiary(context),
+                        fontSize: 12,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                ],
+              ),
             ),
-          ),
-          if (data.time.isNotEmpty)
-            Text(data.time, style: TextStyle(color: AppColors.textDisabled(context), fontSize: 11)),
-        ]),
+            if (data.time.isNotEmpty)
+              Text(
+                data.time,
+                style: TextStyle(
+                  color: AppColors.textDisabled(context),
+                  fontSize: 11,
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

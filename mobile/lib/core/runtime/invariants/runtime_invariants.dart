@@ -3,11 +3,7 @@ import '../plugin/plugin_registry.dart';
 import '../event_bus.dart';
 import '../kernel/runtime_clock.dart';
 
-enum InvariantSeverity {
-  critical,
-  important,
-  warning,
-}
+enum InvariantSeverity { critical, important, warning }
 
 class InvariantViolation {
   final String invariantId;
@@ -54,7 +50,8 @@ class TaskTerminalStateInvariant implements RuntimeInvariant {
   @override
   final id = 'INV-TASK-001';
   @override
-  final description = 'Every task must eventually reach one of: completed, failed, or cancelled';
+  final description =
+      'Every task must eventually reach one of: completed, failed, or cancelled';
   @override
   final severity = InvariantSeverity.critical;
 
@@ -64,7 +61,9 @@ class TaskTerminalStateInvariant implements RuntimeInvariant {
     final stuck = <String, TaskState>{};
     for (final entry in states.entries) {
       final state = entry.value;
-      if (state != TaskState.completed && state != TaskState.failed && state != TaskState.cancelled) {
+      if (state != TaskState.completed &&
+          state != TaskState.failed &&
+          state != TaskState.cancelled) {
         stuck[entry.key] = state;
       }
     }
@@ -92,7 +91,8 @@ class SchedulerNoOrphanTasksInvariant implements RuntimeInvariant {
   @override
   InvariantViolation? check(RuntimeInvariantContext ctx) {
     final total = ctx.scheduler.totalTasks;
-    final accounted = ctx.scheduler.pendingCount +
+    final accounted =
+        ctx.scheduler.pendingCount +
         ctx.scheduler.runningCount +
         ctx.scheduler.completedCount +
         ctx.scheduler.failedCount +
@@ -125,7 +125,8 @@ class EventBusNoLeakedSubscriptionsInvariant implements RuntimeInvariant {
     if (subCount > pluginCount * 20 && pluginCount > 0) {
       return InvariantViolation(
         invariantId: id,
-        description: 'Potential subscription leak: $subCount subs for $pluginCount plugins',
+        description:
+            'Potential subscription leak: $subCount subs for $pluginCount plugins',
         severity: InvariantSeverity.warning,
         context: {'subscriptionCount': subCount, 'pluginCount': pluginCount},
         timestamp: ctx.clock.now(),
@@ -149,7 +150,8 @@ class InvariantChecker {
 
   List<InvariantViolation> get violations => List.unmodifiable(_violations);
   int get violationCount => _violations.length;
-  bool get hasCriticalViolations => _violations.any((v) => v.severity == InvariantSeverity.critical);
+  bool get hasCriticalViolations =>
+      _violations.any((v) => v.severity == InvariantSeverity.critical);
 
   List<InvariantViolation> checkAll(RuntimeInvariantContext ctx) {
     final newViolations = <InvariantViolation>[];

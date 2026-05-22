@@ -16,18 +16,38 @@ import 'agent/embedding_service.dart';
 final locator = GetIt.instance;
 
 Future<void> setupLocator() async {
-  locator.registerLazySingleton<SecureStorageService>(() => SecureStorageService.instance);
-  locator.registerLazySingleton<DatabaseService>(() => DatabaseService.instance);
-  locator.registerLazySingleton<ConnectivityService>(() => ConnectivityService.instance);
-  locator.registerLazySingleton<ApiProxyService>(() => ApiProxyService.instance);
+  locator.registerLazySingleton<SecureStorageService>(
+    () => SecureStorageService.instance,
+  );
+  locator.registerLazySingleton<DatabaseService>(
+    () => DatabaseService.instance,
+  );
+  locator.registerLazySingleton<ConnectivityService>(
+    () => ConnectivityService.instance,
+  );
+  locator.registerLazySingleton<ApiProxyService>(
+    () => ApiProxyService.instance,
+  );
   locator.registerLazySingleton<AuthService>(() => AuthService.instance);
-  locator.registerLazySingleton<SupabaseSyncService>(() => SupabaseSyncService.instance);
-  locator.registerLazySingleton<RemoteConfigService>(() => RemoteConfigService.instance);
-  locator.registerLazySingleton<PushNotificationService>(() => PushNotificationService.instance);
-  locator.registerLazySingleton<DeepLinkService>(() => DeepLinkService.instance);
+  locator.registerLazySingleton<SupabaseSyncService>(
+    () => SupabaseSyncService.instance,
+  );
+  locator.registerLazySingleton<RemoteConfigService>(
+    () => RemoteConfigService.instance,
+  );
+  locator.registerLazySingleton<PushNotificationService>(
+    () => PushNotificationService.instance,
+  );
+  locator.registerLazySingleton<DeepLinkService>(
+    () => DeepLinkService.instance,
+  );
   locator.registerLazySingleton<VoiceService>(() => VoiceService.instance);
-  locator.registerLazySingleton<AgentMemoryService>(() => AgentMemoryService.instance);
-  locator.registerLazySingleton<EmbeddingService>(() => EmbeddingService.instance);
+  locator.registerLazySingleton<AgentMemoryService>(
+    () => AgentMemoryService.instance,
+  );
+  locator.registerLazySingleton<EmbeddingService>(
+    () => EmbeddingService.instance,
+  );
 
   AppLogger.instance.info('Service locator initialized');
 }

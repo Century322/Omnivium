@@ -37,13 +37,13 @@ class FailureEvent {
   });
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'type': type.name,
-        'source': sourceNodeId,
-        'detected': detectedAt,
-        'hlc': hlcTime,
-        'ctx': context,
-      };
+    'id': id,
+    'type': type.name,
+    'source': sourceNodeId,
+    'detected': detectedAt,
+    'hlc': hlcTime,
+    'ctx': context,
+  };
 }
 
 class RecoveryDecision {
@@ -111,9 +111,9 @@ class RecoveryManager {
     required String localNodeId,
     required HybridLogicalClock clock,
     required SessionLeaseManager leaseManager,
-  })  : _localNodeId = localNodeId,
-        _clock = clock,
-        _leaseManager = leaseManager;
+  }) : _localNodeId = localNodeId,
+       _clock = clock,
+       _leaseManager = leaseManager;
 
   String get localNodeId => _localNodeId;
   List<FailureEvent> get failureLog => List.unmodifiable(_failureLog);
@@ -121,7 +121,11 @@ class RecoveryManager {
   int get failureCount => _failureLog.length;
   int get recoveryCount => _recoveryLog.length;
 
-  FailureEvent detectFailure(FailureType type, String sourceNodeId, {Map<String, dynamic> context = const {}}) {
+  FailureEvent detectFailure(
+    FailureType type,
+    String sourceNodeId, {
+    Map<String, dynamic> context = const {},
+  }) {
     final now = _clock.tick();
     final event = FailureEvent(
       id: 'fail_${_failureSeq++}',
@@ -309,7 +313,11 @@ class RecoveryManager {
 
   int? lastKnownIncarnation(String nodeId) => _lastKnownIncarnations[nodeId];
 
-  RecoveryResult detectAndRecover(FailureType type, String sourceNodeId, {Map<String, dynamic> context = const {}}) {
+  RecoveryResult detectAndRecover(
+    FailureType type,
+    String sourceNodeId, {
+    Map<String, dynamic> context = const {},
+  }) {
     final failure = detectFailure(type, sourceNodeId, context: context);
     final decision = analyze(failure);
     return execute(decision);

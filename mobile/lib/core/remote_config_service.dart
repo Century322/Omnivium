@@ -19,7 +19,8 @@ class RemoteConfigService {
   Map<String, dynamic> get config => _config;
   Map<String, Map<String, dynamic>> get uiSchemas => _uiSchemas;
 
-  bool get _isCacheStale => _lastFetch == null || DateTime.now().difference(_lastFetch!) > _cacheTtl;
+  bool get _isCacheStale =>
+      _lastFetch == null || DateTime.now().difference(_lastFetch!) > _cacheTtl;
 
   bool getFeatureFlag(String key, {bool defaultValue = false}) {
     final features = _config['features'] as Map<String, dynamic>?;
@@ -45,7 +46,8 @@ class RemoteConfigService {
   int get maxCacheSize => getInt('max_cache_size', defaultValue: 1000);
   int get maxInputLength => getInt('max_input_length', defaultValue: 32000);
   int get maxNotifications => getInt('max_notifications', defaultValue: 100);
-  double get memorySimilarityThreshold => getDouble('memory_similarity_threshold', defaultValue: 0.3);
+  double get memorySimilarityThreshold =>
+      getDouble('memory_similarity_threshold', defaultValue: 0.3);
   int get maxMemoryResults => getInt('max_memory_results', defaultValue: 5);
 
   Map<String, dynamic>? getUISchema(String screenId) {
@@ -65,10 +67,15 @@ class RemoteConfigService {
 
     try {
       final uri = Uri.parse('${proxy.backendUrl}/config');
-      final response = await proxy.secureClient.get(uri, headers: {
-        ...proxy.buildAuthHeaders(),
-        ...proxy.buildDeviceHeaders(),
-      }).timeout(const Duration(seconds: 5));
+      final response = await proxy.secureClient
+          .get(
+            uri,
+            headers: {
+              ...proxy.buildAuthHeaders(),
+              ...proxy.buildDeviceHeaders(),
+            },
+          )
+          .timeout(const Duration(seconds: 5));
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body) as Map<String, dynamic>;
@@ -76,22 +83,41 @@ class RemoteConfigService {
         _lastFetch = DateTime.now();
         await _saveToCache();
       }
-    } catch (e, stackTrace) { AppLogger.instance.error('Operation failed', error: e, stackTrace: stackTrace); }
+    } catch (e, stackTrace) {
+      AppLogger.instance.error(
+        'Operation failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
+    }
 
     try {
       final uri = Uri.parse('${proxy.backendUrl}/ui/schemas');
-      final response = await proxy.secureClient.get(uri, headers: {
-        ...proxy.buildAuthHeaders(),
-        ...proxy.buildDeviceHeaders(),
-      }).timeout(const Duration(seconds: 5));
+      final response = await proxy.secureClient
+          .get(
+            uri,
+            headers: {
+              ...proxy.buildAuthHeaders(),
+              ...proxy.buildDeviceHeaders(),
+            },
+          )
+          .timeout(const Duration(seconds: 5));
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body) as Map<String, dynamic>;
         final schemas = body['schemas'] as Map<String, dynamic>? ?? {};
-        _uiSchemas = schemas.map((k, v) => MapEntry(k, v as Map<String, dynamic>));
+        _uiSchemas = schemas.map(
+          (k, v) => MapEntry(k, v as Map<String, dynamic>),
+        );
         await _saveSchemasToCache();
       }
-    } catch (e, stackTrace) { AppLogger.instance.error('Operation failed', error: e, stackTrace: stackTrace); }
+    } catch (e, stackTrace) {
+      AppLogger.instance.error(
+        'Operation failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
+    }
   }
 
   Future<void> _loadFromCache() async {
@@ -103,9 +129,17 @@ class RemoteConfigService {
         _config = data['config'] as Map<String, dynamic>? ?? {};
         final schemasRaw = data['schemas'] as Map<String, dynamic>?;
         if (schemasRaw != null) {
-          _uiSchemas = schemasRaw.map((k, v) => MapEntry(k, v as Map<String, dynamic>));
+          _uiSchemas = schemasRaw.map(
+            (k, v) => MapEntry(k, v as Map<String, dynamic>),
+          );
         }
-      } catch (e, stackTrace) { AppLogger.instance.error('Operation failed', error: e, stackTrace: stackTrace); }
+      } catch (e, stackTrace) {
+        AppLogger.instance.error(
+          'Operation failed',
+          error: e,
+          stackTrace: stackTrace,
+        );
+      }
     }
 
     final schemaRaw = db.getCache(_uiSchemaKey);
@@ -113,17 +147,26 @@ class RemoteConfigService {
       try {
         final data = jsonDecode(schemaRaw) as Map<String, dynamic>;
         _uiSchemas = data.map((k, v) => MapEntry(k, v as Map<String, dynamic>));
-      } catch (e, stackTrace) { AppLogger.instance.error('Operation failed', error: e, stackTrace: stackTrace); }
+      } catch (e, stackTrace) {
+        AppLogger.instance.error(
+          'Operation failed',
+          error: e,
+          stackTrace: stackTrace,
+        );
+      }
     }
   }
 
   Future<void> _saveToCache() async {
     final db = DatabaseService.instance;
-    await db.putCache(_cacheKey, jsonEncode({
-      'config': _config,
-      'schemas': _uiSchemas,
-      'lastFetch': _lastFetch?.toIso8601String(),
-    }));
+    await db.putCache(
+      _cacheKey,
+      jsonEncode({
+        'config': _config,
+        'schemas': _uiSchemas,
+        'lastFetch': _lastFetch?.toIso8601String(),
+      }),
+    );
   }
 
   Future<void> _saveSchemasToCache() async {

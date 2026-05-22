@@ -15,12 +15,25 @@ class ModelConfig {
   final String name;
   final String provider;
   final String tier;
-  const ModelConfig({required this.id, required this.name, required this.provider, this.tier = 'smart'});
+  const ModelConfig({
+    required this.id,
+    required this.name,
+    required this.provider,
+    this.tier = 'smart',
+  });
 
-  Map<String, dynamic> toJson() => {'id': id, 'name': name, 'provider': provider, 'tier': tier};
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+    'provider': provider,
+    'tier': tier,
+  };
 
   factory ModelConfig.fromJson(Map<String, dynamic> json) => ModelConfig(
-    id: json['id'], name: json['name'], provider: json['provider'] ?? '', tier: json['tier'] ?? 'smart',
+    id: json['id'],
+    name: json['name'],
+    provider: json['provider'] ?? '',
+    tier: json['tier'] ?? 'smart',
   );
 }
 
@@ -36,12 +49,13 @@ class ModelProvider extends ChangeNotifier {
   List<ModelConfig> get models => List.unmodifiable(_models);
   String? _activeModelId;
   String? get activeModelId => _activeModelId;
-  ModelConfig? get activeModel => _models.where((m) => m.id == _activeModelId).firstOrNull;
+  ModelConfig? get activeModel =>
+      _models.where((m) => m.id == _activeModelId).firstOrNull;
 
   AgentOrchestrator get orchestrator => _orchestrator;
 
   ModelProvider({required AgentOrchestrator orchestrator})
-      : _orchestrator = orchestrator;
+    : _orchestrator = orchestrator;
 
   Future<void> loadModels() async {
     await _loadModelsFromBackend();
@@ -73,7 +87,13 @@ class ModelProvider extends ChangeNotifier {
     try {
       final uri = proxy.resolveModelsUrl();
       final response = await proxy.secureClient
-          .get(uri, headers: <String, String>{...proxy.buildAuthHeaders(), ...proxy.buildDeviceHeaders()})
+          .get(
+            uri,
+            headers: <String, String>{
+              ...proxy.buildAuthHeaders(),
+              ...proxy.buildDeviceHeaders(),
+            },
+          )
           .timeout(const Duration(seconds: 5));
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body) as Map<String, dynamic>;
@@ -81,16 +101,24 @@ class ModelProvider extends ChangeNotifier {
         _models.clear();
         for (final item in list) {
           final m = item as Map<String, dynamic>;
-          _models.add(ModelConfig(
-            id: m['id'] as String,
-            name: m['name'] as String,
-            provider: m['provider'] as String,
-            tier: m['tier'] as String? ?? 'smart',
-          ));
+          _models.add(
+            ModelConfig(
+              id: m['id'] as String,
+              name: m['name'] as String,
+              provider: m['provider'] as String,
+              tier: m['tier'] as String? ?? 'smart',
+            ),
+          );
         }
         await _saveModels();
       }
-    } catch (e, stackTrace) { AppLogger.instance.error('Operation failed', error: e, stackTrace: stackTrace); }
+    } catch (e, stackTrace) {
+      AppLogger.instance.error(
+        'Operation failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
+    }
   }
 
   Future<void> _loadModelsFromCache() async {
@@ -103,7 +131,13 @@ class ModelProvider extends ChangeNotifier {
         for (final item in list) {
           _models.add(ModelConfig.fromJson(item as Map<String, dynamic>));
         }
-      } catch (e, stackTrace) { AppLogger.instance.error('Operation failed', error: e, stackTrace: stackTrace); }
+      } catch (e, stackTrace) {
+        AppLogger.instance.error(
+          'Operation failed',
+          error: e,
+          stackTrace: stackTrace,
+        );
+      }
     }
     _activeModelId = prefs.getString(_activeModelKey);
   }
@@ -118,7 +152,13 @@ class ModelProvider extends ChangeNotifier {
       } else {
         await prefs.remove(_activeModelKey);
       }
-    } catch (e, stackTrace) { AppLogger.instance.error('Operation failed', error: e, stackTrace: stackTrace); }
+    } catch (e, stackTrace) {
+      AppLogger.instance.error(
+        'Operation failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
+    }
   }
 
   void switchModel(String id) {
@@ -140,13 +180,22 @@ class ModelProvider extends ChangeNotifier {
   void _registerSkills() {
     final registry = _orchestrator.skillRegistry;
     registry.register(WebSearchSkill());
-    final remoteSkills = RemoteConfigService.instance.getValue<List<dynamic>>('skills');
+    final remoteSkills = RemoteConfigService.instance.getValue<List<dynamic>>(
+      'skills',
+    );
     if (remoteSkills != null) {
       for (final s in remoteSkills) {
         final m = s as Map<String, dynamic>;
         final id = m['id'] as String? ?? '';
         if (id == 'web_search') continue;
-        registry.register(RemoteSkill(id: id, name: m['name'] as String? ?? id, description: m['description'] as String? ?? '', endpoint: m['endpoint'] as String? ?? ''));
+        registry.register(
+          RemoteSkill(
+            id: id,
+            name: m['name'] as String? ?? id,
+            description: m['description'] as String? ?? '',
+            endpoint: m['endpoint'] as String? ?? '',
+          ),
+        );
       }
     }
   }

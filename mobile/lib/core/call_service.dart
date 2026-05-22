@@ -3,14 +3,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:matrix/matrix.dart' as matrix;
 import '../app_logger.dart';
 
-enum CallState {
-  idle,
-  inviting,
-  ringing,
-  connecting,
-  connected,
-  ended,
-}
+enum CallState { idle, inviting, ringing, connecting, connected, ended }
 
 class VoIPCall {
   final String callId;
@@ -37,7 +30,8 @@ class VoIPCall {
 
   MediaStream? get localStream => _localStream;
   MediaStream? get remoteStream => _remoteStream;
-  bool get isActive => state == CallState.connected || state == CallState.connecting;
+  bool get isActive =>
+      state == CallState.connected || state == CallState.connecting;
 
   Future<void> createPeerConnection() async {
     final config = {
@@ -110,7 +104,11 @@ class VoIPCall {
     return answer.sdp;
   }
 
-  Future<void> addIceCandidate(String candidate, String? sdpMid, int? sdpMLineIndex) async {
+  Future<void> addIceCandidate(
+    String candidate,
+    String? sdpMid,
+    int? sdpMLineIndex,
+  ) async {
     final rtcCandidate = RTCIceCandidate(candidate, sdpMid, sdpMLineIndex);
     if (_peerConnection?.remoteDescription != null) {
       await _peerConnection!.addCandidate(rtcCandidate);
@@ -214,16 +212,17 @@ class CallService {
       'call_id': callId,
       'version': 1,
       'lifetime': 60000,
-      'offer': {
-        'type': 'offer',
-        'sdp': offerSdp,
-      },
+      'offer': {'type': 'offer', 'sdp': offerSdp},
     });
 
     AppLogger.instance.info('Outgoing call initiated: $callId');
   }
 
-  void _handleIncomingCall(String callId, String roomId, Map<String, dynamic> content) {
+  void _handleIncomingCall(
+    String callId,
+    String roomId,
+    Map<String, dynamic> content,
+  ) {
     if (_currentCall != null && _currentCall!.isActive) {
       _sendCallEvent(roomId, 'm.call.hangup', {
         'call_id': callId,
@@ -254,7 +253,8 @@ class CallService {
   }
 
   Future<void> answerCall() async {
-    if (_currentCall == null || _currentCall!.state != CallState.ringing) return;
+    if (_currentCall == null || _currentCall!.state != CallState.ringing)
+      return;
 
     final call = _currentCall!;
     final client = _matrixClient;
@@ -278,7 +278,9 @@ class CallService {
       return;
     }
 
-    final offerSdp = (inviteEvent.content['offer'] as Map<String, dynamic>?)?['sdp'] as String?;
+    final offerSdp =
+        (inviteEvent.content['offer'] as Map<String, dynamic>?)?['sdp']
+            as String?;
     if (offerSdp == null) return;
 
     final answerSdp = await call.createAnswer(offerSdp);
@@ -290,10 +292,7 @@ class CallService {
     await _sendCallEvent(call.roomId, 'm.call.answer', {
       'call_id': call.callId,
       'version': 1,
-      'answer': {
-        'type': 'answer',
-        'sdp': answerSdp,
-      },
+      'answer': {'type': 'answer', 'sdp': answerSdp},
     });
 
     _notifyState();
@@ -363,7 +362,11 @@ class CallService {
     _notifyState();
   }
 
-  Future<void> _sendCallEvent(String roomId, String type, Map<String, dynamic> content) async {
+  Future<void> _sendCallEvent(
+    String roomId,
+    String type,
+    Map<String, dynamic> content,
+  ) async {
     final client = _matrixClient;
     if (client == null) return;
 

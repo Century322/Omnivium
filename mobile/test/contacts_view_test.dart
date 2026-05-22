@@ -6,7 +6,9 @@ import 'package:omnivium/presentation/views/contacts_view.dart';
 void main() {
   group('ContactsView', () {
     testWidgets('renders contacts view', (tester) async {
-      await tester.pumpWidget(MaterialApp(home: ContactsView(provider: AppProvider())));
+      await tester.pumpWidget(
+        MaterialApp(home: ContactsView(provider: AppProvider())),
+      );
       expect(find.byType(ContactsView), findsOneWidget);
     });
   });

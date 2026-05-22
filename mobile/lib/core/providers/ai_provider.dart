@@ -20,7 +20,8 @@ class RateLimitException implements Exception {
   final int waitSeconds;
   RateLimitException(this.waitSeconds);
   @override
-  String toString() => 'Rate limit exceeded. Please try again in $waitSeconds seconds.';
+  String toString() =>
+      'Rate limit exceeded. Please try again in $waitSeconds seconds.';
 }
 
 class AIResponse {
@@ -58,14 +59,17 @@ class ChatService {
     final matrix = MatrixService.instance;
     if (matrix.isLoggedIn) {
       final auth = AuthService.instance;
-      auth.refreshSession().then((success) {
-        if (!success) {
-          matrix.logout();
-          _authEventController.add(AuthEvent.tokenExpired);
-        }
-      }).catchError((_) {
-        _authEventController.add(AuthEvent.tokenExpired);
-      });
+      auth
+          .refreshSession()
+          .then((success) {
+            if (!success) {
+              matrix.logout();
+              _authEventController.add(AuthEvent.tokenExpired);
+            }
+          })
+          .catchError((_) {
+            _authEventController.add(AuthEvent.tokenExpired);
+          });
     }
   }
 
@@ -101,7 +105,9 @@ class ChatService {
     request.body = body;
 
     final client = proxy.secureClient;
-    final response = await client.send(request).timeout(const Duration(seconds: 60));
+    final response = await client
+        .send(request)
+        .timeout(const Duration(seconds: 60));
 
     if (response.statusCode == 401) {
       _handleAuthFailure();
@@ -110,7 +116,9 @@ class ChatService {
 
     if (response.statusCode == 429) {
       final retryAfter = response.headers['retry-after'];
-      final waitSeconds = retryAfter != null ? int.tryParse(retryAfter) ?? 30 : 30;
+      final waitSeconds = retryAfter != null
+          ? int.tryParse(retryAfter) ?? 30
+          : 30;
       throw RateLimitException(waitSeconds);
     }
 
@@ -124,15 +132,21 @@ class ChatService {
         .transform(const LineSplitter())
         .where((line) => line.startsWith('data: ') && !line.contains('[DONE]'))
         .map((line) {
-      try {
-        final json = jsonDecode(line.substring(6));
-        final delta = json['choices']?[0]?['delta']?['content'];
-        return delta ?? '';
-      } catch (e, stackTrace) {
-        AppLogger.instance.warning('SSE parse failed', error: e, stackTrace: stackTrace);
-        return '';
-      }
-    }).where((content) => content.isNotEmpty).cast<String>();
+          try {
+            final json = jsonDecode(line.substring(6));
+            final delta = json['choices']?[0]?['delta']?['content'];
+            return delta ?? '';
+          } catch (e, stackTrace) {
+            AppLogger.instance.warning(
+              'SSE parse failed',
+              error: e,
+              stackTrace: stackTrace,
+            );
+            return '';
+          }
+        })
+        .where((content) => content.isNotEmpty)
+        .cast<String>();
   }
 
   Future<AIResponse> chatSync(
@@ -165,7 +179,9 @@ class ChatService {
 
     if (response.statusCode == 429) {
       final retryAfter = response.headers['retry-after'];
-      final waitSeconds = retryAfter != null ? int.tryParse(retryAfter) ?? 30 : 30;
+      final waitSeconds = retryAfter != null
+          ? int.tryParse(retryAfter) ?? 30
+          : 30;
       throw RateLimitException(waitSeconds);
     }
 
@@ -175,12 +191,18 @@ class ChatService {
 
     final json = jsonDecode(response.body) as Map<String, dynamic>;
     final choices = json['choices'] as List?;
-    final content = choices?.firstOrNull?['message']?['content']?.toString() ?? '';
+    final content =
+        choices?.firstOrNull?['message']?['content']?.toString() ?? '';
     return AIResponse(
       content: content,
       model: json['model'] as String? ?? useModel,
-      promptTokens: (json['usage'] as Map<String, dynamic>?)?['prompt_tokens'] as int? ?? 0,
-      completionTokens: (json['usage'] as Map<String, dynamic>?)?['completion_tokens'] as int? ?? 0,
+      promptTokens:
+          (json['usage'] as Map<String, dynamic>?)?['prompt_tokens'] as int? ??
+          0,
+      completionTokens:
+          (json['usage'] as Map<String, dynamic>?)?['completion_tokens']
+              as int? ??
+          0,
     );
   }
 
@@ -210,7 +232,9 @@ class ChatService {
     request.body = agentBody;
 
     final client = proxy.secureClient;
-    final response = await client.send(request).timeout(const Duration(seconds: 120));
+    final response = await client
+        .send(request)
+        .timeout(const Duration(seconds: 120));
 
     if (response.statusCode == 401) {
       _handleAuthFailure();
@@ -219,7 +243,9 @@ class ChatService {
 
     if (response.statusCode == 429) {
       final retryAfter = response.headers['retry-after'];
-      final waitSeconds = retryAfter != null ? int.tryParse(retryAfter) ?? 30 : 30;
+      final waitSeconds = retryAfter != null
+          ? int.tryParse(retryAfter) ?? 30
+          : 30;
       throw RateLimitException(waitSeconds);
     }
 
@@ -228,7 +254,11 @@ class ChatService {
       throw Exception('API error: ${response.statusCode} - $body');
     }
 
-    return AgentStream(response.stream.transform(const Utf8Decoder()).transform(const LineSplitter()));
+    return AgentStream(
+      response.stream
+          .transform(const Utf8Decoder())
+          .transform(const LineSplitter()),
+    );
   }
 }
 
@@ -253,23 +283,28 @@ class _AgentEventTransformer extends StreamTransformerBase<String, AgentEvent> {
   @override
   Stream<AgentEvent> bind(Stream<String> stream) {
     String? currentEvent;
-    return stream.transform(StreamTransformer.fromHandlers(
-      handleData: (line, sink) {
-        if (line.startsWith('event: ')) {
-          currentEvent = line.substring(7).trim();
-        } else if (line.startsWith('data: ')) {
-          final dataStr = line.substring(6).trim();
-          if (dataStr == '[DONE]') return;
-          try {
-            final data = jsonDecode(dataStr) as Map<String, dynamic>;
-            final eventType = currentEvent ?? 'message';
-            currentEvent = null;
-            sink.add(AgentEvent(eventType, data));
-          } catch (e) {
-            AppLogger.instance.warning('SSE: failed to parse event data', error: e);
+    return stream.transform(
+      StreamTransformer.fromHandlers(
+        handleData: (line, sink) {
+          if (line.startsWith('event: ')) {
+            currentEvent = line.substring(7).trim();
+          } else if (line.startsWith('data: ')) {
+            final dataStr = line.substring(6).trim();
+            if (dataStr == '[DONE]') return;
+            try {
+              final data = jsonDecode(dataStr) as Map<String, dynamic>;
+              final eventType = currentEvent ?? 'message';
+              currentEvent = null;
+              sink.add(AgentEvent(eventType, data));
+            } catch (e) {
+              AppLogger.instance.warning(
+                'SSE: failed to parse event data',
+                error: e,
+              );
+            }
           }
-        }
-      },
-    ));
+        },
+      ),
+    );
   }
 }

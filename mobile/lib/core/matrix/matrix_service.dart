@@ -36,10 +36,7 @@ class MatrixService {
     if (kIsWeb) {
       return NativeImplementationsDummy();
     }
-    return NativeImplementationsIsolate(
-      compute,
-      vodozemacInit: initVodozemac,
-    );
+    return NativeImplementationsIsolate(compute, vodozemacInit: initVodozemac);
   }
 
   Future<void> _closeDatabase() async {
@@ -65,7 +62,8 @@ class MatrixService {
     return await _lock.synchronized(() async {
       if (_client != null) {
         final currentHomeserver = _client!.homeserver?.toString();
-        if (currentHomeserver == homeserverUrl || currentHomeserver == '$homeserverUrl/') {
+        if (currentHomeserver == homeserverUrl ||
+            currentHomeserver == '$homeserverUrl/') {
           return _client!;
         }
       }
@@ -82,7 +80,11 @@ class MatrixService {
     });
   }
 
-  Future<void> login(String username, String password, String homeserverUrl) async {
+  Future<void> login(
+    String username,
+    String password,
+    String homeserverUrl,
+  ) async {
     final client = await _createClient(homeserverUrl);
     await client.login(
       LoginType.mLoginPassword,
@@ -96,16 +98,17 @@ class MatrixService {
 
   Future<void> loginWithToken(String token, String homeserverUrl) async {
     final client = await _createClient(homeserverUrl);
-    await client.login(
-      LoginType.mLoginToken,
-      token: token,
-    );
+    await client.login(LoginType.mLoginToken, token: token);
     await _saveCredentials(client);
     client.backgroundSync = true;
     await IdentityBridge.instance.onMatrixLinked(client.userID ?? '');
   }
 
-  Future<void> register(String username, String password, String homeserverUrl) async {
+  Future<void> register(
+    String username,
+    String password,
+    String homeserverUrl,
+  ) async {
     final client = await _createClient(homeserverUrl);
     await client.register(username: username, password: password);
     await _saveCredentials(client);
@@ -152,7 +155,11 @@ class MatrixService {
         client.backgroundSync = true;
         return true;
       } catch (e, stackTrace) {
-        AppLogger.instance.warning('Session restore failed', error: e, stackTrace: stackTrace);
+        AppLogger.instance.warning(
+          'Session restore failed',
+          error: e,
+          stackTrace: stackTrace,
+        );
         await _closeDatabase();
         return false;
       }
@@ -164,7 +171,11 @@ class MatrixService {
     try {
       await _client?.logout();
     } catch (e, stackTrace) {
-      AppLogger.instance.error('Logout failed', error: e, stackTrace: stackTrace);
+      AppLogger.instance.error(
+        'Logout failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
     _client?.dispose();
     _client = null;
@@ -177,10 +188,13 @@ class MatrixService {
   }
 
   Future<void> _saveCredentials(Client client) async {
-    if (client.accessToken != null) await _secure.write(_tokenKey, client.accessToken!);
+    if (client.accessToken != null)
+      await _secure.write(_tokenKey, client.accessToken!);
     if (client.userID != null) await _secure.write(_userIdKey, client.userID!);
-    if (client.homeserver != null) await _secure.write(_homeserverKey, client.homeserver!.toString());
-    if (client.deviceID != null) await _secure.write(_deviceIdKey, client.deviceID!);
+    if (client.homeserver != null)
+      await _secure.write(_homeserverKey, client.homeserver!.toString());
+    if (client.deviceID != null)
+      await _secure.write(_deviceIdKey, client.deviceID!);
     await _secure.write(_deviceNameKey, client.clientName);
   }
 
@@ -188,21 +202,19 @@ class MatrixService {
     final dbPath = await getDatabasesPath();
     final path = '$dbPath/omnivium.db';
     _rawDb = await openDatabase(path);
-    _database = await MatrixSdkDatabase.init(
-      'Omnivium',
-      database: _rawDb!,
-    );
+    _database = await MatrixSdkDatabase.init('Omnivium', database: _rawDb!);
     return _database!;
   }
 
   List<Room> get rooms {
     if (_client == null) return [];
-    return _client!.rooms.where((r) => !r.isSpace).toList()
-      ..sort((a, b) {
-        final aTime = a.lastEvent?.originServerTs ?? DateTime.fromMillisecondsSinceEpoch(0);
-        final bTime = b.lastEvent?.originServerTs ?? DateTime.fromMillisecondsSinceEpoch(0);
-        return bTime.compareTo(aTime);
-      });
+    return _client!.rooms.where((r) => !r.isSpace).toList()..sort((a, b) {
+      final aTime =
+          a.lastEvent?.originServerTs ?? DateTime.fromMillisecondsSinceEpoch(0);
+      final bTime =
+          b.lastEvent?.originServerTs ?? DateTime.fromMillisecondsSinceEpoch(0);
+      return bTime.compareTo(aTime);
+    });
   }
 
   Room? getRoom(String roomId) => _client?.getRoomById(roomId);
@@ -212,7 +224,11 @@ class MatrixService {
     return await _client!.startDirectChat(userId, enableEncryption: true);
   }
 
-  Future<String> createGroupChat(String name, {List<String>? invite, List<String>? userIds}) async {
+  Future<String> createGroupChat(
+    String name, {
+    List<String>? invite,
+    List<String>? userIds,
+  }) async {
     if (_client == null) throw StateError('Not logged in');
     return await _client!.createRoom(
       preset: CreateRoomPreset.privateChat,
@@ -240,7 +256,11 @@ class MatrixService {
       final result = await _client!.searchUserDirectory(query, limit: 20);
       return result.results;
     } catch (e, stackTrace) {
-      AppLogger.instance.warning('Search users failed', error: e, stackTrace: stackTrace);
+      AppLogger.instance.warning(
+        'Search users failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
       return [];
     }
   }
@@ -250,7 +270,11 @@ class MatrixService {
     try {
       return await _client!.getProfileFromUserId(userId);
     } catch (e, stackTrace) {
-      AppLogger.instance.warning('Get user profile failed', error: e, stackTrace: stackTrace);
+      AppLogger.instance.warning(
+        'Get user profile failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
       return null;
     }
   }

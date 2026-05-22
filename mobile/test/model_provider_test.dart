@@ -15,7 +15,12 @@ void main() {
     });
 
     test('creates with tier', () {
-      const config = ModelConfig(id: 'gpt4o-mini', name: 'GPT-4o Mini', provider: 'openai', tier: 'fast');
+      const config = ModelConfig(
+        id: 'gpt4o-mini',
+        name: 'GPT-4o Mini',
+        provider: 'openai',
+        tier: 'fast',
+      );
       expect(config.tier, 'fast');
     });
 
@@ -29,7 +34,12 @@ void main() {
     });
 
     test('fromJson creates correct config', () {
-      final json = {'id': 'test', 'name': 'Test', 'provider': 'claude', 'tier': 'fast'};
+      final json = {
+        'id': 'test',
+        'name': 'Test',
+        'provider': 'claude',
+        'tier': 'fast',
+      };
       final config = ModelConfig.fromJson(json);
       expect(config.id, 'test');
       expect(config.name, 'Test');
@@ -69,7 +79,12 @@ void main() {
     });
 
     test('models list is unmodifiable', () {
-      expect(() => provider.models.add(const ModelConfig(id: 'x', name: 'X', provider: 'openai')), throwsUnsupportedError);
+      expect(
+        () => provider.models.add(
+          const ModelConfig(id: 'x', name: 'X', provider: 'openai'),
+        ),
+        throwsUnsupportedError,
+      );
     });
 
     test('orchestrator getter returns same instance', () {

@@ -6,7 +6,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'permission_service.dart';
 
 enum STTEngine { system, whisper, google }
+
 enum TTSVoice { alloy, echo, fable, onyx, nova, shimmer }
+
 enum VoiceMode { handsFree, pushToTalk, off }
 
 class VoiceService {
@@ -97,12 +99,21 @@ class VoiceService {
 
   Future<void> _loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
-    final sttName = prefs.getString('omnivium_stt_engine') ?? STTEngine.system.name;
-    final ttsName = prefs.getString('omnivium_tts_voice') ?? TTSVoice.alloy.name;
-    final modeName = prefs.getString('omnivium_voice_mode') ?? VoiceMode.handsFree.name;
-    _sttEngine = STTEngine.values.where((e) => e.name == sttName).firstOrNull ?? STTEngine.system;
-    _ttsVoice = TTSVoice.values.where((e) => e.name == ttsName).firstOrNull ?? TTSVoice.alloy;
-    _voiceMode = VoiceMode.values.where((e) => e.name == modeName).firstOrNull ?? VoiceMode.handsFree;
+    final sttName =
+        prefs.getString('omnivium_stt_engine') ?? STTEngine.system.name;
+    final ttsName =
+        prefs.getString('omnivium_tts_voice') ?? TTSVoice.alloy.name;
+    final modeName =
+        prefs.getString('omnivium_voice_mode') ?? VoiceMode.handsFree.name;
+    _sttEngine =
+        STTEngine.values.where((e) => e.name == sttName).firstOrNull ??
+        STTEngine.system;
+    _ttsVoice =
+        TTSVoice.values.where((e) => e.name == ttsName).firstOrNull ??
+        TTSVoice.alloy;
+    _voiceMode =
+        VoiceMode.values.where((e) => e.name == modeName).firstOrNull ??
+        VoiceMode.handsFree;
   }
 
   Future<void> setSTTEngine(STTEngine engine) async {
@@ -112,7 +123,9 @@ class VoiceService {
   }
 
   void setSttEngine(String name) {
-    _sttEngine = STTEngine.values.where((e) => e.name == name).firstOrNull ?? STTEngine.system;
+    _sttEngine =
+        STTEngine.values.where((e) => e.name == name).firstOrNull ??
+        STTEngine.system;
   }
 
   Future<void> setTTSVoice(TTSVoice voice) async {
@@ -128,7 +141,9 @@ class VoiceService {
   }
 
   void setVoiceModeByName(String name) {
-    _voiceMode = VoiceMode.values.where((e) => e.name == name).firstOrNull ?? VoiceMode.handsFree;
+    _voiceMode =
+        VoiceMode.values.where((e) => e.name == name).firstOrNull ??
+        VoiceMode.handsFree;
   }
 
   Future<bool> startListening() async {

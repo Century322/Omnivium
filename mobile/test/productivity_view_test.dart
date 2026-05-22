@@ -6,7 +6,9 @@ import 'package:omnivium/core/note_provider.dart';
 void main() {
   group('ProductivityView', () {
     testWidgets('renders productivity view', (tester) async {
-      await tester.pumpWidget(MaterialApp(home: ProductivityView(provider: NoteProvider())));
+      await tester.pumpWidget(
+        MaterialApp(home: ProductivityView(provider: NoteProvider())),
+      );
       expect(find.byType(ProductivityView), findsOneWidget);
     });
   });

@@ -11,7 +11,10 @@ void main() {
   setUp(() {
     final clock = HybridLogicalClock(nodeId: 'kernel-test');
     final securityManager = SecurityManager();
-    final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
+    final enforcer = RuntimeLawEnforcer(
+      clock: clock,
+      securityManager: securityManager,
+    );
     kernel = CivilizationKernel(nodeId: 'node-A', enforcer: enforcer);
   });
 
@@ -43,8 +46,15 @@ void main() {
     test('kernel with network has network getter', () {
       final clock = HybridLogicalClock(nodeId: 'test');
       final securityManager = SecurityManager();
-      final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
-      final k = CivilizationKernel(nodeId: 'node-A', enforcer: enforcer, enableNetwork: true);
+      final enforcer = RuntimeLawEnforcer(
+        clock: clock,
+        securityManager: securityManager,
+      );
+      final k = CivilizationKernel(
+        nodeId: 'node-A',
+        enforcer: enforcer,
+        enableNetwork: true,
+      );
       expect(k.network, isNotNull);
     });
   });
@@ -101,7 +111,9 @@ void main() {
         'routed': true,
         'traced': true,
       });
-      final result = kernel.syscall(KernelCall.trustQuery, {'entityId': 'sandbox-1'});
+      final result = kernel.syscall(KernelCall.trustQuery, {
+        'entityId': 'sandbox-1',
+      });
       expect(result.success, isTrue);
       expect(result.data.containsKey('score'), isTrue);
       expect(result.data.containsKey('trustLevel'), isTrue);
@@ -131,7 +143,9 @@ void main() {
 
   group('CivilizationKernel — syscall: diplomacySync', () {
     test('sync sends constitution to target', () {
-      final result = kernel.syscall(KernelCall.diplomacySync, {'targetId': 'node-B'});
+      final result = kernel.syscall(KernelCall.diplomacySync, {
+        'targetId': 'node-B',
+      });
       expect(result.success, isTrue);
       expect(result.data['target'], 'node-B');
     });
@@ -259,7 +273,9 @@ void main() {
         'routed': true,
         'traced': true,
       });
-      final result = kernel.syscall(KernelCall.reputationScore, {'entityId': 'sandbox-1'});
+      final result = kernel.syscall(KernelCall.reputationScore, {
+        'entityId': 'sandbox-1',
+      });
       expect(result.success, isTrue);
       expect(result.data.containsKey('localScore'), isTrue);
       expect(result.data.containsKey('federatedScore'), isTrue);
@@ -269,7 +285,9 @@ void main() {
 
   group('CivilizationKernel — syscall: federationJoin', () {
     test('join federation returns accepted', () {
-      final result = kernel.syscall(KernelCall.federationJoin, {'federationId': 'fed-1'});
+      final result = kernel.syscall(KernelCall.federationJoin, {
+        'federationId': 'fed-1',
+      });
       expect(result.success, isTrue);
       expect(result.data['federationId'], 'fed-1');
       expect(result.data['accepted'], isTrue);
@@ -284,7 +302,9 @@ void main() {
         'routed': true,
         'traced': true,
       });
-      final result = kernel.syscall(KernelCall.passportIssue, {'entityId': 'sandbox-1'});
+      final result = kernel.syscall(KernelCall.passportIssue, {
+        'entityId': 'sandbox-1',
+      });
       expect(result.success, isTrue);
       expect(result.data.containsKey('score'), isTrue);
     });
@@ -292,16 +312,27 @@ void main() {
 
   group('CivilizationKernel — syscall: byzantineReport', () {
     test('report without network returns failure', () {
-      final result = kernel.syscall(KernelCall.byzantineReport, {'accusedId': 'node-C'});
+      final result = kernel.syscall(KernelCall.byzantineReport, {
+        'accusedId': 'node-C',
+      });
       expect(result.success, isFalse);
     });
 
     test('report with network returns success', () {
       final clock = HybridLogicalClock(nodeId: 'test');
       final securityManager = SecurityManager();
-      final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
-      final k = CivilizationKernel(nodeId: 'node-A', enforcer: enforcer, enableNetwork: true);
-      final result = k.syscall(KernelCall.byzantineReport, {'accusedId': 'node-C'});
+      final enforcer = RuntimeLawEnforcer(
+        clock: clock,
+        securityManager: securityManager,
+      );
+      final k = CivilizationKernel(
+        nodeId: 'node-A',
+        enforcer: enforcer,
+        enableNetwork: true,
+      );
+      final result = k.syscall(KernelCall.byzantineReport, {
+        'accusedId': 'node-C',
+      });
       expect(result.success, isTrue);
       expect(result.data['reported'], isTrue);
     });
@@ -309,15 +340,24 @@ void main() {
 
   group('CivilizationKernel — syscall: heartbeat', () {
     test('heartbeat without network returns failure', () {
-      final result = kernel.syscall(KernelCall.heartbeat, {'targetId': 'node-B'});
+      final result = kernel.syscall(KernelCall.heartbeat, {
+        'targetId': 'node-B',
+      });
       expect(result.success, isFalse);
     });
 
     test('heartbeat with network returns success', () {
       final clock = HybridLogicalClock(nodeId: 'test');
       final securityManager = SecurityManager();
-      final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
-      final k = CivilizationKernel(nodeId: 'node-A', enforcer: enforcer, enableNetwork: true);
+      final enforcer = RuntimeLawEnforcer(
+        clock: clock,
+        securityManager: securityManager,
+      );
+      final k = CivilizationKernel(
+        nodeId: 'node-A',
+        enforcer: enforcer,
+        enableNetwork: true,
+      );
       final result = k.syscall(KernelCall.heartbeat, {'targetId': 'node-B'});
       expect(result.success, isTrue);
     });
@@ -369,7 +409,9 @@ void main() {
         'amount': 25.0,
       });
 
-      final trust = kernel.syscall(KernelCall.trustQuery, {'entityId': 'sandbox-1'});
+      final trust = kernel.syscall(KernelCall.trustQuery, {
+        'entityId': 'sandbox-1',
+      });
       expect(trust.success, isTrue);
       expect(kernel.ledger.verifyIntegrity(), isTrue);
     });
@@ -384,10 +426,14 @@ void main() {
         });
       }
 
-      final score = kernel.syscall(KernelCall.reputationScore, {'entityId': 'sandbox-2'});
+      final score = kernel.syscall(KernelCall.reputationScore, {
+        'entityId': 'sandbox-2',
+      });
       expect(score.success, isTrue);
 
-      final passport = kernel.syscall(KernelCall.passportIssue, {'entityId': 'sandbox-2'});
+      final passport = kernel.syscall(KernelCall.passportIssue, {
+        'entityId': 'sandbox-2',
+      });
       expect(passport.success, isTrue);
     });
 

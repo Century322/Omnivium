@@ -54,8 +54,10 @@ class AppLockService {
     _hash = await storage.read(_hashKey);
     _salt = await storage.read(_saltKey);
     final typeStr = await storage.read(_typeKey);
-    _type = typeStr == 'pin' ? PasscodeType.pin
-        : typeStr == 'password' ? PasscodeType.password
+    _type = typeStr == 'pin'
+        ? PasscodeType.pin
+        : typeStr == 'password'
+        ? PasscodeType.password
         : PasscodeType.none;
     final autoLockStr = await storage.read(_autoLockKey);
     _autoLockMinutes = int.tryParse(autoLockStr ?? '') ?? 0;
@@ -89,7 +91,10 @@ class AppLockService {
     final storage = SecureStorageService.instance;
     await storage.write(_hashKey, _hash!);
     await storage.write(_saltKey, _salt!);
-    await storage.write(_typeKey, type == PasscodeType.pin ? 'pin' : 'password');
+    await storage.write(
+      _typeKey,
+      type == PasscodeType.pin ? 'pin' : 'password',
+    );
     _failedAttempts = 0;
     await storage.write(_attemptsKey, '0');
     await storage.delete(_lockUntilKey);
@@ -168,7 +173,10 @@ class AppLockService {
 
   void recordUnlock() {
     _lastUnlockTime = DateTime.now();
-    SecureStorageService.instance.write(_lastUnlockKey, _lastUnlockTime!.toIso8601String());
+    SecureStorageService.instance.write(
+      _lastUnlockKey,
+      _lastUnlockTime!.toIso8601String(),
+    );
   }
 }
 

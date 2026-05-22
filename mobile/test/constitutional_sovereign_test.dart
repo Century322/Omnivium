@@ -30,25 +30,33 @@ void main() {
       expect(fork.resolution, LawForkResolution.merge);
     });
 
-    test('version mismatch detects fork — adopt remote when remote has higher epoch', () {
-      final remoteManifest = LawManifest.forNode('node-B', 5);
-      final bumped = remoteManifest.bumpVersion(RuntimeLawId.noBypassCapabilityRouter);
+    test(
+      'version mismatch detects fork — adopt remote when remote has higher epoch',
+      () {
+        final remoteManifest = LawManifest.forNode('node-B', 5);
+        final bumped = remoteManifest.bumpVersion(
+          RuntimeLawId.noBypassCapabilityRouter,
+        );
 
-      final fork = localConsensus.detectFork(bumped);
+        final fork = localConsensus.detectFork(bumped);
 
-      expect(fork.resolution, LawForkResolution.adoptRemote);
-      expect(localConsensus.forks.length, 1);
-    });
+        expect(fork.resolution, LawForkResolution.adoptRemote);
+        expect(localConsensus.forks.length, 1);
+      },
+    );
 
-    test('version mismatch detects fork — conflict when versions differ at same epoch', () {
-      final remoteManifest = LawManifest.forNode('node-B', 0);
-      final bumped = remoteManifest.bumpVersion(RuntimeLawId.noBudgetBypass);
+    test(
+      'version mismatch detects fork — conflict when versions differ at same epoch',
+      () {
+        final remoteManifest = LawManifest.forNode('node-B', 0);
+        final bumped = remoteManifest.bumpVersion(RuntimeLawId.noBudgetBypass);
 
-      final fork = localConsensus.detectFork(bumped);
+        final fork = localConsensus.detectFork(bumped);
 
-      expect(fork.resolution, LawForkResolution.adoptRemote);
-      expect(localConsensus.forks.length, 1);
-    });
+        expect(fork.resolution, LawForkResolution.adoptRemote);
+        expect(localConsensus.forks.length, 1);
+      },
+    );
 
     test('same epoch with different versions = conflict', () {
       final remoteManifest = LawManifest.forNode('node-B', 0);
@@ -73,9 +81,24 @@ void main() {
     });
 
     test('cast and tally votes', () {
-      localConsensus.castVote(voterId: 'node-A', amendmentId: 'amendment-0', support: true, timestamp: 1000);
-      localConsensus.castVote(voterId: 'node-B', amendmentId: 'amendment-0', support: true, timestamp: 1001);
-      localConsensus.castVote(voterId: 'node-C', amendmentId: 'amendment-0', support: false, timestamp: 1002);
+      localConsensus.castVote(
+        voterId: 'node-A',
+        amendmentId: 'amendment-0',
+        support: true,
+        timestamp: 1000,
+      );
+      localConsensus.castVote(
+        voterId: 'node-B',
+        amendmentId: 'amendment-0',
+        support: true,
+        timestamp: 1001,
+      );
+      localConsensus.castVote(
+        voterId: 'node-C',
+        amendmentId: 'amendment-0',
+        support: false,
+        timestamp: 1002,
+      );
 
       final result = localConsensus.tallyVotes('amendment-0', 2000);
 
@@ -87,9 +110,24 @@ void main() {
     });
 
     test('vote fails below threshold', () {
-      localConsensus.castVote(voterId: 'node-A', amendmentId: 'amendment-1', support: true, timestamp: 1000);
-      localConsensus.castVote(voterId: 'node-B', amendmentId: 'amendment-1', support: false, timestamp: 1001);
-      localConsensus.castVote(voterId: 'node-C', amendmentId: 'amendment-1', support: false, timestamp: 1002);
+      localConsensus.castVote(
+        voterId: 'node-A',
+        amendmentId: 'amendment-1',
+        support: true,
+        timestamp: 1000,
+      );
+      localConsensus.castVote(
+        voterId: 'node-B',
+        amendmentId: 'amendment-1',
+        support: false,
+        timestamp: 1001,
+      );
+      localConsensus.castVote(
+        voterId: 'node-C',
+        amendmentId: 'amendment-1',
+        support: false,
+        timestamp: 1002,
+      );
 
       final result = localConsensus.tallyVotes('amendment-1', 2000);
 
@@ -98,10 +136,28 @@ void main() {
     });
 
     test('custom pass threshold', () {
-      final consensus = ConstitutionalConsensus(localNodeId: 'node-A', passThreshold: 0.8);
-      consensus.castVote(voterId: 'node-A', amendmentId: 'amendment-0', support: true, timestamp: 1000);
-      consensus.castVote(voterId: 'node-B', amendmentId: 'amendment-0', support: true, timestamp: 1001);
-      consensus.castVote(voterId: 'node-C', amendmentId: 'amendment-0', support: false, timestamp: 1002);
+      final consensus = ConstitutionalConsensus(
+        localNodeId: 'node-A',
+        passThreshold: 0.8,
+      );
+      consensus.castVote(
+        voterId: 'node-A',
+        amendmentId: 'amendment-0',
+        support: true,
+        timestamp: 1000,
+      );
+      consensus.castVote(
+        voterId: 'node-B',
+        amendmentId: 'amendment-0',
+        support: true,
+        timestamp: 1001,
+      );
+      consensus.castVote(
+        voterId: 'node-C',
+        amendmentId: 'amendment-0',
+        support: false,
+        timestamp: 1002,
+      );
 
       final result = consensus.tallyVotes('amendment-0', 2000);
       expect(result.passed, isFalse);
@@ -109,7 +165,9 @@ void main() {
 
     test('manifest bumpVersion increments specific law', () {
       final manifest = LawManifest.forNode('node-A', 0);
-      final bumped = manifest.bumpVersion(RuntimeLawId.noBypassCapabilityRouter);
+      final bumped = manifest.bumpVersion(
+        RuntimeLawId.noBypassCapabilityRouter,
+      );
 
       expect(bumped.lawVersions[RuntimeLawId.noBypassCapabilityRouter], 2);
       expect(bumped.epoch, 1);
@@ -265,7 +323,8 @@ void main() {
       final proposal = legislature.propose(
         description: 'Add mandatory side-channel proof for all state access',
         targetLaw: RuntimeLawId.noSideChannels,
-        proposedChange: 'Require side-channel proof at every state access checkpoint',
+        proposedChange:
+            'Require side-channel proof at every state access checkpoint',
         rationale: 'Side-channel violations increasing across sandboxes',
         timestamp: 1000,
       );
@@ -315,7 +374,10 @@ void main() {
       final result = legislature.analyzeImpact();
 
       expect(result.stage, LegislativeStage.impactAnalysis);
-      expect(result.impactAnalysis.containsKey('constitutionalHealthScore'), isTrue);
+      expect(
+        result.impactAnalysis.containsKey('constitutionalHealthScore'),
+        isTrue,
+      );
       expect(result.impactAnalysis.containsKey('breakingChange'), isTrue);
     });
 
@@ -353,8 +415,18 @@ void main() {
     });
 
     test('enact after successful vote', () {
-      consensus.castVote(voterId: 'node-A', amendmentId: 'leg-0', support: true, timestamp: 1000);
-      consensus.castVote(voterId: 'node-B', amendmentId: 'leg-0', support: true, timestamp: 1001);
+      consensus.castVote(
+        voterId: 'node-A',
+        amendmentId: 'leg-0',
+        support: true,
+        timestamp: 1000,
+      );
+      consensus.castVote(
+        voterId: 'node-B',
+        amendmentId: 'leg-0',
+        support: true,
+        timestamp: 1001,
+      );
 
       legislature.propose(
         description: 'Test proposal',
@@ -375,8 +447,18 @@ void main() {
     });
 
     test('reject after failed vote', () {
-      consensus.castVote(voterId: 'node-A', amendmentId: 'leg-0', support: false, timestamp: 1000);
-      consensus.castVote(voterId: 'node-B', amendmentId: 'leg-0', support: false, timestamp: 1001);
+      consensus.castVote(
+        voterId: 'node-A',
+        amendmentId: 'leg-0',
+        support: false,
+        timestamp: 1000,
+      );
+      consensus.castVote(
+        voterId: 'node-B',
+        amendmentId: 'leg-0',
+        support: false,
+        timestamp: 1001,
+      );
 
       legislature.propose(
         description: 'Test proposal',
@@ -404,12 +486,26 @@ void main() {
         timestamp: 1000,
       );
 
-      consensus.castVote(voterId: 'node-A', amendmentId: 'leg-0', support: true, timestamp: 1000);
-      consensus.castVote(voterId: 'node-B', amendmentId: 'leg-0', support: true, timestamp: 1001);
+      consensus.castVote(
+        voterId: 'node-A',
+        amendmentId: 'leg-0',
+        support: true,
+        timestamp: 1000,
+      );
+      consensus.castVote(
+        voterId: 'node-B',
+        amendmentId: 'leg-0',
+        support: true,
+        timestamp: 1001,
+      );
 
       final result = legislature.runFullPipeline(2000);
 
-      expect(result.stage == LegislativeStage.enacted || result.stage == LegislativeStage.rejected, isTrue);
+      expect(
+        result.stage == LegislativeStage.enacted ||
+            result.stage == LegislativeStage.rejected,
+        isTrue,
+      );
     });
 
     test('legislative proposal JSON serialization', () {
@@ -432,12 +528,12 @@ void main() {
     test('guard with nodeId exposes consensus and federated reputation', () {
       final clock = HybridLogicalClock(nodeId: 'sovereign-test');
       final securityManager = SecurityManager();
-      final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
-
-      final guard = ConstitutionalGuard(
-        enforcer: enforcer,
-        nodeId: 'node-A',
+      final enforcer = RuntimeLawEnforcer(
+        clock: clock,
+        securityManager: securityManager,
       );
+
+      final guard = ConstitutionalGuard(enforcer: enforcer, nodeId: 'node-A');
 
       expect(guard.consensus, isNotNull);
       expect(guard.federatedReputation, isNotNull);
@@ -447,7 +543,10 @@ void main() {
     test('guard without nodeId has null sovereign components', () {
       final clock = HybridLogicalClock(nodeId: 'basic-test');
       final securityManager = SecurityManager();
-      final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
+      final enforcer = RuntimeLawEnforcer(
+        clock: clock,
+        securityManager: securityManager,
+      );
 
       final guard = ConstitutionalGuard(enforcer: enforcer);
 
@@ -458,12 +557,12 @@ void main() {
     test('enable legislature creates autonomous legislature', () {
       final clock = HybridLogicalClock(nodeId: 'leg-test');
       final securityManager = SecurityManager();
-      final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
-
-      final guard = ConstitutionalGuard(
-        enforcer: enforcer,
-        nodeId: 'node-A',
+      final enforcer = RuntimeLawEnforcer(
+        clock: clock,
+        securityManager: securityManager,
       );
+
+      final guard = ConstitutionalGuard(enforcer: enforcer, nodeId: 'node-A');
 
       final legislature = guard.enableLegislature();
       expect(legislature, isNotNull);
@@ -472,7 +571,10 @@ void main() {
     test('enable legislature without nodeId throws', () {
       final clock = HybridLogicalClock(nodeId: 'no-leg-test');
       final securityManager = SecurityManager();
-      final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
+      final enforcer = RuntimeLawEnforcer(
+        clock: clock,
+        securityManager: securityManager,
+      );
 
       final guard = ConstitutionalGuard(enforcer: enforcer);
 
@@ -520,59 +622,84 @@ void main() {
       expect(trustLevel, TrustLevel.signed);
     });
 
-    test('full sovereign loop: detect loophole → propose → simulate → vote → enact', () {
-      final traceGraph = ConstitutionalTraceGraph();
-      final ledger = ImmutableAuditLedger();
-      final consensus = ConstitutionalConsensus(localNodeId: 'node-A');
-      final reputationEconomy = ReputationEconomy(traceGraph);
-      final judiciary = RuntimeJudiciary(traceGraph, ledger);
-      final legislature = AutonomousLegislature(
-        consensus: consensus,
-        traceGraph: traceGraph,
-        reputationEconomy: reputationEconomy,
-        judiciary: judiciary,
-      );
-
-      for (var i = 0; i < 20; i++) {
-        traceGraph.record(
-          sandboxId: 'sb-$i',
-          operationType: 'capability',
-          violatedLaw: RuntimeLawId.noBypassCapabilityRouter,
-          compliant: false,
-          escalationBefore: EscalationLevel.warning,
-          escalationAfter: EscalationLevel.warning,
-          timestamp: 1000 + i,
+    test(
+      'full sovereign loop: detect loophole → propose → simulate → vote → enact',
+      () {
+        final traceGraph = ConstitutionalTraceGraph();
+        final ledger = ImmutableAuditLedger();
+        final consensus = ConstitutionalConsensus(localNodeId: 'node-A');
+        final reputationEconomy = ReputationEconomy(traceGraph);
+        final judiciary = RuntimeJudiciary(traceGraph, ledger);
+        final legislature = AutonomousLegislature(
+          consensus: consensus,
+          traceGraph: traceGraph,
+          reputationEconomy: reputationEconomy,
+          judiciary: judiciary,
         );
-      }
 
-      consensus.castVote(voterId: 'node-A', amendmentId: 'leg-0', support: true, timestamp: 2000);
-      consensus.castVote(voterId: 'node-B', amendmentId: 'leg-0', support: true, timestamp: 2001);
+        for (var i = 0; i < 20; i++) {
+          traceGraph.record(
+            sandboxId: 'sb-$i',
+            operationType: 'capability',
+            violatedLaw: RuntimeLawId.noBypassCapabilityRouter,
+            compliant: false,
+            escalationBefore: EscalationLevel.warning,
+            escalationAfter: EscalationLevel.warning,
+            timestamp: 1000 + i,
+          );
+        }
 
-      legislature.propose(
-        description: 'Strengthen CapabilityRouter enforcement',
-        targetLaw: RuntimeLawId.noBypassCapabilityRouter,
-        proposedChange: 'Add mandatory route proof at all capability invocation points',
-        rationale: '20 violations detected across multiple sandboxes',
-        timestamp: 3000,
-      );
+        consensus.castVote(
+          voterId: 'node-A',
+          amendmentId: 'leg-0',
+          support: true,
+          timestamp: 2000,
+        );
+        consensus.castVote(
+          voterId: 'node-B',
+          amendmentId: 'leg-0',
+          support: true,
+          timestamp: 2001,
+        );
 
-      legislature.simulate();
-      expect(legislature.proposals[0].simulationResult['currentViolations'], 20);
+        legislature.propose(
+          description: 'Strengthen CapabilityRouter enforcement',
+          targetLaw: RuntimeLawId.noBypassCapabilityRouter,
+          proposedChange:
+              'Add mandatory route proof at all capability invocation points',
+          rationale: '20 violations detected across multiple sandboxes',
+          timestamp: 3000,
+        );
 
-      legislature.analyzeImpact();
-      expect(legislature.proposals[0].impactAnalysis.containsKey('constitutionalHealthScore'), isTrue);
+        legislature.simulate();
+        expect(
+          legislature.proposals[0].simulationResult['currentViolations'],
+          20,
+        );
 
-      legislature.judiciaryCheck();
-      expect(legislature.proposals[0].judiciaryReview['recommendation'], 'proceed');
+        legislature.analyzeImpact();
+        expect(
+          legislature.proposals[0].impactAnalysis.containsKey(
+            'constitutionalHealthScore',
+          ),
+          isTrue,
+        );
 
-      legislature.submitToVote(4000);
+        legislature.judiciaryCheck();
+        expect(
+          legislature.proposals[0].judiciaryReview['recommendation'],
+          'proceed',
+        );
 
-      final result = legislature.enact(5000);
-      expect(result.stage, LegislativeStage.enacted);
-      expect(result.consensusResult!.passed, isTrue);
-      expect(result.consensusResult!.supportVotes, 2);
+        legislature.submitToVote(4000);
 
-      expect(ledger.verifyIntegrity(), isTrue);
-    });
+        final result = legislature.enact(5000);
+        expect(result.stage, LegislativeStage.enacted);
+        expect(result.consensusResult!.passed, isTrue);
+        expect(result.consensusResult!.supportVotes, 2);
+
+        expect(ledger.verifyIntegrity(), isTrue);
+      },
+    );
   });
 }

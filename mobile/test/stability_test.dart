@@ -67,7 +67,12 @@ void main() {
     test('version toString', () {
       expect(SemanticVersion(major: 1, minor: 2, patch: 3).toString(), '1.2.3');
       expect(
-        SemanticVersion(major: 0, minor: 8, patch: 0, preRelease: 'alpha').toString(),
+        SemanticVersion(
+          major: 0,
+          minor: 8,
+          patch: 0,
+          preRelease: 'alpha',
+        ).toString(),
         '0.8.0-alpha',
       );
     });
@@ -101,8 +106,14 @@ void main() {
         replacement: 'new.cap',
       );
 
-      expect(notice.isDeprecatedIn(SemanticVersion(major: 0, minor: 8, patch: 0)), isTrue);
-      expect(notice.isDeprecatedIn(SemanticVersion(major: 0, minor: 6, patch: 0)), isFalse);
+      expect(
+        notice.isDeprecatedIn(SemanticVersion(major: 0, minor: 8, patch: 0)),
+        isTrue,
+      );
+      expect(
+        notice.isDeprecatedIn(SemanticVersion(major: 0, minor: 6, patch: 0)),
+        isFalse,
+      );
     });
 
     test('isRemovedIn checks version', () {
@@ -114,8 +125,14 @@ void main() {
         replacement: 'new.cap',
       );
 
-      expect(notice.isRemovedIn(SemanticVersion(major: 1, minor: 0, patch: 0)), isTrue);
-      expect(notice.isRemovedIn(SemanticVersion(major: 0, minor: 9, patch: 0)), isFalse);
+      expect(
+        notice.isRemovedIn(SemanticVersion(major: 1, minor: 0, patch: 0)),
+        isTrue,
+      );
+      expect(
+        notice.isRemovedIn(SemanticVersion(major: 0, minor: 9, patch: 0)),
+        isFalse,
+      );
     });
   });
 
@@ -128,10 +145,12 @@ void main() {
 
     test('register and query capability version', () {
       final registry = RuntimeVersionRegistry.current();
-      registry.registerCapability(CapabilityVersion(
-        capabilityId: 'storage.read',
-        version: SemanticVersion(major: 1, minor: 0, patch: 0),
-      ));
+      registry.registerCapability(
+        CapabilityVersion(
+          capabilityId: 'storage.read',
+          version: SemanticVersion(major: 1, minor: 0, patch: 0),
+        ),
+      );
 
       final cap = registry.capabilityVersion('storage.read');
       expect(cap, isNotNull);
@@ -140,12 +159,14 @@ void main() {
 
     test('add and query deprecations', () {
       final registry = RuntimeVersionRegistry.current();
-      registry.addDeprecation(const DeprecationNotice(
-        id: 'DEP-001',
-        feature: 'old.cap',
-        deprecatedIn: SemanticVersion(major: 0, minor: 7, patch: 0),
-        replacement: 'new.cap',
-      ));
+      registry.addDeprecation(
+        const DeprecationNotice(
+          id: 'DEP-001',
+          feature: 'old.cap',
+          deprecatedIn: SemanticVersion(major: 0, minor: 7, patch: 0),
+          replacement: 'new.cap',
+        ),
+      );
 
       expect(registry.deprecations.length, 1);
       expect(registry.activeDeprecations().length, 1);
@@ -203,10 +224,12 @@ void main() {
         runtimeVersion: const SemanticVersion(major: 0, minor: 8, patch: 0),
         protocolVersion: const ProtocolVersion(major: 1, minor: 0),
       );
-      regA.registerCapability(CapabilityVersion(
-        capabilityId: 'storage.read',
-        version: SemanticVersion(major: 1, minor: 0, patch: 0),
-      ));
+      regA.registerCapability(
+        CapabilityVersion(
+          capabilityId: 'storage.read',
+          version: SemanticVersion(major: 1, minor: 0, patch: 0),
+        ),
+      );
 
       final regB = RuntimeVersionRegistry(
         runtimeVersion: const SemanticVersion(major: 0, minor: 8, patch: 0),
@@ -220,12 +243,14 @@ void main() {
 
     test('migration steps between versions', () {
       final registry = RuntimeVersionRegistry.current();
-      registry.addMigration(const MigrationStep(
-        fromVersion: '0.7.0',
-        toVersion: '0.8.0',
-        description: 'Add governance layer',
-        actions: ['Initialize PolicyEngine', 'Initialize ResourceController'],
-      ));
+      registry.addMigration(
+        const MigrationStep(
+          fromVersion: '0.7.0',
+          toVersion: '0.8.0',
+          description: 'Add governance layer',
+          actions: ['Initialize PolicyEngine', 'Initialize ResourceController'],
+        ),
+      );
 
       final steps = registry.migrationsBetween(
         SemanticVersion(major: 0, minor: 7, patch: 0),
@@ -243,14 +268,19 @@ void main() {
       manager.setPluginTrustLevel('untrusted-plugin', TrustLevel.untrusted);
 
       expect(manager.pluginTrustLevel('system-plugin'), TrustLevel.system);
-      expect(manager.pluginTrustLevel('untrusted-plugin'), TrustLevel.untrusted);
+      expect(
+        manager.pluginTrustLevel('untrusted-plugin'),
+        TrustLevel.untrusted,
+      );
       expect(manager.pluginTrustLevel('unknown'), TrustLevel.untrusted);
     });
 
     test('plugin allowed based on trust level', () {
-      final manager = SecurityManager(policy: const SecurityPolicy(
-        minimumPluginTrustLevel: TrustLevel.verified,
-      ));
+      final manager = SecurityManager(
+        policy: const SecurityPolicy(
+          minimumPluginTrustLevel: TrustLevel.verified,
+        ),
+      );
 
       manager.setPluginTrustLevel('verified-plugin', TrustLevel.verified);
       manager.setPluginTrustLevel('untrusted-plugin', TrustLevel.untrusted);
@@ -268,59 +298,87 @@ void main() {
 
     test('capability authorization', () {
       final manager = SecurityManager();
-      manager.registerCapabilityAuth(const CapabilityAuth(
-        capabilityId: 'storage.delete',
-        requiredTrustLevel: TrustLevel.system,
-        allowedCallerPatterns: {'system.*'},
-      ));
+      manager.registerCapabilityAuth(
+        const CapabilityAuth(
+          capabilityId: 'storage.delete',
+          requiredTrustLevel: TrustLevel.system,
+          allowedCallerPatterns: {'system.*'},
+        ),
+      );
 
       expect(
-        manager.isCapabilityInvocationAllowed('storage.delete', 'system.main', TrustLevel.system),
+        manager.isCapabilityInvocationAllowed(
+          'storage.delete',
+          'system.main',
+          TrustLevel.system,
+        ),
         isTrue,
       );
       expect(
-        manager.isCapabilityInvocationAllowed('storage.delete', 'agent.main', TrustLevel.verified),
+        manager.isCapabilityInvocationAllowed(
+          'storage.delete',
+          'agent.main',
+          TrustLevel.verified,
+        ),
         isFalse,
       );
     });
 
     test('capability auth with wildcard pattern', () {
       final manager = SecurityManager();
-      manager.registerCapabilityAuth(const CapabilityAuth(
-        capabilityId: 'storage.read',
-        requiredTrustLevel: TrustLevel.verified,
-        allowedCallerPatterns: {'*'},
-      ));
+      manager.registerCapabilityAuth(
+        const CapabilityAuth(
+          capabilityId: 'storage.read',
+          requiredTrustLevel: TrustLevel.verified,
+          allowedCallerPatterns: {'*'},
+        ),
+      );
 
       expect(
-        manager.isCapabilityInvocationAllowed('storage.read', 'any.caller', TrustLevel.verified),
+        manager.isCapabilityInvocationAllowed(
+          'storage.read',
+          'any.caller',
+          TrustLevel.verified,
+        ),
         isTrue,
       );
     });
 
     test('capability auth with prefix pattern', () {
       final manager = SecurityManager();
-      manager.registerCapabilityAuth(const CapabilityAuth(
-        capabilityId: 'storage.read',
-        requiredTrustLevel: TrustLevel.verified,
-        allowedCallerPatterns: {'agent.*'},
-      ));
+      manager.registerCapabilityAuth(
+        const CapabilityAuth(
+          capabilityId: 'storage.read',
+          requiredTrustLevel: TrustLevel.verified,
+          allowedCallerPatterns: {'agent.*'},
+        ),
+      );
 
       expect(
-        manager.isCapabilityInvocationAllowed('storage.read', 'agent.main', TrustLevel.verified),
+        manager.isCapabilityInvocationAllowed(
+          'storage.read',
+          'agent.main',
+          TrustLevel.verified,
+        ),
         isTrue,
       );
       expect(
-        manager.isCapabilityInvocationAllowed('storage.read', 'plugin.main', TrustLevel.verified),
+        manager.isCapabilityInvocationAllowed(
+          'storage.read',
+          'plugin.main',
+          TrustLevel.verified,
+        ),
         isFalse,
       );
     });
 
     test('auth rate limiting', () {
-      final manager = SecurityManager(policy: const SecurityPolicy(
-        maxAuthRetries: 3,
-        authLockoutDuration: Duration(milliseconds: 100),
-      ));
+      final manager = SecurityManager(
+        policy: const SecurityPolicy(
+          maxAuthRetries: 3,
+          authLockoutDuration: Duration(milliseconds: 100),
+        ),
+      );
 
       expect(manager.checkAuthRateLimit('user-1'), isTrue);
       manager.recordAuthFailure('user-1');
@@ -331,7 +389,9 @@ void main() {
     });
 
     test('auth success resets retries', () {
-      final manager = SecurityManager(policy: const SecurityPolicy(maxAuthRetries: 3));
+      final manager = SecurityManager(
+        policy: const SecurityPolicy(maxAuthRetries: 3),
+      );
 
       manager.recordAuthFailure('user-1');
       manager.recordAuthFailure('user-1');
@@ -343,8 +403,17 @@ void main() {
     test('audit logging', () {
       final manager = SecurityManager();
 
-      manager.audit('capability.invoke', 'agent.main', context: {'cap': 'storage.read'});
-      manager.audit('policy.deny', 'agent.main', context: {'rule': 'deny-agent-delete'}, success: false);
+      manager.audit(
+        'capability.invoke',
+        'agent.main',
+        context: {'cap': 'storage.read'},
+      );
+      manager.audit(
+        'policy.deny',
+        'agent.main',
+        context: {'rule': 'deny-agent-delete'},
+        success: false,
+      );
 
       final log = manager.auditLog();
       expect(log.length, 2);
@@ -364,36 +433,63 @@ void main() {
     });
 
     test('remote node trust check', () {
-      final manager = SecurityManager(policy: const SecurityPolicy(
-        minimumRemoteNodeTrustLevel: TrustLevel.verified,
-      ));
+      final manager = SecurityManager(
+        policy: const SecurityPolicy(
+          minimumRemoteNodeTrustLevel: TrustLevel.verified,
+        ),
+      );
 
-      expect(manager.isRemoteNodeAllowed('node-A', TrustLevel.verified), isTrue);
-      expect(manager.isRemoteNodeAllowed('node-B', TrustLevel.untrusted), isFalse);
-      expect(manager.isRemoteNodeAllowed('node-C', TrustLevel.blocked), isFalse);
+      expect(
+        manager.isRemoteNodeAllowed('node-A', TrustLevel.verified),
+        isTrue,
+      );
+      expect(
+        manager.isRemoteNodeAllowed('node-B', TrustLevel.untrusted),
+        isFalse,
+      );
+      expect(
+        manager.isRemoteNodeAllowed('node-C', TrustLevel.blocked),
+        isFalse,
+      );
     });
   });
 
   group('Secret Store', () {
     test('store and retrieve secret', () {
       final store = SecretStore();
-      store.store('api-key', 'secret-value',
-          scope: 'storage', expiresAt: DateTime.now().millisecondsSinceEpoch + 60000);
+      store.store(
+        'api-key',
+        'secret-value',
+        scope: 'storage',
+        expiresAt: DateTime.now().millisecondsSinceEpoch + 60000,
+      );
 
-      final value = store.retrieve('api-key', requesterId: 'plugin-A', trustLevel: TrustLevel.verified);
+      final value = store.retrieve(
+        'api-key',
+        requesterId: 'plugin-A',
+        trustLevel: TrustLevel.verified,
+      );
       expect(value, 'secret-value');
     });
 
     test('retrieve non-existent secret returns null', () {
       final store = SecretStore();
-      final value = store.retrieve('nonexistent', requesterId: 'plugin-A', trustLevel: TrustLevel.verified);
+      final value = store.retrieve(
+        'nonexistent',
+        requesterId: 'plugin-A',
+        trustLevel: TrustLevel.verified,
+      );
       expect(value, isNull);
     });
 
     test('revoke secret', () {
       final store = SecretStore();
-      store.store('api-key', 'secret-value',
-          scope: 'storage', expiresAt: DateTime.now().millisecondsSinceEpoch + 60000);
+      store.store(
+        'api-key',
+        'secret-value',
+        scope: 'storage',
+        expiresAt: DateTime.now().millisecondsSinceEpoch + 60000,
+      );
 
       store.revoke('api-key');
       expect(store.exists('api-key'), isFalse);
@@ -401,10 +497,18 @@ void main() {
 
     test('expired secret returns null', () {
       final store = SecretStore();
-      store.store('api-key', 'secret-value',
-          scope: 'storage', expiresAt: DateTime.now().millisecondsSinceEpoch - 1);
+      store.store(
+        'api-key',
+        'secret-value',
+        scope: 'storage',
+        expiresAt: DateTime.now().millisecondsSinceEpoch - 1,
+      );
 
-      final value = store.retrieve('api-key', requesterId: 'plugin-A', trustLevel: TrustLevel.verified);
+      final value = store.retrieve(
+        'api-key',
+        requesterId: 'plugin-A',
+        trustLevel: TrustLevel.verified,
+      );
       expect(value, isNull);
     });
   });
@@ -524,17 +628,19 @@ void main() {
 
     test('new RFC can be registered', () {
       final registry = RuntimeSpecRegistry();
-      registry.register(const RuntimeRfc(
-        id: 'RFC-009',
-        title: 'Future Extension',
-        status: RfcStatus.proposed,
-        category: RfcCategory.core,
-        author: 'runtime-team',
-        createdAt: 0,
-        summary: 'Future extension placeholder',
-        motivation: 'Placeholder for future RFC',
-        specification: 'TBD',
-      ));
+      registry.register(
+        const RuntimeRfc(
+          id: 'RFC-009',
+          title: 'Future Extension',
+          status: RfcStatus.proposed,
+          category: RfcCategory.core,
+          author: 'runtime-team',
+          createdAt: 0,
+          summary: 'Future extension placeholder',
+          motivation: 'Placeholder for future RFC',
+          specification: 'TBD',
+        ),
+      );
 
       expect(registry.rfcs.length, 9);
       expect(registry.getRfc('RFC-009')!.status, RfcStatus.proposed);

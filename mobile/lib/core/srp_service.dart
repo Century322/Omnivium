@@ -47,7 +47,11 @@ class SrpService {
     return _verifier!;
   }
 
-  Future<void> _registerWithWorker(String username, String verifier, String salt) async {
+  Future<void> _registerWithWorker(
+    String username,
+    String verifier,
+    String salt,
+  ) async {
     try {
       final proxy = ApiProxyService.instance;
       await proxy.secureClient.post(
@@ -68,7 +72,10 @@ class SrpService {
     }
   }
 
-  Future<Map<String, dynamic>?> srpLogin(String username, String password) async {
+  Future<Map<String, dynamic>?> srpLogin(
+    String username,
+    String password,
+  ) async {
     final key = await deriveKey(password, salt: _salt);
     final proof = base64Encode(key);
     final srpId = DateTime.now().millisecondsSinceEpoch.toString();
@@ -128,7 +135,9 @@ class SrpService {
 
   Uint8List _generateSalt() {
     final random = Random.secure();
-    return Uint8List.fromList(List<int>.generate(32, (_) => random.nextInt(256)));
+    return Uint8List.fromList(
+      List<int>.generate(32, (_) => random.nextInt(256)),
+    );
   }
 
   Uint8List _pbkdf2(List<int> password, List<int> salt, int iterations) {

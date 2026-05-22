@@ -23,22 +23,22 @@ class MemoryEntry {
   });
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'content': content,
-        'category': category,
-        'importance': importance,
-        'createdAt': createdAt,
-        'metadata': metadata,
-      };
+    'id': id,
+    'content': content,
+    'category': category,
+    'importance': importance,
+    'createdAt': createdAt,
+    'metadata': metadata,
+  };
 
   factory MemoryEntry.fromJson(Map<String, dynamic> json) => MemoryEntry(
-        id: json['id'] as String,
-        content: json['content'] as String,
-        category: json['category'] as String? ?? 'general',
-        importance: (json['importance'] as num?)?.toDouble() ?? 0.5,
-        createdAt: json['createdAt'] as int,
-        metadata: (json['metadata'] as Map<String, dynamic>?) ?? {},
-      );
+    id: json['id'] as String,
+    content: json['content'] as String,
+    category: json['category'] as String? ?? 'general',
+    importance: (json['importance'] as num?)?.toDouble() ?? 0.5,
+    createdAt: json['createdAt'] as int,
+    metadata: (json['metadata'] as Map<String, dynamic>?) ?? {},
+  );
 }
 
 class MemoryPlugin implements PluginHandler {
@@ -68,17 +68,27 @@ class MemoryPlugin implements PluginHandler {
   }
 
   @override
-  Future<HandlerResult> handleMessage(RuntimeMessage message, CapabilityContext context) async {
+  Future<HandlerResult> handleMessage(
+    RuntimeMessage message,
+    CapabilityContext context,
+  ) async {
     return HandlerResult.ok();
   }
 
   @override
-  Future<HandlerResult> handleEvent(RuntimeEvent event, CapabilityContext context) async {
+  Future<HandlerResult> handleEvent(
+    RuntimeEvent event,
+    CapabilityContext context,
+  ) async {
     return HandlerResult.ok();
   }
 
   @override
-  Future<CapabilityResult> invokeCapability(String capabilityId, dynamic params, CapabilityContext context) async {
+  Future<CapabilityResult> invokeCapability(
+    String capabilityId,
+    dynamic params,
+    CapabilityContext context,
+  ) async {
     if (!_loaded) await loadFromPersistence();
     switch (capabilityId) {
       case 'memory.read':
@@ -91,7 +101,10 @@ class MemoryPlugin implements PluginHandler {
         return _handleEmbed(params);
       default:
         return CapabilityResult.fail(
-          RuntimeError(code: 'UNKNOWN_CAPABILITY', message: 'Unknown capability: $capabilityId'),
+          RuntimeError(
+            code: 'UNKNOWN_CAPABILITY',
+            message: 'Unknown capability: $capabilityId',
+          ),
         );
     }
   }
@@ -109,7 +122,12 @@ class MemoryPlugin implements PluginHandler {
 
   Future<CapabilityResult> _handleWrite(dynamic params) async {
     if (params is! Map) {
-      return CapabilityResult.fail(const RuntimeError(code: 'INVALID_PARAMS', message: 'Expected {content, category?, importance?}'));
+      return CapabilityResult.fail(
+        const RuntimeError(
+          code: 'INVALID_PARAMS',
+          message: 'Expected {content, category?, importance?}',
+        ),
+      );
     }
 
     final id = 'mem_${_idCounter++}';
@@ -134,7 +152,9 @@ class MemoryPlugin implements PluginHandler {
     final category = params is Map ? params['category'] as String? : null;
 
     var results = _memories.values.where((m) {
-      final matchesContent = m.content.toLowerCase().contains(query.toLowerCase());
+      final matchesContent = m.content.toLowerCase().contains(
+        query.toLowerCase(),
+      );
       final matchesCategory = category == null || m.category == category;
       return matchesContent && matchesCategory;
     }).toList();
@@ -158,41 +178,44 @@ class MemoryPlugin implements PluginHandler {
     }
     return CapabilityResult.ok({
       'id': id,
-      'embedding': List.generate(8, (i) => ((entry.content.hashCode >> (i * 4)) & 0xFF) / 255.0),
+      'embedding': List.generate(
+        8,
+        (i) => ((entry.content.hashCode >> (i * 4)) & 0xFF) / 255.0,
+      ),
       'dimensions': 8,
     });
   }
 
   static PluginDescriptor descriptor() => PluginDescriptor(
-        id: 'memory',
-        name: 'Memory Plugin',
-        version: '1.0.0',
-        description: 'AI memory management with read/write/search/embed',
-        capabilities: const [
-          CapabilityDeclaration(
-            id: 'memory.read',
-            name: 'Read',
-            description: 'Read a memory by ID',
-            permission: 'auto',
-          ),
-          CapabilityDeclaration(
-            id: 'memory.write',
-            name: 'Write',
-            description: 'Write a new memory',
-            permission: 'confirm',
-          ),
-          CapabilityDeclaration(
-            id: 'memory.search',
-            name: 'Search',
-            description: 'Search memories by content',
-            permission: 'auto',
-          ),
-          CapabilityDeclaration(
-            id: 'memory.embed',
-            name: 'Embed',
-            description: 'Get embedding for a memory',
-            permission: 'auto',
-          ),
-        ],
-      );
+    id: 'memory',
+    name: 'Memory Plugin',
+    version: '1.0.0',
+    description: 'AI memory management with read/write/search/embed',
+    capabilities: const [
+      CapabilityDeclaration(
+        id: 'memory.read',
+        name: 'Read',
+        description: 'Read a memory by ID',
+        permission: 'auto',
+      ),
+      CapabilityDeclaration(
+        id: 'memory.write',
+        name: 'Write',
+        description: 'Write a new memory',
+        permission: 'confirm',
+      ),
+      CapabilityDeclaration(
+        id: 'memory.search',
+        name: 'Search',
+        description: 'Search memories by content',
+        permission: 'auto',
+      ),
+      CapabilityDeclaration(
+        id: 'memory.embed',
+        name: 'Embed',
+        description: 'Get embedding for a memory',
+        permission: 'auto',
+      ),
+    ],
+  );
 }

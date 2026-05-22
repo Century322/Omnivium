@@ -6,7 +6,9 @@ import 'package:omnivium/core/quick_command_provider.dart';
 void main() {
   group('QuickCommandsView', () {
     testWidgets('renders quick commands', (tester) async {
-      await tester.pumpWidget(MaterialApp(home: QuickCommandsView(provider: QuickCommandProvider())));
+      await tester.pumpWidget(
+        MaterialApp(home: QuickCommandsView(provider: QuickCommandProvider())),
+      );
       expect(find.byType(QuickCommandsView), findsOneWidget);
     });
   });

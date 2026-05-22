@@ -38,17 +38,24 @@ class DiplomacyMessage {
   });
 
   Map<String, dynamic> toJson() => {
-        'type': type.name,
-        'sender': senderId,
-        'target': targetId,
-        'epoch': epoch,
-        'payload': payload,
-        'ts': timestamp,
-        'sig': signature,
-      };
+    'type': type.name,
+    'sender': senderId,
+    'target': targetId,
+    'epoch': epoch,
+    'payload': payload,
+    'ts': timestamp,
+    'sig': signature,
+  };
 
-  static String computeSignature(String senderId, String targetId, int timestamp, Map<String, dynamic> payload) {
-    final input = utf8.encode('$senderId|$targetId|$timestamp|${jsonEncode(payload)}');
+  static String computeSignature(
+    String senderId,
+    String targetId,
+    int timestamp,
+    Map<String, dynamic> payload,
+  ) {
+    final input = utf8.encode(
+      '$senderId|$targetId|$timestamp|${jsonEncode(payload)}',
+    );
     final digest = sha256.convert(input);
     return 'diplo_${digest.toString().substring(0, 32)}';
   }
@@ -78,7 +85,10 @@ class CivilizationTransport {
   final Map<String, DiplomacyChannel> _channels = {};
   int _messageSeq = 0;
 
-  CivilizationTransport({required this.localNodeId, ConstitutionalTraceGraph? traceGraph}) : _traceGraph = traceGraph;
+  CivilizationTransport({
+    required this.localNodeId,
+    ConstitutionalTraceGraph? traceGraph,
+  }) : _traceGraph = traceGraph;
 
   List<DiplomacyMessage> get outbox => List.unmodifiable(_outbox);
   List<DiplomacyMessage> get inbox => List.unmodifiable(_inbox);
@@ -98,7 +108,11 @@ class CivilizationTransport {
     return channel;
   }
 
-  DiplomacyMessage sendConstitutionSync(String targetId, LawManifest manifest, int timestamp) {
+  DiplomacyMessage sendConstitutionSync(
+    String targetId,
+    LawManifest manifest,
+    int timestamp,
+  ) {
     final msg = _createMessage(
       type: DiplomacyMessageType.constitutionSync,
       targetId: targetId,
@@ -113,7 +127,11 @@ class CivilizationTransport {
     return msg;
   }
 
-  DiplomacyMessage sendJudiciaryBroadcast(String targetId, Sanction sanction, int timestamp) {
+  DiplomacyMessage sendJudiciaryBroadcast(
+    String targetId,
+    Sanction sanction,
+    int timestamp,
+  ) {
     final msg = _createMessage(
       type: DiplomacyMessageType.judiciaryBroadcast,
       targetId: targetId,
@@ -128,7 +146,11 @@ class CivilizationTransport {
     return msg;
   }
 
-  DiplomacyMessage sendReputationExchange(String targetId, TrustPassport passport, int timestamp) {
+  DiplomacyMessage sendReputationExchange(
+    String targetId,
+    TrustPassport passport,
+    int timestamp,
+  ) {
     final msg = _createMessage(
       type: DiplomacyMessageType.reputationExchange,
       targetId: targetId,
@@ -143,7 +165,11 @@ class CivilizationTransport {
     return msg;
   }
 
-  DiplomacyMessage sendLegislativeGossip(String targetId, LegislativeProposal proposal, int timestamp) {
+  DiplomacyMessage sendLegislativeGossip(
+    String targetId,
+    LegislativeProposal proposal,
+    int timestamp,
+  ) {
     final msg = _createMessage(
       type: DiplomacyMessageType.legislativeGossip,
       targetId: targetId,
@@ -159,7 +185,12 @@ class CivilizationTransport {
     return msg;
   }
 
-  DiplomacyMessage sendForkNegotiation(String targetId, LawFork fork, String proposedResolution, int timestamp) {
+  DiplomacyMessage sendForkNegotiation(
+    String targetId,
+    LawFork fork,
+    String proposedResolution,
+    int timestamp,
+  ) {
     final msg = _createMessage(
       type: DiplomacyMessageType.forkNegotiation,
       targetId: targetId,
@@ -186,7 +217,11 @@ class CivilizationTransport {
     return msg;
   }
 
-  DiplomacyMessage sendIdentityAnnounce(String targetId, CivilizationIdentity identity, int timestamp) {
+  DiplomacyMessage sendIdentityAnnounce(
+    String targetId,
+    CivilizationIdentity identity,
+    int timestamp,
+  ) {
     final msg = _createMessage(
       type: DiplomacyMessageType.identityAnnounce,
       targetId: targetId,
@@ -203,7 +238,11 @@ class CivilizationTransport {
     return msg;
   }
 
-  DiplomacyMessage sendFederationInvite(String targetId, String federationId, int timestamp) {
+  DiplomacyMessage sendFederationInvite(
+    String targetId,
+    String federationId,
+    int timestamp,
+  ) {
     final msg = _createMessage(
       type: DiplomacyMessageType.federationInvite,
       targetId: targetId,
@@ -214,7 +253,11 @@ class CivilizationTransport {
     return msg;
   }
 
-  DiplomacyMessage sendFederationAccept(String targetId, String federationId, int timestamp) {
+  DiplomacyMessage sendFederationAccept(
+    String targetId,
+    String federationId,
+    int timestamp,
+  ) {
     final msg = _createMessage(
       type: DiplomacyMessageType.federationAccept,
       targetId: targetId,
@@ -244,7 +287,12 @@ class CivilizationTransport {
     required Map<String, dynamic> payload,
     required int timestamp,
   }) {
-    final sig = DiplomacyMessage.computeSignature(localNodeId, targetId, timestamp, payload);
+    final sig = DiplomacyMessage.computeSignature(
+      localNodeId,
+      targetId,
+      timestamp,
+      payload,
+    );
     return DiplomacyMessage(
       type: type,
       senderId: localNodeId,
@@ -279,48 +327,48 @@ class CivilizationIdentity {
   });
 
   Map<String, dynamic> toJson() => {
-        'nodeId': nodeId,
-        'publicKey': publicKey,
-        'epoch': civilizationEpoch,
-        'federation': federationId,
-        'trust': trustLevel.name,
-        'ancestry': constitutionalAncestry,
-        'created': createdAt,
-        'sig': signature,
-      };
+    'nodeId': nodeId,
+    'publicKey': publicKey,
+    'epoch': civilizationEpoch,
+    'federation': federationId,
+    'trust': trustLevel.name,
+    'ancestry': constitutionalAncestry,
+    'created': createdAt,
+    'sig': signature,
+  };
 
   CivilizationIdentity bumpEpoch() => CivilizationIdentity(
-        nodeId: nodeId,
-        publicKey: publicKey,
-        civilizationEpoch: civilizationEpoch + 1,
-        federationId: federationId,
-        trustLevel: trustLevel,
-        constitutionalAncestry: constitutionalAncestry,
-        createdAt: createdAt,
-        signature: signature,
-      );
+    nodeId: nodeId,
+    publicKey: publicKey,
+    civilizationEpoch: civilizationEpoch + 1,
+    federationId: federationId,
+    trustLevel: trustLevel,
+    constitutionalAncestry: constitutionalAncestry,
+    createdAt: createdAt,
+    signature: signature,
+  );
 
   CivilizationIdentity joinFederation(String fedId) => CivilizationIdentity(
-        nodeId: nodeId,
-        publicKey: publicKey,
-        civilizationEpoch: civilizationEpoch,
-        federationId: fedId,
-        trustLevel: trustLevel,
-        constitutionalAncestry: constitutionalAncestry,
-        createdAt: createdAt,
-        signature: signature,
-      );
+    nodeId: nodeId,
+    publicKey: publicKey,
+    civilizationEpoch: civilizationEpoch,
+    federationId: fedId,
+    trustLevel: trustLevel,
+    constitutionalAncestry: constitutionalAncestry,
+    createdAt: createdAt,
+    signature: signature,
+  );
 
   CivilizationIdentity updateTrust(TrustLevel newLevel) => CivilizationIdentity(
-        nodeId: nodeId,
-        publicKey: publicKey,
-        civilizationEpoch: civilizationEpoch,
-        federationId: federationId,
-        trustLevel: newLevel,
-        constitutionalAncestry: constitutionalAncestry,
-        createdAt: createdAt,
-        signature: signature,
-      );
+    nodeId: nodeId,
+    publicKey: publicKey,
+    civilizationEpoch: civilizationEpoch,
+    federationId: federationId,
+    trustLevel: newLevel,
+    constitutionalAncestry: constitutionalAncestry,
+    createdAt: createdAt,
+    signature: signature,
+  );
 
   static CivilizationIdentity generate(String nodeId, {String? federationId}) {
     final createdAt = DateTime.now().millisecondsSinceEpoch;
@@ -339,7 +387,11 @@ class CivilizationIdentity {
   }
 
   static bool verify(CivilizationIdentity identity) {
-    final expectedSig = _computeSignature(identity.nodeId, identity.publicKey, identity.createdAt);
+    final expectedSig = _computeSignature(
+      identity.nodeId,
+      identity.publicKey,
+      identity.createdAt,
+    );
     return identity.signature == expectedSig;
   }
 
@@ -349,7 +401,11 @@ class CivilizationIdentity {
     return 'pk_${digest.toString().substring(0, 32)}';
   }
 
-  static String _computeSignature(String nodeId, String publicKey, int createdAt) {
+  static String _computeSignature(
+    String nodeId,
+    String publicKey,
+    int createdAt,
+  ) {
     final input = utf8.encode('$nodeId|$publicKey|$createdAt');
     final digest = sha256.convert(input);
     return 'id_${digest.toString().substring(0, 32)}';
@@ -370,8 +426,7 @@ class TrustGraph {
     _edges[from]?.remove(to);
   }
 
-  bool trusts(String from, String to) =>
-      _edges[from]?.contains(to) ?? false;
+  bool trusts(String from, String to) => _edges[from]?.contains(to) ?? false;
 
   Set<String> trustedBy(String nodeId) {
     final result = <String>{};
@@ -434,27 +489,26 @@ class FederationMembership {
         memberTrustLevels: {...memberTrustLevels, nodeId: trustLevel},
       );
 
-  FederationMembership removeMember(String nodeId) =>
-      FederationMembership(
-        federationId: federationId,
-        members: members.where((m) => m != nodeId).toList(),
-        founder: founder,
-        createdAt: createdAt,
-        memberTrustLevels: Map.fromEntries(
-          memberTrustLevels.entries.where((e) => e.key != nodeId),
-        ),
-      );
+  FederationMembership removeMember(String nodeId) => FederationMembership(
+    federationId: federationId,
+    members: members.where((m) => m != nodeId).toList(),
+    founder: founder,
+    createdAt: createdAt,
+    memberTrustLevels: Map.fromEntries(
+      memberTrustLevels.entries.where((e) => e.key != nodeId),
+    ),
+  );
 
   bool isMember(String nodeId) => members.contains(nodeId);
   int get size => members.length;
 
   Map<String, dynamic> toJson() => {
-        'id': federationId,
-        'members': members,
-        'founder': founder,
-        'created': createdAt,
-        'trustLevels': memberTrustLevels.map((k, v) => MapEntry(k, v.name)),
-      };
+    'id': federationId,
+    'members': members,
+    'founder': founder,
+    'created': createdAt,
+    'trustLevels': memberTrustLevels.map((k, v) => MapEntry(k, v.name)),
+  };
 
   static FederationMembership create(String federationId, String founder) =>
       FederationMembership(
@@ -489,24 +543,23 @@ class ExecutionCredits {
     double? spentTotal,
     double? taxPaid,
     int? lastUpdated,
-  }) =>
-      ExecutionCredits(
-        entityId: entityId,
-        balance: balance ?? this.balance,
-        earnedTotal: earnedTotal ?? this.earnedTotal,
-        spentTotal: spentTotal ?? this.spentTotal,
-        taxPaid: taxPaid ?? this.taxPaid,
-        lastUpdated: lastUpdated ?? this.lastUpdated,
-      );
+  }) => ExecutionCredits(
+    entityId: entityId,
+    balance: balance ?? this.balance,
+    earnedTotal: earnedTotal ?? this.earnedTotal,
+    spentTotal: spentTotal ?? this.spentTotal,
+    taxPaid: taxPaid ?? this.taxPaid,
+    lastUpdated: lastUpdated ?? this.lastUpdated,
+  );
 
   Map<String, dynamic> toJson() => {
-        'entity': entityId,
-        'balance': balance.toStringAsFixed(2),
-        'earned': earnedTotal.toStringAsFixed(2),
-        'spent': spentTotal.toStringAsFixed(2),
-        'tax': taxPaid.toStringAsFixed(2),
-        'updated': lastUpdated,
-      };
+    'entity': entityId,
+    'balance': balance.toStringAsFixed(2),
+    'earned': earnedTotal.toStringAsFixed(2),
+    'spent': spentTotal.toStringAsFixed(2),
+    'tax': taxPaid.toStringAsFixed(2),
+    'updated': lastUpdated,
+  };
 }
 
 class FederationTreasury {
@@ -515,16 +568,15 @@ class FederationTreasury {
   final Map<String, double> _taxCollected;
   final List<Map<String, dynamic>> _transactions;
 
-  FederationTreasury({
-    required this.federationId,
-    double initialBalance = 0,
-  })  : _balance = initialBalance,
-        _taxCollected = {},
-        _transactions = [];
+  FederationTreasury({required this.federationId, double initialBalance = 0})
+    : _balance = initialBalance,
+      _taxCollected = {},
+      _transactions = [];
 
   double get balance => _balance;
   Map<String, double> get taxCollected => Map.unmodifiable(_taxCollected);
-  List<Map<String, dynamic>> get transactions => List.unmodifiable(_transactions);
+  List<Map<String, dynamic>> get transactions =>
+      List.unmodifiable(_transactions);
 
   double collectTax(String entityId, double amount, int timestamp) {
     _balance += amount;
@@ -538,7 +590,12 @@ class FederationTreasury {
     return _balance;
   }
 
-  double distribute(String entityId, double amount, String reason, int timestamp) {
+  double distribute(
+    String entityId,
+    double amount,
+    String reason,
+    int timestamp,
+  ) {
     if (amount > _balance) return _balance;
     _balance -= amount;
     _transactions.add({
@@ -551,7 +608,12 @@ class FederationTreasury {
     return _balance;
   }
 
-  double imposePenalty(String entityId, double amount, String reason, int timestamp) {
+  double imposePenalty(
+    String entityId,
+    double amount,
+    String reason,
+    int timestamp,
+  ) {
     _balance += amount;
     _transactions.add({
       'type': 'penalty',
@@ -576,17 +638,18 @@ class ResourceEconomy {
     double executionCreditRate = 1.0,
     String federationId = 'default',
     ImmutableAuditLedger? ledger,
-  })  : _taxRate = taxRate,
-        _executionCreditRate = executionCreditRate,
-        _treasury = FederationTreasury(federationId: federationId),
-        _ledger = ledger;
+  }) : _taxRate = taxRate,
+       _executionCreditRate = executionCreditRate,
+       _treasury = FederationTreasury(federationId: federationId),
+       _ledger = ledger;
 
   double get taxRate => _taxRate;
   FederationTreasury get treasury => _treasury;
   Map<String, ExecutionCredits> get accounts => Map.unmodifiable(_accounts);
 
   ExecutionCredits accountFor(String entityId) =>
-      _accounts[entityId] ?? ExecutionCredits(
+      _accounts[entityId] ??
+      ExecutionCredits(
         entityId: entityId,
         balance: 100.0,
         earnedTotal: 100.0,
@@ -636,12 +699,23 @@ class ResourceEconomy {
     return accountFor(entityId).balance >= cost;
   }
 
-  ExecutionCredits? chargeExecution(String entityId, int tokens, int tasks, int streams, int timestamp) {
+  ExecutionCredits? chargeExecution(
+    String entityId,
+    int tokens,
+    int tasks,
+    int streams,
+    int timestamp,
+  ) {
     final cost = executionCost(tokens, tasks, streams);
     return spend(entityId, cost, timestamp);
   }
 
-  void imposePenalty(String entityId, double amount, String reason, int timestamp) {
+  void imposePenalty(
+    String entityId,
+    double amount,
+    String reason,
+    int timestamp,
+  ) {
     final current = accountFor(entityId);
     _treasury.imposePenalty(entityId, amount, reason, timestamp);
 

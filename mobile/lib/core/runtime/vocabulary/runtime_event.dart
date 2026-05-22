@@ -1,24 +1,11 @@
 import 'runtime_metadata.dart';
 import 'runtime_route.dart';
 
-enum EventPhase {
-  before,
-  during,
-  after,
-}
+enum EventPhase { before, during, after }
 
-enum EventPermission {
-  observe,
-  intercept,
-  mutate,
-}
+enum EventPermission { observe, intercept, mutate }
 
-enum PropagationScope {
-  local,
-  session,
-  node,
-  cluster,
-}
+enum PropagationScope { local, session, node, cluster }
 
 class RuntimeEvent {
   final String id;
@@ -56,17 +43,16 @@ class RuntimeEvent {
     EventPermission? permission,
     PropagationScope? scope,
     int? timestamp,
-  }) =>
-      RuntimeEvent(
-        id: id ?? this.id,
-        version: version ?? this.version,
-        type: type ?? this.type,
-        source: source ?? this.source,
-        phase: phase ?? this.phase,
-        payload: payload ?? this.payload,
-        metadata: metadata ?? this.metadata,
-        permission: permission ?? this.permission,
-        scope: scope ?? this.scope,
-        timestamp: timestamp ?? this.timestamp,
-      );
+  }) => RuntimeEvent(
+    id: id ?? this.id,
+    version: version ?? this.version,
+    type: type ?? this.type,
+    source: source ?? this.source,
+    phase: phase ?? this.phase,
+    payload: payload ?? this.payload,
+    metadata: metadata ?? this.metadata,
+    permission: permission ?? this.permission,
+    scope: scope ?? this.scope,
+    timestamp: timestamp ?? this.timestamp,
+  );
 }

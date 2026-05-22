@@ -35,8 +35,12 @@ class _VoiceRecorderButtonState extends State<VoiceRecorderButton> {
     try {
       if (!await _recorder.hasPermission()) return;
       final dir = await getTemporaryDirectory();
-      _recordPath = '${dir.path}/voice_${DateTime.now().millisecondsSinceEpoch}.m4a';
-      await _recorder.start(const RecordConfig(encoder: AudioEncoder.aacLc), path: _recordPath!);
+      _recordPath =
+          '${dir.path}/voice_${DateTime.now().millisecondsSinceEpoch}.m4a';
+      await _recorder.start(
+        const RecordConfig(encoder: AudioEncoder.aacLc),
+        path: _recordPath!,
+      );
       setState(() {
         _isRecording = true;
         _duration = Duration.zero;
@@ -44,7 +48,13 @@ class _VoiceRecorderButtonState extends State<VoiceRecorderButton> {
       _timer = Timer.periodic(const Duration(seconds: 1), (_) {
         if (mounted) setState(() => _duration += const Duration(seconds: 1));
       });
-    } catch (e, stackTrace) { AppLogger.instance.error('Operation failed', error: e, stackTrace: stackTrace); }
+    } catch (e, stackTrace) {
+      AppLogger.instance.error(
+        'Operation failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
+    }
   }
 
   Future<void> _stopRecording(bool send) async {
@@ -56,7 +66,13 @@ class _VoiceRecorderButtonState extends State<VoiceRecorderButton> {
       } else if (path != null) {
         File(path).deleteSync();
       }
-    } catch (e, stackTrace) { AppLogger.instance.error('Operation failed', error: e, stackTrace: stackTrace); }
+    } catch (e, stackTrace) {
+      AppLogger.instance.error(
+        'Operation failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
+    }
     if (mounted) {
       setState(() {
         _isRecording = false;
@@ -85,55 +101,87 @@ class _VoiceRecorderButtonState extends State<VoiceRecorderButton> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Semantics(label: localeProvider.t('cancel_recording'), child: GestureDetector(
-
-      behavior: HitTestBehavior.opaque,
-              onTap: () => _stopRecording(false),
-              child: Container(
-                width: 32, height: 32,
-                decoration: BoxDecoration(
-                  color: AppColors.dng(context).withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(16),
+            Semantics(
+              label: localeProvider.t('cancel_recording'),
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () => _stopRecording(false),
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: AppColors.dng(context).withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Icon(
+                    LucideIcons.x,
+                    size: 16,
+                    color: AppColors.dng(context),
+                  ),
                 ),
-                child: Icon(LucideIcons.x, size: 16, color: AppColors.dng(context)),
               ),
-            )),
+            ),
             const SizedBox(width: 10),
-            Container(width: 8, height: 8, decoration: BoxDecoration(color: AppColors.dng(context), borderRadius: BorderRadius.circular(4))),
+            Container(
+              width: 8,
+              height: 8,
+              decoration: BoxDecoration(
+                color: AppColors.dng(context),
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
             const SizedBox(width: 8),
-            Text(_formatDuration(_duration), style: TextStyle(color: AppColors.textPrimary(context), fontSize: 14, fontWeight: FontWeight.w600, fontFeatures: [FontFeature.tabularFigures()])),
-            const SizedBox(width: 10),
-            Semantics(label: localeProvider.t('send_recording'), child: GestureDetector(
-
-      behavior: HitTestBehavior.opaque,
-              onTap: () => _stopRecording(true),
-              child: Container(
-                width: 32, height: 32,
-                decoration: BoxDecoration(
-                  color: AppColors.accent,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Icon(LucideIcons.send, size: 14, color: AppColors.textPrimary(context)),
+            Text(
+              _formatDuration(_duration),
+              style: TextStyle(
+                color: AppColors.textPrimary(context),
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                fontFeatures: [FontFeature.tabularFigures()],
               ),
-            )),
+            ),
+            const SizedBox(width: 10),
+            Semantics(
+              label: localeProvider.t('send_recording'),
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () => _stopRecording(true),
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: AppColors.accent,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Icon(
+                    LucideIcons.send,
+                    size: 14,
+                    color: AppColors.textPrimary(context),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       );
     }
 
-    return Semantics(label: localeProvider.t('voice_message_record'), child: GestureDetector(
-
-      behavior: HitTestBehavior.opaque,
-      onLongPress: _startRecording,
-      child: Container(
-        width: 36, height: 36,
-        decoration: BoxDecoration(
-          color: AppColors.sfAlt(context),
-          borderRadius: BorderRadius.circular(18),
+    return Semantics(
+      label: localeProvider.t('voice_message_record'),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onLongPress: _startRecording,
+        child: Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: AppColors.sfAlt(context),
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: Icon(LucideIcons.mic, size: 18, color: AppColors.sec(context)),
         ),
-        child: Icon(LucideIcons.mic, size: 18, color: AppColors.sec(context)),
       ),
-    ));
+    );
   }
 }
 
@@ -156,10 +204,33 @@ class _VoiceMessagePlayerState extends State<VoiceMessagePlayer> {
   @override
   void initState() {
     super.initState();
-    _subs.add(_player.onDurationChanged.listen((d) { if (mounted) setState(() => _duration = d); }));
-    _subs.add(_player.onPositionChanged.listen((p) { if (mounted) setState(() => _position = p); }));
-    _subs.add(_player.onPlayerStateChanged.listen((s) { if (mounted) setState(() { _isPlaying = s == PlayerState.playing; }); }));
-    _subs.add(_player.onPlayerComplete.listen((_) { if (mounted) setState(() { _position = Duration.zero; _isPlaying = false; }); }));
+    _subs.add(
+      _player.onDurationChanged.listen((d) {
+        if (mounted) setState(() => _duration = d);
+      }),
+    );
+    _subs.add(
+      _player.onPositionChanged.listen((p) {
+        if (mounted) setState(() => _position = p);
+      }),
+    );
+    _subs.add(
+      _player.onPlayerStateChanged.listen((s) {
+        if (mounted)
+          setState(() {
+            _isPlaying = s == PlayerState.playing;
+          });
+      }),
+    );
+    _subs.add(
+      _player.onPlayerComplete.listen((_) {
+        if (mounted)
+          setState(() {
+            _position = Duration.zero;
+            _isPlaying = false;
+          });
+      }),
+    );
   }
 
   @override
@@ -191,8 +262,12 @@ class _VoiceMessagePlayerState extends State<VoiceMessagePlayer> {
 
   @override
   Widget build(BuildContext context) {
-    final progress = _duration.inMilliseconds > 0 ? _position.inMilliseconds / _duration.inMilliseconds : 0.0;
-    final bgColor = widget.isMe ? AppColors.accent.withValues(alpha: 0.15) : AppColors.sfAlt(context);
+    final progress = _duration.inMilliseconds > 0
+        ? _position.inMilliseconds / _duration.inMilliseconds
+        : 0.0;
+    final bgColor = widget.isMe
+        ? AppColors.accent.withValues(alpha: 0.15)
+        : AppColors.sfAlt(context);
     final iconColor = widget.isMe ? AppColors.accent : AppColors.sec(context);
 
     return Container(
@@ -204,22 +279,26 @@ class _VoiceMessagePlayerState extends State<VoiceMessagePlayer> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Semantics(label: _isPlaying ? 'Pause voice message' : 'Play voice message', child: GestureDetector(
-
-      behavior: HitTestBehavior.opaque,
-            onTap: _togglePlay,
-            child: Container(
-              width: 32, height: 32,
-              decoration: BoxDecoration(
-                color: iconColor,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Icon(
-                _isPlaying ? LucideIcons.pause : LucideIcons.play,
-                size: 16, color: AppColors.textPrimary(context),
+          Semantics(
+            label: _isPlaying ? 'Pause voice message' : 'Play voice message',
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: _togglePlay,
+              child: Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: iconColor,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Icon(
+                  _isPlaying ? LucideIcons.pause : LucideIcons.play,
+                  size: 16,
+                  color: AppColors.textPrimary(context),
+                ),
               ),
             ),
-          )),
+          ),
           const SizedBox(width: 8),
           SizedBox(
             width: 100,
@@ -234,8 +313,16 @@ class _VoiceMessagePlayerState extends State<VoiceMessagePlayer> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  _formatDuration(_isPlaying || _position > Duration.zero ? _position : _duration),
-                  style: TextStyle(color: AppColors.textTertiary(context), fontSize: 11, fontFeatures: [FontFeature.tabularFigures()]),
+                  _formatDuration(
+                    _isPlaying || _position > Duration.zero
+                        ? _position
+                        : _duration,
+                  ),
+                  style: TextStyle(
+                    color: AppColors.textTertiary(context),
+                    fontSize: 11,
+                    fontFeatures: [FontFeature.tabularFigures()],
+                  ),
                 ),
               ],
             ),

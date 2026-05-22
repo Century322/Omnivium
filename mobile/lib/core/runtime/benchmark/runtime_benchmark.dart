@@ -30,7 +30,8 @@ class BenchmarkResult {
   });
 
   @override
-  String toString() => '$name: ${opsPerSec.toStringAsFixed(1)} ops/s (avg=${avgMs.toStringAsFixed(2)}ms, min=${minMs.toStringAsFixed(2)}ms, max=${maxMs.toStringAsFixed(2)}ms)';
+  String toString() =>
+      '$name: ${opsPerSec.toStringAsFixed(1)} ops/s (avg=${avgMs.toStringAsFixed(2)}ms, min=${minMs.toStringAsFixed(2)}ms, max=${maxMs.toStringAsFixed(2)}ms)';
 }
 
 class RuntimeBenchmark {
@@ -48,7 +49,9 @@ class RuntimeBenchmark {
     return results;
   }
 
-  Future<BenchmarkResult> benchmarkTaskThroughput({int iterations = 1000}) async {
+  Future<BenchmarkResult> benchmarkTaskThroughput({
+    int iterations = 1000,
+  }) async {
     final clock = _container.clock;
     final latencies = <int>[];
 
@@ -79,16 +82,13 @@ class RuntimeBenchmark {
     final completer = Completer<void>();
     var received = 0;
 
-    _container.eventBus.subscribe(
-      'bench.event',
-      (event) async {
-        latencies.add(clock.now() - event.timestamp);
-        received++;
-        if (received >= iterations && !completer.isCompleted) {
-          completer.complete();
-        }
-      },
-    );
+    _container.eventBus.subscribe('bench.event', (event) async {
+      latencies.add(clock.now() - event.timestamp);
+      received++;
+      if (received >= iterations && !completer.isCompleted) {
+        completer.complete();
+      }
+    });
 
     for (var i = 0; i < iterations; i++) {
       _container.eventBus.publish(
@@ -103,7 +103,9 @@ class RuntimeBenchmark {
     return _buildResult('event_latency', iterations, latencies);
   }
 
-  Future<BenchmarkResult> benchmarkPluginLoadTime({int iterations = 100}) async {
+  Future<BenchmarkResult> benchmarkPluginLoadTime({
+    int iterations = 100,
+  }) async {
     final clock = _container.clock;
     final latencies = <int>[];
 
@@ -128,14 +130,18 @@ class RuntimeBenchmark {
     return _buildResult('plugin_load_time', iterations, latencies);
   }
 
-  Future<BenchmarkResult> benchmarkCapabilityInvoke({int iterations = 500}) async {
+  Future<BenchmarkResult> benchmarkCapabilityInvoke({
+    int iterations = 500,
+  }) async {
     final descriptor = StoragePlugin.descriptor();
     final handler = StoragePlugin();
     await _container.registerPlugin(descriptor, handler);
 
     final clock = _container.clock;
     final latencies = <int>[];
-    const perm = RuntimePermission(capabilities: ['storage.write', 'storage.read']);
+    const perm = RuntimePermission(
+      capabilities: ['storage.write', 'storage.read'],
+    );
 
     for (var i = 0; i < iterations; i++) {
       final start = clock.now();
@@ -155,7 +161,9 @@ class RuntimeBenchmark {
     return _buildResult('capability_invoke', iterations, latencies);
   }
 
-  Future<BenchmarkResult> benchmarkSchedulerDelay({int iterations = 500}) async {
+  Future<BenchmarkResult> benchmarkSchedulerDelay({
+    int iterations = 500,
+  }) async {
     final clock = _container.clock;
     final latencies = <int>[];
 
@@ -179,7 +187,11 @@ class RuntimeBenchmark {
     return _buildResult('scheduler_delay', iterations, latencies);
   }
 
-  BenchmarkResult _buildResult(String name, int iterations, List<int> latencies) {
+  BenchmarkResult _buildResult(
+    String name,
+    int iterations,
+    List<int> latencies,
+  ) {
     if (latencies.isEmpty) {
       return BenchmarkResult(
         name: name,

@@ -30,18 +30,26 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
     _player = Player();
     _controller = VideoController(_player);
     _player.open(Media(widget.url));
-    _subs.add(_player.stream.playing.listen((playing) {
-      if (mounted) setState(() => _isPlaying = playing);
-    }));
-    _subs.add(_player.stream.buffering.listen((buffering) {
-      if (mounted) setState(() => _isBuffering = buffering);
-    }));
-    _subs.add(_player.stream.position.listen((pos) {
-      if (mounted) setState(() => _position = pos);
-    }));
-    _subs.add(_player.stream.duration.listen((dur) {
-      if (mounted) setState(() => _duration = dur);
-    }));
+    _subs.add(
+      _player.stream.playing.listen((playing) {
+        if (mounted) setState(() => _isPlaying = playing);
+      }),
+    );
+    _subs.add(
+      _player.stream.buffering.listen((buffering) {
+        if (mounted) setState(() => _isBuffering = buffering);
+      }),
+    );
+    _subs.add(
+      _player.stream.position.listen((pos) {
+        if (mounted) setState(() => _position = pos);
+      }),
+    );
+    _subs.add(
+      _player.stream.duration.listen((dur) {
+        if (mounted) setState(() => _duration = dur);
+      }),
+    );
   }
 
   @override
@@ -68,7 +76,13 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
         backgroundColor: AppColors.background,
         foregroundColor: AppColors.textPrimary(context),
         title: widget.title != null
-            ? Text(widget.title!, style: TextStyle(color: AppColors.textPrimary(context), fontSize: 16))
+            ? Text(
+                widget.title!,
+                style: TextStyle(
+                  color: AppColors.textPrimary(context),
+                  fontSize: 16,
+                ),
+              )
             : null,
       ),
       body: Column(
@@ -84,20 +98,26 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
                     if (_isBuffering)
                       const CircularProgressIndicator(color: AppColors.accent),
                     if (!_isPlaying && !_isBuffering)
-                      Semantics(label: localeProvider.t('play_video'), child: GestureDetector(
-
-      behavior: HitTestBehavior.opaque,
-                        onTap: () => _player.play(),
-                        child: Container(
-                          width: 64,
-                          height: 64,
-                          decoration: BoxDecoration(
-                            color: AppColors.textTertiary(context),
-                            borderRadius: BorderRadius.circular(32),
+                      Semantics(
+                        label: localeProvider.t('play_video'),
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () => _player.play(),
+                          child: Container(
+                            width: 64,
+                            height: 64,
+                            decoration: BoxDecoration(
+                              color: AppColors.textTertiary(context),
+                              borderRadius: BorderRadius.circular(32),
+                            ),
+                            child: Icon(
+                              LucideIcons.play,
+                              color: AppColors.textPrimary(context),
+                              size: 32,
+                            ),
                           ),
-                          child: Icon(LucideIcons.play, color: AppColors.textPrimary(context), size: 32),
                         ),
-                      )),
+                      ),
                   ],
                 ),
               ),
@@ -118,13 +138,21 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
         children: [
           Row(
             children: [
-              Text(_formatDuration(_position), style: TextStyle(color: AppColors.textSecondary(context), fontSize: 12)),
+              Text(
+                _formatDuration(_position),
+                style: TextStyle(
+                  color: AppColors.textSecondary(context),
+                  fontSize: 12,
+                ),
+              ),
               const SizedBox(width: 8),
               Expanded(
                 child: SliderTheme(
                   data: SliderThemeData(
                     trackHeight: 3,
-                    thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
+                    thumbShape: const RoundSliderThumbShape(
+                      enabledThumbRadius: 6,
+                    ),
                     activeTrackColor: AppColors.accent,
                     inactiveTrackColor: AppColors.textDisabled(context),
                     thumbColor: AppColors.accent,
@@ -134,13 +162,23 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
                         ? _position.inMilliseconds / _duration.inMilliseconds
                         : 0,
                     onChanged: (v) {
-                      _player.seek(Duration(milliseconds: (v * _duration.inMilliseconds).round()));
+                      _player.seek(
+                        Duration(
+                          milliseconds: (v * _duration.inMilliseconds).round(),
+                        ),
+                      );
                     },
                   ),
                 ),
               ),
               const SizedBox(width: 8),
-              Text(_formatDuration(_duration), style: TextStyle(color: AppColors.textSecondary(context), fontSize: 12)),
+              Text(
+                _formatDuration(_duration),
+                style: TextStyle(
+                  color: AppColors.textSecondary(context),
+                  fontSize: 12,
+                ),
+              ),
             ],
           ),
           Row(
@@ -148,7 +186,11 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
             children: [
               IconButton(
                 tooltip: localeProvider.t('rewind'),
-                icon: Icon(LucideIcons.skipBack, color: AppColors.textSecondary(context), size: 20),
+                icon: Icon(
+                  LucideIcons.skipBack,
+                  color: AppColors.textSecondary(context),
+                  size: 20,
+                ),
                 onPressed: () {
                   final newPos = _position - const Duration(seconds: 10);
                   _player.seek(newPos.isNegative ? Duration.zero : newPos);
@@ -158,17 +200,29 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
               Container(
                 width: 48,
                 height: 48,
-                decoration: BoxDecoration(color: AppColors.accent, borderRadius: BorderRadius.circular(24)),
+                decoration: BoxDecoration(
+                  color: AppColors.accent,
+                  borderRadius: BorderRadius.circular(24),
+                ),
                 child: IconButton(
                   tooltip: localeProvider.t('play'),
-                  icon: Icon(_isPlaying ? LucideIcons.pause : LucideIcons.play, color: AppColors.bg(context), size: 24),
-                  onPressed: () => _isPlaying ? _player.pause() : _player.play(),
+                  icon: Icon(
+                    _isPlaying ? LucideIcons.pause : LucideIcons.play,
+                    color: AppColors.bg(context),
+                    size: 24,
+                  ),
+                  onPressed: () =>
+                      _isPlaying ? _player.pause() : _player.play(),
                 ),
               ),
               const SizedBox(width: 16),
               IconButton(
                 tooltip: localeProvider.t('forward'),
-                icon: Icon(LucideIcons.skipForward, color: AppColors.textSecondary(context), size: 20),
+                icon: Icon(
+                  LucideIcons.skipForward,
+                  color: AppColors.textSecondary(context),
+                  size: 20,
+                ),
                 onPressed: () {
                   final newPos = _position + const Duration(seconds: 10);
                   _player.seek(newPos > _duration ? _duration : newPos);

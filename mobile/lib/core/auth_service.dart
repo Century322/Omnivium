@@ -27,7 +27,8 @@ class AuthService {
   User? get currentUser => _currentUser;
   String? get jwtToken => _jwtToken;
   bool get isAuthenticated => _currentUser != null;
-  String? get matrixUserId => _currentUser?.userMetadata?['matrix_user_id'] as String?;
+  String? get matrixUserId =>
+      _currentUser?.userMetadata?['matrix_user_id'] as String?;
   SupabaseClient? get client => _client;
   bool get isSupabaseInitialized => _supabaseInitialized;
 
@@ -54,8 +55,13 @@ class AuthService {
     if (cachedUrl == null || cachedKey == null) {
       final envUrl = _getEnv(_supabaseUrlEnvKey);
       final envKey = _getEnv(_supabaseAnonKeyEnvKey);
-      if (envUrl == null || envUrl.isEmpty || envKey == null || envKey.isEmpty) {
-        AppLogger.instance.warning('Supabase credentials not configured. Set SUPABASE_URL and SUPABASE_ANON_KEY via --dart-define or backend config.');
+      if (envUrl == null ||
+          envUrl.isEmpty ||
+          envKey == null ||
+          envKey.isEmpty) {
+        AppLogger.instance.warning(
+          'Supabase credentials not configured. Set SUPABASE_URL and SUPABASE_ANON_KEY via --dart-define or backend config.',
+        );
         return;
       }
       cachedUrl = envUrl;
@@ -77,7 +83,9 @@ class AuthService {
           final body = jsonDecode(response.body) as Map<String, dynamic>;
           final url = body['supabase_url'] as String?;
           final anonKey = body['supabase_anon_key'] as String?;
-          if (url != null && anonKey != null && (url != cachedUrl || anonKey != cachedKey)) {
+          if (url != null &&
+              anonKey != null &&
+              (url != cachedUrl || anonKey != cachedKey)) {
             await storage.write(_supabaseUrlKey, url);
             await storage.write(_supabaseAnonKeyKey, anonKey);
             await _reinitSupabase(url, anonKey);
@@ -109,7 +117,9 @@ class AuthService {
       await _initSupabase(url, anonKey);
       return;
     }
-    AppLogger.instance.info('Supabase config updated from backend, will apply on next app restart');
+    AppLogger.instance.info(
+      'Supabase config updated from backend, will apply on next app restart',
+    );
   }
 
   void _setupAuthListener() {
@@ -189,7 +199,10 @@ class AuthService {
   Future<bool> signIn({required String email, required String password}) async {
     if (_client == null || !_supabaseInitialized) return false;
     try {
-      final response = await _client!.auth.signInWithPassword(email: email, password: password);
+      final response = await _client!.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
       _currentUser = response.user;
       _jwtToken = response.session?.accessToken;
       if (_currentUser != null) {

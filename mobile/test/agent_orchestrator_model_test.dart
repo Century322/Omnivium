@@ -71,7 +71,11 @@ void main() {
   group('ConversationMessage', () {
     test('creates with required fields', () {
       final now = DateTime.now();
-      final msg = ConversationMessage(role: 'user', content: 'Hello', timestamp: now);
+      final msg = ConversationMessage(
+        role: 'user',
+        content: 'Hello',
+        timestamp: now,
+      );
       expect(msg.role, 'user');
       expect(msg.content, 'Hello');
       expect(msg.isStreaming, isFalse);
@@ -80,7 +84,13 @@ void main() {
 
     test('creates with all fields', () {
       final now = DateTime.now();
-      final thoughts = [ThoughtStep(type: ThoughtType.analysis, content: 'Processing...', timestamp: now)];
+      final thoughts = [
+        ThoughtStep(
+          type: ThoughtType.analysis,
+          content: 'Processing...',
+          timestamp: now,
+        ),
+      ];
       final msg = ConversationMessage(
         role: 'assistant',
         content: 'Response',
@@ -94,7 +104,11 @@ void main() {
 
     test('copyWith updates specified fields', () {
       final now = DateTime.now();
-      final msg = ConversationMessage(role: 'assistant', content: 'Original', timestamp: now);
+      final msg = ConversationMessage(
+        role: 'assistant',
+        content: 'Original',
+        timestamp: now,
+      );
       final updated = msg.copyWith(content: 'Updated', isStreaming: true);
       expect(updated.content, 'Updated');
       expect(updated.isStreaming, isTrue);
@@ -104,7 +118,12 @@ void main() {
 
     test('copyWith without args keeps original', () {
       final now = DateTime.now();
-      final msg = ConversationMessage(role: 'user', content: 'Hello', timestamp: now, isStreaming: true);
+      final msg = ConversationMessage(
+        role: 'user',
+        content: 'Hello',
+        timestamp: now,
+        isStreaming: true,
+      );
       final copy = msg.copyWith();
       expect(copy.content, 'Hello');
       expect(copy.isStreaming, isTrue);

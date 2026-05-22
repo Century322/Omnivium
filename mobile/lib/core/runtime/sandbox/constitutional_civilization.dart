@@ -3,12 +3,7 @@ import 'runtime_law.dart';
 import 'sandbox_runtime.dart';
 import 'constitutional_trace.dart';
 
-enum PolicyLoopholeSeverity {
-  low,
-  medium,
-  high,
-  critical,
-}
+enum PolicyLoopholeSeverity { low, medium, high, critical }
 
 class PolicyLoophole {
   final String loopholeId;
@@ -34,16 +29,16 @@ class PolicyLoophole {
   });
 
   Map<String, dynamic> toJson() => {
-        'id': loopholeId,
-        'desc': description,
-        'law': affectedLaw.name,
-        'severity': severity.name,
-        'count': occurrenceCount,
-        'sandboxes': affectedSandboxIds,
-        'caps': affectedCapabilityIds,
-        'fix': suggestedFix,
-        'detected': detectedAt,
-      };
+    'id': loopholeId,
+    'desc': description,
+    'law': affectedLaw.name,
+    'severity': severity.name,
+    'count': occurrenceCount,
+    'sandboxes': affectedSandboxIds,
+    'caps': affectedCapabilityIds,
+    'fix': suggestedFix,
+    'detected': detectedAt,
+  };
 }
 
 class ConstitutionalAmendment {
@@ -76,40 +71,34 @@ class ConstitutionalAmendment {
     int? enactedAt,
     int? supportVotes,
     int? opposeVotes,
-  }) =>
-      ConstitutionalAmendment(
-        amendmentId: amendmentId,
-        description: description,
-        targetLaw: targetLaw,
-        rationale: rationale,
-        proposedChange: proposedChange,
-        status: status ?? this.status,
-        proposedAt: proposedAt,
-        enactedAt: enactedAt ?? this.enactedAt,
-        supportVotes: supportVotes ?? this.supportVotes,
-        opposeVotes: opposeVotes ?? this.opposeVotes,
-      );
+  }) => ConstitutionalAmendment(
+    amendmentId: amendmentId,
+    description: description,
+    targetLaw: targetLaw,
+    rationale: rationale,
+    proposedChange: proposedChange,
+    status: status ?? this.status,
+    proposedAt: proposedAt,
+    enactedAt: enactedAt ?? this.enactedAt,
+    supportVotes: supportVotes ?? this.supportVotes,
+    opposeVotes: opposeVotes ?? this.opposeVotes,
+  );
 
   Map<String, dynamic> toJson() => {
-        'id': amendmentId,
-        'desc': description,
-        'law': targetLaw.name,
-        'rationale': rationale,
-        'change': proposedChange,
-        'status': status.name,
-        'proposed': proposedAt,
-        'enacted': enactedAt,
-        'support': supportVotes,
-        'oppose': opposeVotes,
-      };
+    'id': amendmentId,
+    'desc': description,
+    'law': targetLaw.name,
+    'rationale': rationale,
+    'change': proposedChange,
+    'status': status.name,
+    'proposed': proposedAt,
+    'enacted': enactedAt,
+    'support': supportVotes,
+    'oppose': opposeVotes,
+  };
 }
 
-enum ConstitutionalAmendmentStatus {
-  proposed,
-  underReview,
-  enacted,
-  rejected,
-}
+enum ConstitutionalAmendmentStatus { proposed, underReview, enacted, rejected }
 
 class ConstitutionalEvolutionEngine {
   final ConstitutionalTraceGraph _traceGraph;
@@ -120,7 +109,8 @@ class ConstitutionalEvolutionEngine {
   ConstitutionalEvolutionEngine(this._traceGraph);
 
   List<PolicyLoophole> get loopholes => List.unmodifiable(_loopholes);
-  List<ConstitutionalAmendment> get amendments => List.unmodifiable(_amendments);
+  List<ConstitutionalAmendment> get amendments =>
+      List.unmodifiable(_amendments);
 
   List<PolicyLoophole> scanForLoopholes() {
     final stats = _traceGraph.computeStatistics();
@@ -143,38 +133,51 @@ class ConstitutionalEvolutionEngine {
 
       final violations = _traceGraph.violationsForLaw(law);
       final sandboxIds = violations.map((v) => v.sandboxId).toSet().toList();
-      final capIds = violations.where((v) => v.capabilityId != null).map((v) => v.capabilityId!).toSet().toList();
+      final capIds = violations
+          .where((v) => v.capabilityId != null)
+          .map((v) => v.capabilityId!)
+          .toSet()
+          .toList();
 
       final existing = _loopholes.where((l) => l.affectedLaw == law).isNotEmpty;
       if (existing) continue;
 
-      newLoopholes.add(PolicyLoophole(
-        loopholeId: 'loophole-${law.name}-$count',
-        description: 'Law ${law.name} violated $count times across ${sandboxIds.length} sandboxes',
-        affectedLaw: law,
-        severity: severity,
-        occurrenceCount: count,
-        affectedSandboxIds: sandboxIds,
-        affectedCapabilityIds: capIds,
-        suggestedFix: _suggestFix(law, count, sandboxIds.length),
-        detectedAt: violations.last.timestamp,
-      ));
+      newLoopholes.add(
+        PolicyLoophole(
+          loopholeId: 'loophole-${law.name}-$count',
+          description:
+              'Law ${law.name} violated $count times across ${sandboxIds.length} sandboxes',
+          affectedLaw: law,
+          severity: severity,
+          occurrenceCount: count,
+          affectedSandboxIds: sandboxIds,
+          affectedCapabilityIds: capIds,
+          suggestedFix: _suggestFix(law, count, sandboxIds.length),
+          detectedAt: violations.last.timestamp,
+        ),
+      );
     }
 
     if (stats.complianceRate < 0.5 && stats.totalDecisions > 10) {
-      final alreadyExists = _loopholes.any((l) => l.loopholeId == 'systemic-low-compliance');
+      final alreadyExists = _loopholes.any(
+        (l) => l.loopholeId == 'systemic-low-compliance',
+      );
       if (!alreadyExists) {
-        newLoopholes.add(PolicyLoophole(
-          loopholeId: 'systemic-low-compliance',
-          description: 'System compliance rate is ${(stats.complianceRate * 100).toStringAsFixed(1)}% — below 50% threshold',
-          affectedLaw: RuntimeLawId.noBypassCapabilityRouter,
-          severity: PolicyLoopholeSeverity.critical,
-          occurrenceCount: stats.totalViolations,
-          affectedSandboxIds: stats.mostDangerousSandboxes(),
-          affectedCapabilityIds: stats.mostAbusedCapabilities(),
-          suggestedFix: 'Review and strengthen policy enforcement; consider reducing trust levels for high-violation plugins',
-          detectedAt: _traceGraph.decisions.last.timestamp,
-        ));
+        newLoopholes.add(
+          PolicyLoophole(
+            loopholeId: 'systemic-low-compliance',
+            description:
+                'System compliance rate is ${(stats.complianceRate * 100).toStringAsFixed(1)}% — below 50% threshold',
+            affectedLaw: RuntimeLawId.noBypassCapabilityRouter,
+            severity: PolicyLoopholeSeverity.critical,
+            occurrenceCount: stats.totalViolations,
+            affectedSandboxIds: stats.mostDangerousSandboxes(),
+            affectedCapabilityIds: stats.mostAbusedCapabilities(),
+            suggestedFix:
+                'Review and strengthen policy enforcement; consider reducing trust levels for high-violation plugins',
+            detectedAt: _traceGraph.decisions.last.timestamp,
+          ),
+        );
       }
     }
 
@@ -202,14 +205,21 @@ class ConstitutionalEvolutionEngine {
     return amendment;
   }
 
-  ConstitutionalAmendment reviewAmendment(String amendmentId, {bool approve = false}) {
+  ConstitutionalAmendment reviewAmendment(
+    String amendmentId, {
+    bool approve = false,
+  }) {
     final idx = _amendments.indexWhere((a) => a.amendmentId == amendmentId);
     if (idx < 0) throw StateError('Amendment $amendmentId not found');
 
     final current = _amendments[idx];
     final updated = current.copyWith(
-      status: approve ? ConstitutionalAmendmentStatus.enacted : ConstitutionalAmendmentStatus.rejected,
-      enactedAt: approve ? _traceGraph.decisions.lastOrNull?.timestamp ?? 0 : null,
+      status: approve
+          ? ConstitutionalAmendmentStatus.enacted
+          : ConstitutionalAmendmentStatus.rejected,
+      enactedAt: approve
+          ? _traceGraph.decisions.lastOrNull?.timestamp ?? 0
+          : null,
     );
     _amendments[idx] = updated;
     return updated;
@@ -222,16 +232,20 @@ class ConstitutionalEvolutionEngine {
       if (loophole.severity == PolicyLoopholeSeverity.critical ||
           loophole.severity == PolicyLoopholeSeverity.high) {
         final alreadyProposed = _amendments.any(
-          (a) => a.targetLaw == loophole.affectedLaw && a.status != ConstitutionalAmendmentStatus.rejected,
+          (a) =>
+              a.targetLaw == loophole.affectedLaw &&
+              a.status != ConstitutionalAmendmentStatus.rejected,
         );
         if (!alreadyProposed) {
-          proposals.add(proposeAmendment(
-            description: 'Auto-proposed fix for ${loophole.affectedLaw.name}',
-            targetLaw: loophole.affectedLaw,
-            rationale: loophole.description,
-            proposedChange: loophole.suggestedFix,
-            timestamp: timestamp,
-          ));
+          proposals.add(
+            proposeAmendment(
+              description: 'Auto-proposed fix for ${loophole.affectedLaw.name}',
+              targetLaw: loophole.affectedLaw,
+              rationale: loophole.description,
+              proposedChange: loophole.suggestedFix,
+              timestamp: timestamp,
+            ),
+          );
         }
       }
     }
@@ -294,28 +308,27 @@ class ReputationScore {
     double? complianceRatio,
     TrustLevel? effectiveTrustLevel,
     int? lastUpdated,
-  }) =>
-      ReputationScore(
-        entityId: entityId,
-        score: score ?? this.score,
-        totalInteractions: totalInteractions ?? this.totalInteractions,
-        violations: violations ?? this.violations,
-        compliantActions: compliantActions ?? this.compliantActions,
-        complianceRatio: complianceRatio ?? this.complianceRatio,
-        effectiveTrustLevel: effectiveTrustLevel ?? this.effectiveTrustLevel,
-        lastUpdated: lastUpdated ?? this.lastUpdated,
-      );
+  }) => ReputationScore(
+    entityId: entityId,
+    score: score ?? this.score,
+    totalInteractions: totalInteractions ?? this.totalInteractions,
+    violations: violations ?? this.violations,
+    compliantActions: compliantActions ?? this.compliantActions,
+    complianceRatio: complianceRatio ?? this.complianceRatio,
+    effectiveTrustLevel: effectiveTrustLevel ?? this.effectiveTrustLevel,
+    lastUpdated: lastUpdated ?? this.lastUpdated,
+  );
 
   Map<String, dynamic> toJson() => {
-        'entity': entityId,
-        'score': score.toStringAsFixed(2),
-        'interactions': totalInteractions,
-        'violations': violations,
-        'compliant': compliantActions,
-        'ratio': complianceRatio.toStringAsFixed(3),
-        'trust': effectiveTrustLevel.name,
-        'updated': lastUpdated,
-      };
+    'entity': entityId,
+    'score': score.toStringAsFixed(2),
+    'interactions': totalInteractions,
+    'violations': violations,
+    'compliant': compliantActions,
+    'ratio': complianceRatio.toStringAsFixed(3),
+    'trust': effectiveTrustLevel.name,
+    'updated': lastUpdated,
+  };
 }
 
 class TrustDecayPolicy {
@@ -340,13 +353,14 @@ class ReputationEconomy {
   final ConstitutionalTraceGraph _traceGraph;
 
   ReputationEconomy(this._traceGraph, {TrustDecayPolicy? policy})
-      : _policy = policy ?? const TrustDecayPolicy();
+    : _policy = policy ?? const TrustDecayPolicy();
 
   Map<String, ReputationScore> get scores => Map.unmodifiable(_scores);
   TrustDecayPolicy get policy => _policy;
 
   ReputationScore scoreFor(String entityId) =>
-      _scores[entityId] ?? ReputationScore(
+      _scores[entityId] ??
+      ReputationScore(
         entityId: entityId,
         score: 100.0,
         totalInteractions: 0,
@@ -359,7 +373,10 @@ class ReputationEconomy {
 
   ReputationScore recordCompliance(String entityId, int timestamp) {
     final current = scoreFor(entityId);
-    final newScore = (current.score + _policy.complianceReward).clamp(0.0, 100.0);
+    final newScore = (current.score + _policy.complianceReward).clamp(
+      0.0,
+      100.0,
+    );
     final newCompliant = current.compliantActions + 1;
     final newTotal = current.totalInteractions + 1;
     final ratio = newCompliant / newTotal;
@@ -376,10 +393,17 @@ class ReputationEconomy {
     return updated;
   }
 
-  ReputationScore recordViolation(String entityId, int timestamp, {SandboxViolationType? type}) {
+  ReputationScore recordViolation(
+    String entityId,
+    int timestamp, {
+    SandboxViolationType? type,
+  }) {
     final current = scoreFor(entityId);
     final penalty = _penaltyForType(type);
-    final newScore = (current.score - penalty).clamp(_policy.minimumScore, 100.0);
+    final newScore = (current.score - penalty).clamp(
+      _policy.minimumScore,
+      100.0,
+    );
     final newViolations = current.violations + 1;
     final newTotal = current.totalInteractions + 1;
     final newCompliant = current.compliantActions;
@@ -399,7 +423,10 @@ class ReputationEconomy {
 
   ReputationScore applyDecay(String entityId, int timestamp) {
     final current = scoreFor(entityId);
-    final newScore = (current.score - _policy.decayRate).clamp(_policy.minimumScore, 100.0);
+    final newScore = (current.score - _policy.decayRate).clamp(
+      _policy.minimumScore,
+      100.0,
+    );
 
     final updated = current.copyWith(
       score: newScore,
@@ -412,7 +439,9 @@ class ReputationEconomy {
 
   double constitutionalScore() {
     if (_scores.isEmpty) return 100.0;
-    final totalScore = _scores.values.map((s) => s.score).reduce((a, b) => a + b);
+    final totalScore = _scores.values
+        .map((s) => s.score)
+        .reduce((a, b) => a + b);
     return totalScore / _scores.length;
   }
 
@@ -463,12 +492,7 @@ class ReputationEconomy {
   }
 }
 
-enum SanctionType {
-  warning,
-  restriction,
-  suspension,
-  termination,
-}
+enum SanctionType { warning, restriction, suspension, termination }
 
 class Sanction {
   final String sanctionId;
@@ -492,29 +516,29 @@ class Sanction {
   });
 
   Sanction copyWith({int? liftedAt}) => Sanction(
-        sanctionId: sanctionId,
-        sandboxId: sandboxId,
-        type: type,
-        reason: reason,
-        violatedLaw: violatedLaw,
-        imposedAt: imposedAt,
-        liftedAt: liftedAt ?? this.liftedAt,
-        isReversible: isReversible,
-      );
+    sanctionId: sanctionId,
+    sandboxId: sandboxId,
+    type: type,
+    reason: reason,
+    violatedLaw: violatedLaw,
+    imposedAt: imposedAt,
+    liftedAt: liftedAt ?? this.liftedAt,
+    isReversible: isReversible,
+  );
 
   bool get isActive => liftedAt == null;
   bool get isLifted => liftedAt != null;
 
   Map<String, dynamic> toJson() => {
-        'id': sanctionId,
-        'sandbox': sandboxId,
-        'type': type.name,
-        'reason': reason,
-        'law': violatedLaw?.name,
-        'imposed': imposedAt,
-        'lifted': liftedAt,
-        'reversible': isReversible,
-      };
+    'id': sanctionId,
+    'sandbox': sandboxId,
+    'type': type.name,
+    'reason': reason,
+    'law': violatedLaw?.name,
+    'imposed': imposedAt,
+    'lifted': liftedAt,
+    'reversible': isReversible,
+  };
 }
 
 class Appeal {
@@ -544,30 +568,29 @@ class Appeal {
     AppealStatus? status,
     int? resolvedAt,
     String? resolution,
-  }) =>
-      Appeal(
-        appealId: appealId,
-        sandboxId: sandboxId,
-        sanctionId: sanctionId,
-        grounds: grounds,
-        evidence: evidence,
-        status: status ?? this.status,
-        filedAt: filedAt,
-        resolvedAt: resolvedAt ?? this.resolvedAt,
-        resolution: resolution ?? this.resolution,
-      );
+  }) => Appeal(
+    appealId: appealId,
+    sandboxId: sandboxId,
+    sanctionId: sanctionId,
+    grounds: grounds,
+    evidence: evidence,
+    status: status ?? this.status,
+    filedAt: filedAt,
+    resolvedAt: resolvedAt ?? this.resolvedAt,
+    resolution: resolution ?? this.resolution,
+  );
 
   Map<String, dynamic> toJson() => {
-        'id': appealId,
-        'sandbox': sandboxId,
-        'sanction': sanctionId,
-        'grounds': grounds,
-        'evidence': evidence,
-        'status': status.name,
-        'filed': filedAt,
-        'resolved': resolvedAt,
-        'resolution': resolution,
-      };
+    'id': appealId,
+    'sandbox': sandboxId,
+    'sanction': sanctionId,
+    'grounds': grounds,
+    'evidence': evidence,
+    'status': status.name,
+    'filed': filedAt,
+    'resolved': resolvedAt,
+    'resolution': resolution,
+  };
 }
 
 enum AppealStatus {
@@ -616,7 +639,11 @@ class RuntimeJudiciary {
     _ledger.append(
       entryType: 'sanction.imposed',
       sandboxId: sandboxId,
-      data: {'sanctionId': sanction.sanctionId, 'type': type.name, 'reason': reason},
+      data: {
+        'sanctionId': sanction.sanctionId,
+        'type': type.name,
+        'reason': reason,
+      },
       timestamp: timestamp,
     );
 
@@ -665,14 +692,23 @@ class RuntimeJudiciary {
     _ledger.append(
       entryType: 'appeal.filed',
       sandboxId: sandboxId,
-      data: {'appealId': appeal.appealId, 'sanctionId': sanctionId, 'grounds': grounds},
+      data: {
+        'appealId': appeal.appealId,
+        'sanctionId': sanctionId,
+        'grounds': grounds,
+      },
       timestamp: timestamp,
     );
 
     return appeal;
   }
 
-  Appeal reviewAppeal(String appealId, {bool overturn = false, bool partial = false, int? timestamp}) {
+  Appeal reviewAppeal(
+    String appealId, {
+    bool overturn = false,
+    bool partial = false,
+    int? timestamp,
+  }) {
     final idx = _appeals.indexWhere((a) => a.appealId == appealId);
     if (idx < 0) throw StateError('Appeal $appealId not found');
 
@@ -688,9 +724,13 @@ class RuntimeJudiciary {
     } else if (overturn) {
       status = AppealStatus.overturned;
       resolution = 'Sanction overturned on appeal';
-      final sanctionIdx = _sanctions.indexWhere((s) => s.sanctionId == current.sanctionId);
+      final sanctionIdx = _sanctions.indexWhere(
+        (s) => s.sanctionId == current.sanctionId,
+      );
       if (sanctionIdx >= 0 && _sanctions[sanctionIdx].isReversible) {
-        _sanctions[sanctionIdx] = _sanctions[sanctionIdx].copyWith(liftedAt: ts);
+        _sanctions[sanctionIdx] = _sanctions[sanctionIdx].copyWith(
+          liftedAt: ts,
+        );
       }
     } else {
       status = AppealStatus.upheld;
@@ -707,7 +747,11 @@ class RuntimeJudiciary {
     _ledger.append(
       entryType: 'appeal.resolved',
       sandboxId: current.sandboxId,
-      data: {'appealId': appealId, 'status': status.name, 'resolution': resolution},
+      data: {
+        'appealId': appealId,
+        'status': status.name,
+        'resolution': resolution,
+      },
       timestamp: ts,
     );
 
@@ -720,7 +764,9 @@ class RuntimeJudiciary {
   SanctionType? highestActiveSanction(String sandboxId) {
     final active = activeSanctionsFor(sandboxId);
     if (active.isEmpty) return null;
-    return active.map((s) => s.type).reduce((a, b) => a.index > b.index ? a : b);
+    return active
+        .map((s) => s.type)
+        .reduce((a, b) => a.index > b.index ? a : b);
   }
 
   List<LawDecisionRecord> gatherEvidence(String sandboxId) =>

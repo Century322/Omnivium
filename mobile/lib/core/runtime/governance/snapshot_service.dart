@@ -27,15 +27,15 @@ class RuntimeSnapshot {
   }) : resourceUsage = resourceUsage ?? ResourceUsage();
 
   Map<String, dynamic> toJson() => {
-        'snapshotId': snapshotId,
-        'timestamp': timestamp,
-        'status': status.name,
-        'pluginStates': pluginStates,
-        'sessions': sessions.map((s) => s.toJson()).toList(),
-        'capabilityCache': capabilityCache,
-        'resourceUsage': resourceUsage.toJson(),
-        'extra': extra,
-      };
+    'snapshotId': snapshotId,
+    'timestamp': timestamp,
+    'status': status.name,
+    'pluginStates': pluginStates,
+    'sessions': sessions.map((s) => s.toJson()).toList(),
+    'capabilityCache': capabilityCache,
+    'resourceUsage': resourceUsage.toJson(),
+    'extra': extra,
+  };
 }
 
 class SessionSnapshot {
@@ -54,12 +54,12 @@ class SessionSnapshot {
   });
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'userId': userId,
-        'state': state,
-        'createdAt': createdAt,
-        'lastActiveAt': lastActiveAt,
-      };
+    'id': id,
+    'userId': userId,
+    'state': state,
+    'createdAt': createdAt,
+    'lastActiveAt': lastActiveAt,
+  };
 }
 
 class SnapshotService {
@@ -68,7 +68,8 @@ class SnapshotService {
   final List<RuntimeSnapshot> _snapshots = [];
   int _snapshotId = 0;
 
-  SnapshotService(this._clock, {PersistenceBackend? persistence}) : _persistence = persistence;
+  SnapshotService(this._clock, {PersistenceBackend? persistence})
+    : _persistence = persistence;
 
   List<RuntimeSnapshot> get snapshots => List.unmodifiable(_snapshots);
   int get snapshotCount => _snapshots.length;
@@ -88,13 +89,15 @@ class SnapshotService {
       status: status,
       pluginStates: pluginStates.map((k, v) => MapEntry(k, v.name)),
       sessions: sessions.values
-          .map((s) => SessionSnapshot(
-                id: s.id,
-                userId: s.userId,
-                state: s.state.name,
-                createdAt: s.createdAt,
-                lastActiveAt: s.lastActiveAt,
-              ))
+          .map(
+            (s) => SessionSnapshot(
+              id: s.id,
+              userId: s.userId,
+              state: s.state.name,
+              createdAt: s.createdAt,
+              lastActiveAt: s.lastActiveAt,
+            ),
+          )
           .toList(),
       capabilityCache: capabilityCache,
       resourceUsage: resourceUsage,
@@ -119,7 +122,9 @@ class SnapshotService {
 
   List<RuntimeSnapshot> snapshotsInRange(int fromTimestamp, int toTimestamp) {
     return _snapshots
-        .where((s) => s.timestamp >= fromTimestamp && s.timestamp <= toTimestamp)
+        .where(
+          (s) => s.timestamp >= fromTimestamp && s.timestamp <= toTimestamp,
+        )
         .toList();
   }
 

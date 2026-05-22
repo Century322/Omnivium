@@ -16,7 +16,13 @@ void main() {
 
     test('creates with all fields', () {
       final now = DateTime.now();
-      final thoughts = [ThoughtStep(type: ThoughtType.planning, content: 'Planning...', timestamp: now)];
+      final thoughts = [
+        ThoughtStep(
+          type: ThoughtType.planning,
+          content: 'Planning...',
+          timestamp: now,
+        ),
+      ];
       final msg = ChatMessageData(
         role: 'assistant',
         content: 'Response',

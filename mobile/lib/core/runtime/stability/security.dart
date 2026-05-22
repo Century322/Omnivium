@@ -1,18 +1,8 @@
 import 'dart:typed_data';
 
-enum TrustLevel {
-  system,
-  signed,
-  verified,
-  untrusted,
-  blocked,
-}
+enum TrustLevel { system, signed, verified, untrusted, blocked }
 
-enum SignatureAlgorithm {
-  ed25519,
-  rsa256,
-  hmacSha256,
-}
+enum SignatureAlgorithm { ed25519, rsa256, hmacSha256 }
 
 class PluginSignature {
   final String pluginId;
@@ -34,12 +24,12 @@ class PluginSignature {
   });
 
   Map<String, dynamic> toJson() => {
-        'pluginId': pluginId,
-        'version': version,
-        'algorithm': algorithm.name,
-        'signerId': signerId,
-        'signedAt': signedAt,
-      };
+    'pluginId': pluginId,
+    'version': version,
+    'algorithm': algorithm.name,
+    'signerId': signerId,
+    'signedAt': signedAt,
+  };
 }
 
 class TrustBoundary {
@@ -71,24 +61,25 @@ class TrustBoundary {
 
   bool isNodeAllowed(String nodeId) {
     if (allowedNodes.isEmpty) return true;
-    return allowedNodes.contains(nodeId) ||
-        allowedNodes.contains('*');
+    return allowedNodes.contains(nodeId) || allowedNodes.contains('*');
   }
 
   TrustBoundary merge(TrustBoundary other) => TrustBoundary(
-        boundaryId: '${boundaryId}_merged',
-        minimumTrustLevel: minimumTrustLevel.index > other.minimumTrustLevel.index
-            ? minimumTrustLevel
-            : other.minimumTrustLevel,
-        allowedCapabilities: allowedCapabilities.intersection(other.allowedCapabilities),
-        allowedNodes: allowedNodes.intersection(other.allowedNodes),
-        maxResourceBudget: maxResourceBudget < other.maxResourceBudget
-            ? maxResourceBudget
-            : other.maxResourceBudget,
-        allowNetworkAccess: allowNetworkAccess && other.allowNetworkAccess,
-        allowFileSystemAccess: allowFileSystemAccess && other.allowFileSystemAccess,
-        allowSubprocess: allowSubprocess && other.allowSubprocess,
-      );
+    boundaryId: '${boundaryId}_merged',
+    minimumTrustLevel: minimumTrustLevel.index > other.minimumTrustLevel.index
+        ? minimumTrustLevel
+        : other.minimumTrustLevel,
+    allowedCapabilities: allowedCapabilities.intersection(
+      other.allowedCapabilities,
+    ),
+    allowedNodes: allowedNodes.intersection(other.allowedNodes),
+    maxResourceBudget: maxResourceBudget < other.maxResourceBudget
+        ? maxResourceBudget
+        : other.maxResourceBudget,
+    allowNetworkAccess: allowNetworkAccess && other.allowNetworkAccess,
+    allowFileSystemAccess: allowFileSystemAccess && other.allowFileSystemAccess,
+    allowSubprocess: allowSubprocess && other.allowSubprocess,
+  );
 }
 
 class SecretRef {
@@ -112,7 +103,12 @@ class SecretStore {
   final Map<String, SecretRef> _refs = {};
   final Map<String, TrustLevel> _accessLog = {};
 
-  void store(String id, String value, {required String scope, required int expiresAt}) {
+  void store(
+    String id,
+    String value, {
+    required String scope,
+    required int expiresAt,
+  }) {
     _secrets[id] = value;
     _refs[id] = SecretRef(
       id: id,
@@ -122,7 +118,11 @@ class SecretStore {
     );
   }
 
-  String? retrieve(String id, {required String requesterId, required TrustLevel trustLevel}) {
+  String? retrieve(
+    String id, {
+    required String requesterId,
+    required TrustLevel trustLevel,
+  }) {
     final ref = _refs[id];
     if (ref == null) return null;
     if (!ref.isValidAt(DateTime.now().millisecondsSinceEpoch)) {
@@ -233,10 +233,9 @@ class SecurityManager {
   final List<SecurityAuditEntry> _auditLog = [];
   int _auditSeq = 0;
 
-  SecurityManager({
-    SecurityPolicy policy = const SecurityPolicy(),
-  })  : _policy = policy,
-        _secretStore = SecretStore();
+  SecurityManager({SecurityPolicy policy = const SecurityPolicy()})
+    : _policy = policy,
+      _secretStore = SecretStore();
 
   SecurityPolicy get policy => _policy;
   SecretStore get secretStore => _secretStore;
@@ -279,7 +278,8 @@ class SecurityManager {
     TrustLevel callerTrust,
   ) {
     final auth = _capabilityAuths[capabilityId];
-    if (auth == null) return callerTrust.index <= _policy.minimumPluginTrustLevel.index;
+    if (auth == null)
+      return callerTrust.index <= _policy.minimumPluginTrustLevel.index;
 
     if (callerTrust.index > auth.requiredTrustLevel.index) return false;
     if (!auth.isCallerAllowed(callerId)) return false;
@@ -318,15 +318,22 @@ class SecurityManager {
     _authLockoutUntil.remove(identityId);
   }
 
-  void audit(String action, String actorId, {Map<String, dynamic> context = const {}, bool success = true}) {
-    _auditLog.add(SecurityAuditEntry(
-      id: _auditSeq++,
-      action: action,
-      actorId: actorId,
-      timestamp: DateTime.now().millisecondsSinceEpoch,
-      context: context,
-      success: success,
-    ));
+  void audit(
+    String action,
+    String actorId, {
+    Map<String, dynamic> context = const {},
+    bool success = true,
+  }) {
+    _auditLog.add(
+      SecurityAuditEntry(
+        id: _auditSeq++,
+        action: action,
+        actorId: actorId,
+        timestamp: DateTime.now().millisecondsSinceEpoch,
+        context: context,
+        success: success,
+      ),
+    );
   }
 
   List<SecurityAuditEntry> auditLog({int? limit}) {
@@ -337,7 +344,8 @@ class SecurityManager {
     return log;
   }
 
-  TrustBoundary? trustBoundary(String boundaryId) => _trustBoundaries[boundaryId];
+  TrustBoundary? trustBoundary(String boundaryId) =>
+      _trustBoundaries[boundaryId];
 
   void clearAuditLog() => _auditLog.clear();
 }
@@ -360,11 +368,11 @@ class SecurityAuditEntry {
   });
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'action': action,
-        'actor': actorId,
-        'ts': timestamp,
-        'ctx': context,
-        'ok': success,
-      };
+    'id': id,
+    'action': action,
+    'actor': actorId,
+    'ts': timestamp,
+    'ctx': context,
+    'ok': success,
+  };
 }

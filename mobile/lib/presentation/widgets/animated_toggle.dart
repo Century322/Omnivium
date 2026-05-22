@@ -16,7 +16,8 @@ class AnimatedToggle extends StatefulWidget {
   State<AnimatedToggle> createState() => _AnimatedToggleState();
 }
 
-class _AnimatedToggleState extends State<AnimatedToggle> with SingleTickerProviderStateMixin {
+class _AnimatedToggleState extends State<AnimatedToggle>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _position;
 
@@ -27,9 +28,10 @@ class _AnimatedToggleState extends State<AnimatedToggle> with SingleTickerProvid
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-    _position = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _position = Tween<double>(
+      begin: 0,
+      end: 1,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
     if (widget.enabled) _controller.value = 1;
   }
 
@@ -54,50 +56,56 @@ class _AnimatedToggleState extends State<AnimatedToggle> with SingleTickerProvid
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-
       behavior: HitTestBehavior.opaque,
-      onTap: () { HapticService.toggleSwitch(); widget.onChanged(!widget.enabled); },
+      onTap: () {
+        HapticService.toggleSwitch();
+        widget.onChanged(!widget.enabled);
+      },
       child: Semantics(
         toggled: widget.enabled,
         label: widget.enabled ? 'Enabled' : 'Disabled',
         child: AnimatedBuilder(
-        animation: _position,
-        builder: (context, child) {
-          return Container(
-            width: 50,
-            height: 28,
-            decoration: BoxDecoration(
-              color: Color.lerp(AppColors.sfHover(context), AppColors.accent, _position.value),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(3),
-              child: Align(
-                alignment: Alignment.lerp(
-                  Alignment.centerLeft,
-                  Alignment.centerRight,
+          animation: _position,
+          builder: (context, child) {
+            return Container(
+              width: 50,
+              height: 28,
+              decoration: BoxDecoration(
+                color: Color.lerp(
+                  AppColors.sfHover(context),
+                  AppColors.accent,
                   _position.value,
-                )!,
-                child: Container(
-                  width: 22,
-                  height: 22,
-                  decoration: BoxDecoration(
-                    color: AppColors.textPrimary(context),
-                    borderRadius: BorderRadius.circular(11),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.bg(context).withValues(alpha: 0.2),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
+                ),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(3),
+                child: Align(
+                  alignment: Alignment.lerp(
+                    Alignment.centerLeft,
+                    Alignment.centerRight,
+                    _position.value,
+                  )!,
+                  child: Container(
+                    width: 22,
+                    height: 22,
+                    decoration: BoxDecoration(
+                      color: AppColors.textPrimary(context),
+                      borderRadius: BorderRadius.circular(11),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.bg(context).withValues(alpha: 0.2),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          );
-        },
-      ),
+            );
+          },
+        ),
       ),
     );
   }

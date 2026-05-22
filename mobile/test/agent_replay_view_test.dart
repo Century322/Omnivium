@@ -6,7 +6,9 @@ import 'package:omnivium/core/agent/agent_orchestrator.dart';
 void main() {
   group('AgentReplayView', () {
     testWidgets('renders replay view', (tester) async {
-      await tester.pumpWidget(MaterialApp(home: AgentReplayView(orchestrator: AgentOrchestrator())));
+      await tester.pumpWidget(
+        MaterialApp(home: AgentReplayView(orchestrator: AgentOrchestrator())),
+      );
       expect(find.byType(AgentReplayView), findsOneWidget);
     });
   });

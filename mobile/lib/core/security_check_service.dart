@@ -21,6 +21,8 @@ class SecurityCheckService {
     _isRooted = result['rooted'] ?? false;
     _isJailbroken = result['jailbroken'] ?? false;
     _isEmulator = result['emulator'] ?? false;
-    AppLogger.instance.info('Security check: rooted=$_isRooted, jailbroken=$_isJailbroken, emulator=$_isEmulator');
+    AppLogger.instance.info(
+      'Security check: rooted=$_isRooted, jailbroken=$_isJailbroken, emulator=$_isEmulator',
+    );
   }
 }

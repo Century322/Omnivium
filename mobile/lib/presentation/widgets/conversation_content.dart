@@ -56,14 +56,19 @@ class ConversationContent extends StatelessWidget {
               child: ListView.builder(
                 controller: scrollController,
                 physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 8,
+                ),
                 itemCount: needSpacer ? items.length + 1 : items.length,
                 itemBuilder: (_, index) {
                   if (index == items.length) {
                     return SizedBox(height: constraints.maxHeight);
                   }
                   return Padding(
-                    padding: EdgeInsets.only(bottom: items[index].bottomPadding),
+                    padding: EdgeInsets.only(
+                      bottom: items[index].bottomPadding,
+                    ),
                     child: items[index].widget,
                   );
                 },
@@ -74,8 +79,7 @@ class ConversationContent extends StatelessWidget {
                 right: 20,
                 bottom: 8,
                 child: GestureDetector(
-
-      behavior: HitTestBehavior.opaque,
+                  behavior: HitTestBehavior.opaque,
                   onTap: onScrollToLatest,
                   child: Container(
                     width: 36,
@@ -85,10 +89,17 @@ class ConversationContent extends StatelessWidget {
                       borderRadius: BorderRadius.circular(18),
                       border: Border.all(color: AppColors.divider(context)),
                       boxShadow: [
-                        BoxShadow(color: AppColors.bg(context).withValues(alpha: 0.3), blurRadius: 8),
+                        BoxShadow(
+                          color: AppColors.bg(context).withValues(alpha: 0.3),
+                          blurRadius: 8,
+                        ),
                       ],
                     ),
-                    child: Icon(LucideIcons.chevronDown, size: 18, color: AppColors.sec(context)),
+                    child: Icon(
+                      LucideIcons.chevronDown,
+                      size: 18,
+                      color: AppColors.sec(context),
+                    ),
                   ),
                 ),
               ),
@@ -104,27 +115,59 @@ class ConversationContent extends StatelessWidget {
       final msg = messages[i];
       final isLastUser = msg.role == 'user' && i == messages.length - 2;
       if (msg.role == 'user') {
-        items.add(ListItemData(UserBubble(content: msg.content, key: isLastUser ? lastUserBubbleKey : null, onLongPress: onMessageLongPress != null ? () => onMessageLongPress!(i) : null), 12));
+        items.add(
+          ListItemData(
+            UserBubble(
+              content: msg.content,
+              key: isLastUser ? lastUserBubbleKey : null,
+              onLongPress: onMessageLongPress != null
+                  ? () => onMessageLongPress!(i)
+                  : null,
+            ),
+            12,
+          ),
+        );
       } else {
         if (msg.thoughts.isNotEmpty) {
-          items.add(ListItemData(ThoughtChainPanel(
-            thoughts: msg.thoughts,
-            isExpanded: expandedThoughts.contains(i),
-            onToggle: () => onToggleThought(i),
-          ), 4));
+          items.add(
+            ListItemData(
+              ThoughtChainPanel(
+                thoughts: msg.thoughts,
+                isExpanded: expandedThoughts.contains(i),
+                onToggle: () => onToggleThought(i),
+              ),
+              4,
+            ),
+          );
         }
-        items.add(ListItemData(AiTextBubble(content: msg.content, isStreaming: msg.isStreaming, onLongPress: onMessageLongPress != null ? () => onMessageLongPress!(i) : null), 12));
+        items.add(
+          ListItemData(
+            AiTextBubble(
+              content: msg.content,
+              isStreaming: msg.isStreaming,
+              onLongPress: onMessageLongPress != null
+                  ? () => onMessageLongPress!(i)
+                  : null,
+            ),
+            12,
+          ),
+        );
         final isLastAi = i == messages.length - 1 && !msg.isStreaming;
         if (isLastAi) {
-          items.add(ListItemData(AiActionRow(
-            content: msg.content,
-            msgIndex: i,
-            onRegenerate: onRegenerate,
-            onCopy: () => onCopy(msg.content),
-            onSpeak: onSpeak,
-            onShare: () => onShare(msg.content),
-            onMore: () => onMore(msg.content, i),
-          ), 36));
+          items.add(
+            ListItemData(
+              AiActionRow(
+                content: msg.content,
+                msgIndex: i,
+                onRegenerate: onRegenerate,
+                onCopy: () => onCopy(msg.content),
+                onSpeak: onSpeak,
+                onShare: () => onShare(msg.content),
+                onMore: () => onMore(msg.content, i),
+              ),
+              36,
+            ),
+          );
           final logs = orchestrator.executionLogs;
           if (logs.isNotEmpty) {
             items.add(ListItemData(ExecutionLogBubble(log: logs.last), 8));
@@ -133,7 +176,12 @@ class ConversationContent extends StatelessWidget {
         if (msg.isStreaming && i == messages.length - 1) {
           final currentThoughts = orchestrator.currentThoughts;
           if (currentThoughts.isNotEmpty) {
-            items.add(ListItemData(ThoughtChainPanel(thoughts: currentThoughts, isExpanded: true), 4));
+            items.add(
+              ListItemData(
+                ThoughtChainPanel(thoughts: currentThoughts, isExpanded: true),
+                4,
+              ),
+            );
           }
           if (orchestrator.isThinking || orchestrator.isReflecting) {
             items.add(const ListItemData(ThinkingIndicator(), 4));

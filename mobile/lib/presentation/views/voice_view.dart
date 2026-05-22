@@ -62,7 +62,9 @@ class _VoiceViewState extends State<VoiceView> with TickerProviderStateMixin {
       });
     }
 
-    if (orch.isIdle && _responseCompleter != null && !_responseCompleter!.isCompleted) {
+    if (orch.isIdle &&
+        _responseCompleter != null &&
+        !_responseCompleter!.isCompleted) {
       _responseCompleter!.complete();
       _responseCompleter = null;
     }
@@ -70,7 +72,9 @@ class _VoiceViewState extends State<VoiceView> with TickerProviderStateMixin {
     final messages = orch.messages;
     if (messages.isNotEmpty) {
       final last = messages.last;
-      if (last.role == 'assistant' && !last.isStreaming && last.content.isNotEmpty) {
+      if (last.role == 'assistant' &&
+          !last.isStreaming &&
+          last.content.isNotEmpty) {
         if (_aiResponse != last.content) {
           _aiResponse = last.content;
           setState(() {
@@ -172,7 +176,8 @@ class _VoiceViewState extends State<VoiceView> with TickerProviderStateMixin {
     }
   }
 
-  final bool _continuousMode = VoiceService.instance.voiceMode == VoiceMode.handsFree;
+  final bool _continuousMode =
+      VoiceService.instance.voiceMode == VoiceMode.handsFree;
   Completer<void>? _responseCompleter;
 
   Future<void> _waitForResponseAndContinue() async {
@@ -190,7 +195,10 @@ class _VoiceViewState extends State<VoiceView> with TickerProviderStateMixin {
   void _onResponseComplete() {
     final messages = widget.provider.orchestrator.messages;
     final lastMsg = messages.isNotEmpty ? messages.last : null;
-    if (lastMsg != null && lastMsg.role == 'assistant' && lastMsg.content.isNotEmpty && !_isMuted) {
+    if (lastMsg != null &&
+        lastMsg.role == 'assistant' &&
+        lastMsg.content.isNotEmpty &&
+        !_isMuted) {
       final voice = _selectedVoice;
       VoiceService.instance.speak(lastMsg.content).then((_) {
         if (_continuousMode && mounted) {
@@ -241,24 +249,35 @@ class _VoiceViewState extends State<VoiceView> with TickerProviderStateMixin {
           children: [
             if (_aiResponse.isNotEmpty || _recognizedText.isNotEmpty)
               GestureDetector(
-
-      behavior: HitTestBehavior.opaque,
+                behavior: HitTestBehavior.opaque,
                 onTap: _clearConversation,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.divider(context),
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: Text(localeProvider.t('clear'), style: TextStyle(color: AppColors.textSecondary(context), fontSize: 12)),
+                  child: Text(
+                    localeProvider.t('clear'),
+                    style: TextStyle(
+                      color: AppColors.textSecondary(context),
+                      fontSize: 12,
+                    ),
+                  ),
                 ),
               ),
             const SizedBox(width: 8),
             GestureDetector(
-
-      behavior: HitTestBehavior.opaque,
+              behavior: HitTestBehavior.opaque,
               onTap: () => widget.provider.navigation.setIsSettingsOpen(true),
-              child: Icon(LucideIcons.settings, color: AppColors.textHint(context), size: 24),
+              child: Icon(
+                LucideIcons.settings,
+                color: AppColors.textHint(context),
+                size: 24,
+              ),
             ),
           ],
         ),
@@ -269,8 +288,7 @@ class _VoiceViewState extends State<VoiceView> with TickerProviderStateMixin {
   Widget _buildConversationArea() {
     return Center(
       child: GestureDetector(
-
-      behavior: HitTestBehavior.opaque,
+        behavior: HitTestBehavior.opaque,
         onTap: _toggleListening,
         child: SizedBox(
           width: 288,
@@ -281,7 +299,9 @@ class _VoiceViewState extends State<VoiceView> with TickerProviderStateMixin {
               AnimatedBuilder(
                 animation: _pulseController,
                 builder: (context, child) {
-                  final pulseScale = _isListening ? 1 + 0.12 * _pulseController.value : 1 + 0.05 * _pulseController.value;
+                  final pulseScale = _isListening
+                      ? 1 + 0.12 * _pulseController.value
+                      : 1 + 0.05 * _pulseController.value;
                   return Transform.scale(
                     scale: pulseScale,
                     child: Container(
@@ -293,16 +313,16 @@ class _VoiceViewState extends State<VoiceView> with TickerProviderStateMixin {
                           color: _isListening
                               ? AppColors.accentDark.withValues(alpha: 0.7)
                               : _isSpeaking
-                                  ? AppColors.accentDark.withValues(alpha: 0.6)
-                                  : AppColors.accentDark.withValues(alpha: 0.4),
+                              ? AppColors.accentDark.withValues(alpha: 0.6)
+                              : AppColors.accentDark.withValues(alpha: 0.4),
                         ),
                         boxShadow: [
                           BoxShadow(
                             color: _isListening
                                 ? AppColors.accentDark.withValues(alpha: 0.4)
                                 : _isSpeaking
-                                    ? AppColors.accentDark.withValues(alpha: 0.3)
-                                    : AppColors.accentDark.withValues(alpha: 0.2),
+                                ? AppColors.accentDark.withValues(alpha: 0.3)
+                                : AppColors.accentDark.withValues(alpha: 0.2),
                             blurRadius: 80,
                           ),
                         ],
@@ -314,9 +334,12 @@ class _VoiceViewState extends State<VoiceView> with TickerProviderStateMixin {
               AnimatedBuilder(
                 animation: _rotateController,
                 builder: (context, child) {
-                  final shouldRotate = _isListening || _isSpeaking || _isProcessing;
+                  final shouldRotate =
+                      _isListening || _isSpeaking || _isProcessing;
                   return Transform.rotate(
-                    angle: shouldRotate ? _rotateController.value * 2 * math.pi : 0,
+                    angle: shouldRotate
+                        ? _rotateController.value * 2 * math.pi
+                        : 0,
                     child: Container(
                       width: 224,
                       height: 224,
@@ -326,8 +349,8 @@ class _VoiceViewState extends State<VoiceView> with TickerProviderStateMixin {
                           color: _isListening
                               ? AppColors.accentDark.withValues(alpha: 0.6)
                               : _isSpeaking
-                                  ? AppColors.accentDark.withValues(alpha: 0.5)
-                                  : AppColors.accentDark.withValues(alpha: 0.4),
+                              ? AppColors.accentDark.withValues(alpha: 0.5)
+                              : AppColors.accentDark.withValues(alpha: 0.4),
                           width: 2,
                           style: BorderStyle.solid,
                         ),
@@ -337,8 +360,8 @@ class _VoiceViewState extends State<VoiceView> with TickerProviderStateMixin {
                           color: _isListening
                               ? AppColors.accentDark.withValues(alpha: 0.6)
                               : _isSpeaking
-                                  ? AppColors.accentDark.withValues(alpha: 0.5)
-                                  : AppColors.accentDark.withValues(alpha: 0.4),
+                              ? AppColors.accentDark.withValues(alpha: 0.5)
+                              : AppColors.accentDark.withValues(alpha: 0.4),
                         ),
                       ),
                     ),
@@ -353,22 +376,20 @@ class _VoiceViewState extends State<VoiceView> with TickerProviderStateMixin {
                   color: _isListening
                       ? AppColors.accentDark.withValues(alpha: 0.4)
                       : _isSpeaking
-                          ? AppColors.accentDark.withValues(alpha: 0.3)
-                          : AppColors.accentDark.withValues(alpha: 0.3),
+                      ? AppColors.accentDark.withValues(alpha: 0.3)
+                      : AppColors.accentDark.withValues(alpha: 0.3),
                   boxShadow: [
                     BoxShadow(
                       color: _isListening
                           ? AppColors.accentDark.withValues(alpha: 0.4)
                           : _isSpeaking
-                              ? AppColors.accentDark.withValues(alpha: 0.3)
-                              : AppColors.accentDark.withValues(alpha: 0.3),
+                          ? AppColors.accentDark.withValues(alpha: 0.3)
+                          : AppColors.accentDark.withValues(alpha: 0.3),
                       blurRadius: 40,
                     ),
                   ],
                 ),
-                child: Center(
-                  child: _buildCenterIcon(),
-                ),
+                child: Center(child: _buildCenterIcon()),
               ),
             ],
           ),
@@ -389,12 +410,24 @@ class _VoiceViewState extends State<VoiceView> with TickerProviderStateMixin {
       );
     }
     if (_isListening) {
-      return Icon(LucideIcons.mic, color: AppColors.textPrimary(context), size: 36);
+      return Icon(
+        LucideIcons.mic,
+        color: AppColors.textPrimary(context),
+        size: 36,
+      );
     }
     if (_isSpeaking) {
-      return Icon(LucideIcons.volume2, color: AppColors.textPrimary(context), size: 36);
+      return Icon(
+        LucideIcons.volume2,
+        color: AppColors.textPrimary(context),
+        size: 36,
+      );
     }
-    return Icon(LucideIcons.mic, color: AppColors.textPrimary(context).withValues(alpha: 0.7), size: 36);
+    return Icon(
+      LucideIcons.mic,
+      color: AppColors.textPrimary(context).withValues(alpha: 0.7),
+      size: 36,
+    );
   }
 
   Widget _buildTranscriptArea() {
@@ -409,7 +442,9 @@ class _VoiceViewState extends State<VoiceView> with TickerProviderStateMixin {
         child: Text(
           _statusText,
           style: TextStyle(
-            color: _isSpeaking ? AppColors.accentDark.withValues(alpha: 0.9) : AppColors.textPrimary(context),
+            color: _isSpeaking
+                ? AppColors.accentDark.withValues(alpha: 0.9)
+                : AppColors.textPrimary(context),
             fontSize: 16,
             fontWeight: FontWeight.w500,
             height: 1.5,
@@ -429,8 +464,7 @@ class _VoiceViewState extends State<VoiceView> with TickerProviderStateMixin {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           GestureDetector(
-
-      behavior: HitTestBehavior.opaque,
+            behavior: HitTestBehavior.opaque,
             onTap: () {
               _voice.stopListening();
               _voice.stopSpeaking();
@@ -446,18 +480,23 @@ class _VoiceViewState extends State<VoiceView> with TickerProviderStateMixin {
                   color: AppColors.divider(context),
                   borderRadius: BorderRadius.circular(28),
                 ),
-                child: Icon(LucideIcons.x, color: AppColors.textSecondary(context), size: 24),
+                child: Icon(
+                  LucideIcons.x,
+                  color: AppColors.textSecondary(context),
+                  size: 24,
+                ),
               ),
             ),
           ),
           GestureDetector(
-
-      behavior: HitTestBehavior.opaque,
+            behavior: HitTestBehavior.opaque,
             onTap: _toggleListening,
             onLongPress: _isListening ? null : _toggleListening,
             child: Semantics(
               button: true,
-              label: _isListening ? localeProvider.t('stop_listening') : localeProvider.t('start_listening'),
+              label: _isListening
+                  ? localeProvider.t('stop_listening')
+                  : localeProvider.t('start_listening'),
               child: Container(
                 width: 72,
                 height: 72,
@@ -465,11 +504,16 @@ class _VoiceViewState extends State<VoiceView> with TickerProviderStateMixin {
                   color: _isListening
                       ? AppColors.accentDark
                       : _isProcessing
-                          ? AppColors.accentDark.withValues(alpha: 0.5)
-                          : AppColors.accentDark.withValues(alpha: 0.8),
+                      ? AppColors.accentDark.withValues(alpha: 0.5)
+                      : AppColors.accentDark.withValues(alpha: 0.8),
                   shape: BoxShape.circle,
                   boxShadow: _isListening
-                      ? [BoxShadow(color: AppColors.accentDark.withValues(alpha: 0.4), blurRadius: 20)]
+                      ? [
+                          BoxShadow(
+                            color: AppColors.accentDark.withValues(alpha: 0.4),
+                            blurRadius: 20,
+                          ),
+                        ]
                       : null,
                 ),
                 child: Icon(
@@ -481,8 +525,7 @@ class _VoiceViewState extends State<VoiceView> with TickerProviderStateMixin {
             ),
           ),
           GestureDetector(
-
-      behavior: HitTestBehavior.opaque,
+            behavior: HitTestBehavior.opaque,
             onTap: () {
               setState(() => _isMuted = !_isMuted);
               if (_isMuted) {
@@ -493,12 +536,16 @@ class _VoiceViewState extends State<VoiceView> with TickerProviderStateMixin {
               width: 56,
               height: 56,
               decoration: BoxDecoration(
-                color: _isMuted ? AppColors.dng(context).withValues(alpha: 0.8) : AppColors.divider(context),
+                color: _isMuted
+                    ? AppColors.dng(context).withValues(alpha: 0.8)
+                    : AppColors.divider(context),
                 borderRadius: BorderRadius.circular(28),
               ),
               child: Icon(
                 _isMuted ? LucideIcons.volumeX : LucideIcons.volume2,
-                color: _isMuted ? AppColors.textPrimary(context) : AppColors.textSecondary(context),
+                color: _isMuted
+                    ? AppColors.textPrimary(context)
+                    : AppColors.textSecondary(context),
                 size: 24,
               ),
             ),
@@ -547,5 +594,6 @@ class _DashedCirclePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _DashedCirclePainter oldDelegate) => oldDelegate.color != color;
+  bool shouldRepaint(covariant _DashedCirclePainter oldDelegate) =>
+      oldDelegate.color != color;
 }

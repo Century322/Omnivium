@@ -83,7 +83,12 @@ void main() {
         resolution: LawForkResolution.conflict,
         detectedAt: 1000,
       );
-      final msg = transportA.sendForkNegotiation('node-B', fork, 'adoptRemote', 1000);
+      final msg = transportA.sendForkNegotiation(
+        'node-B',
+        fork,
+        'adoptRemote',
+        1000,
+      );
 
       expect(msg.type, DiplomacyMessageType.forkNegotiation);
       expect(msg.payload['proposedResolution'], 'adoptRemote');
@@ -113,7 +118,10 @@ void main() {
     });
 
     test('open channel between nodes', () {
-      final channel = transportA.openChannel('node-B', DiplomacyMessageType.constitutionSync);
+      final channel = transportA.openChannel(
+        'node-B',
+        DiplomacyMessageType.constitutionSync,
+      );
 
       expect(channel.localNodeId, 'node-A');
       expect(channel.remoteNodeId, 'node-B');
@@ -128,12 +136,17 @@ void main() {
       transportB.receive(msg);
 
       expect(transportB.inboxCount, 1);
-      expect(transportB.inboxOfType(DiplomacyMessageType.constitutionSync).length, 1);
+      expect(
+        transportB.inboxOfType(DiplomacyMessageType.constitutionSync).length,
+        1,
+      );
     });
 
     test('filter inbox by sender', () {
       final manifest = LawManifest.forNode('node-A', 0);
-      transportB.receive(transportA.sendConstitutionSync('node-B', manifest, 1000));
+      transportB.receive(
+        transportA.sendConstitutionSync('node-B', manifest, 1000),
+      );
       transportB.receive(transportA.sendHeartbeat('node-B', 0, 1001));
 
       expect(transportB.inboxFrom('node-A').length, 2);
@@ -141,7 +154,12 @@ void main() {
 
     test('message signature verification', () {
       final msg = transportA.sendHeartbeat('node-B', 0, 1000);
-      final expectedSig = DiplomacyMessage.computeSignature('node-A', 'node-B', 1000, msg.payload);
+      final expectedSig = DiplomacyMessage.computeSignature(
+        'node-A',
+        'node-B',
+        1000,
+        msg.payload,
+      );
       expect(msg.signature, expectedSig);
     });
 
@@ -429,7 +447,10 @@ void main() {
     test('guard with nodeId exposes transport, identity, economy', () {
       final clock = HybridLogicalClock(nodeId: 'civ-test');
       final securityManager = SecurityManager();
-      final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
+      final enforcer = RuntimeLawEnforcer(
+        clock: clock,
+        securityManager: securityManager,
+      );
 
       final guard = ConstitutionalGuard(enforcer: enforcer, nodeId: 'node-A');
 
@@ -442,7 +463,10 @@ void main() {
     test('guard without nodeId has null civilization layer', () {
       final clock = HybridLogicalClock(nodeId: 'basic-test');
       final securityManager = SecurityManager();
-      final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
+      final enforcer = RuntimeLawEnforcer(
+        clock: clock,
+        securityManager: securityManager,
+      );
 
       final guard = ConstitutionalGuard(enforcer: enforcer);
 
@@ -454,7 +478,10 @@ void main() {
     test('full civilization stack: guard + transport + identity + economy', () {
       final clock = HybridLogicalClock(nodeId: 'full-stack');
       final securityManager = SecurityManager();
-      final enforcer = RuntimeLawEnforcer(clock: clock, securityManager: securityManager);
+      final enforcer = RuntimeLawEnforcer(
+        clock: clock,
+        securityManager: securityManager,
+      );
 
       final guard = ConstitutionalGuard(enforcer: enforcer, nodeId: 'node-A');
 

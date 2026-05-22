@@ -6,7 +6,8 @@ import 'runtime/plugins/persistence_backend.dart';
 class DatabasePersistenceBackend implements PersistenceBackend {
   final String _boxName;
 
-  DatabasePersistenceBackend({String boxName = 'omnivium_data'}) : _boxName = boxName;
+  DatabasePersistenceBackend({String boxName = 'omnivium_data'})
+    : _boxName = boxName;
 
   Box<String> get _box {
     switch (_boxName) {

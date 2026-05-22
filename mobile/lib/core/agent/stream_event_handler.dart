@@ -30,9 +30,9 @@ class StreamEventHandler {
     required AgentStateMachine stateMachine,
     required StreamingController streamingController,
     required ConversationManager conversation,
-  })  : _stateMachine = stateMachine,
-        _streamingController = streamingController,
-        _conversation = conversation;
+  }) : _stateMachine = stateMachine,
+       _streamingController = streamingController,
+       _conversation = conversation;
 
   StreamEventResult handleEvent(AgentEvent event, int msgIndex) {
     final data = event.data;
@@ -71,14 +71,23 @@ class StreamEventHandler {
   StreamEventResult _handleIntent(Map<String, dynamic> data, int msgIndex) {
     final intent = data['intent'] ?? 'chat';
     final channel = data['channel'] ?? 'fast';
-    _conversation.addThought(ThoughtType.planning, 'Intent classified: $intent ($channel)');
+    _conversation.addThought(
+      ThoughtType.planning,
+      'Intent classified: $intent ($channel)',
+    );
     return const StreamEventResult(shouldNotify: true);
   }
 
-  StreamEventResult _handleSkillResult(Map<String, dynamic> data, int msgIndex) {
+  StreamEventResult _handleSkillResult(
+    Map<String, dynamic> data,
+    int msgIndex,
+  ) {
     final skillName = data['skill'] ?? '';
     final success = data['success'] ?? false;
-    _conversation.addThought(ThoughtType.evaluation, 'Tool ${success ? 'succeeded' : 'failed'}: $skillName');
+    _conversation.addThought(
+      ThoughtType.evaluation,
+      'Tool ${success ? 'succeeded' : 'failed'}: $skillName',
+    );
     return const StreamEventResult(shouldNotify: true);
   }
 
@@ -87,8 +96,15 @@ class StreamEventHandler {
       msgIndex,
       'Error: ${data['error'] ?? 'Unknown error'}',
     );
-    _conversation.finalizeStreaming(msgIndex, 'Error: ${data['error'] ?? 'Unknown error'}');
-    return const StreamEventResult(shouldNotify: true, isComplete: true, isError: true);
+    _conversation.finalizeStreaming(
+      msgIndex,
+      'Error: ${data['error'] ?? 'Unknown error'}',
+    );
+    return const StreamEventResult(
+      shouldNotify: true,
+      isComplete: true,
+      isError: true,
+    );
   }
 
   StreamEventResult _handleMessage(Map<String, dynamic> data, int msgIndex) {
@@ -109,7 +125,8 @@ class StreamEventHandler {
   void completeStreamWithError(int msgIndex, Object error) {
     String msg;
     if (error is RateLimitException) {
-      msg = '⚠️ ${error.waitSeconds < 60 ? '${error.waitSeconds}s' : '${(error.waitSeconds / 60).round()}min'}';
+      msg =
+          '⚠️ ${error.waitSeconds < 60 ? '${error.waitSeconds}s' : '${(error.waitSeconds / 60).round()}min'}';
     } else {
       msg = 'Error: $error';
     }

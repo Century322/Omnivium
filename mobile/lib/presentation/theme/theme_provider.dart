@@ -28,17 +28,23 @@ class ThemeProvider extends ChangeNotifier {
 
   ThemeMode _fromString(String s) {
     switch (s) {
-      case 'light': return ThemeMode.light;
-      case 'system': return ThemeMode.system;
-      default: return ThemeMode.dark;
+      case 'light':
+        return ThemeMode.light;
+      case 'system':
+        return ThemeMode.system;
+      default:
+        return ThemeMode.dark;
     }
   }
 
   String _toString(ThemeMode m) {
     switch (m) {
-      case ThemeMode.light: return 'light';
-      case ThemeMode.system: return 'system';
-      default: return 'dark';
+      case ThemeMode.light:
+        return 'light';
+      case ThemeMode.system:
+        return 'system';
+      default:
+        return 'dark';
     }
   }
 
@@ -50,9 +56,12 @@ class ThemeProvider extends ChangeNotifier {
 
   String get currentLabel {
     switch (_mode) {
-      case ThemeMode.light: return localeProvider.t('light');
-      case ThemeMode.system: return localeProvider.t('system');
-      default: return localeProvider.t('dark');
+      case ThemeMode.light:
+        return localeProvider.t('light');
+      case ThemeMode.system:
+        return localeProvider.t('system');
+      default:
+        return localeProvider.t('dark');
     }
   }
 
@@ -90,7 +99,11 @@ class ThemeProvider extends ChangeNotifier {
       backgroundColor: AppColors.background,
       elevation: 0,
       iconTheme: IconThemeData(color: Colors.white),
-      titleTextStyle: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
+      titleTextStyle: TextStyle(
+        color: Colors.white,
+        fontSize: 18,
+        fontWeight: FontWeight.w600,
+      ),
       systemOverlayStyle: SystemUiOverlayStyle(
         statusBarColor: AppColors.background,
         statusBarIconBrightness: Brightness.light,
@@ -100,27 +113,87 @@ class ThemeProvider extends ChangeNotifier {
       ),
     ),
     textTheme: const TextTheme(
-      headlineLarge: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w800),
-      headlineMedium: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w700),
-      headlineSmall: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600),
-      titleLarge: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
-      titleMedium: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
-      titleSmall: TextStyle(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.w500),
-      bodyLarge: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w400),
-      bodyMedium: TextStyle(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.w400),
-      bodySmall: TextStyle(color: Colors.white54, fontSize: 12, fontWeight: FontWeight.w400),
-      labelLarge: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
-      labelMedium: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w500),
-      labelSmall: TextStyle(color: Colors.white54, fontSize: 11, fontWeight: FontWeight.w400),
+      headlineLarge: TextStyle(
+        color: Colors.white,
+        fontSize: 28,
+        fontWeight: FontWeight.w800,
+      ),
+      headlineMedium: TextStyle(
+        color: Colors.white,
+        fontSize: 24,
+        fontWeight: FontWeight.w700,
+      ),
+      headlineSmall: TextStyle(
+        color: Colors.white,
+        fontSize: 20,
+        fontWeight: FontWeight.w600,
+      ),
+      titleLarge: TextStyle(
+        color: Colors.white,
+        fontSize: 18,
+        fontWeight: FontWeight.w600,
+      ),
+      titleMedium: TextStyle(
+        color: Colors.white,
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
+      ),
+      titleSmall: TextStyle(
+        color: Colors.white70,
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+      ),
+      bodyLarge: TextStyle(
+        color: Colors.white,
+        fontSize: 16,
+        fontWeight: FontWeight.w400,
+      ),
+      bodyMedium: TextStyle(
+        color: Colors.white70,
+        fontSize: 14,
+        fontWeight: FontWeight.w400,
+      ),
+      bodySmall: TextStyle(
+        color: Colors.white54,
+        fontSize: 12,
+        fontWeight: FontWeight.w400,
+      ),
+      labelLarge: TextStyle(
+        color: Colors.white,
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+      ),
+      labelMedium: TextStyle(
+        color: Colors.white70,
+        fontSize: 12,
+        fontWeight: FontWeight.w500,
+      ),
+      labelSmall: TextStyle(
+        color: Colors.white54,
+        fontSize: 11,
+        fontWeight: FontWeight.w400,
+      ),
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: AppColors.surface,
       hintStyle: const TextStyle(color: Colors.white38, fontSize: 14),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
-      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
-      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: AppColors.accent, width: 1.5)),
-      errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: AppColors.danger, width: 1)),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide.none,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide.none,
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: AppColors.accent, width: 1.5),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: AppColors.danger, width: 1),
+      ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
     ),
     cardTheme: CardThemeData(
@@ -192,7 +265,11 @@ class ThemeProvider extends ChangeNotifier {
       backgroundColor: AppColors.lightBackground,
       elevation: 0,
       iconTheme: IconThemeData(color: Color(0xFF1C1C1E)),
-      titleTextStyle: TextStyle(color: Color(0xFF1C1C1E), fontSize: 18, fontWeight: FontWeight.w600),
+      titleTextStyle: TextStyle(
+        color: Color(0xFF1C1C1E),
+        fontSize: 18,
+        fontWeight: FontWeight.w600,
+      ),
       systemOverlayStyle: SystemUiOverlayStyle(
         statusBarColor: AppColors.lightBackground,
         statusBarIconBrightness: Brightness.dark,
@@ -202,27 +279,87 @@ class ThemeProvider extends ChangeNotifier {
       ),
     ),
     textTheme: const TextTheme(
-      headlineLarge: TextStyle(color: Color(0xFF1C1C1E), fontSize: 28, fontWeight: FontWeight.w800),
-      headlineMedium: TextStyle(color: Color(0xFF1C1C1E), fontSize: 24, fontWeight: FontWeight.w700),
-      headlineSmall: TextStyle(color: Color(0xFF1C1C1E), fontSize: 20, fontWeight: FontWeight.w600),
-      titleLarge: TextStyle(color: Color(0xFF1C1C1E), fontSize: 18, fontWeight: FontWeight.w600),
-      titleMedium: TextStyle(color: Color(0xFF444444), fontSize: 16, fontWeight: FontWeight.w500),
-      titleSmall: TextStyle(color: Color(0xFF666666), fontSize: 14, fontWeight: FontWeight.w500),
-      bodyLarge: TextStyle(color: Color(0xFF1C1C1E), fontSize: 16, fontWeight: FontWeight.w400),
-      bodyMedium: TextStyle(color: Color(0xFF444444), fontSize: 14, fontWeight: FontWeight.w400),
-      bodySmall: TextStyle(color: Color(0xFF666666), fontSize: 12, fontWeight: FontWeight.w400),
-      labelLarge: TextStyle(color: Color(0xFF1C1C1E), fontSize: 14, fontWeight: FontWeight.w600),
-      labelMedium: TextStyle(color: Color(0xFF444444), fontSize: 12, fontWeight: FontWeight.w500),
-      labelSmall: TextStyle(color: Color(0xFF888888), fontSize: 11, fontWeight: FontWeight.w400),
+      headlineLarge: TextStyle(
+        color: Color(0xFF1C1C1E),
+        fontSize: 28,
+        fontWeight: FontWeight.w800,
+      ),
+      headlineMedium: TextStyle(
+        color: Color(0xFF1C1C1E),
+        fontSize: 24,
+        fontWeight: FontWeight.w700,
+      ),
+      headlineSmall: TextStyle(
+        color: Color(0xFF1C1C1E),
+        fontSize: 20,
+        fontWeight: FontWeight.w600,
+      ),
+      titleLarge: TextStyle(
+        color: Color(0xFF1C1C1E),
+        fontSize: 18,
+        fontWeight: FontWeight.w600,
+      ),
+      titleMedium: TextStyle(
+        color: Color(0xFF444444),
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
+      ),
+      titleSmall: TextStyle(
+        color: Color(0xFF666666),
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+      ),
+      bodyLarge: TextStyle(
+        color: Color(0xFF1C1C1E),
+        fontSize: 16,
+        fontWeight: FontWeight.w400,
+      ),
+      bodyMedium: TextStyle(
+        color: Color(0xFF444444),
+        fontSize: 14,
+        fontWeight: FontWeight.w400,
+      ),
+      bodySmall: TextStyle(
+        color: Color(0xFF666666),
+        fontSize: 12,
+        fontWeight: FontWeight.w400,
+      ),
+      labelLarge: TextStyle(
+        color: Color(0xFF1C1C1E),
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+      ),
+      labelMedium: TextStyle(
+        color: Color(0xFF444444),
+        fontSize: 12,
+        fontWeight: FontWeight.w500,
+      ),
+      labelSmall: TextStyle(
+        color: Color(0xFF888888),
+        fontSize: 11,
+        fontWeight: FontWeight.w400,
+      ),
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: AppColors.lightSurface,
       hintStyle: const TextStyle(color: Color(0xFF888888), fontSize: 14),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
-      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
-      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: AppColors.lightAccent, width: 1.5)),
-      errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: AppColors.lightDanger, width: 1)),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide.none,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide.none,
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: AppColors.lightAccent, width: 1.5),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: AppColors.lightDanger, width: 1),
+      ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
     ),
     cardTheme: CardThemeData(

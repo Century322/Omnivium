@@ -4,31 +4,23 @@ import '../push_notification_service.dart';
 import '../database_service.dart';
 import 'agent_memory_service.dart';
 
-enum ReminderType {
-  messageNotification,
-  recurring,
-  scheduled,
-  aiSmart,
-}
+enum ReminderType { messageNotification, recurring, scheduled, aiSmart }
 
-enum ReminderStatus {
-  active,
-  paused,
-  completed,
-  cancelled,
-}
+enum ReminderStatus { active, paused, completed, cancelled }
 
 class ReminderFrequency {
   final Duration interval;
   final bool isCustom;
 
-  const ReminderFrequency({
-    required this.interval,
-    this.isCustom = false,
-  });
+  const ReminderFrequency({required this.interval, this.isCustom = false});
 
-  static const everyMinute = ReminderFrequency(interval: Duration(minutes: 1), isCustom: true);
-  static const every30Minutes = ReminderFrequency(interval: Duration(minutes: 30));
+  static const everyMinute = ReminderFrequency(
+    interval: Duration(minutes: 1),
+    isCustom: true,
+  );
+  static const every30Minutes = ReminderFrequency(
+    interval: Duration(minutes: 30),
+  );
   static const every2Hours = ReminderFrequency(interval: Duration(hours: 2));
   static const every6Hours = ReminderFrequency(interval: Duration(hours: 6));
   static const everyDay = ReminderFrequency(interval: Duration(hours: 24));
@@ -64,10 +56,7 @@ class Reminder {
     this.aiPrompt,
   });
 
-  Reminder copyWith({
-    ReminderStatus? status,
-    DateTime? nextTriggerAt,
-  }) =>
+  Reminder copyWith({ReminderStatus? status, DateTime? nextTriggerAt}) =>
       Reminder(
         id: id,
         type: type,
@@ -83,41 +72,41 @@ class Reminder {
       );
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'type': type.name,
-        'title': title,
-        'description': description,
-        'frequencyMs': frequency.interval.inMilliseconds,
-        'isCustom': frequency.isCustom,
-        'createdAt': createdAt.toIso8601String(),
-        'nextTriggerAt': nextTriggerAt?.toIso8601String(),
-        'status': status.name,
-        'metadata': metadata,
-        'matrixRoomId': matrixRoomId,
-        'aiPrompt': aiPrompt,
-      };
+    'id': id,
+    'type': type.name,
+    'title': title,
+    'description': description,
+    'frequencyMs': frequency.interval.inMilliseconds,
+    'isCustom': frequency.isCustom,
+    'createdAt': createdAt.toIso8601String(),
+    'nextTriggerAt': nextTriggerAt?.toIso8601String(),
+    'status': status.name,
+    'metadata': metadata,
+    'matrixRoomId': matrixRoomId,
+    'aiPrompt': aiPrompt,
+  };
 
   factory Reminder.fromJson(Map<String, dynamic> json) => Reminder(
-        id: json['id'] as String,
-        type: ReminderType.values.firstWhere((t) => t.name == json['type']),
-        title: json['title'] as String,
-        description: json['description'] as String,
-        frequency: ReminderFrequency(
-          interval: Duration(milliseconds: json['frequencyMs'] as int),
-          isCustom: json['isCustom'] as bool? ?? false,
-        ),
-        createdAt: DateTime.parse(json['createdAt'] as String),
-        nextTriggerAt: json['nextTriggerAt'] != null
-            ? DateTime.parse(json['nextTriggerAt'] as String)
-            : null,
-        status: ReminderStatus.values.firstWhere(
-          (s) => s.name == json['status'],
-          orElse: () => ReminderStatus.active,
-        ),
-        metadata: json['metadata'] as Map<String, dynamic>? ?? {},
-        matrixRoomId: json['matrixRoomId'] as String?,
-        aiPrompt: json['aiPrompt'] as String?,
-      );
+    id: json['id'] as String,
+    type: ReminderType.values.firstWhere((t) => t.name == json['type']),
+    title: json['title'] as String,
+    description: json['description'] as String,
+    frequency: ReminderFrequency(
+      interval: Duration(milliseconds: json['frequencyMs'] as int),
+      isCustom: json['isCustom'] as bool? ?? false,
+    ),
+    createdAt: DateTime.parse(json['createdAt'] as String),
+    nextTriggerAt: json['nextTriggerAt'] != null
+        ? DateTime.parse(json['nextTriggerAt'] as String)
+        : null,
+    status: ReminderStatus.values.firstWhere(
+      (s) => s.name == json['status'],
+      orElse: () => ReminderStatus.active,
+    ),
+    metadata: json['metadata'] as Map<String, dynamic>? ?? {},
+    matrixRoomId: json['matrixRoomId'] as String?,
+    aiPrompt: json['aiPrompt'] as String?,
+  );
 }
 
 class ReminderService {
@@ -146,7 +135,9 @@ class ReminderService {
     _onReminderFired = onReminderFired;
     await _loadFromStorage();
     _initialized = true;
-    AppLogger.instance.info('ReminderService initialized with ${_reminders.length} reminders');
+    AppLogger.instance.info(
+      'ReminderService initialized with ${_reminders.length} reminders',
+    );
   }
 
   Future<void> _loadFromStorage() async {
@@ -164,29 +155,29 @@ class ReminderService {
         final rooms = notifData['rooms'] as List<dynamic>? ?? [];
         for (final entry in rooms) {
           final map = entry as Map<String, dynamic>;
-          _messageNotificationRooms[map['roomId'] as String] = map['enabled'] as bool? ?? true;
+          _messageNotificationRooms[map['roomId'] as String] =
+              map['enabled'] as bool? ?? true;
         }
       }
     } catch (e) {
-      AppLogger.instance.error('Failed to load reminders from storage', error: e);
+      AppLogger.instance.error(
+        'Failed to load reminders from storage',
+        error: e,
+      );
     }
   }
 
   Future<void> _saveToStorage() async {
     try {
       final db = DatabaseService.instance;
-      await db.putData(
-        _storageKey,
-        {'reminders': _reminders.map((r) => r.toJson()).toList()},
-      );
-      await db.putData(
-        _messageNotificationKey,
-        {
-          'rooms': _messageNotificationRooms.entries
-              .map((e) => {'roomId': e.key, 'enabled': e.value})
-              .toList(),
-        },
-      );
+      await db.putData(_storageKey, {
+        'reminders': _reminders.map((r) => r.toJson()).toList(),
+      });
+      await db.putData(_messageNotificationKey, {
+        'rooms': _messageNotificationRooms.entries
+            .map((e) => {'roomId': e.key, 'enabled': e.value})
+            .toList(),
+      });
     } catch (e) {
       AppLogger.instance.error('Failed to save reminders to storage', error: e);
     }
@@ -242,14 +233,18 @@ class ReminderService {
 
     _reminders.add(reminder);
     await _saveToStorage();
-    AppLogger.instance.info('Reminder created: ${reminder.id} (${reminder.type.name})');
+    AppLogger.instance.info(
+      'Reminder created: ${reminder.id} (${reminder.type.name})',
+    );
     return reminder;
   }
 
   Future<void> cancelReminder(String reminderId) async {
     final idx = _reminders.indexWhere((r) => r.id == reminderId);
     if (idx < 0) return;
-    _reminders[idx] = _reminders[idx].copyWith(status: ReminderStatus.cancelled);
+    _reminders[idx] = _reminders[idx].copyWith(
+      status: ReminderStatus.cancelled,
+    );
     await _saveToStorage();
     AppLogger.instance.info('Reminder cancelled: $reminderId');
   }
@@ -274,7 +269,10 @@ class ReminderService {
 
   void startChecking() {
     if (_checkTimer != null) return;
-    _checkTimer = Timer.periodic(const Duration(minutes: 1), (_) => _runChecks());
+    _checkTimer = Timer.periodic(
+      const Duration(minutes: 1),
+      (_) => _runChecks(),
+    );
     AppLogger.instance.info('ReminderService started periodic checks');
   }
 
@@ -291,7 +289,8 @@ class ReminderService {
       if (reminder.status != ReminderStatus.active) continue;
       if (reminder.type == ReminderType.messageNotification) continue;
 
-      if (reminder.nextTriggerAt != null && now.isAfter(reminder.nextTriggerAt!)) {
+      if (reminder.nextTriggerAt != null &&
+          now.isAfter(reminder.nextTriggerAt!)) {
         try {
           await _fireReminder(reminder);
           _consecutiveFailures[reminder.id] = 0;
@@ -310,9 +309,14 @@ class ReminderService {
           if (count >= 5) {
             _reminders[i] = reminder.copyWith(status: ReminderStatus.paused);
             await _saveToStorage();
-            AppLogger.instance.warning('Reminder "${reminder.id}" paused after $count failures');
+            AppLogger.instance.warning(
+              'Reminder "${reminder.id}" paused after $count failures',
+            );
           } else {
-            AppLogger.instance.error('Reminder "${reminder.id}" failed', error: e);
+            AppLogger.instance.error(
+              'Reminder "${reminder.id}" failed',
+              error: e,
+            );
           }
         }
       }
@@ -323,9 +327,13 @@ class ReminderService {
     String body = reminder.description;
 
     if (reminder.type == ReminderType.aiSmart && _onAiTrigger != null) {
-      final aiResponse = await _onAiTrigger!(reminder.aiPrompt ?? reminder.description);
+      final aiResponse = await _onAiTrigger!(
+        reminder.aiPrompt ?? reminder.description,
+      );
       if (aiResponse != null && aiResponse.isNotEmpty) {
-        body = aiResponse.length > 200 ? '${aiResponse.substring(0, 200)}...' : aiResponse;
+        body = aiResponse.length > 200
+            ? '${aiResponse.substring(0, 200)}...'
+            : aiResponse;
       }
     }
 
@@ -335,14 +343,22 @@ class ReminderService {
     );
 
     _onReminderFired?.call(reminder);
-    AppLogger.instance.info('Reminder fired: ${reminder.id} (${reminder.type.name})');
+    AppLogger.instance.info(
+      'Reminder fired: ${reminder.id} (${reminder.type.name})',
+    );
   }
 
-  Future<void> fireMessageNotification(String roomId, String senderName, String messagePreview) async {
+  Future<void> fireMessageNotification(
+    String roomId,
+    String senderName,
+    String messagePreview,
+  ) async {
     if (!isMessageNotificationEnabled(roomId)) return;
     await PushNotificationService.instance.showLocalNotification(
       title: senderName,
-      body: messagePreview.length > 100 ? '${messagePreview.substring(0, 100)}...' : messagePreview,
+      body: messagePreview.length > 100
+          ? '${messagePreview.substring(0, 100)}...'
+          : messagePreview,
     );
   }
 
@@ -355,12 +371,14 @@ class ReminderService {
       _reminders.where((r) => r.type == type).toList();
 
   Map<String, dynamic> get statusSummary => {
-        'total': _reminders.length,
-        'active': _reminders.where((r) => r.status == ReminderStatus.active).length,
-        'paused': _reminders.where((r) => r.status == ReminderStatus.paused).length,
-        'completed': _reminders.where((r) => r.status == ReminderStatus.completed).length,
-        'messageNotifications': _messageNotificationRooms.length,
-      };
+    'total': _reminders.length,
+    'active': _reminders.where((r) => r.status == ReminderStatus.active).length,
+    'paused': _reminders.where((r) => r.status == ReminderStatus.paused).length,
+    'completed': _reminders
+        .where((r) => r.status == ReminderStatus.completed)
+        .length,
+    'messageNotifications': _messageNotificationRooms.length,
+  };
 
   void dispose() {
     stopChecking();

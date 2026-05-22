@@ -216,23 +216,32 @@ void main() {
         issuerPublicKey: 'test_public_key',
         issuerVerificationKey: 'correct_verification',
       );
-      expect(VerifiableCredential.verifyCredential(vc, 'wrong_verification'), isFalse);
+      expect(
+        VerifiableCredential.verifyCredential(vc, 'wrong_verification'),
+        isFalse,
+      );
     });
 
-    test('verifyCredentialWithSigningKey returns true for correct signing key', () {
-      final signingKey = 'signing_key';
-      final vc = VerifiableCredential.issue(
-        issuerDid: 'did:omnivium:authority',
-        subjectDid: 'did:omnivium:1234',
-        credentialType: 'Test',
-        claims: {'test': true},
-        ttl: 3600000,
-        issuerSigningKey: signingKey,
-        issuerPublicKey: 'test_public_key',
-        issuerVerificationKey: 'verification_key',
-      );
-      expect(VerifiableCredential.verifyCredentialWithSigningKey(vc, signingKey), isTrue);
-    });
+    test(
+      'verifyCredentialWithSigningKey returns true for correct signing key',
+      () {
+        final signingKey = 'signing_key';
+        final vc = VerifiableCredential.issue(
+          issuerDid: 'did:omnivium:authority',
+          subjectDid: 'did:omnivium:1234',
+          credentialType: 'Test',
+          claims: {'test': true},
+          ttl: 3600000,
+          issuerSigningKey: signingKey,
+          issuerPublicKey: 'test_public_key',
+          issuerVerificationKey: 'verification_key',
+        );
+        expect(
+          VerifiableCredential.verifyCredentialWithSigningKey(vc, signingKey),
+          isTrue,
+        );
+      },
+    );
 
     test('verifyCredential returns false for tampered claims', () {
       final signingKey = 'signing_key';
@@ -259,7 +268,10 @@ void main() {
         proof: vc.proof,
         verificationTag: vc.verificationTag,
       );
-      expect(VerifiableCredential.verifyCredential(tampered, verificationKey), isFalse);
+      expect(
+        VerifiableCredential.verifyCredential(tampered, verificationKey),
+        isFalse,
+      );
     });
 
     test('credential toJson includes proof and verificationTag', () {
@@ -283,7 +295,10 @@ void main() {
 
   group('ConstitutionalPassport �?Machine Sovereign Identity', () {
     test('issue creates valid passport', () {
-      final holder = SovereignIdentity.generate('node-A', federationId: 'fed-1');
+      final holder = SovereignIdentity.generate(
+        'node-A',
+        federationId: 'fed-1',
+      );
       final passport = ConstitutionalPassport.issue(
         holder: holder,
         reputationScore: 85.0,
@@ -295,9 +310,15 @@ void main() {
       expect(passport.passportId, startsWith('passport:'));
       expect(passport.holder.did, holder.did);
       expect(passport.isValid, isTrue);
-      expect(passport.identityCredential.credentialType, 'ConstitutionalIdentity');
+      expect(
+        passport.identityCredential.credentialType,
+        'ConstitutionalIdentity',
+      );
       expect(passport.reputationCredential.credentialType, 'ReputationScore');
-      expect(passport.federationCredential.credentialType, 'FederationMembership');
+      expect(
+        passport.federationCredential.credentialType,
+        'FederationMembership',
+      );
       expect(passport.verificationTag, isNotEmpty);
     });
 
@@ -312,7 +333,10 @@ void main() {
         issuerPublicKey: publicKey,
         issuerVerificationKey: 'auth_verification_key',
       );
-      expect(ConstitutionalPassport.verifyPassport(passport, publicKey), isTrue);
+      expect(
+        ConstitutionalPassport.verifyPassport(passport, publicKey),
+        isTrue,
+      );
     });
 
     test('verifyPassport returns false for wrong verification key', () {
@@ -325,7 +349,10 @@ void main() {
         issuerPublicKey: 'test_public_key',
         issuerVerificationKey: 'correct_key',
       );
-      expect(ConstitutionalPassport.verifyPassport(passport, 'wrong_key'), isFalse);
+      expect(
+        ConstitutionalPassport.verifyPassport(passport, 'wrong_key'),
+        isFalse,
+      );
     });
 
     test('passport includes reputation score in credential claims', () {
@@ -406,14 +433,20 @@ void main() {
       final id = SovereignIdentity.generate('node-A');
       final sig = id.selfSignature;
       final sigData = '${id.did}|${id.publicKey}|${id.createdAt}';
-      expect(SovereignIdentity.verifySignature(sigData, sig, id.verificationKey), isTrue);
+      expect(
+        SovereignIdentity.verifySignature(sigData, sig, id.verificationKey),
+        isTrue,
+      );
     });
 
     test('verifySignature fails with wrong verification key', () {
       final id = SovereignIdentity.generate('node-A');
       final sig = id.selfSignature;
       final sigData = '${id.did}|${id.publicKey}|${id.createdAt}';
-      expect(SovereignIdentity.verifySignature(sigData, sig, 'wrong_key'), isFalse);
+      expect(
+        SovereignIdentity.verifySignature(sigData, sig, 'wrong_key'),
+        isFalse,
+      );
     });
   });
 
@@ -446,4 +479,3 @@ void main() {
     });
   });
 }
-
