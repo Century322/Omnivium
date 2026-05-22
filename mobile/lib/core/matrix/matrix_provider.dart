@@ -1,4 +1,5 @@
 import '../app_logger.dart';
+import '../call_service.dart';
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -58,6 +59,7 @@ class MatrixProvider extends ChangeNotifier {
     try {
       await _service.login(username, password, homeserverUrl);
       _listenToSync();
+      _initCallService();
     } catch (e) {
       _error = e.toString();
     }
@@ -72,6 +74,7 @@ class MatrixProvider extends ChangeNotifier {
     try {
       await _service.loginWithToken(token, homeserverUrl);
       _listenToSync();
+      _initCallService();
     } catch (e) {
       _error = e.toString();
     }
@@ -215,6 +218,14 @@ class MatrixProvider extends ChangeNotifier {
       }
       if (!_disposed) notifyListeners();
     });
+  }
+
+  void _initCallService() {
+    final client = _service.client;
+    if (client != null) {
+      CallService.instance.init(client);
+      AppLogger.instance.info('CallService initialized with Matrix client');
+    }
   }
 
   @override

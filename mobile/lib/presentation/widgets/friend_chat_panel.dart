@@ -12,6 +12,7 @@ import '../theme/app_colors.dart';
 import '../theme/locale_provider.dart';
 import '../../core/app_provider.dart';
 import '../../core/app_logger.dart';
+import '../../core/call_service.dart';
 import '../../core/haptic_service.dart';
 import '../../core/file_download_service.dart';
 import '../widgets/home_components.dart';
@@ -19,6 +20,7 @@ import '../widgets/voice_message.dart';
 import '../widgets/link_preview_card.dart';
 import '../views/key_verification_view.dart';
 import '../views/friend_profile_view.dart';
+import '../views/call_screen.dart';
 import 'image_viewer.dart';
 
 class FriendChatPanel extends StatefulWidget {
@@ -312,7 +314,7 @@ class _FriendChatPanelState extends State<FriendChatPanel> with TickerProviderSt
                   _plusMenuItem(LucideIcons.image, localeProvider.t('image'), onTap: _pickImage),
                   _plusMenuItem(LucideIcons.camera, localeProvider.t('camera'), onTap: _takePhoto),
                   _plusMenuItem(LucideIcons.file, localeProvider.t('file'), onTap: _pickFile),
-                  _plusMenuItem(LucideIcons.phone, localeProvider.t('voice_call'), onTap: () => _showComingSoon()),
+                  _plusMenuItem(LucideIcons.phone, localeProvider.t('voice_call'), onTap: _startVoiceCall),
                   _plusMenuItem(LucideIcons.video, localeProvider.t('video_call'), onTap: () => _showComingSoon()),
                 ],
               ),
@@ -353,6 +355,19 @@ class _FriendChatPanelState extends State<FriendChatPanel> with TickerProviderSt
   void _showComingSoon() {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(localeProvider.t('coming_soon')), backgroundColor: AppColors.accent, duration: const Duration(seconds: 2)),
+    );
+  }
+
+  void _startVoiceCall() {
+    final room = _room;
+    if (room == null) return;
+    final remoteMembers = room.getParticipants();
+    final remoteUser = remoteMembers.where((m) => m.id != room.client.userID).firstOrNull;
+    if (remoteUser == null) return;
+
+    CallService.instance.initiateCall(room.id, remoteUser.id);
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const CallScreen()),
     );
   }
 

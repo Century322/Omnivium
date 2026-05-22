@@ -56,6 +56,7 @@ dependencies:
   intl: any
   freezed_annotation: ^2.4.4
   json_annotation: ^4.9.0
+  flutter_webrtc: ^1.4.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
