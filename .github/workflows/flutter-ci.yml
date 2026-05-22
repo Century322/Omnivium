@@ -93,9 +93,9 @@ jobs:
 
       - name: Fix Java SSL
         run: |
-          sudo apt-get update && sudo apt-get install -y ca-certificates
-          sudo update-ca-certificates
-          keytool -importcert -noprompt -trustcacerts -alias custom-ca -file /etc/ssl/certs/ca-certificates.crt -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit || true
+          export JAVA_CACERTS=$JAVA_HOME/lib/security/cacerts
+          sudo keytool -importcert -noprompt -trustcacerts -alias custom-ca -file /etc/ssl/certs/ca-certificates.crt -keystore $JAVA_CACERTS -storepass changeit 2>/dev/null || true
+          echo "JAVA_TOOL_OPTIONS=-Djavax.net.ssl.trustStore=$JAVA_CACERTS -Djavax.net.ssl.trustStorePassword=changeit" >> $GITHUB_ENV
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
