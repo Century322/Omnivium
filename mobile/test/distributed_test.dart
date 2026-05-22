@@ -97,8 +97,16 @@ void main() {
 
     test('concurrent events are detected', () {
       final now = DateTime.now().millisecondsSinceEpoch;
-      final tA = HybridTimestamp(physicalTime: now, logicalTime: 1, nodeId: 'node-A');
-      final tB = HybridTimestamp(physicalTime: now, logicalTime: 1, nodeId: 'node-B');
+      final tA = HybridTimestamp(
+        physicalTime: now,
+        logicalTime: 1,
+        nodeId: 'node-A',
+      );
+      final tB = HybridTimestamp(
+        physicalTime: now,
+        logicalTime: 1,
+        nodeId: 'node-B',
+      );
 
       final isConcurrent = tA.isConcurrentWith(tB) || tB.isConcurrentWith(tA);
       expect(isConcurrent, isTrue);
