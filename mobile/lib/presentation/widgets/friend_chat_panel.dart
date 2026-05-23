@@ -11,6 +11,7 @@ import 'package:matrix/matrix.dart';
 import '../theme/app_colors.dart';
 import '../theme/locale_provider.dart';
 import '../../core/app_provider.dart';
+import '../../core/analytics_service.dart';
 import '../../core/app_logger.dart';
 import '../../core/call_service.dart';
 import '../../core/haptic_service.dart';
@@ -239,6 +240,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
     final matrix = widget.provider.matrix;
     if (matrix.isLoggedIn && widget.chatTargetId.isNotEmpty) {
       matrix.sendMessage(widget.chatTargetId, text);
+      AnalyticsService.instance.logSendMessage(type: 'text');
     }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -472,6 +474,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
     if (remoteUser == null) return;
 
     CallService.instance.initiateCall(room.id, remoteUser.id);
+    AnalyticsService.instance.logVoiceCall();
     Navigator.of(
       context,
     ).push(MaterialPageRoute(builder: (_) => const CallScreen()));

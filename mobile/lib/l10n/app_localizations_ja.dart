@@ -401,7 +401,11 @@ class SJa extends S {
 
   @override
   String get discover => '発見';
+
+  @override
   String get discover_welcome => 'Omniviumへようこそ';
+
+  @override
   String get discover_welcome_desc => 'AIによる厳選コンテンツを探索。最新アップデートをお楽しみに。';
 
   @override

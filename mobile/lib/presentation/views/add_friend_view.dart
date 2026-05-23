@@ -5,6 +5,7 @@ import '../widgets/skeleton_loader.dart';
 import '../theme/app_colors.dart';
 import '../theme/locale_provider.dart';
 import '../../core/app_provider.dart';
+import '../../core/analytics_service.dart';
 
 class AddFriendView extends StatefulWidget {
   final AppProvider provider;
@@ -53,6 +54,7 @@ class _AddFriendViewState extends State<AddFriendView> {
     });
     try {
       final roomId = await widget.provider.matrix.createDirectChat(userId);
+      AnalyticsService.instance.logAddContact();
       if (mounted) {
         widget.provider.matrix.setActiveRoom(roomId);
         Navigator.pop(context, roomId);

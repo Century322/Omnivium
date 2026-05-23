@@ -25,6 +25,8 @@ class DiscoverView extends StatefulWidget {
 class _DiscoverViewState extends State<DiscoverView> {
   List<_Item> _items = [];
   bool _isLoading = true;
+  int _activeTab = 0;
+  final Set<int> _likedItems = {};
 
   List<Map<String, String>> get _fallbackItems => [
     {
@@ -47,7 +49,11 @@ class _DiscoverViewState extends State<DiscoverView> {
     try {
       final proxy = ApiProxyService.instance;
       if (proxy.isConfigured) {
-        final uri = Uri.parse('${proxy.backendUrl}/content/discover');
+        final categories = ['all', 'news', 'tech', 'business', 'art'];
+        final category = categories[_activeTab];
+        final uri = Uri.parse(
+          '${proxy.backendUrl}/content/discover?category=$category',
+        );
         final response = await proxy.secureClient
             .get(
               uri,
@@ -298,23 +304,27 @@ class _DiscoverViewState extends State<DiscoverView> {
                                         _tab(
                                           context,
                                           localeProvider.t('for_you'),
-                                          active: true,
+                                          index: 0,
                                         ),
                                         _tab(
                                           context,
                                           localeProvider.t('headline_news'),
+                                          index: 1,
                                         ),
                                         _tab(
                                           context,
                                           localeProvider.t('science_tech'),
+                                          index: 2,
                                         ),
                                         _tab(
                                           context,
                                           localeProvider.t('business'),
+                                          index: 3,
                                         ),
                                         _tab(
                                           context,
                                           localeProvider.t('art_culture'),
+                                          index: 4,
                                         ),
                                       ],
                                     ),
@@ -426,23 +436,27 @@ class _DiscoverViewState extends State<DiscoverView> {
                                       _tab(
                                         context,
                                         localeProvider.t('for_you'),
-                                        active: true,
+                                        index: 0,
                                       ),
                                       _tab(
                                         context,
                                         localeProvider.t('headline_news'),
+                                        index: 1,
                                       ),
                                       _tab(
                                         context,
                                         localeProvider.t('science_tech'),
+                                        index: 2,
                                       ),
                                       _tab(
                                         context,
                                         localeProvider.t('business'),
+                                        index: 3,
                                       ),
                                       _tab(
                                         context,
                                         localeProvider.t('art_culture'),
+                                        index: 4,
                                       ),
                                     ],
                                   ),
@@ -578,10 +592,24 @@ class _DiscoverViewState extends State<DiscoverView> {
                           ),
                         ),
                         const Spacer(),
-                        Icon(
-                          LucideIcons.bookmark,
-                          color: AppColors.textTertiary(context),
-                          size: 20,
+                        GestureDetector(
+                          onTap: () => setState(() {
+                            final key = item.title.hashCode;
+                            if (_likedItems.contains(key)) {
+                              _likedItems.remove(key);
+                            } else {
+                              _likedItems.add(key);
+                            }
+                          }),
+                          child: Icon(
+                            _likedItems.contains(item.title.hashCode)
+                                ? LucideIcons.bookmark
+                                : LucideIcons.bookmark,
+                            color: _likedItems.contains(item.title.hashCode)
+                                ? AppColors.accent
+                                : AppColors.textTertiary(context),
+                            size: 20,
+                          ),
                         ),
                       ],
                     ),
@@ -595,21 +623,28 @@ class _DiscoverViewState extends State<DiscoverView> {
     );
   }
 
-  Widget _tab(BuildContext context, String label, {bool active = false}) {
-    return Container(
-      margin: const EdgeInsets.only(right: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      decoration: BoxDecoration(
-        color: active ? AppColors.accBg(context) : AppColors.sf(context),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Center(
-        child: Text(
-          label,
-          style: TextStyle(
-            color: active ? AppColors.accentLight : AppColors.sec(context),
-            fontSize: 14.5,
-            fontWeight: FontWeight.w500,
+  Widget _tab(BuildContext context, String label, {required int index}) {
+    final active = _activeTab == index;
+    return GestureDetector(
+      onTap: () => setState(() {
+        _activeTab = index;
+        _loadContent();
+      }),
+      child: Container(
+        margin: const EdgeInsets.only(right: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        decoration: BoxDecoration(
+          color: active ? AppColors.accBg(context) : AppColors.sf(context),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Center(
+          child: Text(
+            label,
+            style: TextStyle(
+              color: active ? AppColors.accentLight : AppColors.sec(context),
+              fontSize: 14.5,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
       ),

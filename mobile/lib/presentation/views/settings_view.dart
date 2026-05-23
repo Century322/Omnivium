@@ -10,6 +10,7 @@ import '../theme/app_colors.dart';
 import '../theme/locale_provider.dart';
 import '../../main.dart';
 import '../../core/app_provider.dart';
+import '../../core/analytics_service.dart';
 import '../../core/remote_ui_engine.dart';
 import '../../core/auth_service.dart';
 import '../widgets/section_header.dart';
@@ -996,6 +997,7 @@ class _SettingsViewState extends State<SettingsView>
                   : null,
               onTap: () {
                 localeProvider.setLocaleFromLabel(code);
+                AnalyticsService.instance.logChangeLanguage(language: code);
                 setState(() {});
                 Navigator.pop(context);
               },

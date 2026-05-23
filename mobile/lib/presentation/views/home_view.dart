@@ -5,6 +5,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:share_plus/share_plus.dart';
 import '../theme/app_colors.dart';
 import '../../core/app_provider.dart';
+import '../../core/analytics_service.dart';
 import '../../core/navigation_provider.dart';
 import '../../core/voice_service.dart';
 import '../../core/runtime/card_runtime.dart';
@@ -318,7 +319,12 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     _focusNode.unfocus();
 
     final orchestrator = widget.provider.orchestrator;
-    if (orchestrator.isIdle) orchestrator.sendMessage(text);
+    if (orchestrator.isIdle) {
+      orchestrator.sendMessage(text);
+      AnalyticsService.instance.logAiQuery(
+        model: widget.provider.model.activeModelId ?? 'unknown',
+      );
+    }
 
     widget.provider.session.saveCurrentSession();
 

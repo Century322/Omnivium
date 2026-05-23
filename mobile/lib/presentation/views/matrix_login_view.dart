@@ -3,6 +3,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../theme/app_colors.dart';
 import '../theme/locale_provider.dart';
+import '../../core/analytics_service.dart';
 import '../../core/app_provider.dart';
 import '../../core/totp_service.dart';
 import '../../core/srp_service.dart';
@@ -124,9 +125,11 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
       if (_isRegister) {
         await widget.provider.matrix.register(username, password, homeserver);
         await srp.createVerifier(username, password);
+        AnalyticsService.instance.logSignUp(method: 'matrix');
       } else {
         await widget.provider.matrix.login(username, password, homeserver);
         await srp.createVerifier(username, password);
+        AnalyticsService.instance.logLogin(method: 'matrix');
       }
       if (mounted && widget.provider.matrix.isLoggedIn) {
         if (TotpService.instance.isEnabled) {

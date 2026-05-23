@@ -400,7 +400,11 @@ class SKo extends S {
 
   @override
   String get discover => '발견';
+
+  @override
   String get discover_welcome => 'Omnivium에 오신 것을 환영합니다';
+
+  @override
   String get discover_welcome_desc => 'AI가 엄선한 콘텐츠를 탐색하세요. 최신 업데이트를 기대해 주세요.';
 
   @override

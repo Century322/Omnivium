@@ -243,7 +243,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     if (localStream == null) return;
     for (final track in localStream.getVideoTracks()) {
       try {
-        track.switchCamera();
+        Helper.switchCamera(track);
       } catch (_) {}
     }
   }

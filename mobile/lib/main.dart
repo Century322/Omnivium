@@ -12,6 +12,7 @@ import 'presentation/theme/locale_provider.dart';
 import 'core/app_provider.dart';
 import 'core/app_navigator.dart';
 import 'core/app_config.dart';
+import 'core/analytics_service.dart';
 import 'core/agent/agent_reminder_service.dart' show ReminderService;
 import 'core/navigation_provider.dart';
 import 'presentation/widgets/app_error_boundary.dart';
@@ -110,6 +111,7 @@ void main() async {
       AppLogger.instance.warning('Vodozemac init failed', error: e);
     }
   }
+  await AnalyticsService.instance.init();
   try {
     final sentryDsn = String.fromEnvironment('SENTRY_DSN', defaultValue: '');
     if (sentryDsn.isNotEmpty) {

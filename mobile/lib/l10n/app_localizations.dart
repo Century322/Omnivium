@@ -881,8 +881,16 @@ abstract class S {
   /// **'发现'**
   String get discover;
 
+  /// No description provided for @discover_welcome.
+  ///
+  /// In zh, this message translates to:
+  /// **'欢迎来到 Omnivium'**
   String get discover_welcome;
 
+  /// No description provided for @discover_welcome_desc.
+  ///
+  /// In zh, this message translates to:
+  /// **'探索由 AI 策划的精选内容，敬请期待最新动态。'**
   String get discover_welcome_desc;
 
   /// No description provided for @library_empty_desc.
