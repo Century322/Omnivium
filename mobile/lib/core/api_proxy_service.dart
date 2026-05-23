@@ -1,5 +1,6 @@
 import 'app_logger.dart';
 import 'app_config.dart';
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 import 'package:http/http.dart' as http;
@@ -19,7 +20,12 @@ class ApiProxyService {
       'https://omnivium-api-proxy.so1946875590.workers.dev';
   static const _fallbackUrls = [
     'https://omnivium-api-proxy.so1946875590.workers.dev',
+    'https://omnivium-api-fallback.so1946875590.workers.dev',
   ];
+
+  static const Duration _shortTimeout = Duration(seconds: 5);
+  static const Duration _mediumTimeout = Duration(seconds: 10);
+  static const Duration _longTimeout = Duration(seconds: 30);
 
   String get _effectiveBaseUrl {
     final envUrl = AppConfig.apiBaseUrl;
@@ -29,6 +35,8 @@ class ApiProxyService {
 
   int _activeUrlIndex = 0;
   final Map<String, int> _failureCounts = {};
+
+  final Map<String, Completer<http.Response>> _inFlightRequests = {};
 
   String get backendUrl {
     final remote = _remoteConfig?['backend_url'] as String?;
@@ -53,6 +61,7 @@ class ApiProxyService {
 
   Map<String, dynamic>? _remoteConfig;
   Map<String, List<String>>? _availableModels;
+  DateTime? _rateLimitResetTime;
 
   final _circuitBreaker = _CircuitBreaker(
     failureThreshold: 5,
@@ -128,9 +137,7 @@ class ApiProxyService {
   Future<bool> checkBackendHealth() async {
     try {
       final uri = Uri.parse('$backendUrl/health');
-      final response = await secureClient
-          .get(uri)
-          .timeout(const Duration(seconds: 5));
+      final response = await secureClient.get(uri).timeout(_shortTimeout);
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
         return body['status'] == 'ok';
@@ -155,7 +162,7 @@ class ApiProxyService {
       final uri = Uri.parse('$backendUrl/status');
       final response = await secureClient
           .get(uri, headers: buildDeviceHeaders())
-          .timeout(const Duration(seconds: 5));
+          .timeout(_shortTimeout);
       if (response.statusCode == 200) {
         final result = jsonDecode(response.body) as Map<String, dynamic>;
         _responseCache.put(cacheKey, result, ttl: const Duration(minutes: 10));
@@ -164,7 +171,7 @@ class ApiProxyService {
       return {};
     } catch (e, stackTrace) {
       AppLogger.instance.warning(
-        'Operation failed',
+        'checkAppStatus failed',
         error: e,
         stackTrace: stackTrace,
       );
@@ -178,14 +185,14 @@ class ApiProxyService {
       final uri = Uri.parse('$backendUrl/config');
       final response = await secureClient
           .get(uri, headers: {...buildAuthHeaders(), ...buildDeviceHeaders()})
-          .timeout(const Duration(seconds: 5));
+          .timeout(_shortTimeout);
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body) as Map<String, dynamic>;
         _remoteConfig = body['config'] as Map<String, dynamic>?;
       }
     } catch (e, stackTrace) {
       AppLogger.instance.error(
-        'Operation failed',
+        'fetchRemoteConfig failed',
         error: e,
         stackTrace: stackTrace,
       );
@@ -195,7 +202,7 @@ class ApiProxyService {
       final uri = Uri.parse('$backendUrl/models');
       final response = await secureClient
           .get(uri, headers: {...buildAuthHeaders(), ...buildDeviceHeaders()})
-          .timeout(const Duration(seconds: 5));
+          .timeout(_shortTimeout);
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body) as Map<String, dynamic>;
         final raw = body['models'] as Map<String, dynamic>?;
@@ -207,7 +214,7 @@ class ApiProxyService {
       }
     } catch (e, stackTrace) {
       AppLogger.instance.error(
-        'Operation failed',
+        'fetchModels failed',
         error: e,
         stackTrace: stackTrace,
       );
@@ -235,11 +242,11 @@ class ApiProxyService {
               'user_id': userId,
             }),
           )
-          .timeout(const Duration(seconds: 10));
+          .timeout(_mediumTimeout);
       return response.statusCode == 200;
     } catch (e, stackTrace) {
       AppLogger.instance.warning(
-        'Operation failed',
+        'registerDevice failed',
         error: e,
         stackTrace: stackTrace,
       );
@@ -263,48 +270,99 @@ class ApiProxyService {
     };
     if (enc.isReady) headers['X-Encrypted'] = '1';
 
-    http.Response response;
-    try {
-      switch (method.toUpperCase()) {
-        case 'POST':
-          response = await secureClient
-              .post(uri, headers: headers, body: payload)
-              .timeout(const Duration(seconds: 30));
-          break;
-        case 'PUT':
-          response = await secureClient
-              .put(uri, headers: headers, body: payload)
-              .timeout(const Duration(seconds: 30));
-          break;
-        case 'DELETE':
-          response = await secureClient
-              .delete(uri, headers: headers, body: payload)
-              .timeout(const Duration(seconds: 30));
-          break;
-        default:
-          response = await secureClient
-              .post(uri, headers: headers, body: payload)
-              .timeout(const Duration(seconds: 30));
-      }
-    } catch (e) {
-      AppLogger.instance.error(
-        'Proxy request timeout or network error',
-        error: e,
-      );
-      rethrow;
-    }
-
-    if (response.statusCode >= 200 && response.statusCode < 300) {
-      _reportSuccess(uri.toString());
+    final dedupeKey = '$method:${uri.toString()}:$encodedBody';
+    if (_inFlightRequests.containsKey(dedupeKey)) {
+      final response = await _inFlightRequests[dedupeKey]!.future;
       final responseBody = response.headers['x-encrypted'] == '1' && enc.isReady
           ? enc.decrypt(response.body) ?? response.body
           : response.body;
       return jsonDecode(responseBody) as Map<String, dynamic>;
-    } else {
-      _reportFailure(uri.toString());
-      throw Exception(
-        'Proxy request failed: ${response.statusCode} ${response.body}',
-      );
+    }
+
+    final completer = Completer<http.Response>();
+    _inFlightRequests[dedupeKey] = completer;
+
+    try {
+      if (_rateLimitResetTime != null &&
+          DateTime.now().isBefore(_rateLimitResetTime!)) {
+        throw ApiProxyException.rateLimited(
+          retryAfter: _rateLimitResetTime!.difference(DateTime.now()),
+        );
+      }
+
+      http.Response response;
+      try {
+        switch (method.toUpperCase()) {
+          case 'POST':
+            response = await secureClient
+                .post(uri, headers: headers, body: payload)
+                .timeout(_longTimeout);
+            break;
+          case 'PUT':
+            response = await secureClient
+                .put(uri, headers: headers, body: payload)
+                .timeout(_longTimeout);
+            break;
+          case 'DELETE':
+            response = await secureClient
+                .delete(uri, headers: headers, body: payload)
+                .timeout(_longTimeout);
+            break;
+          default:
+            response = await secureClient
+                .post(uri, headers: headers, body: payload)
+                .timeout(_longTimeout);
+        }
+      } on TimeoutException {
+        throw ApiProxyException.timeout(uri: uri.toString());
+      } catch (e) {
+        throw ApiProxyException.networkError(
+          uri: uri.toString(),
+          originalError: e,
+        );
+      }
+
+      if (response.statusCode == 429) {
+        final retryAfter = response.headers['retry-after'];
+        final seconds = int.tryParse(retryAfter ?? '') ?? 60;
+        _rateLimitResetTime = DateTime.now().add(Duration(seconds: seconds));
+        throw ApiProxyException.rateLimited(
+          retryAfter: Duration(seconds: seconds),
+        );
+      }
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        _reportSuccess(uri.toString());
+        completer.complete(response);
+        final responseBody =
+            response.headers['x-encrypted'] == '1' && enc.isReady
+            ? enc.decrypt(response.body) ?? response.body
+            : response.body;
+        return jsonDecode(responseBody) as Map<String, dynamic>;
+      } else {
+        _reportFailure(uri.toString());
+        if (response.statusCode == 401 || response.statusCode == 403) {
+          throw ApiProxyException.authentication(
+            statusCode: response.statusCode,
+            body: response.body,
+          );
+        }
+        if (response.statusCode >= 500) {
+          throw ApiProxyException.serverError(
+            statusCode: response.statusCode,
+            body: response.body,
+          );
+        }
+        throw ApiProxyException.clientError(
+          statusCode: response.statusCode,
+          body: response.body,
+        );
+      }
+    } catch (e) {
+      if (!completer.isCompleted) completer.completeError(e);
+      rethrow;
+    } finally {
+      _inFlightRequests.remove(dedupeKey);
     }
   }
 
@@ -529,5 +587,90 @@ class _BreadcrumbClient extends http.BaseClient {
     copy.maxRedirects = original.maxRedirects;
     copy.persistentConnection = original.persistentConnection;
     return copy;
+  }
+}
+
+class ApiProxyException implements Exception {
+  final String message;
+  final int? statusCode;
+  final String? body;
+  final Duration? retryAfter;
+  final Object? originalError;
+
+  const ApiProxyException({
+    required this.message,
+    this.statusCode,
+    this.body,
+    this.retryAfter,
+    this.originalError,
+  });
+
+  factory ApiProxyException.timeout({required String uri}) {
+    return ApiProxyException(message: 'Request timed out', statusCode: 408);
+  }
+
+  factory ApiProxyException.networkError({
+    required String uri,
+    required Object originalError,
+  }) {
+    return ApiProxyException(
+      message: 'Network error',
+      originalError: originalError,
+    );
+  }
+
+  factory ApiProxyException.rateLimited({required Duration retryAfter}) {
+    return ApiProxyException(
+      message: 'Rate limited',
+      statusCode: 429,
+      retryAfter: retryAfter,
+    );
+  }
+
+  factory ApiProxyException.authentication({
+    required int statusCode,
+    required String body,
+  }) {
+    return ApiProxyException(
+      message: 'Authentication failed',
+      statusCode: statusCode,
+      body: body,
+    );
+  }
+
+  factory ApiProxyException.serverError({
+    required int statusCode,
+    required String body,
+  }) {
+    return ApiProxyException(
+      message: 'Server error',
+      statusCode: statusCode,
+      body: body,
+    );
+  }
+
+  factory ApiProxyException.clientError({
+    required int statusCode,
+    required String body,
+  }) {
+    return ApiProxyException(
+      message: 'Client error',
+      statusCode: statusCode,
+      body: body,
+    );
+  }
+
+  bool get isTimeout => statusCode == 408;
+  bool get isNetworkError => originalError != null;
+  bool get isRateLimited => statusCode == 429;
+  bool get isAuthError => statusCode == 401 || statusCode == 403;
+  bool get isServerError => statusCode != null && statusCode! >= 500;
+
+  @override
+  String toString() {
+    final parts = <String>['ApiProxyException: $message'];
+    if (statusCode != null) parts.add('status=$statusCode');
+    if (retryAfter != null) parts.add('retryAfter=${retryAfter!.inSeconds}s');
+    return parts.join(', ');
   }
 }
