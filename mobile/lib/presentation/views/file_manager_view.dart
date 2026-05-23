@@ -128,8 +128,8 @@ class _FileManagerViewState extends State<FileManagerView>
         ),
         bottom: TabBar(
           controller: _tabController,
-          indicatorColor: AppColors.accent,
-          labelColor: AppColors.accent,
+          indicatorColor: AppColors.acc(context),
+          labelColor: AppColors.acc(context),
           unselectedLabelColor: AppColors.textHint(context),
           tabs: [
             Tab(text: t('images')),

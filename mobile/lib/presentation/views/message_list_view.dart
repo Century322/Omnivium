@@ -32,7 +32,7 @@ class _MessageListViewState extends State<MessageListView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.bg(context),
       appBar: AppBar(
         backgroundColor: AppColors.sf(context),
         elevation: 0,
@@ -55,7 +55,7 @@ class _MessageListViewState extends State<MessageListView> {
         actions: [
           IconButton(
             tooltip: localeProvider.t('new_chat'),
-            icon: Icon(LucideIcons.edit, color: AppColors.accent, size: 20),
+            icon: Icon(LucideIcons.edit, color: AppColors.acc(context), size: 20),
             onPressed: () => _showNewChatOptions(context),
           ),
         ],
@@ -83,7 +83,7 @@ class _MessageListViewState extends State<MessageListView> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showNewChatOptions(context),
-        backgroundColor: AppColors.accent,
+        backgroundColor: AppColors.acc(context),
         foregroundColor: AppColors.bg(context),
         child: const Icon(LucideIcons.messageSquarePlus, size: 22),
       ),
@@ -164,8 +164,8 @@ class _MessageListViewState extends State<MessageListView> {
               child: isDirect
                   ? Text(
                       initial,
-                      style: const TextStyle(
-                        color: AppColors.accent,
+                      style: TextStyle(
+                        color: AppColors.acc(context),
                         fontWeight: FontWeight.w600,
                         fontSize: 18,
                       ),
@@ -189,7 +189,7 @@ class _MessageListViewState extends State<MessageListView> {
                   child: Icon(
                     LucideIcons.shieldCheck,
                     size: 10,
-                    color: AppColors.accent,
+                    color: AppColors.acc(context),
                   ),
                 ),
               ),
@@ -214,7 +214,7 @@ class _MessageListViewState extends State<MessageListView> {
                 timeStr,
                 style: TextStyle(
                   color: unreadCount > 0
-                      ? AppColors.accent
+                      ? AppColors.acc(context)
                       : AppColors.textDisabled(context),
                   fontSize: 11,
                 ),
@@ -235,7 +235,7 @@ class _MessageListViewState extends State<MessageListView> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: AppColors.accent,
+                  color: AppColors.acc(context),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
@@ -295,7 +295,7 @@ class _MessageListViewState extends State<MessageListView> {
           FilledButton(
             onPressed: () => _showNewChatOptions(context),
             style: FilledButton.styleFrom(
-              backgroundColor: AppColors.accent,
+              backgroundColor: AppColors.acc(context),
               foregroundColor: AppColors.bg(context),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -338,7 +338,7 @@ class _MessageListViewState extends State<MessageListView> {
                 backgroundColor: AppColors.accBg(context),
                 child: Icon(
                   LucideIcons.userPlus,
-                  color: AppColors.accent,
+                  color: AppColors.acc(context),
                   size: 20,
                 ),
               ),
@@ -356,7 +356,7 @@ class _MessageListViewState extends State<MessageListView> {
                 backgroundColor: AppColors.accBg(context),
                 child: Icon(
                   LucideIcons.users,
-                  color: AppColors.accent,
+                  color: AppColors.acc(context),
                   size: 20,
                 ),
               ),
@@ -397,7 +397,7 @@ class _MessageListViewState extends State<MessageListView> {
                 borderSide: BorderSide(color: AppColors.divider(context)),
               ),
               focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: AppColors.accent),
+                borderSide: BorderSide(color: AppColors.acc(context)),
               ),
             ),
             autofocus: true,
@@ -434,7 +434,7 @@ class _MessageListViewState extends State<MessageListView> {
                 }
               },
               style: FilledButton.styleFrom(
-                backgroundColor: AppColors.accent,
+                backgroundColor: AppColors.acc(context),
                 foregroundColor: AppColors.bg(context),
               ),
               child: Text(localeProvider.t('create')),

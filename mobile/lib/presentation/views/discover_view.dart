@@ -25,6 +25,7 @@ class DiscoverView extends StatefulWidget {
 class _DiscoverViewState extends State<DiscoverView> {
   List<_Item> _items = [];
   bool _isLoading = true;
+  bool _hasError = false;
   int _activeTab = 0;
   final Set<int> _likedItems = {};
 
@@ -46,6 +47,7 @@ class _DiscoverViewState extends State<DiscoverView> {
   }
 
   Future<void> _loadContent() async {
+    if (mounted) setState(() { _isLoading = true; _hasError = false; });
     try {
       final proxy = ApiProxyService.instance;
       if (proxy.isConfigured) {
@@ -79,7 +81,7 @@ class _DiscoverViewState extends State<DiscoverView> {
                     imgSrc: m['image'] as String? ?? '',
                     avatarColor:
                         _parseColor(m['avatar_color'] as String?) ??
-                        AppColors.accent,
+                        AppColors.acc(context),
                     bgColor:
                         _parseColor(m['bg_color'] as String?) ??
                         AppColors.sf(context),
@@ -113,7 +115,7 @@ class _DiscoverViewState extends State<DiscoverView> {
               author: m['author'] as String? ?? '',
               imgSrc: m['image'] as String? ?? '',
               avatarColor:
-                  _parseColor(m['avatar_color'] as String?) ?? AppColors.accent,
+                  _parseColor(m['avatar_color'] as String?) ?? AppColors.acc(context),
               bgColor:
                   _parseColor(m['bg_color'] as String?) ??
                   AppColors.sf(context),
@@ -126,21 +128,30 @@ class _DiscoverViewState extends State<DiscoverView> {
     }
 
     if (mounted) {
-      setState(() {
-        _items = _fallbackItems
-            .map(
-              (m) => _Item(
-                title: m['title']!,
-                desc: m['desc']!,
-                author: m['author']!,
-                imgSrc: m['img']!,
-                avatarColor: _parseColor(m['avatar']) ?? AppColors.accent,
-                bgColor: _parseColor(m['bg']) ?? AppColors.sf(context),
-              ),
-            )
-            .toList();
-        _isLoading = false;
-      });
+      try {
+        setState(() {
+          _items = _fallbackItems
+              .map(
+                (m) => _Item(
+                  title: m['title']!,
+                  desc: m['desc']!,
+                  author: m['author']!,
+                  imgSrc: m['img']!,
+                  avatarColor: _parseColor(m['avatar']) ?? AppColors.acc(context),
+                  bgColor: _parseColor(m['bg']) ?? AppColors.sf(context),
+                ),
+              )
+              .toList();
+          _isLoading = false;
+        });
+      } catch (_) {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+            _hasError = true;
+          });
+        }
+      }
     }
   }
 
@@ -185,6 +196,36 @@ class _DiscoverViewState extends State<DiscoverView> {
                             ),
                           ),
                         )
+                      : _hasError
+                          ? Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    LucideIcons.wifiOff,
+                                    size: 48,
+                                    color: AppColors.mut(context),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    localeProvider.t('discover_load_error'),
+                                    style: TextStyle(
+                                      color: AppColors.textSecondary(context),
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  FilledButton(
+                                    style: FilledButton.styleFrom(
+                                      backgroundColor: AppColors.acc(context),
+                                      foregroundColor: AppColors.bg(context),
+                                    ),
+                                    onPressed: _loadContent,
+                                    child: Text(localeProvider.t('retry')),
+                                  ),
+                                ],
+                              ),
+                            )
                       : PageView.builder(
                           scrollDirection: Axis.vertical,
                           itemCount: _items.length,
@@ -501,7 +542,7 @@ class _DiscoverViewState extends State<DiscoverView> {
                         height: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: AppColors.accent,
+                          color: AppColors.acc(context),
                         ),
                       ),
                     ),
@@ -524,7 +565,7 @@ class _DiscoverViewState extends State<DiscoverView> {
                   child: Center(
                     child: Icon(
                       LucideIcons.sparkles,
-                      color: AppColors.accent,
+                      color: AppColors.acc(context),
                       size: 48,
                     ),
                   ),
@@ -606,7 +647,7 @@ class _DiscoverViewState extends State<DiscoverView> {
                                 ? LucideIcons.bookmark
                                 : LucideIcons.bookmark,
                             color: _likedItems.contains(item.title.hashCode)
-                                ? AppColors.accent
+                                ? AppColors.acc(context)
                                 : AppColors.textTertiary(context),
                             size: 20,
                           ),

@@ -176,7 +176,7 @@ class _LibraryPanelState extends State<LibraryPanel> {
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
                     color: isFocused
-                        ? AppColors.accent
+                        ? AppColors.acc(context)
                         : AppColors.divider(context),
                   ),
                 ),
@@ -239,7 +239,7 @@ class _LibraryPanelState extends State<LibraryPanel> {
               child: Text(
                 localeProvider.t('go_login'),
                 style: TextStyle(
-                  color: AppColors.accent,
+                  color: AppColors.acc(context),
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
                 ),
@@ -274,7 +274,7 @@ class _LibraryPanelState extends State<LibraryPanel> {
       );
     }
     return RefreshIndicator(
-      color: AppColors.accent,
+      color: AppColors.acc(context),
       onRefresh: () async {
         setState(() {});
       },
@@ -317,14 +317,14 @@ class _LibraryPanelState extends State<LibraryPanel> {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: AppColors.accent.withValues(alpha: 0.12),
+                color: AppColors.acc(context).withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Center(
                 child: Text(
                   data.name.isNotEmpty ? data.name[0].toUpperCase() : '?',
                   style: TextStyle(
-                    color: AppColors.accent,
+                    color: AppColors.acc(context),
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),

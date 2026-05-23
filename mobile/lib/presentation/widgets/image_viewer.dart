@@ -11,9 +11,9 @@ class ImageViewer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.bg(context),
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: AppColors.bg(context),
         elevation: 0,
         leading: IconButton(
           tooltip: localeProvider.t('close'),
@@ -46,7 +46,7 @@ class ImageViewer extends StatelessWidget {
                       ? progress.cumulativeBytesLoaded /
                             progress.expectedTotalBytes!
                       : null,
-                  color: AppColors.accent,
+                  color: AppColors.acc(context),
                 ),
               );
             },

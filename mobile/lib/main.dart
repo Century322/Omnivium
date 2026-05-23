@@ -298,7 +298,7 @@ class _AppLockDialogState extends State<_AppLockDialog> {
       widget.onUnlocked();
     } else {
       setState(() {
-        _error = 'Incorrect PIN';
+        _error = localeProvider.t('incorrect_pin');
         _controller.clear();
       });
     }
@@ -326,13 +326,13 @@ class _AppLockDialogState extends State<_AppLockDialog> {
               autofocus: true,
               onSubmitted: (_) => _submit(),
               decoration: InputDecoration(
-                hintText: 'Enter PIN',
+                hintText: localeProvider.t('enter_pin'),
                 errorText: _error,
               ),
             ),
           ],
         ),
-        actions: [FilledButton(onPressed: _submit, child: Text('Unlock'))],
+        actions: [FilledButton(onPressed: _submit, child: Text(localeProvider.t('unlock')))],
       ),
     );
   }
@@ -350,8 +350,8 @@ class OmniviumApp extends StatelessWidget {
           title: 'Omnivium',
           navigatorKey: navigatorKey,
           debugShowCheckedModeBanner: false,
-          theme: ThemeProvider.lightTheme,
-          darkTheme: ThemeProvider.darkTheme,
+          theme: themeProvider.lightTheme,
+          darkTheme: themeProvider.darkTheme,
           themeMode: themeProvider.mode,
           locale: localeProvider.locale,
           localizationsDelegates: [
@@ -437,7 +437,7 @@ class _AppShellState extends State<_AppShell>
                 onPressed: () => Navigator.pop(context),
                 child: Text(
                   localeProvider.t('update_now'),
-                  style: TextStyle(color: AppColors.accent),
+                  style: TextStyle(color: AppColors.acc(context)),
                 ),
               ),
             ],
@@ -600,7 +600,7 @@ class _AppShellState extends State<_AppShell>
               onPressed: () => Navigator.pop(context),
               child: Text(
                 localeProvider.t('understand'),
-                style: TextStyle(color: AppColors.accent),
+                style: TextStyle(color: AppColors.acc(context)),
               ),
             ),
           ],
@@ -625,13 +625,13 @@ class _AppShellState extends State<_AppShell>
   Widget build(BuildContext context) {
     if (!_initialized) {
       return MaterialApp(
-        theme: ThemeProvider.lightTheme,
-        darkTheme: ThemeProvider.darkTheme,
+        theme: themeProvider.lightTheme,
+        darkTheme: themeProvider.darkTheme,
         themeMode: themeProvider.mode,
         home: Scaffold(
-          backgroundColor: AppColors.background,
+          backgroundColor: AppColors.bg(context),
           body: Center(
-            child: CircularProgressIndicator(color: AppColors.accent),
+            child: CircularProgressIndicator(color: AppColors.acc(context)),
           ),
         ),
       );
@@ -639,7 +639,7 @@ class _AppShellState extends State<_AppShell>
 
     if (_showPrivacyConsent) {
       return MaterialApp(
-        theme: ThemeProvider.darkTheme,
+        theme: themeProvider.darkTheme,
         home: _PrivacyConsentScreen(onResult: _onPrivacyConsentResult),
       );
     }
@@ -738,8 +738,8 @@ class _PrivacyConsentScreen extends StatelessWidget {
       agreed.then((result) => onResult(result));
     });
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: Center(child: CircularProgressIndicator(color: AppColors.accent)),
+      backgroundColor: AppColors.bg(context),
+      body: Center(child: CircularProgressIndicator(color: AppColors.acc(context))),
     );
   }
 }

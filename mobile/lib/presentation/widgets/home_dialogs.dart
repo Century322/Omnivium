@@ -128,7 +128,7 @@ class HomeDialogs {
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.accent,
+              backgroundColor: AppColors.acc(context),
               foregroundColor: AppColors.textPrimary(context),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
@@ -155,43 +155,44 @@ class HomeDialogs {
     String t(String key) => localeProvider.t(key);
     final nameCtrl = TextEditingController();
     final membersCtrl = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: AppColors.sf(context),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          t('new_group'),
-          style: TextStyle(color: AppColors.textPrimary(context)),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameCtrl,
-              style: TextStyle(color: AppColors.textPrimary(context)),
-              decoration: InputDecoration(
-                labelText: t('enter_new_name'),
-                hintStyle: TextStyle(color: AppColors.textDisabled(context)),
-                filled: true,
-                fillColor: AppColors.sfAlt(context),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
+    try {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          backgroundColor: AppColors.sf(context),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text(
+            t('new_group'),
+            style: TextStyle(color: AppColors.textPrimary(context)),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameCtrl,
+                style: TextStyle(color: AppColors.textPrimary(context)),
+                decoration: InputDecoration(
+                  labelText: t('enter_new_name'),
+                  hintStyle: TextStyle(color: AppColors.textDisabled(context)),
+                  filled: true,
+                  fillColor: AppColors.sfAlt(context),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: membersCtrl,
-              style: TextStyle(
-                color: AppColors.textPrimary(context),
-                fontSize: 14,
-              ),
-              decoration: InputDecoration(
-                labelText: t('enter_matrix_id'),
-                hintStyle: TextStyle(
-                  color: AppColors.textDisabled(context),
+              const SizedBox(height: 12),
+              TextField(
+                controller: membersCtrl,
+                style: TextStyle(
+                  color: AppColors.textPrimary(context),
+                  fontSize: 14,
+                ),
+                decoration: InputDecoration(
+                  labelText: t('enter_matrix_id'),
+                  hintStyle: TextStyle(
+                    color: AppColors.textDisabled(context),
                   fontSize: 13,
                 ),
                 filled: true,
@@ -224,11 +225,15 @@ class HomeDialogs {
               Navigator.pop(context);
               await onCreate(name, members);
             },
-            child: Text(t('create'), style: TextStyle(color: AppColors.accent)),
+            child: Text(t('create'), style: TextStyle(color: AppColors.acc(context))),
           ),
         ],
       ),
     );
+    } finally {
+      nameCtrl.dispose();
+      membersCtrl.dispose();
+    }
   }
 
   static void showAddContact(
@@ -237,8 +242,9 @@ class HomeDialogs {
   }) {
     String t(String key) => localeProvider.t(key);
     final idCtrl = TextEditingController();
-    showDialog(
-      context: context,
+    try {
+      showDialog(
+        context: context,
       builder: (_) => AlertDialog(
         backgroundColor: AppColors.sf(context),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -278,10 +284,13 @@ class HomeDialogs {
               Navigator.pop(context);
               await onAdd(userId);
             },
-            child: Text(t('add'), style: TextStyle(color: AppColors.accent)),
+            child: Text(t('add'), style: TextStyle(color: AppColors.acc(context))),
           ),
         ],
       ),
     );
+    } finally {
+      idCtrl.dispose();
+    }
   }
 }

@@ -68,12 +68,12 @@ class ChatInputArea extends StatelessWidget {
                 builder: (context, _) {
                   final g = listeningGlow.value;
                   final hasText = textController.text.trim().isNotEmpty;
-                  final glowShadows = _buildGlowShadows(g);
+                  final glowShadows = _buildGlowShadows(g, context);
                   final isFocused = focusNode.hasFocus;
                   final borderColor = isFocused
-                      ? AppColors.accent
+                      ? AppColors.acc(context)
                       : g > 0.5
-                      ? AppColors.accent.withValues(alpha: 0.3)
+                      ? AppColors.acc(context).withValues(alpha: 0.3)
                       : AppColors.divider(context);
                   return Container(
                     decoration: BoxDecoration(
@@ -171,16 +171,16 @@ class ChatInputArea extends StatelessWidget {
     );
   }
 
-  List<BoxShadow> _buildGlowShadows(double g) {
+  List<BoxShadow> _buildGlowShadows(double g, BuildContext context) {
     if (g > 0.01) {
       return [
         BoxShadow(
-          color: AppColors.accent.withValues(alpha: 0.5 * g),
+          color: AppColors.acc(context).withValues(alpha: 0.5 * g),
           blurRadius: 24,
           offset: const Offset(0, -4),
         ),
         BoxShadow(
-          color: AppColors.accent.withValues(alpha: 0.3 * g),
+          color: AppColors.acc(context).withValues(alpha: 0.3 * g),
           blurRadius: 8,
         ),
       ];
@@ -272,7 +272,7 @@ class ChatInputArea extends StatelessWidget {
                       width: 34,
                       height: 34,
                       decoration: BoxDecoration(
-                        color: AppColors.accent,
+                        color: AppColors.acc(context),
                         borderRadius: BorderRadius.circular(17),
                       ),
                       child: Icon(
@@ -302,7 +302,7 @@ class ChatInputArea extends StatelessWidget {
                             LucideIcons.glasses,
                             size: 20,
                             color: isIncognito
-                                ? AppColors.accent
+                                ? AppColors.acc(context)
                                 : AppColors.sec(context),
                           ),
                         ),
@@ -340,7 +340,7 @@ class ChatInputArea extends StatelessWidget {
                           width: 34,
                           height: 34,
                           decoration: BoxDecoration(
-                            color: AppColors.accent,
+                            color: AppColors.acc(context),
                             borderRadius: BorderRadius.circular(17),
                           ),
                           child: isGenerating

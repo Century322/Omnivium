@@ -893,6 +893,12 @@ abstract class S {
   /// **'探索由 AI 策划的精选内容，敬请期待最新动态。'**
   String get discover_welcome_desc;
 
+  /// No description provided for @discover_load_error.
+  ///
+  /// In zh, this message translates to:
+  /// **'加载内容失败'**
+  String get discover_load_error;
+
   /// No description provided for @library_empty_desc.
   ///
   /// In zh, this message translates to:
@@ -1097,6 +1103,12 @@ abstract class S {
   /// **'搜索'**
   String get search;
 
+  /// No description provided for @search_error.
+  ///
+  /// In zh, this message translates to:
+  /// **'搜索失败，请重试'**
+  String get search_error;
+
   /// No description provided for @not_logged_in_short.
   ///
   /// In zh, this message translates to:
@@ -1120,6 +1132,96 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'取消'**
   String get cancel;
+
+  /// No description provided for @calling.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在呼叫...'**
+  String get calling;
+
+  /// No description provided for @ringing.
+  ///
+  /// In zh, this message translates to:
+  /// **'来电响铃中'**
+  String get ringing;
+
+  /// No description provided for @connecting.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在连接...'**
+  String get connecting;
+
+  /// No description provided for @call_ended.
+  ///
+  /// In zh, this message translates to:
+  /// **'通话已结束'**
+  String get call_ended;
+
+  /// No description provided for @unmute.
+  ///
+  /// In zh, this message translates to:
+  /// **'取消静音'**
+  String get unmute;
+
+  /// No description provided for @speaker.
+  ///
+  /// In zh, this message translates to:
+  /// **'扬声器'**
+  String get speaker;
+
+  /// No description provided for @earpiece.
+  ///
+  /// In zh, this message translates to:
+  /// **'听筒'**
+  String get earpiece;
+
+  /// No description provided for @hang_up.
+  ///
+  /// In zh, this message translates to:
+  /// **'挂断'**
+  String get hang_up;
+
+  /// No description provided for @open_camera.
+  ///
+  /// In zh, this message translates to:
+  /// **'开启摄像头'**
+  String get open_camera;
+
+  /// No description provided for @close_camera.
+  ///
+  /// In zh, this message translates to:
+  /// **'关闭摄像头'**
+  String get close_camera;
+
+  /// No description provided for @flip_camera.
+  ///
+  /// In zh, this message translates to:
+  /// **'翻转'**
+  String get flip_camera;
+
+  /// No description provided for @decline.
+  ///
+  /// In zh, this message translates to:
+  /// **'拒绝'**
+  String get decline;
+
+  /// No description provided for @answer.
+  ///
+  /// In zh, this message translates to:
+  /// **'接听'**
+  String get answer;
+
+  /// No description provided for @incorrect_pin.
+  ///
+  /// In zh, this message translates to:
+  /// **'PIN码错误'**
+  String get incorrect_pin;
+
+  /// No description provided for @unlock.
+  ///
+  /// In zh, this message translates to:
+  /// **'解锁'**
+  String get unlock;
 
   /// No description provided for @hours_ago.
   ///
@@ -1342,6 +1444,60 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'主题'**
   String get theme;
+
+  /// No description provided for @accent_color.
+  ///
+  /// In zh, this message translates to:
+  /// **'强调色'**
+  String get accent_color;
+
+  /// No description provided for @accent_teal.
+  ///
+  /// In zh, this message translates to:
+  /// **'青绿'**
+  String get accent_teal;
+
+  /// No description provided for @accent_ocean_blue.
+  ///
+  /// In zh, this message translates to:
+  /// **'海洋蓝'**
+  String get accent_ocean_blue;
+
+  /// No description provided for @accent_lavender.
+  ///
+  /// In zh, this message translates to:
+  /// **'薰衣紫'**
+  String get accent_lavender;
+
+  /// No description provided for @accent_coral.
+  ///
+  /// In zh, this message translates to:
+  /// **'珊瑚红'**
+  String get accent_coral;
+
+  /// No description provided for @accent_amber.
+  ///
+  /// In zh, this message translates to:
+  /// **'琥珀橙'**
+  String get accent_amber;
+
+  /// No description provided for @accent_emerald.
+  ///
+  /// In zh, this message translates to:
+  /// **'翡翠绿'**
+  String get accent_emerald;
+
+  /// No description provided for @accent_rose.
+  ///
+  /// In zh, this message translates to:
+  /// **'玫瑰粉'**
+  String get accent_rose;
+
+  /// No description provided for @accent_slate.
+  ///
+  /// In zh, this message translates to:
+  /// **'石墨蓝'**
+  String get accent_slate;
 
   /// No description provided for @orch_reflection_gap.
   ///

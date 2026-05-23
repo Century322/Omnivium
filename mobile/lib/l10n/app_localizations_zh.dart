@@ -407,6 +407,9 @@ class SZh extends S {
   String get discover_welcome_desc => '探索由 AI 策划的精选内容，敬请期待最新动态。';
 
   @override
+  String get discover_load_error => '加载内容失败';
+
+  @override
   String get library_empty_desc => '您的历史记录和收藏将显示在此处';
 
   @override
@@ -509,6 +512,9 @@ class SZh extends S {
   String get search => '搜索';
 
   @override
+  String get search_error => '搜索失败，请重试';
+
+  @override
   String get not_logged_in_short => '未登录';
 
   @override
@@ -519,6 +525,51 @@ class SZh extends S {
 
   @override
   String get cancel => '取消';
+
+  @override
+  String get calling => '正在呼叫...';
+
+  @override
+  String get ringing => '来电响铃中';
+
+  @override
+  String get connecting => '正在连接...';
+
+  @override
+  String get call_ended => '通话已结束';
+
+  @override
+  String get unmute => '取消静音';
+
+  @override
+  String get speaker => '扬声器';
+
+  @override
+  String get earpiece => '听筒';
+
+  @override
+  String get hang_up => '挂断';
+
+  @override
+  String get open_camera => '开启摄像头';
+
+  @override
+  String get close_camera => '关闭摄像头';
+
+  @override
+  String get flip_camera => '翻转';
+
+  @override
+  String get decline => '拒绝';
+
+  @override
+  String get answer => '接听';
+
+  @override
+  String get incorrect_pin => 'PIN码错误';
+
+  @override
+  String get unlock => '解锁';
 
   @override
   String get hours_ago => '小时前';
@@ -630,6 +681,33 @@ class SZh extends S {
 
   @override
   String get theme => '主题';
+
+  @override
+  String get accent_color => '强调色';
+
+  @override
+  String get accent_teal => '青绿';
+
+  @override
+  String get accent_ocean_blue => '海洋蓝';
+
+  @override
+  String get accent_lavender => '薰衣紫';
+
+  @override
+  String get accent_coral => '珊瑚红';
+
+  @override
+  String get accent_amber => '琥珀橙';
+
+  @override
+  String get accent_emerald => '翡翠绿';
+
+  @override
+  String get accent_rose => '玫瑰粉';
+
+  @override
+  String get accent_slate => '石墨蓝';
 
   @override
   String get orch_reflection_gap => '反思发现不足';

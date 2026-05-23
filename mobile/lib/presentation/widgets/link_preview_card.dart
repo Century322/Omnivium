@@ -56,7 +56,7 @@ class LinkPreviewCard extends StatelessWidget {
                       Text(
                         preview!.siteName!,
                         style: TextStyle(
-                          color: AppColors.accent,
+                          color: AppColors.acc(context),
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
                         ),
@@ -139,7 +139,7 @@ class LinkPreviewCard extends StatelessWidget {
                 color: AppColors.accBg(context),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Icon(LucideIcons.link, size: 20, color: AppColors.accent),
+              child: Icon(LucideIcons.link, size: 20, color: AppColors.acc(context)),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -149,7 +149,7 @@ class LinkPreviewCard extends StatelessWidget {
                   Text(
                     _truncateUrl(url),
                     style: TextStyle(
-                      color: AppColors.accent,
+                      color: AppColors.acc(context),
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
                     ),

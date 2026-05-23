@@ -77,7 +77,7 @@ class _AnimatedToggleState extends State<AnimatedToggle>
               decoration: BoxDecoration(
                 color: Color.lerp(
                   AppColors.sfHover(context),
-                  AppColors.accent,
+                  AppColors.acc(context),
                   _position.value,
                 ),
                 borderRadius: BorderRadius.circular(14),

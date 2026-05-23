@@ -91,6 +91,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
   }
 
   void _onMatrixChanged() {
+    if (!mounted) return;
     if (widget.chatTargetId.isEmpty) {
       setState(() {});
       return;
@@ -328,7 +329,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(t('copied')),
-                    backgroundColor: AppColors.accent,
+                    backgroundColor: AppColors.acc(context),
                     duration: const Duration(milliseconds: 1500),
                   ),
                 );
@@ -456,7 +457,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(localeProvider.t('coming_soon')),
-        backgroundColor: AppColors.accent,
+        backgroundColor: AppColors.acc(context),
         duration: const Duration(seconds: 2),
       ),
     );
@@ -599,7 +600,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
           children: [
             Icon(
               isEncrypted ? LucideIcons.shieldCheck : LucideIcons.shieldAlert,
-              color: isEncrypted ? AppColors.accent : AppColors.warn(context),
+              color: isEncrypted ? AppColors.acc(context) : AppColors.warn(context),
               size: 20,
             ),
             const SizedBox(width: 8),
@@ -708,12 +709,12 @@ class _FriendChatPanelState extends State<FriendChatPanel>
               },
               child: Text(
                 t('verify_device'),
-                style: TextStyle(color: AppColors.accent),
+                style: TextStyle(color: AppColors.acc(context)),
               ),
             ),
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(t('got_it'), style: TextStyle(color: AppColors.accent)),
+            child: Text(t('got_it'), style: TextStyle(color: AppColors.acc(context))),
           ),
         ],
       ),
@@ -1049,7 +1050,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
           TextSpan(
             text: match,
             style: TextStyle(
-              color: AppColors.accent,
+              color: AppColors.acc(context),
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -1095,12 +1096,12 @@ class _FriendChatPanelState extends State<FriendChatPanel>
     if (g > 0.01) {
       return [
         BoxShadow(
-          color: AppColors.accent.withValues(alpha: 0.5 * g),
+          color: AppColors.acc(context).withValues(alpha: 0.5 * g),
           blurRadius: 24,
           offset: const Offset(0, -4),
         ),
         BoxShadow(
-          color: AppColors.accent.withValues(alpha: 0.3 * g),
+          color: AppColors.acc(context).withValues(alpha: 0.3 * g),
           blurRadius: 8,
         ),
       ];
@@ -1162,7 +1163,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                     if (_isOtherTyping)
                       Text(
                         t('typing'),
-                        style: TextStyle(color: AppColors.accent, fontSize: 11),
+                        style: TextStyle(color: AppColors.acc(context), fontSize: 11),
                       )
                     else
                       FutureBuilder<CachedPresence?>(
@@ -1189,7 +1190,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                                 height: 6,
                                 decoration: BoxDecoration(
                                   color: isOnline
-                                      ? AppColors.accent
+                                      ? AppColors.acc(context)
                                       : AppColors.iconGray(context),
                                   borderRadius: BorderRadius.circular(3),
                                 ),
@@ -1199,7 +1200,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                                 status,
                                 style: TextStyle(
                                   color: isOnline
-                                      ? AppColors.accent
+                                      ? AppColors.acc(context)
                                       : AppColors.iconGray(context),
                                   fontSize: 11,
                                 ),
@@ -1229,7 +1230,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                           : LucideIcons.shieldAlert,
                       size: 18,
                       color: isEncrypted
-                          ? AppColors.accent
+                          ? AppColors.acc(context)
                           : AppColors.warn(context),
                     ),
                   );
@@ -1283,7 +1284,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                     : const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 decoration: BoxDecoration(
                   color: msg.isMe
-                      ? AppColors.sfHover(context)
+                      ? AppColors.acc(context)
                       : AppColors.sf(context),
                   borderRadius: BorderRadius.circular(18),
                 ),
@@ -1303,7 +1304,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                         msg.content,
                         style: TextStyle(
                           color: msg.isMe
-                              ? AppColors.textPrimary(context)
+                              ? AppColors.bg(context)
                               : AppColors.textSecondary(context),
                           fontSize: 15,
                           fontWeight: msg.isMe
@@ -1399,7 +1400,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                       height: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        color: AppColors.accent,
+                        color: AppColors.acc(context),
                       ),
                     ),
                   ),
@@ -1455,7 +1456,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
               ),
               child: Icon(
                 LucideIcons.download,
-                color: AppColors.accent,
+                color: AppColors.acc(context),
                 size: 20,
               ),
             ),
@@ -1507,9 +1508,9 @@ class _FriendChatPanelState extends State<FriendChatPanel>
               final glowShadows = _buildGlowShadows(g);
               final isFocused = _focusNode.hasFocus;
               final borderColor = isFocused
-                  ? AppColors.accent
+                  ? AppColors.acc(context)
                   : g > 0.5
-                  ? AppColors.accent.withValues(alpha: 0.3)
+                  ? AppColors.acc(context).withValues(alpha: 0.3)
                   : AppColors.divider(context);
               return Container(
                 decoration: BoxDecoration(
@@ -1642,7 +1643,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                       width: 34,
                       height: 34,
                       decoration: BoxDecoration(
-                        color: AppColors.accent,
+                        color: AppColors.acc(context),
                         borderRadius: BorderRadius.circular(17),
                       ),
                       child: Icon(
@@ -1671,7 +1672,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                             width: 34,
                             height: 34,
                             decoration: BoxDecoration(
-                              color: AppColors.accent,
+                              color: AppColors.acc(context),
                               borderRadius: BorderRadius.circular(17),
                             ),
                             child: hasText

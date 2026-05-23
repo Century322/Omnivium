@@ -24,7 +24,7 @@ class ThoughtChainPanel extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.sfAlt(context).withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.accent.withValues(alpha: 0.15)),
+        border: Border.all(color: AppColors.acc(context).withValues(alpha: 0.15)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,7 +44,7 @@ class ThoughtChainPanel extends StatelessWidget {
                     Icon(
                       Icons.psychology,
                       size: 16,
-                      color: AppColors.accent.withValues(alpha: 0.8),
+                      color: AppColors.acc(context).withValues(alpha: 0.8),
                     ),
                     const SizedBox(width: 6),
                     Text(
@@ -52,7 +52,7 @@ class ThoughtChainPanel extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.accent.withValues(alpha: 0.9),
+                        color: AppColors.acc(context).withValues(alpha: 0.9),
                       ),
                     ),
                     const Spacer(),
@@ -75,7 +75,7 @@ class ThoughtChainPanel extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Container(
                 height: 0.5,
-                color: AppColors.accent.withValues(alpha: 0.1),
+                color: AppColors.acc(context).withValues(alpha: 0.1),
               ),
             ),
             const SizedBox(height: 6),
@@ -138,7 +138,7 @@ class _ThoughtStepTileState extends State<_ThoughtStepTile>
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.accent.withValues(alpha: 0.7),
+                      color: AppColors.acc(context).withValues(alpha: 0.7),
                     ),
                   ),
                   Text(
@@ -197,7 +197,7 @@ class _ThinkingIndicatorState extends State<ThinkingIndicator>
             child: CircularProgressIndicator(
               strokeWidth: 2,
               valueColor: AlwaysStoppedAnimation(
-                AppColors.accent.withValues(alpha: 0.6),
+                AppColors.acc(context).withValues(alpha: 0.6),
               ),
             ),
           ),

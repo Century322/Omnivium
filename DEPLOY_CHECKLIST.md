@@ -166,21 +166,26 @@ openssl s_client -connect api.omnivium.app:443 | openssl x509 -pubkey -noout | o
 - [x] SSL Pinning 框架就绪（待配置真实证书 hash）
 - [x] API Key 已迁移到服务端代理
 - [x] Root/越狱检测已启用
-- [x] 代码混淆构建已验证
+- [x] 代码混淆构建已验证（CI 已配置 --obfuscate）
 - [x] ProGuard 规则已测试
 - [x] 敏感字符串已加密（API Key 不硬编码）
 - [x] 网络请求全部 HTTPS
 - [x] 本地敏感数据使用 flutter_secure_storage
 - [x] 日志中无敏感信息泄露
-- [x] 应用层加密（AES-256-GCM）
+- [x] 应用层加密（AES-256-GCM，密钥不再同步服务器）
 - [x] HMAC 请求签名 + 时间戳防重放
 - [x] Matrix Token 服务端验证
 - [x] 两步验证（TOTP）
 - [x] 推送载荷加密
 - [x] 多端点故障转移
+- [x] 应用锁（PIN 码 + 生物识别）
+- [x] 加密文件存储（AES-256）
+- [x] SRP 安全远程密码
+- [x] 截屏/录屏保护框架
+- [x] Firebase Analytics 集成
 - [ ] Supabase 数据库表已创建（执行 deploy/supabase-schema.sql）
 - [ ] SSL Pinning 真实证书 hash 已配置（通过 SSL_PINS 环境变量）
-- [ ] 截屏/录屏保护（可选，金融级）
+- [ ] 截屏/录屏保护完善（可选，金融级）
 
 ---
 

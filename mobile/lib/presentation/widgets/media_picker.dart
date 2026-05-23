@@ -94,7 +94,7 @@ class MediaPicker {
     return ListTile(
       leading: CircleAvatar(
         backgroundColor: AppColors.accBg(context),
-        child: Icon(icon, color: AppColors.accent, size: 20),
+        child: Icon(icon, color: AppColors.acc(context), size: 20),
       ),
       title: Text(
         label,

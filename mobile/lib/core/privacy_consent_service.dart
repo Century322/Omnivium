@@ -39,11 +39,11 @@ class PrivacyConsentDialog {
         backgroundColor: AppColors.sf(context),
         title: Row(
           children: [
-            Icon(Icons.shield_outlined, color: AppColors.accent, size: 24),
+            Icon(Icons.shield_outlined, color: AppColors.acc(context), size: 24),
             const SizedBox(width: 8),
             Text(
               t('privacy_policy'),
-              style: TextStyle(color: AppColors.secondary, fontSize: 18),
+              style: TextStyle(color: AppColors.sec(context), fontSize: 18),
             ),
           ],
         ),
@@ -54,7 +54,7 @@ class PrivacyConsentDialog {
             children: [
               Text(
                 t('privacy_welcome'),
-                style: TextStyle(color: AppColors.secondary, fontSize: 14),
+                style: TextStyle(color: AppColors.sec(context), fontSize: 14),
               ),
               const SizedBox(height: 12),
               _buildItem(
@@ -103,7 +103,7 @@ class PrivacyConsentDialog {
           FilledButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: FilledButton.styleFrom(
-              backgroundColor: AppColors.accent,
+              backgroundColor: AppColors.acc(context),
               foregroundColor: Colors.black,
             ),
             child: Text(t('agree_continue')),

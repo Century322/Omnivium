@@ -373,6 +373,10 @@ class _SettingsViewState extends State<SettingsView>
                           subtitle: themeProvider.currentLabel,
                           onTap: _showThemeDialog,
                         ),
+                        SettingItem(
+                          title: t('accent_color'),
+                          onTap: _showAccentDialog,
+                        ),
                         SectionHeader(title: t('more')),
                         SettingItem(
                           title: t('storage'),
@@ -546,13 +550,13 @@ class _SettingsViewState extends State<SettingsView>
                 label,
                 style: TextStyle(
                   color: _assistantLang == value
-                      ? AppColors.accent
+                      ? AppColors.acc(context)
                       : AppColors.textPrimary(context),
                   fontSize: 14,
                 ),
               ),
               trailing: _assistantLang == value
-                  ? Icon(LucideIcons.check, color: AppColors.accent, size: 18)
+                  ? Icon(LucideIcons.check, color: AppColors.acc(context), size: 18)
                   : null,
               onTap: () {
                 setState(() => _assistantLang = value);
@@ -598,19 +602,84 @@ class _SettingsViewState extends State<SettingsView>
                 label,
                 style: TextStyle(
                   color: currentKey == key
-                      ? AppColors.accent
+                      ? AppColors.acc(context)
                       : AppColors.textPrimary(context),
                   fontSize: 14,
                 ),
               ),
               trailing: currentKey == key
-                  ? Icon(LucideIcons.check, color: AppColors.accent, size: 18)
+                  ? Icon(LucideIcons.check, color: AppColors.acc(context), size: 18)
                   : null,
               onTap: () {
                 themeProvider.setModeFromString(key);
                 setState(() {});
                 Navigator.pop(context);
               },
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+
+  void _showAccentDialog() {
+    final currentKey = themeProvider.accentPreset.key;
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: AppColors.sf(context),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          t('accent_color'),
+          style: TextStyle(color: AppColors.textPrimary(context)),
+        ),
+        content: Wrap(
+          spacing: 16,
+          runSpacing: 16,
+          children: AccentPreset.presets.map((preset) {
+            final isSelected = preset.key == currentKey;
+            final color = AppColors.isLightMode(context)
+                ? preset.lightAccent
+                : preset.darkAccent;
+            return GestureDetector(
+              onTap: () {
+                themeProvider.setAccent(preset.key);
+                setState(() {});
+                Navigator.pop(context);
+              },
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: color,
+                      shape: BoxShape.circle,
+                      border: isSelected
+                          ? Border.all(
+                              color: AppColors.textPrimary(context),
+                              width: 3,
+                            )
+                          : null,
+                    ),
+                    child: isSelected
+                        ? Icon(Icons.check,
+                            color: AppColors.bg(context), size: 22)
+                        : null,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    t('accent_${preset.key}'),
+                    style: TextStyle(
+                      color: isSelected
+                          ? AppColors.acc(context)
+                          : AppColors.textSecondary(context),
+                      fontSize: 11,
+                    ),
+                  ),
+                ],
+              ),
             );
           }).toList(),
         ),
@@ -740,7 +809,7 @@ class _SettingsViewState extends State<SettingsView>
                       t('enable_lock'),
                       style: TextStyle(color: AppColors.textPrimary(context)),
                     ),
-                    activeThumbColor: AppColors.accent,
+                    activeThumbColor: AppColors.acc(context),
                   ),
                 ],
               ],
@@ -774,7 +843,7 @@ class _SettingsViewState extends State<SettingsView>
                   },
                   child: Text(
                     t('confirm'),
-                    style: TextStyle(color: AppColors.accent),
+                    style: TextStyle(color: AppColors.acc(context)),
                   ),
                 ),
             ],
@@ -820,13 +889,13 @@ class _SettingsViewState extends State<SettingsView>
                 label,
                 style: TextStyle(
                   color: _sttEngine == key
-                      ? AppColors.accent
+                      ? AppColors.acc(context)
                       : AppColors.textPrimary(context),
                   fontSize: 14,
                 ),
               ),
               trailing: _sttEngine == key
-                  ? Icon(LucideIcons.check, color: AppColors.accent, size: 18)
+                  ? Icon(LucideIcons.check, color: AppColors.acc(context), size: 18)
                   : null,
               onTap: () {
                 setState(() => _sttEngine = key);
@@ -891,13 +960,13 @@ class _SettingsViewState extends State<SettingsView>
                 label,
                 style: TextStyle(
                   color: _voiceMode == key
-                      ? AppColors.accent
+                      ? AppColors.acc(context)
                       : AppColors.textPrimary(context),
                   fontSize: 14,
                 ),
               ),
               trailing: _voiceMode == key
-                  ? Icon(LucideIcons.check, color: AppColors.accent, size: 18)
+                  ? Icon(LucideIcons.check, color: AppColors.acc(context), size: 18)
                   : null,
               onTap: () {
                 setState(() => _voiceMode = key);
@@ -938,7 +1007,7 @@ class _SettingsViewState extends State<SettingsView>
                     opt,
                     style: TextStyle(
                       color: current == opt
-                          ? AppColors.accent
+                          ? AppColors.acc(context)
                           : AppColors.textPrimary(context),
                       fontSize: 14,
                     ),
@@ -946,7 +1015,7 @@ class _SettingsViewState extends State<SettingsView>
                   trailing: current == opt
                       ? Icon(
                           LucideIcons.check,
-                          color: AppColors.accent,
+                          color: AppColors.acc(context),
                           size: 18,
                         )
                       : null,
@@ -987,13 +1056,13 @@ class _SettingsViewState extends State<SettingsView>
                 label,
                 style: TextStyle(
                   color: localeProvider.locale.languageCode == code
-                      ? AppColors.accent
+                      ? AppColors.acc(context)
                       : AppColors.textPrimary(context),
                   fontSize: 14,
                 ),
               ),
               trailing: localeProvider.locale.languageCode == code
-                  ? Icon(LucideIcons.check, color: AppColors.accent, size: 18)
+                  ? Icon(LucideIcons.check, color: AppColors.acc(context), size: 18)
                   : null,
               onTap: () {
                 localeProvider.setLocaleFromLabel(code);

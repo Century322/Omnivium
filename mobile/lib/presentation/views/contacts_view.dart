@@ -73,7 +73,7 @@ class _ContactsViewState extends State<ContactsView> {
         actions: [
           IconButton(
             tooltip: localeProvider.t('add_contact'),
-            icon: Icon(LucideIcons.userPlus, color: AppColors.accent, size: 20),
+            icon: Icon(LucideIcons.userPlus, color: AppColors.acc(context), size: 20),
             onPressed: () async {
               final result = await Navigator.push(
                 context,
@@ -166,7 +166,7 @@ class _ContactsViewState extends State<ContactsView> {
             decoration: BoxDecoration(
               color: AppColors.bg(context),
               borderRadius: BorderRadius.circular(20),
-              border: isFocused ? Border.all(color: AppColors.accent) : null,
+              border: isFocused ? Border.all(color: AppColors.acc(context)) : null,
             ),
             padding: const EdgeInsets.symmetric(horizontal: 14),
             child: Row(
@@ -175,7 +175,7 @@ class _ContactsViewState extends State<ContactsView> {
                   LucideIcons.search,
                   size: 16,
                   color: isFocused
-                      ? AppColors.accent
+                      ? AppColors.acc(context)
                       : AppColors.textHint(context),
                 ),
                 const SizedBox(width: 10),
@@ -258,8 +258,8 @@ class _ContactsViewState extends State<ContactsView> {
           child: isDirect
               ? Text(
                   initial,
-                  style: const TextStyle(
-                    color: AppColors.accent,
+                  style: TextStyle(
+                    color: AppColors.acc(context),
                     fontWeight: FontWeight.w600,
                     fontSize: 16,
                   ),
@@ -462,7 +462,7 @@ class _ContactsViewState extends State<ContactsView> {
               icon: const Icon(LucideIcons.refreshCw, size: 16),
               label: Text(localeProvider.t('retry')),
               style: FilledButton.styleFrom(
-                backgroundColor: AppColors.accent,
+                backgroundColor: AppColors.acc(context),
                 foregroundColor: Colors.white,
               ),
             ),

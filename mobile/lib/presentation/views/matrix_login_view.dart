@@ -172,15 +172,15 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
                     width: 80,
                     height: 80,
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [AppColors.accent, AppColors.accentPurple],
+                      gradient: LinearGradient(
+                        colors: [AppColors.acc(context), AppColors.accentPurple],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
                       borderRadius: BorderRadius.circular(24),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.accent.withValues(alpha: 0.3),
+                          color: AppColors.acc(context).withValues(alpha: 0.3),
                           blurRadius: 24,
                           offset: const Offset(0, 8),
                         ),
@@ -458,7 +458,7 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
                 const SizedBox(height: 24),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.accent,
+                    backgroundColor: AppColors.acc(context),
                     foregroundColor: AppColors.textPrimary(context),
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
@@ -498,7 +498,7 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
                             ? t('have_account_login')
                             : t('no_account_create'),
                         style: TextStyle(
-                          color: AppColors.accent,
+                          color: AppColors.acc(context),
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                         ),

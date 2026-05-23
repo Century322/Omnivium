@@ -23,13 +23,13 @@ class UserBubble extends StatelessWidget {
           ),
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           decoration: BoxDecoration(
-            color: AppColors.sfHover(context),
+            color: AppColors.acc(context),
             borderRadius: BorderRadius.circular(18),
           ),
           child: Text(
             content,
             style: TextStyle(
-              color: AppColors.textPrimary(context),
+              color: AppColors.bg(context),
               fontSize: 15,
               fontWeight: FontWeight.w500,
             ),
@@ -120,7 +120,7 @@ class AiTextBubble extends StatelessWidget {
                                 height: 20,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  color: AppColors.accent,
+                                  color: AppColors.acc(context),
                                 ),
                               ),
                             ),
@@ -147,7 +147,7 @@ class AiTextBubble extends StatelessWidget {
                 height: 16,
                 margin: const EdgeInsets.only(left: 2),
                 decoration: BoxDecoration(
-                  color: AppColors.accent,
+                  color: AppColors.acc(context),
                   borderRadius: BorderRadius.circular(1),
                 ),
               ),
@@ -183,7 +183,7 @@ class ExecutionLogBubble extends StatelessWidget {
               height: 14,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                color: AppColors.accent.withValues(alpha: 0.7),
+                color: AppColors.acc(context).withValues(alpha: 0.7),
               ),
             )
           else
@@ -221,7 +221,7 @@ class ExecutionLogBubble extends StatelessWidget {
             const SizedBox(width: 8),
             Text(
               localeProvider.t('execution_running'),
-              style: TextStyle(color: AppColors.accent, fontSize: 11),
+              style: TextStyle(color: AppColors.acc(context), fontSize: 11),
             ),
           ],
         ],

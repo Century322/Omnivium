@@ -98,7 +98,7 @@ class _KeyVerificationViewState extends State<KeyVerificationView> {
               child: Icon(
                 LucideIcons.shieldCheck,
                 size: 40,
-                color: AppColors.accent,
+                color: AppColors.acc(context),
               ),
             ),
             const SizedBox(height: 24),
@@ -132,7 +132,7 @@ class _KeyVerificationViewState extends State<KeyVerificationView> {
                     style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.accent,
+                    backgroundColor: AppColors.acc(context),
                     foregroundColor: AppColors.textPrimary(context),
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
@@ -190,7 +190,7 @@ class _KeyVerificationViewState extends State<KeyVerificationView> {
               child: Icon(
                 LucideIcons.shieldQuestion,
                 size: 40,
-                color: AppColors.accent,
+                color: AppColors.acc(context),
               ),
             ),
             const SizedBox(height: 24),
@@ -245,7 +245,7 @@ class _KeyVerificationViewState extends State<KeyVerificationView> {
                   child: ElevatedButton(
                     onPressed: () => v.acceptSas(),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.accent,
+                      backgroundColor: AppColors.acc(context),
                       foregroundColor: AppColors.textPrimary(context),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
@@ -294,7 +294,7 @@ class _KeyVerificationViewState extends State<KeyVerificationView> {
               child: Icon(
                 LucideIcons.shieldCheck,
                 size: 40,
-                color: AppColors.accent,
+                color: AppColors.acc(context),
               ),
             ),
             const SizedBox(height: 24),
@@ -402,7 +402,7 @@ class _KeyVerificationViewState extends State<KeyVerificationView> {
                     height: 24,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: AppColors.accent,
+                      color: AppColors.acc(context),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -449,7 +449,7 @@ class _KeyVerificationViewState extends State<KeyVerificationView> {
                         v.acceptSas();
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.accent,
+                        backgroundColor: AppColors.acc(context),
                         foregroundColor: AppColors.textPrimary(context),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
@@ -490,7 +490,7 @@ class _KeyVerificationViewState extends State<KeyVerificationView> {
               child: Icon(
                 LucideIcons.checkCircle2,
                 size: 40,
-                color: AppColors.accent,
+                color: AppColors.acc(context),
               ),
             ),
             const SizedBox(height: 24),
@@ -518,7 +518,7 @@ class _KeyVerificationViewState extends State<KeyVerificationView> {
               child: ElevatedButton(
                 onPressed: () => Navigator.pop(context),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.accent,
+                  backgroundColor: AppColors.acc(context),
                   foregroundColor: AppColors.textPrimary(context),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
@@ -586,7 +586,7 @@ class _KeyVerificationViewState extends State<KeyVerificationView> {
               child: ElevatedButton(
                 onPressed: () => Navigator.pop(context),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.accent,
+                  backgroundColor: AppColors.acc(context),
                   foregroundColor: AppColors.textPrimary(context),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
@@ -615,7 +615,7 @@ class _KeyVerificationViewState extends State<KeyVerificationView> {
             height: 32,
             child: CircularProgressIndicator(
               strokeWidth: 2.5,
-              color: AppColors.accent,
+              color: AppColors.acc(context),
             ),
           ),
           const SizedBox(height: 16),

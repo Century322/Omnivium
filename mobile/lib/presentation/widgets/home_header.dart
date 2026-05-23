@@ -169,13 +169,13 @@ class HomeHeader extends StatelessWidget {
                       width: 30,
                       height: 30,
                       decoration: BoxDecoration(
-                        color: AppColors.accent.withValues(alpha: 0.2),
+                        color: AppColors.acc(context).withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Icon(
                         LucideIcons.flame,
                         size: 16,
-                        color: AppColors.accent,
+                        color: AppColors.acc(context),
                       ),
                     ),
                   ),

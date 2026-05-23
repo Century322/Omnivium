@@ -20,6 +20,7 @@ class _SearchViewState extends State<SearchView> {
   final _searchController = TextEditingController();
   String _query = '';
   bool _isSearching = false;
+  bool _searchError = false;
   List<_SearchResult> _results = [];
   List<String> _searchHistory = [];
 
@@ -56,12 +57,15 @@ class _SearchViewState extends State<SearchView> {
     setState(() {
       _query = query.trim();
       _isSearching = true;
+      _searchError = false;
       _results.clear();
     });
     await _saveHistory(query.trim());
 
     final results = <_SearchResult>[];
     final matrix = widget.provider.matrix;
+    bool messageSearchFailed = false;
+    bool userSearchFailed = false;
     if (matrix.isLoggedIn && matrix.client != null) {
       try {
         for (final room in matrix.rooms) {
@@ -85,6 +89,7 @@ class _SearchViewState extends State<SearchView> {
           }
         }
       } catch (e, stackTrace) {
+        messageSearchFailed = true;
         AppLogger.instance.error(
           'Operation failed',
           error: e,
@@ -106,6 +111,7 @@ class _SearchViewState extends State<SearchView> {
           );
         }
       } catch (e, stackTrace) {
+        userSearchFailed = true;
         AppLogger.instance.error(
           'Operation failed',
           error: e,
@@ -132,6 +138,7 @@ class _SearchViewState extends State<SearchView> {
       setState(() {
         _results = results;
         _isSearching = false;
+        _searchError = messageSearchFailed && userSearchFailed && results.isEmpty;
       });
     }
   }
@@ -158,6 +165,29 @@ class _SearchViewState extends State<SearchView> {
                         children: List.generate(4, (_) => const CardSkeleton()),
                       ),
                     )
+                  : _searchError
+                      ? Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(LucideIcons.searchX, size: 48, color: AppColors.mut(context)),
+                              const SizedBox(height: 12),
+                              Text(
+                                localeProvider.t('search_error'),
+                                style: TextStyle(color: AppColors.textSecondary(context), fontSize: 15),
+                              ),
+                              const SizedBox(height: 16),
+                              FilledButton(
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: AppColors.acc(context),
+                                  foregroundColor: AppColors.bg(context),
+                                ),
+                                onPressed: () => _doSearch(_query),
+                                child: Text(localeProvider.t('retry')),
+                              ),
+                            ],
+                          ),
+                        )
                   : _query.isEmpty
                   ? _buildHistorySection(context)
                   : _buildResults(context),
@@ -321,7 +351,7 @@ class _SearchViewState extends State<SearchView> {
                   onTap: _clearHistory,
                   child: Text(
                     localeProvider.t('clear'),
-                    style: TextStyle(color: AppColors.accent, fontSize: 12),
+                    style: TextStyle(color: AppColors.acc(context), fontSize: 12),
                   ),
                 ),
               ),
@@ -465,7 +495,7 @@ class _SearchViewState extends State<SearchView> {
     return ListTile(
       leading: CircleAvatar(
         backgroundColor: AppColors.accBg(context),
-        child: Icon(icon, size: 18, color: AppColors.accent),
+        child: Icon(icon, size: 18, color: AppColors.acc(context)),
       ),
       title: Text(
         result.title,

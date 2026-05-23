@@ -409,6 +409,9 @@ class SJa extends S {
   String get discover_welcome_desc => 'AIによる厳選コンテンツを探索。最新アップデートをお楽しみに。';
 
   @override
+  String get discover_load_error => 'コンテンツの読み込みに失敗しました';
+
+  @override
   String get library_empty_desc => '履歴とお気に入りがここに表示されます';
 
   @override
@@ -511,6 +514,9 @@ class SJa extends S {
   String get search => '検索';
 
   @override
+  String get search_error => '検索に失敗しました。もう一度お試しください';
+
+  @override
   String get not_logged_in_short => '未ログイン';
 
   @override
@@ -521,6 +527,51 @@ class SJa extends S {
 
   @override
   String get cancel => 'キャンセル';
+
+  @override
+  String get calling => '発信中...';
+
+  @override
+  String get ringing => '着信中';
+
+  @override
+  String get connecting => '接続中...';
+
+  @override
+  String get call_ended => '通話終了';
+
+  @override
+  String get unmute => 'ミュート解除';
+
+  @override
+  String get speaker => 'スピーカー';
+
+  @override
+  String get earpiece => 'イヤーピース';
+
+  @override
+  String get hang_up => '終了';
+
+  @override
+  String get open_camera => 'カメラをオン';
+
+  @override
+  String get close_camera => 'カメラをオフ';
+
+  @override
+  String get flip_camera => '反転';
+
+  @override
+  String get decline => '拒否';
+
+  @override
+  String get answer => '応答';
+
+  @override
+  String get incorrect_pin => 'PINコードが間違っています';
+
+  @override
+  String get unlock => 'ロック解除';
 
   @override
   String get hours_ago => '時間前';
@@ -632,6 +683,33 @@ class SJa extends S {
 
   @override
   String get theme => 'テーマ';
+
+  @override
+  String get accent_color => 'アクセントカラー';
+
+  @override
+  String get accent_teal => 'ティール';
+
+  @override
+  String get accent_ocean_blue => 'オーシャンブルー';
+
+  @override
+  String get accent_lavender => 'ラベンダー';
+
+  @override
+  String get accent_coral => 'コーラル';
+
+  @override
+  String get accent_amber => 'アンバー';
+
+  @override
+  String get accent_emerald => 'エメラルド';
+
+  @override
+  String get accent_rose => 'ローズ';
+
+  @override
+  String get accent_slate => 'スレート';
 
   @override
   String get orch_reflection_gap => '振り返りで不足を発見';

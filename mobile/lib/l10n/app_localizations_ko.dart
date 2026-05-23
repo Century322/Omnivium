@@ -408,6 +408,9 @@ class SKo extends S {
   String get discover_welcome_desc => 'AI가 엄선한 콘텐츠를 탐색하세요. 최신 업데이트를 기대해 주세요.';
 
   @override
+  String get discover_load_error => '콘텐츠를 불러오지 못했습니다';
+
+  @override
   String get library_empty_desc => '기록과 즐겨찾기가 여기에 표시됩니다';
 
   @override
@@ -510,6 +513,9 @@ class SKo extends S {
   String get search => '검색';
 
   @override
+  String get search_error => '검색에 실패했습니다. 다시 시도해 주세요';
+
+  @override
   String get not_logged_in_short => '미로그인';
 
   @override
@@ -520,6 +526,51 @@ class SKo extends S {
 
   @override
   String get cancel => '취소';
+
+  @override
+  String get calling => '발신 중...';
+
+  @override
+  String get ringing => '수신 중';
+
+  @override
+  String get connecting => '연결 중...';
+
+  @override
+  String get call_ended => '통화 종료';
+
+  @override
+  String get unmute => '음소거 해제';
+
+  @override
+  String get speaker => '스피커';
+
+  @override
+  String get earpiece => '이어피스';
+
+  @override
+  String get hang_up => '종료';
+
+  @override
+  String get open_camera => '카메라 켜기';
+
+  @override
+  String get close_camera => '카메라 끄기';
+
+  @override
+  String get flip_camera => '반전';
+
+  @override
+  String get decline => '거절';
+
+  @override
+  String get answer => '응답';
+
+  @override
+  String get incorrect_pin => 'PIN 코드가 올바르지 않습니다';
+
+  @override
+  String get unlock => '잠금 해제';
 
   @override
   String get hours_ago => '시간 전';
@@ -631,6 +682,33 @@ class SKo extends S {
 
   @override
   String get theme => '테마';
+
+  @override
+  String get accent_color => '강조 색상';
+
+  @override
+  String get accent_teal => '틸';
+
+  @override
+  String get accent_ocean_blue => '오션 블루';
+
+  @override
+  String get accent_lavender => '라벤더';
+
+  @override
+  String get accent_coral => '코랄';
+
+  @override
+  String get accent_amber => '앰버';
+
+  @override
+  String get accent_emerald => '에메랄드';
+
+  @override
+  String get accent_rose => '로즈';
+
+  @override
+  String get accent_slate => '슬레이트';
 
   @override
   String get orch_reflection_gap => '반성에서 부족 발견';

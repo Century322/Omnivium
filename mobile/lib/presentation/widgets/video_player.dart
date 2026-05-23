@@ -71,9 +71,9 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.bg(context),
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: AppColors.bg(context),
         foregroundColor: AppColors.textPrimary(context),
         title: widget.title != null
             ? Text(
@@ -96,7 +96,7 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
                   children: [
                     Video(controller: _controller),
                     if (_isBuffering)
-                      const CircularProgressIndicator(color: AppColors.accent),
+                      CircularProgressIndicator(color: AppColors.acc(context)),
                     if (!_isPlaying && !_isBuffering)
                       Semantics(
                         label: localeProvider.t('play_video'),
@@ -131,7 +131,7 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
 
   Widget _buildControls() {
     return Container(
-      color: AppColors.background,
+      color: AppColors.bg(context),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -153,9 +153,9 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
                     thumbShape: const RoundSliderThumbShape(
                       enabledThumbRadius: 6,
                     ),
-                    activeTrackColor: AppColors.accent,
+                    activeTrackColor: AppColors.acc(context),
                     inactiveTrackColor: AppColors.textDisabled(context),
-                    thumbColor: AppColors.accent,
+                    thumbColor: AppColors.acc(context),
                   ),
                   child: Slider(
                     value: _duration.inMilliseconds > 0
@@ -201,7 +201,7 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: AppColors.accent,
+                  color: AppColors.acc(context),
                   borderRadius: BorderRadius.circular(24),
                 ),
                 child: IconButton(

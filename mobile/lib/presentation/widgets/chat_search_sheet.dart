@@ -179,7 +179,7 @@ class ChatSearchSheet extends StatelessWidget {
           TextSpan(
             text: match,
             style: TextStyle(
-              color: AppColors.accent,
+              color: AppColors.acc(context),
               fontWeight: FontWeight.w600,
             ),
           ),

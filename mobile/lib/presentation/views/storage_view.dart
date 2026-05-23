@@ -249,7 +249,7 @@ class _StorageViewState extends State<StorageView> {
             child: LinearProgressIndicator(
               value: progress,
               backgroundColor: AppColors.sfAlt(context),
-              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.accent),
+              valueColor: AlwaysStoppedAnimation<Color>(AppColors.acc(context)),
               minHeight: 8,
             ),
           ),
@@ -408,7 +408,7 @@ class _StorageViewState extends State<StorageView> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(t('cache_cleared')),
-                      backgroundColor: AppColors.accent,
+                      backgroundColor: AppColors.acc(context),
                       duration: const Duration(seconds: 2),
                     ),
                   );

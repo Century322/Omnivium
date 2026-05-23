@@ -350,7 +350,7 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView>
                     width: 8,
                     height: 8,
                     decoration: BoxDecoration(
-                      color: AppColors.accent,
+                      color: AppColors.acc(context),
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -401,11 +401,11 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView>
                 margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
                 decoration: BoxDecoration(
                   color: isSelected
-                      ? AppColors.accent.withValues(alpha: 0.12)
+                      ? AppColors.acc(context).withValues(alpha: 0.12)
                       : AppColors.sf(context),
                   borderRadius: BorderRadius.circular(12),
                   border: isSelected
-                      ? Border.all(color: AppColors.accent, width: 1.5)
+                      ? Border.all(color: AppColors.acc(context), width: 1.5)
                       : null,
                 ),
                 child: Column(
@@ -417,7 +417,7 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView>
                       t(tpl.nameKey),
                       style: TextStyle(
                         color: isSelected
-                            ? AppColors.accent
+                            ? AppColors.acc(context)
                             : AppColors.textSecondary(context),
                         fontSize: 11,
                         fontWeight: isSelected
@@ -493,7 +493,7 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView>
                   Text(
                     t(_selectedTemplate!.nameKey),
                     style: TextStyle(
-                      color: AppColors.accent,
+                      color: AppColors.acc(context),
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
                     ),
@@ -511,7 +511,7 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView>
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(t('copied')),
-                              backgroundColor: AppColors.accent,
+                              backgroundColor: AppColors.acc(context),
                               duration: const Duration(milliseconds: 1500),
                             ),
                           );
@@ -562,7 +562,7 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView>
                     height: 14,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: AppColors.accent,
+                      color: AppColors.acc(context),
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -672,8 +672,8 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView>
                       color:
                           _selectedTemplate != null &&
                               _inputController.text.trim().isNotEmpty
-                          ? AppColors.accent
-                          : AppColors.accent.withValues(alpha: 0.4),
+                          ? AppColors.acc(context)
+                          : AppColors.acc(context).withValues(alpha: 0.4),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(

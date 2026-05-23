@@ -175,8 +175,8 @@ class MyIdView extends StatelessWidget {
               icon: Icon(LucideIcons.copy, size: 16),
               label: Text(t('copy_id')),
               style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.accent,
-                side: BorderSide(color: AppColors.accent),
+                foregroundColor: AppColors.acc(context),
+                side: BorderSide(color: AppColors.acc(context)),
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -187,7 +187,7 @@ class MyIdView extends StatelessWidget {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(t('id_copied')),
-                    backgroundColor: AppColors.accent,
+                    backgroundColor: AppColors.acc(context),
                     duration: const Duration(milliseconds: 1500),
                   ),
                 );
@@ -657,10 +657,10 @@ class MyIdView extends StatelessWidget {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: AppColors.accent.withValues(alpha: 0.15),
+                color: AppColors.acc(context).withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(icon, size: 18, color: AppColors.accent),
+              child: Icon(icon, size: 18, color: AppColors.acc(context)),
             ),
             const SizedBox(width: 12),
             Expanded(

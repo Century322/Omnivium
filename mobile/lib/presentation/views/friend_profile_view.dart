@@ -118,7 +118,7 @@ class FriendProfileView extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: isEncrypted
-                        ? AppColors.accent.withValues(alpha: 0.15)
+                        ? AppColors.acc(context).withValues(alpha: 0.15)
                         : AppColors.warn(context).withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -131,7 +131,7 @@ class FriendProfileView extends StatelessWidget {
                             : LucideIcons.shieldAlert,
                         size: 14,
                         color: isEncrypted
-                            ? AppColors.accent
+                            ? AppColors.acc(context)
                             : AppColors.warn(context),
                       ),
                       const SizedBox(width: 4),
@@ -139,7 +139,7 @@ class FriendProfileView extends StatelessWidget {
                         isEncrypted ? t('encrypted') : t('not_encrypted'),
                         style: TextStyle(
                           color: isEncrypted
-                              ? AppColors.accent
+                              ? AppColors.acc(context)
                               : AppColors.warn(context),
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
@@ -390,60 +390,64 @@ class FriendProfileView extends StatelessWidget {
     String Function(String) t,
   ) {
     final ctrl = TextEditingController(text: room.getLocalizedDisplayname());
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: AppColors.sf(context),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          t('edit_group_name'),
-          style: TextStyle(color: AppColors.textPrimary(context)),
+    try {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          backgroundColor: AppColors.sf(context),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text(
+            t('edit_group_name'),
+            style: TextStyle(color: AppColors.textPrimary(context)),
+          ),
+          content: TextField(
+            controller: ctrl,
+            style: TextStyle(color: AppColors.textPrimary(context)),
+            decoration: InputDecoration(
+              labelText: t('enter_new_group_name'),
+              hintStyle: TextStyle(color: AppColors.textDisabled(context)),
+              filled: true,
+              fillColor: AppColors.sfAlt(context),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                t('cancel'),
+                style: TextStyle(color: AppColors.sec(context)),
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                final name = ctrl.text.trim();
+                if (name.isEmpty) return;
+                Navigator.pop(context);
+                try {
+                  await room.setName(name);
+                } catch (e, stackTrace) {
+                  AppLogger.instance.error(
+                    'Operation failed',
+                    error: e,
+                    stackTrace: stackTrace,
+                  );
+                }
+              },
+              child: Text(
+                t('confirm'),
+                style: TextStyle(color: AppColors.acc(context)),
+              ),
+            ),
+          ],
         ),
-        content: TextField(
-          controller: ctrl,
-          style: TextStyle(color: AppColors.textPrimary(context)),
-          decoration: InputDecoration(
-            labelText: t('enter_new_group_name'),
-            hintStyle: TextStyle(color: AppColors.textDisabled(context)),
-            filled: true,
-            fillColor: AppColors.sfAlt(context),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              t('cancel'),
-              style: TextStyle(color: AppColors.sec(context)),
-            ),
-          ),
-          TextButton(
-            onPressed: () async {
-              final name = ctrl.text.trim();
-              if (name.isEmpty) return;
-              Navigator.pop(context);
-              try {
-                await room.setName(name);
-              } catch (e, stackTrace) {
-                AppLogger.instance.error(
-                  'Operation failed',
-                  error: e,
-                  stackTrace: stackTrace,
-                );
-              }
-            },
-            child: Text(
-              t('confirm'),
-              style: TextStyle(color: AppColors.accent),
-            ),
-          ),
-        ],
-      ),
-    );
+      );
+    } finally {
+      ctrl.dispose();
+    }
   }
 
   void _showInviteMember(
@@ -452,60 +456,64 @@ class FriendProfileView extends StatelessWidget {
     String Function(String) t,
   ) {
     final ctrl = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: AppColors.sf(context),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          t('invite_member'),
-          style: TextStyle(color: AppColors.textPrimary(context)),
+    try {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          backgroundColor: AppColors.sf(context),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text(
+            t('invite_member'),
+            style: TextStyle(color: AppColors.textPrimary(context)),
+          ),
+          content: TextField(
+            controller: ctrl,
+            style: TextStyle(color: AppColors.textPrimary(context), fontSize: 14),
+            decoration: InputDecoration(
+              labelText: t('enter_matrix_id'),
+              hintStyle: TextStyle(
+                color: AppColors.textDisabled(context),
+                fontSize: 13,
+              ),
+              filled: true,
+              fillColor: AppColors.sfAlt(context),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                t('cancel'),
+                style: TextStyle(color: AppColors.sec(context)),
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                final userId = ctrl.text.trim();
+                if (userId.isEmpty) return;
+                Navigator.pop(context);
+                try {
+                  await room.invite(userId);
+                } catch (e, stackTrace) {
+                  AppLogger.instance.error(
+                    'Operation failed',
+                    error: e,
+                    stackTrace: stackTrace,
+                  );
+                }
+              },
+              child: Text(t('invite'), style: TextStyle(color: AppColors.acc(context))),
+            ),
+          ],
         ),
-        content: TextField(
-          controller: ctrl,
-          style: TextStyle(color: AppColors.textPrimary(context), fontSize: 14),
-          decoration: InputDecoration(
-            labelText: t('enter_matrix_id'),
-            hintStyle: TextStyle(
-              color: AppColors.textDisabled(context),
-              fontSize: 13,
-            ),
-            filled: true,
-            fillColor: AppColors.sfAlt(context),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              t('cancel'),
-              style: TextStyle(color: AppColors.sec(context)),
-            ),
-          ),
-          TextButton(
-            onPressed: () async {
-              final userId = ctrl.text.trim();
-              if (userId.isEmpty) return;
-              Navigator.pop(context);
-              try {
-                await room.invite(userId);
-              } catch (e, stackTrace) {
-                AppLogger.instance.error(
-                  'Operation failed',
-                  error: e,
-                  stackTrace: stackTrace,
-                );
-              }
-            },
-            child: Text(t('invite'), style: TextStyle(color: AppColors.accent)),
-          ),
-        ],
-      ),
-    );
+      );
+    } finally {
+      ctrl.dispose();
+    }
   }
 
   void _leaveGroup(BuildContext context, Room room) {
@@ -565,7 +573,7 @@ class FriendProfileView extends StatelessWidget {
             content: Text(
               isMuted ? localeProvider.t('unmuted') : localeProvider.t('muted'),
             ),
-            backgroundColor: AppColors.accent,
+            backgroundColor: AppColors.acc(context),
             duration: const Duration(seconds: 1),
           ),
         );
@@ -583,7 +591,7 @@ class FriendProfileView extends StatelessWidget {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(localeProvider.t('coming_soon')),
-        backgroundColor: AppColors.accent,
+        backgroundColor: AppColors.acc(context),
         duration: const Duration(seconds: 2),
       ),
     );

@@ -200,56 +200,60 @@ class AppDrawerState extends State<AppDrawer>
 
   void _showRenameDialog(ConversationSession session) {
     final controller = TextEditingController(text: session.title);
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: AppColors.sf(context),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          localeProvider.t('rename_conversation'),
-          style: TextStyle(color: AppColors.textPrimary(context)),
+    try {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          backgroundColor: AppColors.sf(context),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text(
+            localeProvider.t('rename_conversation'),
+            style: TextStyle(color: AppColors.textPrimary(context)),
+          ),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            style: TextStyle(color: AppColors.textPrimary(context)),
+            decoration: InputDecoration(
+              labelText: localeProvider.t('enter_new_name'),
+              hintStyle: TextStyle(color: AppColors.textDisabled(context)),
+              filled: true,
+              fillColor: AppColors.sfAlt(context),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                localeProvider.t('cancel'),
+                style: TextStyle(color: AppColors.sec(context)),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                if (controller.text.trim().isNotEmpty) {
+                  widget.provider.session.updateSessionTitle(
+                    session.id,
+                    controller.text.trim(),
+                  );
+                }
+                Navigator.pop(context);
+              },
+              child: Text(
+                localeProvider.t('ok'),
+                style: TextStyle(color: AppColors.acc(context)),
+              ),
+            ),
+          ],
         ),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          style: TextStyle(color: AppColors.textPrimary(context)),
-          decoration: InputDecoration(
-            labelText: localeProvider.t('enter_new_name'),
-            hintStyle: TextStyle(color: AppColors.textDisabled(context)),
-            filled: true,
-            fillColor: AppColors.sfAlt(context),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              localeProvider.t('cancel'),
-              style: TextStyle(color: AppColors.sec(context)),
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              if (controller.text.trim().isNotEmpty) {
-                widget.provider.session.updateSessionTitle(
-                  session.id,
-                  controller.text.trim(),
-                );
-              }
-              Navigator.pop(context);
-            },
-            child: Text(
-              localeProvider.t('ok'),
-              style: TextStyle(color: AppColors.accent),
-            ),
-          ),
-        ],
-      ),
-    );
+      );
+    } finally {
+      controller.dispose();
+    }
   }
 
   Widget _buildUserAvatar({required double size, required double radius}) {
@@ -262,14 +266,14 @@ class AppDrawerState extends State<AppDrawer>
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: AppColors.accent.withValues(alpha: 0.15),
+        color: AppColors.acc(context).withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(radius),
       ),
       child: Center(
         child: Text(
           letter,
           style: TextStyle(
-            color: AppColors.accent,
+            color: AppColors.acc(context),
             fontSize: size * 0.4,
             fontWeight: FontWeight.w600,
           ),
@@ -315,19 +319,19 @@ class AppDrawerState extends State<AppDrawer>
                         vertical: 8,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.accent.withValues(alpha: 0.15),
+                        color: AppColors.acc(context).withValues(alpha: 0.15),
                         borderRadius: const BorderRadius.horizontal(
                           right: Radius.circular(24),
                         ),
                       ),
                       child: Row(
                         children: [
-                          IncognitoIcon(size: 14, color: AppColors.accent),
+                          IncognitoIcon(size: 14, color: AppColors.acc(context)),
                           const SizedBox(width: 8),
                           Text(
                             localeProvider.t('incognito_mode'),
                             style: TextStyle(
-                              color: AppColors.accent,
+                              color: AppColors.acc(context),
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
                             ),
@@ -420,7 +424,7 @@ class AppDrawerState extends State<AppDrawer>
                                           child: Container(
                                             padding: const EdgeInsets.all(2),
                                             decoration: BoxDecoration(
-                                              color: AppColors.accent,
+                                              color: AppColors.acc(context),
                                               borderRadius:
                                                   BorderRadius.circular(6),
                                             ),

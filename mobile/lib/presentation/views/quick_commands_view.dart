@@ -106,7 +106,7 @@ class _QuickCommandsViewState extends State<QuickCommandsView>
                         onPressed: () => Navigator.pop(ctx, true),
                         child: Text(
                           t('confirm'),
-                          style: TextStyle(color: AppColors.accent),
+                          style: TextStyle(color: AppColors.acc(context)),
                         ),
                       ),
                     ],
@@ -178,7 +178,7 @@ class _QuickCommandsViewState extends State<QuickCommandsView>
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showEditDialog(context),
-        backgroundColor: AppColors.accent,
+        backgroundColor: AppColors.acc(context),
         child: Icon(
           LucideIcons.plus,
           color: AppColors.textPrimary(context),
@@ -325,8 +325,9 @@ class _QuickCommandsViewState extends State<QuickCommandsView>
       ('work', t('category_work')),
     ];
 
-    showDialog(
-      context: context,
+    try {
+      showDialog(
+        context: context,
       builder: (ctx) {
         return StatefulBuilder(
           builder: (ctx, setDialogState) {
@@ -374,12 +375,12 @@ class _QuickCommandsViewState extends State<QuickCommandsView>
                               height: 36,
                               decoration: BoxDecoration(
                                 color: isSelected
-                                    ? AppColors.accent.withValues(alpha: 0.15)
+                                    ? AppColors.acc(context).withValues(alpha: 0.15)
                                     : AppColors.sfAlt(context),
                                 borderRadius: BorderRadius.circular(8),
                                 border: isSelected
                                     ? Border.all(
-                                        color: AppColors.accent,
+                                        color: AppColors.acc(context),
                                         width: 2,
                                       )
                                     : null,
@@ -488,12 +489,12 @@ class _QuickCommandsViewState extends State<QuickCommandsView>
                               ),
                               decoration: BoxDecoration(
                                 color: isSelected
-                                    ? AppColors.accent.withValues(alpha: 0.15)
+                                    ? AppColors.acc(context).withValues(alpha: 0.15)
                                     : AppColors.sfAlt(context),
                                 borderRadius: BorderRadius.circular(8),
                                 border: isSelected
                                     ? Border.all(
-                                        color: AppColors.accent,
+                                        color: AppColors.acc(context),
                                         width: 1.5,
                                       )
                                     : null,
@@ -502,7 +503,7 @@ class _QuickCommandsViewState extends State<QuickCommandsView>
                                 label,
                                 style: TextStyle(
                                   color: isSelected
-                                      ? AppColors.accent
+                                      ? AppColors.acc(context)
                                       : AppColors.textSecondary(context),
                                   fontSize: 13,
                                   fontWeight: isSelected
@@ -555,7 +556,7 @@ class _QuickCommandsViewState extends State<QuickCommandsView>
                   },
                   child: Text(
                     isEdit ? t('save') : t('create'),
-                    style: TextStyle(color: AppColors.accent),
+                    style: TextStyle(color: AppColors.acc(context)),
                   ),
                 ),
               ],
@@ -564,5 +565,10 @@ class _QuickCommandsViewState extends State<QuickCommandsView>
         );
       },
     );
+    } finally {
+      nameCtrl.dispose();
+      emojiCtrl.dispose();
+      promptCtrl.dispose();
+    }
   }
 }

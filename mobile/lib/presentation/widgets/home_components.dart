@@ -159,7 +159,7 @@ class _VoiceBarsIconState extends State<VoiceBarsIcon>
               height: h,
               margin: const EdgeInsets.symmetric(horizontal: 1),
               decoration: BoxDecoration(
-                color: AppColors.accent,
+                color: AppColors.acc(context),
                 borderRadius: BorderRadius.circular(1.5),
               ),
             );

@@ -419,6 +419,9 @@ class SEn extends S {
       'Discover curated content powered by AI. Stay tuned for the latest updates.';
 
   @override
+  String get discover_load_error => 'Failed to load content';
+
+  @override
   String get library_empty_desc =>
       'Your history and favorites will appear here';
 
@@ -523,6 +526,9 @@ class SEn extends S {
   String get search => 'Search';
 
   @override
+  String get search_error => 'Search failed, please try again';
+
+  @override
   String get not_logged_in_short => 'Not logged in';
 
   @override
@@ -533,6 +539,51 @@ class SEn extends S {
 
   @override
   String get cancel => 'Cancel';
+
+  @override
+  String get calling => 'Calling...';
+
+  @override
+  String get ringing => 'Ringing';
+
+  @override
+  String get connecting => 'Connecting...';
+
+  @override
+  String get call_ended => 'Call ended';
+
+  @override
+  String get unmute => 'Unmute';
+
+  @override
+  String get speaker => 'Speaker';
+
+  @override
+  String get earpiece => 'Earpiece';
+
+  @override
+  String get hang_up => 'Hang up';
+
+  @override
+  String get open_camera => 'Open camera';
+
+  @override
+  String get close_camera => 'Close camera';
+
+  @override
+  String get flip_camera => 'Flip';
+
+  @override
+  String get decline => 'Decline';
+
+  @override
+  String get answer => 'Answer';
+
+  @override
+  String get incorrect_pin => 'Incorrect PIN';
+
+  @override
+  String get unlock => 'Unlock';
 
   @override
   String get hours_ago => 'h ago';
@@ -646,6 +697,33 @@ class SEn extends S {
 
   @override
   String get theme => 'Theme';
+
+  @override
+  String get accent_color => 'Accent Color';
+
+  @override
+  String get accent_teal => 'Teal';
+
+  @override
+  String get accent_ocean_blue => 'Ocean Blue';
+
+  @override
+  String get accent_lavender => 'Lavender';
+
+  @override
+  String get accent_coral => 'Coral';
+
+  @override
+  String get accent_amber => 'Amber';
+
+  @override
+  String get accent_emerald => 'Emerald';
+
+  @override
+  String get accent_rose => 'Rose';
+
+  @override
+  String get accent_slate => 'Slate';
 
   @override
   String get orch_reflection_gap => 'Reflection gap found';

@@ -158,7 +158,7 @@ class OptionsContent extends StatelessWidget {
             ),
             trailing: Icon(
               LucideIcons.check,
-              color: AppColors.accent,
+              color: AppColors.acc(context),
               size: 20,
             ),
           ),
@@ -327,7 +327,7 @@ class ModelsContent extends StatelessWidget {
                       isActive ? LucideIcons.checkCircle2 : LucideIcons.circle,
                       size: 18,
                       color: isActive
-                          ? AppColors.accent
+                          ? AppColors.acc(context)
                           : AppColors.textDisabled(context),
                     ),
                     title: Text(

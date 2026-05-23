@@ -184,7 +184,7 @@ class RemoteUIEngine {
     }
     return FilledButton(
       onPressed: onPressed,
-      style: FilledButton.styleFrom(backgroundColor: AppColors.accent),
+      style: FilledButton.styleFrom(backgroundColor: AppColors.acc(context)),
       child: Text(label),
     );
   }
@@ -332,7 +332,7 @@ class RemoteUIEngine {
       onChanged: schema['action'] != null
           ? (v) => _handleAction(schema['action'], {'value': v})
           : null,
-      activeThumbColor: AppColors.accent,
+      activeThumbColor: AppColors.acc(context),
     );
   }
 
@@ -369,7 +369,7 @@ class RemoteUIEngine {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: AppColors.accent,
+        color: AppColors.acc(context),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Text(
@@ -496,7 +496,7 @@ class RemoteUIEngine {
     if (value is String) {
       switch (value) {
         case 'accent':
-          return AppColors.accent;
+          return AppColors.acc(context);
         case 'primary':
           return AppColors.textPrimary(context);
         case 'secondary':

@@ -55,9 +55,9 @@ class _ProductivityViewState extends State<ProductivityView>
         ),
         bottom: TabBar(
           controller: _tabController,
-          labelColor: AppColors.accent,
+          labelColor: AppColors.acc(context),
           unselectedLabelColor: AppColors.textSecondary(context),
-          indicatorColor: AppColors.accent,
+          indicatorColor: AppColors.acc(context),
           tabs: [
             Tab(text: t('notes')),
             Tab(text: t('todos')),
@@ -71,7 +71,7 @@ class _ProductivityViewState extends State<ProductivityView>
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddDialog(_tabController.index),
-        backgroundColor: AppColors.accent,
+        backgroundColor: AppColors.acc(context),
         child: Icon(
           LucideIcons.plus,
           color: AppColors.textPrimary(context),
@@ -268,10 +268,10 @@ class _ProductivityViewState extends State<ProductivityView>
               width: 24,
               height: 24,
               decoration: BoxDecoration(
-                color: todo.isDone ? AppColors.accent : Colors.transparent,
+                color: todo.isDone ? AppColors.acc(context) : Colors.transparent,
                 border: Border.all(
                   color: todo.isDone
-                      ? AppColors.accent
+                      ? AppColors.acc(context)
                       : AppColors.textSecondary(context),
                   width: 2,
                 ),
@@ -347,7 +347,7 @@ class _ProductivityViewState extends State<ProductivityView>
           decoration: BoxDecoration(
             color: isOverdue
                 ? AppColors.dng(context).withValues(alpha: 0.1)
-                : AppColors.accent.withValues(alpha: 0.1),
+                : AppColors.acc(context).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Column(
@@ -356,7 +356,7 @@ class _ProductivityViewState extends State<ProductivityView>
               Text(
                 schedule.dueDate != null ? '${schedule.dueDate!.day}' : '-',
                 style: TextStyle(
-                  color: isOverdue ? AppColors.dng(context) : AppColors.accent,
+                  color: isOverdue ? AppColors.dng(context) : AppColors.acc(context),
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                 ),
@@ -368,7 +368,7 @@ class _ProductivityViewState extends State<ProductivityView>
                 style: TextStyle(
                   color: isOverdue
                       ? AppColors.dng(context).withValues(alpha: 0.7)
-                      : AppColors.accent.withValues(alpha: 0.7),
+                      : AppColors.acc(context).withValues(alpha: 0.7),
                   fontSize: 9,
                   fontWeight: FontWeight.w600,
                 ),
@@ -672,7 +672,7 @@ class _ProductivityViewState extends State<ProductivityView>
                     },
                     child: Text(
                       t('create'),
-                      style: TextStyle(color: AppColors.accent),
+                      style: TextStyle(color: AppColors.acc(context)),
                     ),
                   ),
                 ],
@@ -785,7 +785,7 @@ class _ProductivityViewState extends State<ProductivityView>
                 },
                 child: Text(
                   t('save'),
-                  style: TextStyle(color: AppColors.accent),
+                  style: TextStyle(color: AppColors.acc(context)),
                 ),
               ),
             ],

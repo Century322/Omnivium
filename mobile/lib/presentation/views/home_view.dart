@@ -139,6 +139,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
   }
 
   void _onOrchestratorChanged() {
+    if (!mounted) return;
     final orchestrator = widget.provider.orchestrator;
     final orchMessages = orchestrator.messages;
 
@@ -199,7 +200,10 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     });
   }
 
-  void _onMatrixChanged() => setState(() {});
+  void _onMatrixChanged() {
+    if (!mounted) return;
+    setState(() {});
+  }
 
   void _onScrollChanged() {
     if (!_scrollController.hasClients || _isAutoScrolling) return;
@@ -645,7 +649,7 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(t('copied')),
-        backgroundColor: AppColors.accent,
+        backgroundColor: AppColors.acc(context),
         duration: const Duration(milliseconds: 1500),
       ),
     );
@@ -690,14 +694,14 @@ class _HomeViewState extends State<HomeView> with TickerProviderStateMixin {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: AppColors.accent.withValues(alpha: 0.2),
+        color: AppColors.acc(context).withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(radius),
       ),
       child: Center(
         child: Text(
           letter,
           style: TextStyle(
-            color: AppColors.accent,
+            color: AppColors.acc(context),
             fontSize: size * 0.45,
             fontWeight: FontWeight.w700,
           ),

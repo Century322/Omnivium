@@ -1,5 +1,83 @@
 import 'package:flutter/material.dart';
 
+class AccentPreset {
+  final String key;
+  final Color darkAccent;
+  final Color lightAccent;
+
+  const AccentPreset({
+    required this.key,
+    required this.darkAccent,
+    required this.lightAccent,
+  });
+
+  static const teal = AccentPreset(
+    key: 'teal',
+    darkAccent: Color(0xFF1BCCB7),
+    lightAccent: Color(0xFF0FA89E),
+  );
+
+  static const oceanBlue = AccentPreset(
+    key: 'ocean_blue',
+    darkAccent: Color(0xFF4A9EF5),
+    lightAccent: Color(0xFF3B82F6),
+  );
+
+  static const lavender = AccentPreset(
+    key: 'lavender',
+    darkAccent: Color(0xFF8B6FC0),
+    lightAccent: Color(0xFF7C5CBF),
+  );
+
+  static const coral = AccentPreset(
+    key: 'coral',
+    darkAccent: Color(0xFFE85D5D),
+    lightAccent: Color(0xFFD94545),
+  );
+
+  static const amber = AccentPreset(
+    key: 'amber',
+    darkAccent: Color(0xFFF0963A),
+    lightAccent: Color(0xFFE08520),
+  );
+
+  static const emerald = AccentPreset(
+    key: 'emerald',
+    darkAccent: Color(0xFF4CAF7D),
+    lightAccent: Color(0xFF3D9E6E),
+  );
+
+  static const rose = AccentPreset(
+    key: 'rose',
+    darkAccent: Color(0xFFE07BA0),
+    lightAccent: Color(0xFFD06088),
+  );
+
+  static const slate = AccentPreset(
+    key: 'slate',
+    darkAccent: Color(0xFF6B7FA3),
+    lightAccent: Color(0xFF5A6E8F),
+  );
+
+  static const List<AccentPreset> presets = [
+    teal,
+    oceanBlue,
+    lavender,
+    coral,
+    amber,
+    emerald,
+    rose,
+    slate,
+  ];
+
+  static AccentPreset fromKey(String key) {
+    return presets.firstWhere(
+      (p) => p.key == key,
+      orElse: () => teal,
+    );
+  }
+}
+
 class AppColors {
   static const Color background = Color(0xFF1C1C1E);
   static const Color surface = Color(0xFF262626);
@@ -55,13 +133,41 @@ class AppColors {
   static Color sfActive(BuildContext context) =>
       of(context, surfaceActive, lightSurfaceActive);
   static Color tab(BuildContext context) => of(context, tabBg, lightTabBg);
-  static Color acc(BuildContext context) => of(context, accent, lightAccent);
-  static Color accDark(BuildContext context) =>
-      of(context, accentDark, lightAccentDark);
-  static Color accBg(BuildContext context) =>
-      of(context, accentBg, lightAccentBg);
-  static Color accLight(BuildContext context) =>
-      of(context, accentLight, lightAccentLight);
+
+  static Color acc(BuildContext context) =>
+      Theme.of(context).colorScheme.primary;
+
+  static Color accDark(BuildContext context) {
+    final primary = Theme.of(context).colorScheme.primary;
+    final hsl = HSLColor.fromColor(primary);
+    return hsl
+        .withLightness((hsl.lightness - 0.15).clamp(0.0, 1.0))
+        .toColor();
+  }
+
+  static Color accBg(BuildContext context) {
+    final primary = Theme.of(context).colorScheme.primary;
+    final hsl = HSLColor.fromColor(primary);
+    if (isLightMode(context)) {
+      return hsl
+          .withSaturation((hsl.saturation * 0.35).clamp(0.0, 1.0))
+          .withLightness(0.92)
+          .toColor();
+    }
+    return hsl
+        .withSaturation((hsl.saturation * 0.55).clamp(0.0, 1.0))
+        .withLightness(0.15)
+        .toColor();
+  }
+
+  static Color accLight(BuildContext context) {
+    final primary = Theme.of(context).colorScheme.primary;
+    final hsl = HSLColor.fromColor(primary);
+    return hsl
+        .withLightness((hsl.lightness + 0.15).clamp(0.0, 1.0))
+        .toColor();
+  }
+
   static Color sec(BuildContext context) =>
       of(context, secondary, lightSecondary);
   static Color mut(BuildContext context) => of(context, muted, lightMuted);

@@ -95,7 +95,7 @@ class _VoiceRecorderButtonState extends State<VoiceRecorderButton> {
         height: 44,
         padding: const EdgeInsets.symmetric(horizontal: 8),
         decoration: BoxDecoration(
-          color: AppColors.accent.withValues(alpha: 0.1),
+          color: AppColors.acc(context).withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(22),
         ),
         child: Row(
@@ -150,7 +150,7 @@ class _VoiceRecorderButtonState extends State<VoiceRecorderButton> {
                   width: 32,
                   height: 32,
                   decoration: BoxDecoration(
-                    color: AppColors.accent,
+                    color: AppColors.acc(context),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Icon(
@@ -268,9 +268,9 @@ class _VoiceMessagePlayerState extends State<VoiceMessagePlayer> {
         ? _position.inMilliseconds / _duration.inMilliseconds
         : 0.0;
     final bgColor = widget.isMe
-        ? AppColors.accent.withValues(alpha: 0.15)
+        ? Colors.transparent
         : AppColors.sfAlt(context);
-    final iconColor = widget.isMe ? AppColors.accent : AppColors.sec(context);
+    final iconColor = widget.isMe ? AppColors.bg(context) : AppColors.sec(context);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),

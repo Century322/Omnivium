@@ -35,7 +35,7 @@ class NotificationView extends StatelessWidget {
               onPressed: () => provider.notification.markAllAsRead(),
               child: Text(
                 t('mark_all_read'),
-                style: TextStyle(color: AppColors.accent, fontSize: 13),
+                style: TextStyle(color: AppColors.acc(context), fontSize: 13),
               ),
             ),
             TextButton(
@@ -126,7 +126,7 @@ class NotificationView extends StatelessWidget {
         : LucideIcons.bell;
     final iconColor = notif.read
         ? AppColors.iconGray(context)
-        : AppColors.accent;
+        : AppColors.acc(context);
     return Semantics(
       button: true,
       label:
@@ -160,7 +160,7 @@ class NotificationView extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               border: notif.read
                   ? null
-                  : Border.all(color: AppColors.accent.withValues(alpha: 0.2)),
+                  : Border.all(color: AppColors.acc(context).withValues(alpha: 0.2)),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -224,7 +224,7 @@ class NotificationView extends StatelessWidget {
                     width: 8,
                     height: 8,
                     decoration: BoxDecoration(
-                      color: AppColors.accent,
+                      color: AppColors.acc(context),
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
