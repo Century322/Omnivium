@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 import '../../core/call_service.dart';
 import '../theme/app_colors.dart';
 
@@ -15,6 +16,10 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
   Duration _callDuration = Duration.zero;
   bool _isMuted = false;
   bool _isSpeakerOn = true;
+  bool _isCameraOff = false;
+  RTCVideoRenderer? _localRenderer;
+  RTCVideoRenderer? _remoteRenderer;
+  bool _renderersInitialized = false;
 
   @override
   void initState() {
@@ -32,7 +37,9 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
       setState(() {});
       if (call.state == CallState.connected) {
         _startTimer();
+        if (call.isVideo) _initRenderers();
       } else if (call.state == CallState.ended) {
+        _disposeRenderers();
         Navigator.of(context).pop();
       }
     });
@@ -49,8 +56,39 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    _disposeRenderers();
     _pulseController.dispose();
     super.dispose();
+  }
+
+  Future<void> _initRenderers() async {
+    if (_renderersInitialized) return;
+    final call = CallService.instance.currentCall;
+    if (call == null) return;
+
+    _localRenderer = RTCVideoRenderer();
+    _remoteRenderer = RTCVideoRenderer();
+    await _localRenderer!.initialize();
+    await _remoteRenderer!.initialize();
+
+    if (call.localStream != null) {
+      _localRenderer!.srcObject = call.localStream;
+    }
+    if (call.remoteStream != null) {
+      _remoteRenderer!.srcObject = call.remoteStream;
+    }
+    _renderersInitialized = true;
+    if (mounted) setState(() {});
+  }
+
+  void _disposeRenderers() {
+    _localRenderer?.srcObject = null;
+    _remoteRenderer?.srcObject = null;
+    _localRenderer?.dispose();
+    _remoteRenderer?.dispose();
+    _localRenderer = null;
+    _remoteRenderer = null;
+    _renderersInitialized = false;
   }
 
   String _formatDuration(Duration d) {
@@ -90,36 +128,38 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        child: Column(
-          children: [
-            const Spacer(flex: 2),
-            _buildAvatar(isConnected),
-            const SizedBox(height: 24),
-            Text(
-              call.remoteUserId.replaceAll('@', '').split(':').first,
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary(context),
+        child: call.isVideo && _renderersInitialized && isConnected
+            ? _buildVideoLayout(context, call)
+            : Column(
+                children: [
+                  const Spacer(flex: 2),
+                  _buildAvatar(isConnected),
+                  const SizedBox(height: 24),
+                  Text(
+                    call.remoteUserId.replaceAll('@', '').split(':').first,
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary(context),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    _getStateText(call.state),
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: isConnected
+                          ? AppColors.success
+                          : AppColors.textSecondary(context),
+                    ),
+                  ),
+                  const Spacer(flex: 3),
+                  if (isConnected) _buildInCallControls(context),
+                  if (isRinging) _buildIncomingCallControls(),
+                  if (isConnecting) _buildConnectingControls(),
+                  const SizedBox(height: 48),
+                ],
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              _getStateText(call.state),
-              style: TextStyle(
-                fontSize: 16,
-                color: isConnected
-                    ? AppColors.success
-                    : AppColors.textSecondary(context),
-              ),
-            ),
-            const Spacer(flex: 3),
-            if (isConnected) _buildInCallControls(context),
-            if (isRinging) _buildIncomingCallControls(),
-            if (isConnecting) _buildConnectingControls(),
-            const SizedBox(height: 48),
-          ],
-        ),
       ),
     );
   }
@@ -136,7 +176,10 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
           icon: _isMuted ? Icons.mic_off : Icons.mic,
           label: _isMuted ? '取消静音' : '静音',
           color: _isMuted ? AppColors.danger : AppColors.textSecondary(context),
-          onTap: () => setState(() => _isMuted = !_isMuted),
+          onTap: () {
+            setState(() => _isMuted = !_isMuted);
+            _toggleMute(_isMuted);
+          },
         ),
         _buildControlButton(
           icon: _isSpeakerOn ? Icons.volume_up : Icons.volume_off,
@@ -144,7 +187,10 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
           color: _isSpeakerOn
               ? AppColors.accent
               : AppColors.textSecondary(context),
-          onTap: () => setState(() => _isSpeakerOn = !_isSpeakerOn),
+          onTap: () {
+            setState(() => _isSpeakerOn = !_isSpeakerOn);
+            _toggleSpeaker(_isSpeakerOn);
+          },
         ),
         _buildControlButton(
           icon: Icons.call_end,
@@ -152,6 +198,159 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
           color: AppColors.danger,
           onTap: () => CallService.instance.hangup(),
           isLarge: true,
+        ),
+      ],
+    );
+  }
+
+  void _toggleMute(bool muted) {
+    final call = CallService.instance.currentCall;
+    if (call == null) return;
+    final localStream = call.localStream;
+    if (localStream == null) return;
+    for (final track in localStream.getAudioTracks()) {
+      track.enabled = !muted;
+    }
+  }
+
+  void _toggleSpeaker(bool speakerOn) {
+    final call = CallService.instance.currentCall;
+    if (call == null) return;
+    final localStream = call.localStream;
+    if (localStream == null) return;
+    for (final track in localStream.getAudioTracks()) {
+      try {
+        track.enableSpeakerphone(speakerOn);
+      } catch (_) {}
+    }
+  }
+
+  void _toggleCamera() {
+    final call = CallService.instance.currentCall;
+    if (call == null) return;
+    final localStream = call.localStream;
+    if (localStream == null) return;
+    for (final track in localStream.getVideoTracks()) {
+      track.enabled = !_isCameraOff;
+    }
+    setState(() {});
+  }
+
+  void _switchCamera() {
+    final call = CallService.instance.currentCall;
+    if (call == null) return;
+    final localStream = call.localStream;
+    if (localStream == null) return;
+    for (final track in localStream.getVideoTracks()) {
+      try {
+        track.switchCamera();
+      } catch (_) {}
+    }
+  }
+
+  Widget _buildVideoLayout(BuildContext context, VoIPCall call) {
+    return Stack(
+      children: [
+        if (_remoteRenderer != null && call.remoteStream != null)
+          Positioned.fill(
+            child: RTCVideoView(
+              _remoteRenderer!,
+              objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+            ),
+          ),
+        if (_localRenderer != null && call.localStream != null && !_isCameraOff)
+          Positioned(
+            top: 60,
+            right: 16,
+            child: Container(
+              width: 120,
+              height: 180,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppColors.accent, width: 2),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: RTCVideoView(
+                _localRenderer!,
+                mirror: true,
+                objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+              ),
+            ),
+          ),
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.transparent,
+                  Colors.black.withValues(alpha: 0.7),
+                ],
+              ),
+            ),
+            padding: const EdgeInsets.fromLTRB(24, 48, 24, 48),
+            child: Column(
+              children: [
+                Text(
+                  call.remoteUserId.replaceAll('@', '').split(':').first,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  _formatDuration(_callDuration),
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.white.withValues(alpha: 0.8),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildControlButton(
+                      icon: _isMuted ? Icons.mic_off : Icons.mic,
+                      label: _isMuted ? '取消静音' : '静音',
+                      color: _isMuted ? AppColors.danger : Colors.white,
+                      onTap: () {
+                        setState(() => _isMuted = !_isMuted);
+                        _toggleMute(_isMuted);
+                      },
+                    ),
+                    _buildControlButton(
+                      icon: _isCameraOff ? Icons.videocam_off : Icons.videocam,
+                      label: _isCameraOff ? '开启摄像头' : '关闭摄像头',
+                      color: _isCameraOff ? AppColors.danger : Colors.white,
+                      onTap: () {
+                        setState(() => _isCameraOff = !_isCameraOff);
+                        _toggleCamera();
+                      },
+                    ),
+                    _buildControlButton(
+                      icon: Icons.flip_camera_ios,
+                      label: '翻转',
+                      color: Colors.white,
+                      onTap: _switchCamera,
+                    ),
+                    _buildControlButton(
+                      icon: Icons.call_end,
+                      label: '挂断',
+                      color: AppColors.danger,
+                      onTap: () => CallService.instance.hangup(),
+                      isLarge: true,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ),
       ],
     );

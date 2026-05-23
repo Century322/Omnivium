@@ -20,7 +20,6 @@ class ApiProxyService {
       'https://omnivium-api-proxy.so1946875590.workers.dev';
   static const _fallbackUrls = [
     'https://omnivium-api-proxy.so1946875590.workers.dev',
-    'https://omnivium-api-fallback.so1946875590.workers.dev',
   ];
 
   static const Duration _shortTimeout = Duration(seconds: 5);

@@ -10,6 +10,7 @@ class VoIPCall {
   final String roomId;
   final String remoteUserId;
   final bool isOutgoing;
+  final bool isVideo;
   final DateTime createdAt;
 
   CallState state;
@@ -23,6 +24,7 @@ class VoIPCall {
     required this.roomId,
     required this.remoteUserId,
     required this.isOutgoing,
+    this.isVideo = false,
     this.state = CallState.idle,
   }) : createdAt = DateTime.now();
 
@@ -55,7 +57,13 @@ class VoIPCall {
 
     _localStream = await navigator.mediaDevices.getUserMedia({
       'audio': true,
-      'video': false,
+      'video': isVideo
+          ? {
+              'width': {'min': 640, 'ideal': 1280},
+              'height': {'min': 480, 'ideal': 720},
+              'facingMode': 'user',
+            }
+          : false,
     });
 
     for (final track in _localStream!.getTracks()) {
@@ -67,7 +75,7 @@ class VoIPCall {
     await _setupPeerConnection();
     final offer = await _peerConnection!.createOffer({
       'offerToReceiveAudio': true,
-      'offerToReceiveVideo': false,
+      'offerToReceiveVideo': isVideo,
     });
     await _peerConnection!.setLocalDescription(offer);
     state = CallState.inviting;
@@ -92,7 +100,7 @@ class VoIPCall {
 
     final answer = await _peerConnection!.createAnswer({
       'offerToReceiveAudio': true,
-      'offerToReceiveVideo': false,
+      'offerToReceiveVideo': isVideo,
     });
     await _peerConnection!.setLocalDescription(answer);
     state = CallState.connecting;
@@ -182,6 +190,14 @@ class CallService {
   }
 
   Future<void> initiateCall(String roomId, String remoteUserId) async {
+    return initiateCallWithVideo(roomId, remoteUserId, isVideo: false);
+  }
+
+  Future<void> initiateCallWithVideo(
+    String roomId,
+    String remoteUserId, {
+    bool isVideo = false,
+  }) async {
     if (_currentCall != null && _currentCall!.isActive) {
       AppLogger.instance.warning('Already in a call');
       return;
@@ -193,6 +209,7 @@ class CallService {
       roomId: roomId,
       remoteUserId: remoteUserId,
       isOutgoing: true,
+      isVideo: isVideo,
     );
 
     final offerSdp = await call.createOffer();
