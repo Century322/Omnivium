@@ -111,10 +111,7 @@ void main() async {
     }
   }
   try {
-    final sentryDsn = String.fromEnvironment(
-      'SENTRY_DSN',
-      defaultValue: '',
-    );
+    final sentryDsn = String.fromEnvironment('SENTRY_DSN', defaultValue: '');
     if (sentryDsn.isNotEmpty) {
       await SentryFlutter.init(
         (options) {
@@ -127,9 +124,8 @@ void main() async {
           options.attachThreads = true;
           options.beforeSend = (event, hint) {
             final message = (event.message?.formatted ?? '').toLowerCase();
-            final exception = event.exceptions?.firstOrNull?.value
-                    .toString()
-                    .toLowerCase() ??
+            final exception =
+                event.exceptions?.firstOrNull?.value.toString().toLowerCase() ??
                 '';
             final combined = '$message $exception';
             final sensitivePatterns = [

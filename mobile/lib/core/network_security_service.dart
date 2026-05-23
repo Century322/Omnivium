@@ -38,8 +38,9 @@ class NetworkSecurityService {
       final result = <String, List<String>>{};
       for (final entry in decoded.entries) {
         if (entry.value is List) {
-          result[entry.key] =
-              (entry.value as List).whereType<String>().toList();
+          result[entry.key] = (entry.value as List)
+              .whereType<String>()
+              .toList();
         }
       }
       return result;
