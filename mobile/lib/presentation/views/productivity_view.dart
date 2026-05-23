@@ -455,70 +455,44 @@ class _ProductivityViewState extends State<ProductivityView>
     DateTime? dueDate;
     TimeOfDay? dueTime;
 
-    showDialog(
-      context: context,
-      builder: (ctx) {
-        return StatefulBuilder(
-          builder: (ctx, setDialogState) {
-            return AlertDialog(
-              backgroundColor: AppColors.sf(context),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              title: Text(
-                tabIndex == 0
-                    ? t('add_note')
-                    : tabIndex == 1
-                    ? t('add_todo')
-                    : t('add_schedule'),
-                style: TextStyle(
-                  color: AppColors.textPrimary(context),
-                  fontSize: 17,
-                  fontWeight: FontWeight.w600,
+    try {
+      showDialog(
+        context: context,
+        builder: (ctx) {
+          return StatefulBuilder(
+            builder: (ctx, setDialogState) {
+              return AlertDialog(
+                backgroundColor: AppColors.sf(context),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
                 ),
-              ),
-              content: SingleChildScrollView(
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.85,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      TextField(
-                        controller: titleCtrl,
-                        style: TextStyle(
-                          color: AppColors.textPrimary(context),
-                          fontSize: 15,
-                        ),
-                        decoration: InputDecoration(
-                          labelText: t('title_hint'),
-                          hintStyle: TextStyle(
-                            color: AppColors.textDisabled(context),
-                            fontSize: 14,
-                          ),
-                          filled: true,
-                          fillColor: AppColors.sfAlt(context),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide.none,
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 10,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      if (type == NoteType.text)
+                title: Text(
+                  tabIndex == 0
+                      ? t('add_note')
+                      : tabIndex == 1
+                      ? t('add_todo')
+                      : t('add_schedule'),
+                  style: TextStyle(
+                    color: AppColors.textPrimary(context),
+                    fontSize: 17,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                content: SingleChildScrollView(
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.85,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                         TextField(
-                          controller: contentCtrl,
-                          maxLines: 4,
+                          controller: titleCtrl,
                           style: TextStyle(
                             color: AppColors.textPrimary(context),
                             fontSize: 15,
                           ),
                           decoration: InputDecoration(
-                            labelText: t('content_hint'),
+                            labelText: t('title_hint'),
                             hintStyle: TextStyle(
                               color: AppColors.textDisabled(context),
                               fontSize: 14,
@@ -535,353 +509,404 @@ class _ProductivityViewState extends State<ProductivityView>
                             ),
                           ),
                         ),
-                      if (type == NoteType.schedule) ...[
-                        const SizedBox(height: 8),
-                        Semantics(
-                          label: localeProvider.t('select_date'),
-                          child: GestureDetector(
-                            behavior: HitTestBehavior.opaque,
-                            onTap: () async {
-                              final date = await showDatePicker(
-                                context: context,
-                                initialDate: DateTime.now(),
-                                firstDate: DateTime.now(),
-                                lastDate: DateTime.now().add(
-                                  const Duration(days: 365),
+                        const SizedBox(height: 12),
+                        if (type == NoteType.text)
+                          TextField(
+                            controller: contentCtrl,
+                            maxLines: 4,
+                            style: TextStyle(
+                              color: AppColors.textPrimary(context),
+                              fontSize: 15,
+                            ),
+                            decoration: InputDecoration(
+                              labelText: t('content_hint'),
+                              hintStyle: TextStyle(
+                                color: AppColors.textDisabled(context),
+                                fontSize: 14,
+                              ),
+                              filled: true,
+                              fillColor: AppColors.sfAlt(context),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide.none,
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 10,
+                              ),
+                            ),
+                          ),
+                        if (type == NoteType.schedule) ...[
+                          const SizedBox(height: 8),
+                          Semantics(
+                            label: localeProvider.t('select_date'),
+                            child: GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onTap: () async {
+                                final date = await showDatePicker(
+                                  context: context,
+                                  initialDate: DateTime.now(),
+                                  firstDate: DateTime.now(),
+                                  lastDate: DateTime.now().add(
+                                    const Duration(days: 365),
+                                  ),
+                                );
+                                if (date != null)
+                                  setDialogState(() => dueDate = date);
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 10,
                                 ),
-                              );
-                              if (date != null)
-                                setDialogState(() => dueDate = date);
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 10,
-                              ),
-                              decoration: BoxDecoration(
-                                color: AppColors.sfAlt(context),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    LucideIcons.calendar,
-                                    size: 16,
-                                    color: AppColors.textSecondary(context),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    dueDate != null
-                                        ? _formatDateTime(dueDate!)
-                                        : t('select_date'),
-                                    style: TextStyle(
-                                      color: dueDate != null
-                                          ? AppColors.textPrimary(context)
-                                          : AppColors.textDisabled(context),
-                                      fontSize: 14,
+                                decoration: BoxDecoration(
+                                  color: AppColors.sfAlt(context),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      LucideIcons.calendar,
+                                      size: 16,
+                                      color: AppColors.textSecondary(context),
                                     ),
-                                  ),
-                                ],
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      dueDate != null
+                                          ? _formatDateTime(dueDate!)
+                                          : t('select_date'),
+                                      style: TextStyle(
+                                        color: dueDate != null
+                                            ? AppColors.textPrimary(context)
+                                            : AppColors.textDisabled(context),
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 8),
-                        Semantics(
-                          label: localeProvider.t('select_time'),
-                          child: GestureDetector(
-                            behavior: HitTestBehavior.opaque,
-                            onTap: () async {
-                              final time = await showTimePicker(
-                                context: context,
-                                initialTime: TimeOfDay.now(),
-                              );
-                              if (time != null)
-                                setDialogState(() => dueTime = time);
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 10,
-                              ),
-                              decoration: BoxDecoration(
-                                color: AppColors.sfAlt(context),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    LucideIcons.clock,
-                                    size: 16,
-                                    color: AppColors.textSecondary(context),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    dueTime != null
-                                        ? '${dueTime!.hour.toString().padLeft(2, '0')}:${dueTime!.minute.toString().padLeft(2, '0')}'
-                                        : t('select_time'),
-                                    style: TextStyle(
-                                      color: dueTime != null
-                                          ? AppColors.textPrimary(context)
-                                          : AppColors.textDisabled(context),
-                                      fontSize: 14,
+                          const SizedBox(height: 8),
+                          Semantics(
+                            label: localeProvider.t('select_time'),
+                            child: GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onTap: () async {
+                                final time = await showTimePicker(
+                                  context: context,
+                                  initialTime: TimeOfDay.now(),
+                                );
+                                if (time != null)
+                                  setDialogState(() => dueTime = time);
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 10,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.sfAlt(context),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      LucideIcons.clock,
+                                      size: 16,
+                                      color: AppColors.textSecondary(context),
                                     ),
-                                  ),
-                                ],
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      dueTime != null
+                                          ? '${dueTime!.hour.toString().padLeft(2, '0')}:${dueTime!.minute.toString().padLeft(2, '0')}'
+                                          : t('select_time'),
+                                      style: TextStyle(
+                                        color: dueTime != null
+                                            ? AppColors.textPrimary(context)
+                                            : AppColors.textDisabled(context),
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
+                        ],
                       ],
-                    ],
+                    ),
                   ),
                 ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(ctx),
-                  child: Text(t('cancel')),
-                ),
-                TextButton(
-                  onPressed: () async {
-                    final title = titleCtrl.text.trim();
-                    if (title.isEmpty) return;
-                    final now = DateTime.now();
-                    DateTime? finalDueDate;
-                    if (type == NoteType.schedule && dueDate != null) {
-                      finalDueDate = DateTime(
-                        dueDate!.year,
-                        dueDate!.month,
-                        dueDate!.day,
-                        dueTime?.hour ?? 0,
-                        dueTime?.minute ?? 0,
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: Text(t('cancel')),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      final title = titleCtrl.text.trim();
+                      if (title.isEmpty) return;
+                      final now = DateTime.now();
+                      DateTime? finalDueDate;
+                      if (type == NoteType.schedule && dueDate != null) {
+                        finalDueDate = DateTime(
+                          dueDate!.year,
+                          dueDate!.month,
+                          dueDate!.day,
+                          dueTime?.hour ?? 0,
+                          dueTime?.minute ?? 0,
+                        );
+                      }
+                      final item = NoteItem(
+                        id: 'note_${now.millisecondsSinceEpoch}',
+                        title: title,
+                        content: contentCtrl.text.trim(),
+                        type: type,
+                        dueDate: finalDueDate,
+                        createdAt: now,
+                        updatedAt: now,
                       );
-                    }
-                    final item = NoteItem(
-                      id: 'note_${now.millisecondsSinceEpoch}',
-                      title: title,
-                      content: contentCtrl.text.trim(),
-                      type: type,
-                      dueDate: finalDueDate,
-                      createdAt: now,
-                      updatedAt: now,
-                    );
-                    await widget.provider.addItem(item);
-                    if (ctx.mounted) Navigator.pop(ctx);
-                  },
-                  child: Text(
-                    t('create'),
-                    style: TextStyle(color: AppColors.accent),
+                      await widget.provider.addItem(item);
+                      if (ctx.mounted) Navigator.pop(ctx);
+                    },
+                    child: Text(
+                      t('create'),
+                      style: TextStyle(color: AppColors.accent),
+                    ),
                   ),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
+                ],
+              );
+            },
+          );
+        },
+      );
+    } finally {
+      titleCtrl.dispose();
+      contentCtrl.dispose();
+    }
   }
 
   void _showEditDialog(NoteItem note) {
     final titleCtrl = TextEditingController(text: note.title);
     final contentCtrl = TextEditingController(text: note.content);
 
-    showDialog(
-      context: context,
-      builder: (ctx) {
-        return AlertDialog(
+    try {
+      showDialog(
+        context: context,
+        builder: (ctx) {
+          return AlertDialog(
+            backgroundColor: AppColors.sf(context),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: Text(
+              t('edit_note'),
+              style: TextStyle(
+                color: AppColors.textPrimary(context),
+                fontSize: 17,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            content: SizedBox(
+              width: MediaQuery.of(context).size.width * 0.85,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextField(
+                    controller: titleCtrl,
+                    style: TextStyle(
+                      color: AppColors.textPrimary(context),
+                      fontSize: 15,
+                    ),
+                    decoration: InputDecoration(
+                      labelText: t('title_hint'),
+                      hintStyle: TextStyle(
+                        color: AppColors.textDisabled(context),
+                        fontSize: 14,
+                      ),
+                      filled: true,
+                      fillColor: AppColors.sfAlt(context),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: contentCtrl,
+                    maxLines: 4,
+                    style: TextStyle(
+                      color: AppColors.textPrimary(context),
+                      fontSize: 15,
+                    ),
+                    decoration: InputDecoration(
+                      labelText: t('content_hint'),
+                      hintStyle: TextStyle(
+                        color: AppColors.textDisabled(context),
+                        fontSize: 14,
+                      ),
+                      filled: true,
+                      fillColor: AppColors.sfAlt(context),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: Text(t('cancel')),
+              ),
+              TextButton(
+                onPressed: () async {
+                  final title = titleCtrl.text.trim();
+                  if (title.isEmpty) return;
+                  final updated = note.copyWith(
+                    title: title,
+                    content: contentCtrl.text.trim(),
+                  );
+                  await widget.provider.updateItem(updated);
+                  if (ctx.mounted) Navigator.pop(ctx);
+                },
+                child: Text(
+                  t('save'),
+                  style: TextStyle(color: AppColors.accent),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    } finally {
+      titleCtrl.dispose();
+      contentCtrl.dispose();
+    }
+  }
+
+  void _showEditTodoDialog(NoteItem todo) {
+    final titleCtrl = TextEditingController(text: todo.title);
+    try {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
           backgroundColor: AppColors.sf(context),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
           title: Text(
-            t('edit_note'),
-            style: TextStyle(
-              color: AppColors.textPrimary(context),
-              fontSize: 17,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          content: SizedBox(
-            width: MediaQuery.of(context).size.width * 0.85,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextField(
-                  controller: titleCtrl,
-                  style: TextStyle(
-                    color: AppColors.textPrimary(context),
-                    fontSize: 15,
-                  ),
-                  decoration: InputDecoration(
-                    labelText: t('title_hint'),
-                    hintStyle: TextStyle(
-                      color: AppColors.textDisabled(context),
-                      fontSize: 14,
-                    ),
-                    filled: true,
-                    fillColor: AppColors.sfAlt(context),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 10,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: contentCtrl,
-                  maxLines: 4,
-                  style: TextStyle(
-                    color: AppColors.textPrimary(context),
-                    fontSize: 15,
-                  ),
-                  decoration: InputDecoration(
-                    labelText: t('content_hint'),
-                    hintStyle: TextStyle(
-                      color: AppColors.textDisabled(context),
-                      fontSize: 14,
-                    ),
-                    filled: true,
-                    fillColor: AppColors.sfAlt(context),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 10,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: Text(t('cancel')),
-            ),
-            TextButton(
-              onPressed: () async {
-                final title = titleCtrl.text.trim();
-                if (title.isEmpty) return;
-                final updated = note.copyWith(
-                  title: title,
-                  content: contentCtrl.text.trim(),
-                );
-                await widget.provider.updateItem(updated);
-                if (ctx.mounted) Navigator.pop(ctx);
-              },
-              child: Text(t('save'), style: TextStyle(color: AppColors.accent)),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showEditTodoDialog(NoteItem todo) {
-    final titleCtrl = TextEditingController(text: todo.title);
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: AppColors.sf(context),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          localeProvider.t('edit'),
-          style: TextStyle(color: AppColors.textPrimary(context)),
-        ),
-        content: TextField(
-          controller: titleCtrl,
-          autofocus: true,
-          style: TextStyle(color: AppColors.textPrimary(context)),
-          decoration: InputDecoration(hintText: localeProvider.t('title')),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(localeProvider.t('cancel')),
-          ),
-          FilledButton(
-            onPressed: () {
-              widget.provider.updateItem(todo.copyWith(title: titleCtrl.text));
-              Navigator.pop(context);
-            },
-            child: Text(localeProvider.t('save')),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showEditScheduleDialog(NoteItem schedule) {
-    final titleCtrl = TextEditingController(text: schedule.title);
-    DateTime? newDate = schedule.dueDate;
-    showDialog(
-      context: context,
-      builder: (_) => StatefulBuilder(
-        builder: (ctx, setDialogState) => AlertDialog(
-          backgroundColor: AppColors.sf(ctx),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: Text(
             localeProvider.t('edit'),
-            style: TextStyle(color: AppColors.textPrimary(ctx)),
+            style: TextStyle(color: AppColors.textPrimary(context)),
           ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: titleCtrl,
-                autofocus: true,
-                style: TextStyle(color: AppColors.textPrimary(ctx)),
-                decoration: InputDecoration(
-                  hintText: localeProvider.t('title'),
-                ),
-              ),
-              const SizedBox(height: 12),
-              GestureDetector(
-                onTap: () async {
-                  final d = await showDatePicker(
-                    context: ctx,
-                    initialDate: newDate ?? DateTime.now(),
-                    firstDate: DateTime(2024),
-                    lastDate: DateTime(2030),
-                  );
-                  if (d != null) setDialogState(() => newDate = d);
-                },
-                child: Text(
-                  newDate != null
-                      ? _formatDateTime(newDate!)
-                      : localeProvider.t('select_date'),
-                  style: TextStyle(color: AppColors.acc(ctx)),
-                ),
-              ),
-            ],
+          content: TextField(
+            controller: titleCtrl,
+            autofocus: true,
+            style: TextStyle(color: AppColors.textPrimary(context)),
+            decoration: InputDecoration(hintText: localeProvider.t('title')),
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(ctx),
+              onPressed: () => Navigator.pop(context),
               child: Text(localeProvider.t('cancel')),
             ),
             FilledButton(
               onPressed: () {
                 widget.provider.updateItem(
-                  schedule.copyWith(title: titleCtrl.text, dueDate: newDate),
+                  todo.copyWith(title: titleCtrl.text),
                 );
-                Navigator.pop(ctx);
+                Navigator.pop(context);
               },
               child: Text(localeProvider.t('save')),
             ),
           ],
         ),
-      ),
-    );
+      );
+    } finally {
+      titleCtrl.dispose();
+    }
+  }
+
+  void _showEditScheduleDialog(NoteItem schedule) {
+    final titleCtrl = TextEditingController(text: schedule.title);
+    DateTime? newDate = schedule.dueDate;
+    try {
+      showDialog(
+        context: context,
+        builder: (_) => StatefulBuilder(
+          builder: (ctx, setDialogState) => AlertDialog(
+            backgroundColor: AppColors.sf(ctx),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: Text(
+              localeProvider.t('edit'),
+              style: TextStyle(color: AppColors.textPrimary(ctx)),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: titleCtrl,
+                  autofocus: true,
+                  style: TextStyle(color: AppColors.textPrimary(ctx)),
+                  decoration: InputDecoration(
+                    hintText: localeProvider.t('title'),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                GestureDetector(
+                  onTap: () async {
+                    final d = await showDatePicker(
+                      context: ctx,
+                      initialDate: newDate ?? DateTime.now(),
+                      firstDate: DateTime(2024),
+                      lastDate: DateTime(2030),
+                    );
+                    if (d != null) setDialogState(() => newDate = d);
+                  },
+                  child: Text(
+                    newDate != null
+                        ? _formatDateTime(newDate!)
+                        : localeProvider.t('select_date'),
+                    style: TextStyle(color: AppColors.acc(ctx)),
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: Text(localeProvider.t('cancel')),
+              ),
+              FilledButton(
+                onPressed: () {
+                  widget.provider.updateItem(
+                    schedule.copyWith(title: titleCtrl.text, dueDate: newDate),
+                  );
+                  Navigator.pop(ctx);
+                },
+                child: Text(localeProvider.t('save')),
+              ),
+            ],
+          ),
+        ),
+      );
+    } finally {
+      titleCtrl.dispose();
+    }
   }
 }

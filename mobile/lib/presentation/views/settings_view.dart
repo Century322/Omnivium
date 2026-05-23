@@ -217,6 +217,7 @@ class _SettingsViewState extends State<SettingsView>
                               title: t('incognito'),
                               subtitle: t('incognito_desc'),
                               rightContent: AnimatedToggle(
+                                semanticLabel: t('incognito'),
                                 enabled: widget.provider.navigation.isIncognito,
                                 onChanged:
                                     widget.provider.navigation.setIsIncognito,
@@ -228,6 +229,7 @@ class _SettingsViewState extends State<SettingsView>
                           title: t('notifications'),
                           subtitle: t('notifications_desc'),
                           rightContent: AnimatedToggle(
+                            semanticLabel: t('notifications'),
                             enabled: _notifications,
                             onChanged: (v) {
                               setState(() => _notifications = v);
@@ -243,6 +245,7 @@ class _SettingsViewState extends State<SettingsView>
                           title: t('data_retention'),
                           subtitle: t('data_retention_desc'),
                           rightContent: AnimatedToggle(
+                            semanticLabel: t('data_retention'),
                             enabled: _dataRetention,
                             onChanged: (v) {
                               setState(() => _dataRetention = v);
@@ -262,6 +265,7 @@ class _SettingsViewState extends State<SettingsView>
                           title: t('enable_assistant'),
                           subtitle: t('enable_assistant_desc'),
                           rightContent: AnimatedToggle(
+                            semanticLabel: t('enable_assistant'),
                             enabled: _agentEnabled,
                             onChanged: (v) {
                               setState(() => _agentEnabled = v);
@@ -665,115 +669,120 @@ class _SettingsViewState extends State<SettingsView>
   void _showLockScreenDialog() {
     final pinCtrl = TextEditingController();
     bool isSetting = !_lockEnabled;
-    showDialog(
-      context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setDialogState) => AlertDialog(
-          backgroundColor: AppColors.sf(context),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: Text(
-            t('lock_screen'),
-            style: TextStyle(color: AppColors.textPrimary(context)),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (isSetting) ...[
-                Text(
-                  t('set_pin_desc'),
-                  style: TextStyle(
-                    color: AppColors.textSecondary(context),
-                    fontSize: 14,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: pinCtrl,
-                  obscureText: true,
-                  keyboardType: TextInputType.number,
-                  maxLength: 6,
-                  style: TextStyle(
-                    color: AppColors.textPrimary(context),
-                    fontSize: 18,
-                    letterSpacing: 8,
-                  ),
-                  decoration: InputDecoration(
-                    labelText: t('enter_pin'),
-                    hintStyle: TextStyle(
-                      color: AppColors.textDisabled(context),
-                    ),
-                    counterText: '',
-                    filled: true,
-                    fillColor: AppColors.sfAlt(context),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
+    try {
+      showDialog(
+        context: context,
+        builder: (ctx) => StatefulBuilder(
+          builder: (ctx, setDialogState) => AlertDialog(
+            backgroundColor: AppColors.sf(context),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: Text(
+              t('lock_screen'),
+              style: TextStyle(color: AppColors.textPrimary(context)),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (isSetting) ...[
+                  Text(
+                    t('set_pin_desc'),
+                    style: TextStyle(
+                      color: AppColors.textSecondary(context),
+                      fontSize: 14,
                     ),
                   ),
-                ),
-              ] else ...[
-                Text(
-                  t('lock_screen_desc'),
-                  style: TextStyle(
-                    color: AppColors.textSecondary(context),
-                    fontSize: 14,
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: pinCtrl,
+                    obscureText: true,
+                    keyboardType: TextInputType.number,
+                    maxLength: 6,
+                    style: TextStyle(
+                      color: AppColors.textPrimary(context),
+                      fontSize: 18,
+                      letterSpacing: 8,
+                    ),
+                    decoration: InputDecoration(
+                      labelText: t('enter_pin'),
+                      hintStyle: TextStyle(
+                        color: AppColors.textDisabled(context),
+                      ),
+                      counterText: '',
+                      filled: true,
+                      fillColor: AppColors.sfAlt(context),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                SwitchListTile(
-                  value: _lockEnabled,
-                  onChanged: (v) {
-                    setDialogState(() {
-                      _lockEnabled = v;
-                    });
-                    _savePref('lock_enabled', v);
-                  },
-                  title: Text(
-                    t('enable_lock'),
-                    style: TextStyle(color: AppColors.textPrimary(context)),
+                ] else ...[
+                  Text(
+                    t('lock_screen_desc'),
+                    style: TextStyle(
+                      color: AppColors.textSecondary(context),
+                      fontSize: 14,
+                    ),
                   ),
-                  activeThumbColor: AppColors.accent,
-                ),
+                  const SizedBox(height: 12),
+                  SwitchListTile(
+                    value: _lockEnabled,
+                    onChanged: (v) {
+                      setDialogState(() {
+                        _lockEnabled = v;
+                      });
+                      _savePref('lock_enabled', v);
+                    },
+                    title: Text(
+                      t('enable_lock'),
+                      style: TextStyle(color: AppColors.textPrimary(context)),
+                    ),
+                    activeThumbColor: AppColors.accent,
+                  ),
+                ],
               ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: Text(
+                  t('cancel'),
+                  style: TextStyle(color: AppColors.sec(context)),
+                ),
+              ),
+              if (isSetting)
+                TextButton(
+                  onPressed: () async {
+                    if (pinCtrl.text.length < 4) return;
+                    final salt = DateTime.now().millisecondsSinceEpoch
+                        .toString();
+                    final pinHash = sha256
+                        .convert(utf8.encode('$salt${pinCtrl.text}'))
+                        .toString();
+                    await _secure.write('omnivium_lock_pin_hash', pinHash);
+                    await _secure.write('omnivium_lock_pin_salt', salt);
+                    await _secure.delete('omnivium_lock_pin');
+                    if (!mounted) return;
+                    setState(() {
+                      _lockEnabled = true;
+                    });
+                    _savePref('lock_enabled', true);
+                    if (ctx.mounted) Navigator.pop(ctx);
+                  },
+                  child: Text(
+                    t('confirm'),
+                    style: TextStyle(color: AppColors.accent),
+                  ),
+                ),
             ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: Text(
-                t('cancel'),
-                style: TextStyle(color: AppColors.sec(context)),
-              ),
-            ),
-            if (isSetting)
-              TextButton(
-                onPressed: () async {
-                  if (pinCtrl.text.length < 4) return;
-                  final salt = DateTime.now().millisecondsSinceEpoch.toString();
-                  final pinHash = sha256
-                      .convert(utf8.encode('$salt${pinCtrl.text}'))
-                      .toString();
-                  await _secure.write('omnivium_lock_pin_hash', pinHash);
-                  await _secure.write('omnivium_lock_pin_salt', salt);
-                  await _secure.delete('omnivium_lock_pin');
-                  if (!mounted) return;
-                  setState(() {
-                    _lockEnabled = true;
-                  });
-                  _savePref('lock_enabled', true);
-                  if (ctx.mounted) Navigator.pop(ctx);
-                },
-                child: Text(
-                  t('confirm'),
-                  style: TextStyle(color: AppColors.accent),
-                ),
-              ),
-          ],
         ),
-      ),
-    );
+      );
+    } finally {
+      pinCtrl.dispose();
+    }
   }
 
   void _showImageModelDialog() {

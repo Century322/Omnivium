@@ -378,69 +378,73 @@ class _MessageListViewState extends State<MessageListView> {
 
   void _showCreateGroup(BuildContext context) {
     final nameController = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.sf(context),
-        title: Text(
-          localeProvider.t('new_group'),
-          style: TextStyle(color: AppColors.textPrimary(context)),
-        ),
-        content: TextField(
-          controller: nameController,
-          style: TextStyle(color: AppColors.textPrimary(context)),
-          decoration: InputDecoration(
-            labelText: localeProvider.t('group_name'),
-            hintStyle: TextStyle(color: AppColors.textDisabled(context)),
-            enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: AppColors.divider(context)),
-            ),
-            focusedBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: AppColors.accent),
-            ),
+    try {
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          backgroundColor: AppColors.sf(context),
+          title: Text(
+            localeProvider.t('new_group'),
+            style: TextStyle(color: AppColors.textPrimary(context)),
           ),
-          autofocus: true,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(
-              localeProvider.t('cancel'),
-              style: TextStyle(color: AppColors.mut(context)),
+          content: TextField(
+            controller: nameController,
+            style: TextStyle(color: AppColors.textPrimary(context)),
+            decoration: InputDecoration(
+              labelText: localeProvider.t('group_name'),
+              hintStyle: TextStyle(color: AppColors.textDisabled(context)),
+              enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: AppColors.divider(context)),
+              ),
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: AppColors.accent),
+              ),
             ),
+            autofocus: true,
           ),
-          FilledButton(
-            onPressed: () async {
-              final name = nameController.text.trim();
-              if (name.isEmpty) return;
-              Navigator.pop(ctx);
-              try {
-                final roomId = await widget.provider.matrix.createGroupChat(
-                  name,
-                );
-                widget.provider.matrix.setActiveRoom(roomId);
-              } catch (e) {
-                if (mounted && context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        '$e'.isEmpty ? localeProvider.t('error') : '$e',
-                      ),
-                      backgroundColor: AppColors.dng(context),
-                    ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(
+                localeProvider.t('cancel'),
+                style: TextStyle(color: AppColors.mut(context)),
+              ),
+            ),
+            FilledButton(
+              onPressed: () async {
+                final name = nameController.text.trim();
+                if (name.isEmpty) return;
+                Navigator.pop(ctx);
+                try {
+                  final roomId = await widget.provider.matrix.createGroupChat(
+                    name,
                   );
+                  widget.provider.matrix.setActiveRoom(roomId);
+                } catch (e) {
+                  if (mounted && context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          '$e'.isEmpty ? localeProvider.t('error') : '$e',
+                        ),
+                        backgroundColor: AppColors.dng(context),
+                      ),
+                    );
+                  }
                 }
-              }
-            },
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.accent,
-              foregroundColor: AppColors.bg(context),
+              },
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.accent,
+                foregroundColor: AppColors.bg(context),
+              ),
+              child: Text(localeProvider.t('create')),
             ),
-            child: Text(localeProvider.t('create')),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
+    } finally {
+      nameController.dispose();
+    }
   }
 
   void _showChatOptions(BuildContext context, Room room) {

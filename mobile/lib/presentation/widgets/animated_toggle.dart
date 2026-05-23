@@ -5,11 +5,13 @@ import '../../core/haptic_service.dart';
 class AnimatedToggle extends StatefulWidget {
   final bool enabled;
   final ValueChanged<bool> onChanged;
+  final String? semanticLabel;
 
   const AnimatedToggle({
     super.key,
     required this.enabled,
     required this.onChanged,
+    this.semanticLabel,
   });
 
   @override
@@ -63,7 +65,9 @@ class _AnimatedToggleState extends State<AnimatedToggle>
       },
       child: Semantics(
         toggled: widget.enabled,
-        label: widget.enabled ? 'Enabled' : 'Disabled',
+        label: widget.semanticLabel != null
+            ? '${widget.semanticLabel}, ${widget.enabled ? 'Enabled' : 'Disabled'}'
+            : (widget.enabled ? 'Enabled' : 'Disabled'),
         child: AnimatedBuilder(
           animation: _position,
           builder: (context, child) {
