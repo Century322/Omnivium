@@ -23,7 +23,30 @@ class NetworkSecurityService {
 
   static const _fallbackPins = <String, List<String>>{};
 
+  static const _dartDefinePins = String.fromEnvironment(
+    'SSL_PINS',
+    defaultValue: '',
+  );
+
   static const _remotePinsCacheKey = 'remote_ssl_pins';
+
+  Map<String, List<String>> _parseDartDefinePins() {
+    if (_dartDefinePins.isEmpty) return {};
+    try {
+      final decoded = jsonDecode(_dartDefinePins);
+      if (decoded is! Map<String, dynamic>) return {};
+      final result = <String, List<String>>{};
+      for (final entry in decoded.entries) {
+        if (entry.value is List) {
+          result[entry.key] =
+              (entry.value as List).whereType<String>().toList();
+        }
+      }
+      return result;
+    } catch (_) {
+      return {};
+    }
+  }
 
   void addPinnedHash(String host, String hash) {
     _pinnedHashes.putIfAbsent(host, () => []);
@@ -47,6 +70,16 @@ class NetworkSecurityService {
 
     _pinnedHashes.addAll(_productionPins);
     for (final entry in _fallbackPins.entries) {
+      _pinnedHashes.putIfAbsent(entry.key, () => []);
+      for (final pin in entry.value) {
+        if (!_pinnedHashes[entry.key]!.contains(pin)) {
+          _pinnedHashes[entry.key]!.add(pin);
+        }
+      }
+    }
+
+    final dartDefinePins = _parseDartDefinePins();
+    for (final entry in dartDefinePins.entries) {
       _pinnedHashes.putIfAbsent(entry.key, () => []);
       for (final pin in entry.value) {
         if (!_pinnedHashes[entry.key]!.contains(pin)) {

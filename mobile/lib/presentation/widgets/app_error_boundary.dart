@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/locale_provider.dart';
@@ -46,16 +47,17 @@ class _GlobalErrorWidget extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
-              Text(
-                details.exceptionAsString(),
-                style: TextStyle(
-                  color: AppColors.textSecondary(context),
-                  fontSize: 12,
+              if (kDebugMode)
+                Text(
+                  details.exceptionAsString(),
+                  style: TextStyle(
+                    color: AppColors.textSecondary(context),
+                    fontSize: 12,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                textAlign: TextAlign.center,
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-              ),
             ],
           ),
         ),

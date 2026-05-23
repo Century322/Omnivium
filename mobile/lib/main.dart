@@ -113,8 +113,7 @@ void main() async {
   try {
     final sentryDsn = String.fromEnvironment(
       'SENTRY_DSN',
-      defaultValue:
-          'https://8c3a67d45a320eff8d5567632224a2bc@o4511395076046848.ingest.us.sentry.io/4511395086139392',
+      defaultValue: '',
     );
     if (sentryDsn.isNotEmpty) {
       await SentryFlutter.init(
@@ -126,6 +125,34 @@ void main() async {
           options.environment = kDebugMode ? 'development' : 'production';
           options.enableAutoSessionTracking = true;
           options.attachThreads = true;
+          options.beforeSend = (event, hint) {
+            final message = (event.message?.formatted ?? '').toLowerCase();
+            final exception = event.exceptions?.firstOrNull?.value
+                    .toString()
+                    .toLowerCase() ??
+                '';
+            final combined = '$message $exception';
+            final sensitivePatterns = [
+              'password',
+              'token',
+              'secret',
+              'api_key',
+              'apikey',
+              'authorization',
+              'bearer',
+              'private_key',
+              'access_token',
+              'refresh_token',
+              'session_id',
+              'cookie',
+            ];
+            for (final pattern in sensitivePatterns) {
+              if (combined.contains(pattern)) {
+                return null;
+              }
+            }
+            return event;
+          };
         },
         appRunner: () async {
           await _initCritical();

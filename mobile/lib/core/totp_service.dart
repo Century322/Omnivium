@@ -16,7 +16,6 @@ class TotpService {
   bool _enabled = false;
 
   bool get isEnabled => _enabled;
-  String? get secret => _secret;
 
   Future<void> init() async {
     final storage = SecureStorageService.instance;
