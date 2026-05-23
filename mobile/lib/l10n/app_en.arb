@@ -128,6 +128,8 @@
     "search_history_desc":  "Your recent searches will appear here",
     "just_now":  "Just now",
     "discover":  "Discover",
+    "discover_welcome":  "Welcome to Omnivium",
+    "discover_welcome_desc":  "Discover curated content powered by AI. Stay tuned for the latest updates.",
     "library_empty_desc":  "Your history and favorites will appear here",
     "ok":  "OK",
     "unarchive":  "Unarchive",

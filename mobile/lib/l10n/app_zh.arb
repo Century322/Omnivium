@@ -129,6 +129,8 @@
     "search_history_desc":  "您最近的搜索内容将显示在此处",
     "just_now":  "刚刚",
     "discover":  "发现",
+    "discover_welcome":  "欢迎来到 Omnivium",
+    "discover_welcome_desc":  "探索由 AI 策划的精选内容，敬请期待最新动态。",
     "library_empty_desc":  "您的历史记录和收藏将显示在此处",
     "ok":  "确定",
     "unarchive":  "取消归档",

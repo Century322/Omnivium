@@ -129,6 +129,8 @@
     "search_history_desc":  "最近の検索がここに表示されます",
     "just_now":  "たった今",
     "discover":  "発見",
+    "discover_welcome":  "Omniviumへようこそ",
+    "discover_welcome_desc":  "AIによる厳選コンテンツを探索。最新アップデートをお楽しみに。",
     "library_empty_desc":  "履歴とお気に入りがここに表示されます",
     "ok":  "OK",
     "unarchive":  "アーカイブ解除",

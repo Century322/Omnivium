@@ -129,6 +129,8 @@
     "search_history_desc":  "최근 검색이 여기에 표시됩니다",
     "just_now":  "방금",
     "discover":  "발견",
+    "discover_welcome":  "Omnivium에 오신 것을 환영합니다",
+    "discover_welcome_desc":  "AI가 엄선한 콘텐츠를 탐색하세요. 최신 업데이트를 기대해 주세요.",
     "library_empty_desc":  "기록과 즐겨찾기가 여기에 표시됩니다",
     "ok":  "확인",
     "unarchive":  "보관 해제",

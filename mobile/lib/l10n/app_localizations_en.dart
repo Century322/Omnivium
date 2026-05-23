@@ -410,6 +410,9 @@ class SEn extends S {
 
   @override
   String get discover => 'Discover';
+  String get discover_welcome => 'Welcome to Omnivium';
+  String get discover_welcome_desc =>
+      'Discover curated content powered by AI. Stay tuned for the latest updates.';
 
   @override
   String get library_empty_desc =>

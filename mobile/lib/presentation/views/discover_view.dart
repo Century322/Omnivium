@@ -26,11 +26,10 @@ class _DiscoverViewState extends State<DiscoverView> {
   List<_Item> _items = [];
   bool _isLoading = true;
 
-  static const _fallbackItems = [
+  List<Map<String, String>> get _fallbackItems => [
     {
-      'title': 'Welcome to Omnivium',
-      'desc':
-          'Discover curated content powered by AI. Stay tuned for the latest updates.',
+      'title': localeProvider.t('discover_welcome'),
+      'desc': localeProvider.t('discover_welcome_desc'),
       'author': 'Omnivium',
       'img': '',
       'bg': '#1a1a2e',

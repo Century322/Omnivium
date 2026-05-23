@@ -3,6 +3,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:matrix/matrix.dart';
 import '../theme/app_colors.dart';
 import '../theme/locale_provider.dart';
+import '../widgets/skeleton_loader.dart';
 import '../../core/app_provider.dart';
 import '../../core/app_navigator.dart';
 import 'add_friend_view.dart';
@@ -94,7 +95,20 @@ class _ContactsViewState extends State<ContactsView> {
             child: ListenableBuilder(
               listenable: widget.provider.matrix,
               builder: (context, _) {
+                final client = widget.provider.matrix.client;
+                final isLoggedIn = client != null && client.isLogged();
+                if (!isLoggedIn) {
+                  return _buildErrorState(
+                    context,
+                    localeProvider.t('connection_error'),
+                    () => setState(() {}),
+                  );
+                }
                 if (directChats.isEmpty && groupChats.isEmpty) {
+                  final isSyncing = client.prevBatch == null;
+                  if (isSyncing) {
+                    return const SkeletonLoader();
+                  }
                   return _buildEmptyState(context);
                 }
                 final items = <dynamic>[
@@ -410,6 +424,46 @@ class _ContactsViewState extends State<ContactsView> {
               style: TextStyle(
                 color: AppColors.textDisabled(context),
                 fontSize: 13,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildErrorState(
+    BuildContext context,
+    String message,
+    VoidCallback onRetry,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.all(48),
+      child: Center(
+        child: Column(
+          children: [
+            Icon(
+              LucideIcons.wifiOff,
+              size: 48,
+              color: AppColors.textDisabled(context),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              message,
+              style: TextStyle(
+                color: AppColors.textHint(context),
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            FilledButton.icon(
+              onPressed: onRetry,
+              icon: const Icon(LucideIcons.refreshCw, size: 16),
+              label: Text(localeProvider.t('retry')),
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.accent,
+                foregroundColor: Colors.white,
               ),
             ),
           ],

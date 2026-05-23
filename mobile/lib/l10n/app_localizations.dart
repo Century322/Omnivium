@@ -881,6 +881,10 @@ abstract class S {
   /// **'发现'**
   String get discover;
 
+  String get discover_welcome;
+
+  String get discover_welcome_desc;
+
   /// No description provided for @library_empty_desc.
   ///
   /// In zh, this message translates to:

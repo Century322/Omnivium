@@ -399,6 +399,8 @@ class SZh extends S {
 
   @override
   String get discover => '发现';
+  String get discover_welcome => '欢迎来到 Omnivium';
+  String get discover_welcome_desc => '探索由 AI 策划的精选内容，敬请期待最新动态。';
 
   @override
   String get library_empty_desc => '您的历史记录和收藏将显示在此处';

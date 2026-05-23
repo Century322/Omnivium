@@ -210,6 +210,8 @@ class LocaleProvider extends ChangeNotifier {
       'search_history_desc': s.search_history_desc,
       'just_now': s.just_now,
       'discover': s.discover,
+      'discover_welcome': s.discover_welcome,
+      'discover_welcome_desc': s.discover_welcome_desc,
       'library_empty_desc': s.library_empty_desc,
       'ok': s.ok,
       'unarchive': s.unarchive,
