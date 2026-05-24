@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../utils/format_utils.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:matrix/matrix.dart';
+import '../utils/format_utils.dart';
 import '../theme/app_colors.dart';
 import '../theme/locale_provider.dart';
 import '../../core/app_provider.dart';
@@ -9,19 +10,17 @@ import 'home_components.dart';
 
 class LibraryPanel extends StatefulWidget {
   final AppProvider provider;
-  final VoidCallback onCreateGroupChat;
-  final VoidCallback onAddContact;
   final bool showSearchBar;
   final VoidCallback onToggleSearch;
+  final VoidCallback onCreateGroupChat;
   final void Function(String id, String name)? onOpenFriendChat;
 
   const LibraryPanel({
     super.key,
     required this.provider,
-    required this.onCreateGroupChat,
-    required this.onAddContact,
     required this.showSearchBar,
     required this.onToggleSearch,
+    required this.onCreateGroupChat,
     this.onOpenFriendChat,
   });
 
@@ -32,6 +31,8 @@ class LibraryPanel extends StatefulWidget {
 class _LibraryPanelState extends State<LibraryPanel> {
   final _searchController = TextEditingController();
   final _searchFocus = FocusNode();
+  List<Profile> _remoteResults = [];
+  bool _isSearching = false;
 
   @override
   void dispose() {
@@ -44,132 +45,13 @@ class _LibraryPanelState extends State<LibraryPanel> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-          child: Row(
-            children: [
-              Expanded(
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: widget.onCreateGroupChat,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 10,
-                      horizontal: 14,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.sf(context),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.divider(context)),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          LucideIcons.users,
-                          size: 16,
-                          color: AppColors.sec(context),
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          localeProvider.t('new_group'),
-                          style: TextStyle(
-                            color: AppColors.sec(context),
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: widget.onAddContact,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 10,
-                      horizontal: 14,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.sf(context),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.divider(context)),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          LucideIcons.userPlus,
-                          size: 16,
-                          color: AppColors.sec(context),
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          localeProvider.t('add_contact'),
-                          style: TextStyle(
-                            color: AppColors.sec(context),
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () {
-                    AppNavigator.go(context, '/contacts');
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 10,
-                      horizontal: 14,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.sf(context),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.divider(context)),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          LucideIcons.contact,
-                          size: 16,
-                          color: AppColors.sec(context),
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          localeProvider.t('contacts'),
-                          style: TextStyle(
-                            color: AppColors.sec(context),
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
         if (widget.showSearchBar)
           AnimatedBuilder(
             animation: Listenable.merge([_searchFocus]),
             builder: (context, _) {
               final isFocused = _searchFocus.hasFocus;
               return Container(
-                margin: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+                margin: const EdgeInsets.fromLTRB(20, 8, 20, 8),
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
                   color: AppColors.sf(context),
@@ -180,37 +62,70 @@ class _LibraryPanelState extends State<LibraryPanel> {
                         : AppColors.divider(context),
                   ),
                 ),
-                child: TextField(
-                  controller: _searchController,
-                  focusNode: _searchFocus,
-                  autofocus: true,
-                  style: TextStyle(
-                    color: AppColors.textPrimary(context),
-                    fontSize: 14,
-                  ),
-                  decoration: InputDecoration(
-                    labelText: localeProvider.t('search_id'),
-                    hintStyle: TextStyle(
-                      color: AppColors.textTertiary(context),
-                      fontSize: 14,
+                child: Row(
+                  children: [
+                    Icon(
+                      LucideIcons.search,
+                      size: 16,
+                      color: isFocused
+                          ? AppColors.acc(context)
+                          : AppColors.textHint(context),
                     ),
-                    border: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                    isDense: true,
-                  ),
-                  onChanged: (_) => setState(() {}),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: TextField(
+                        controller: _searchController,
+                        focusNode: _searchFocus,
+                        autofocus: true,
+                        style: TextStyle(
+                          color: AppColors.textPrimary(context),
+                          fontSize: 14,
+                        ),
+                        decoration: InputDecoration(
+                          labelText: localeProvider.t('search_id'),
+                          hintStyle: TextStyle(
+                            color: AppColors.textTertiary(context),
+                            fontSize: 14,
+                          ),
+                          border: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 10,
+                          ),
+                          isDense: true,
+                        ),
+                        onSubmitted: (_) => _doRemoteSearch(),
+                        onChanged: (_) => setState(() {}),
+                      ),
+                    ),
+                    if (_searchController.text.isNotEmpty)
+                      GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () {
+                          _searchController.clear();
+                          setState(() {
+                            _remoteResults = [];
+                            _isSearching = false;
+                          });
+                        },
+                        child: Icon(
+                          LucideIcons.x,
+                          size: 14,
+                          color: AppColors.textHint(context),
+                        ),
+                      ),
+                  ],
                 ),
               );
             },
           ),
-        Expanded(child: _buildChatList()),
+        Expanded(child: _buildContent()),
       ],
     );
   }
 
-  Widget _buildChatList() {
+  Widget _buildContent() {
     final matrix = widget.provider.matrix;
     if (!matrix.isLoggedIn) {
       return Center(
@@ -233,9 +148,7 @@ class _LibraryPanelState extends State<LibraryPanel> {
             const SizedBox(height: 8),
             GestureDetector(
               behavior: HitTestBehavior.opaque,
-              onTap: () async {
-                await AppNavigator.go(context, '/login');
-              },
+              onTap: () => AppNavigator.go(context, '/login'),
               child: Text(
                 localeProvider.t('go_login'),
                 style: TextStyle(
@@ -249,10 +162,20 @@ class _LibraryPanelState extends State<LibraryPanel> {
         ),
       );
     }
-    var rooms = matrix.rooms;
+
     final query = widget.showSearchBar
         ? _searchController.text.toLowerCase()
         : '';
+
+    if (_isSearching) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (_remoteResults.isNotEmpty && query.isNotEmpty) {
+      return _buildRemoteResults();
+    }
+
+    var rooms = matrix.rooms;
     if (query.isNotEmpty) {
       rooms = rooms.where((r) {
         final name = r.getLocalizedDisplayname().toLowerCase();
@@ -260,6 +183,7 @@ class _LibraryPanelState extends State<LibraryPanel> {
         return name.contains(query) || id.contains(query);
       }).toList();
     }
+
     if (rooms.isEmpty) {
       return Center(
         child: Text(
@@ -273,11 +197,10 @@ class _LibraryPanelState extends State<LibraryPanel> {
         ),
       );
     }
+
     return RefreshIndicator(
       color: AppColors.acc(context),
-      onRefresh: () async {
-        setState(() {});
-      },
+      onRefresh: () async => setState(() {}),
       child: ListView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         itemCount: rooms.length,
@@ -293,6 +216,113 @@ class _LibraryPanelState extends State<LibraryPanel> {
         },
       ),
     );
+  }
+
+  Widget _buildRemoteResults() {
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      itemCount: _remoteResults.length,
+      itemBuilder: (_, i) {
+        final profile = _remoteResults[i];
+        final displayName =
+            profile.displayName ??
+            profile.userId.split(':').first.replaceFirst('@', '');
+        return GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () => _startChatWith(profile.userId),
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: AppColors.sf(context),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: AppColors.acc(context).withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Center(
+                    child: Text(
+                      displayName.isNotEmpty
+                          ? displayName[0].toUpperCase()
+                          : '?',
+                      style: TextStyle(
+                        color: AppColors.acc(context),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        displayName,
+                        style: TextStyle(
+                          color: AppColors.textPrimary(context),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        profile.userId,
+                        style: TextStyle(
+                          color: AppColors.textTertiary(context),
+                          fontSize: 12,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  LucideIcons.messageCircle,
+                  size: 18,
+                  color: AppColors.sec(context),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _doRemoteSearch() async {
+    final query = _searchController.text.trim();
+    if (query.isEmpty) return;
+    setState(() => _isSearching = true);
+    try {
+      final results = await widget.provider.matrix.searchUsers(query);
+      if (mounted) {
+        setState(() {
+          _remoteResults = results;
+          _isSearching = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) setState(() => _isSearching = false);
+    }
+  }
+
+  Future<void> _startChatWith(String userId) async {
+    try {
+      final roomId = await widget.provider.matrix.createDirectChat(userId);
+      if (mounted) {
+        widget.provider.matrix.setActiveRoom(roomId);
+      }
+    } catch (_) {}
   }
 
   Widget _buildChatItem(ChatItemData data) {

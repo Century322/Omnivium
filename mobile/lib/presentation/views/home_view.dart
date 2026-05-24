@@ -44,7 +44,6 @@ class _HomeViewState extends State<HomeView>
   bool _hasSentMessage = false;
   int _editingIndex = -1;
   bool _isLibraryMode = false;
-  bool _showContacts = false;
   bool _showSearchBar = false;
   bool _isFriendChat = false;
   String _chatTargetId = '';
@@ -376,19 +375,16 @@ class _HomeViewState extends State<HomeView>
                             headerSwitch: _headerSwitch,
                             tabSwitch: _tabSwitch,
                             isLibraryMode: _isLibraryMode,
-                            showContacts: _showContacts,
                             isIncognito: widget.provider.navigation.isIncognito,
                             onCloseConversation: _closeConversation,
                             onShowConversationMenu: () =>
                                 showConversationMenu(context),
                             onOpenDrawer: _openDrawer,
-                            onToggleContacts: () =>
-                                setState(() => _showContacts = !_showContacts),
+                            onCreateGroupChat: _showCreateGroupChat,
                             onSwitchToChat: () {
                               _tabSwitch.reverse();
                               setState(() {
                                 _isLibraryMode = false;
-                                _showContacts = false;
                                 _showSearchBar = false;
                               });
                             },
@@ -396,7 +392,6 @@ class _HomeViewState extends State<HomeView>
                               _tabSwitch.forward();
                               setState(() {
                                 _isLibraryMode = true;
-                                _showContacts = false;
                                 _showSearchBar = false;
                               });
                             },
@@ -465,7 +460,6 @@ class _HomeViewState extends State<HomeView>
       return LibraryPanel(
         provider: widget.provider,
         onCreateGroupChat: _showCreateGroupChat,
-        onAddContact: _showAddContact,
         showSearchBar: _showSearchBar,
         onToggleSearch: () => setState(() => _showSearchBar = !_showSearchBar),
         onOpenFriendChat: _openFriendChat,
@@ -594,23 +588,6 @@ class _HomeViewState extends State<HomeView>
       onCreate: (name, members) async {
         try {
           await widget.provider.matrix.createGroupChat(name, userIds: members);
-        } catch (e, stackTrace) {
-          AppLogger.instance.error(
-            'Operation failed',
-            error: e,
-            stackTrace: stackTrace,
-          );
-        }
-      },
-    );
-  }
-
-  void _showAddContact() {
-    HomeDialogs.showAddContact(
-      context,
-      onAdd: (userId) async {
-        try {
-          await widget.provider.matrix.createDirectChat(userId);
         } catch (e, stackTrace) {
           AppLogger.instance.error(
             'Operation failed',

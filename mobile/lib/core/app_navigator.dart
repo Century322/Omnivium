@@ -6,8 +6,6 @@ import '../presentation/views/search_view.dart';
 import '../presentation/views/settings_view.dart';
 import '../presentation/views/matrix_login_view.dart';
 import '../presentation/views/message_list_view.dart';
-import '../presentation/views/contacts_view.dart';
-import '../presentation/views/add_friend_view.dart';
 import '../presentation/views/friend_profile_view.dart';
 import '../presentation/views/key_verification_view.dart';
 import '../presentation/views/notification_view.dart';
@@ -49,10 +47,6 @@ class AppNavigator {
         page = MatrixLoginView(provider: provider);
       case '/messages':
         page = MessageListView(provider: provider);
-      case '/contacts':
-        page = ContactsView(provider: provider);
-      case '/add-friend':
-        page = AddFriendView(provider: provider);
       case '/chat':
         final roomId =
             args?['roomId'] as String? ?? uri.queryParameters['roomId'] ?? '';
@@ -127,7 +121,7 @@ class AppNavigator {
     if (path == '/add') {
       final id = uri.queryParameters['id'];
       if (id != null) {
-        go(context, '/add-friend', args: {'query': id});
+        go(context, '/chat', args: {'query': id});
         return true;
       }
     }

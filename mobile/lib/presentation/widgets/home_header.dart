@@ -9,12 +9,11 @@ class HomeHeader extends StatelessWidget {
   final Animation<double> headerSwitch;
   final Animation<double> tabSwitch;
   final bool isLibraryMode;
-  final bool showContacts;
   final bool isIncognito;
   final VoidCallback onCloseConversation;
   final VoidCallback onShowConversationMenu;
   final VoidCallback onOpenDrawer;
-  final VoidCallback onToggleContacts;
+  final VoidCallback onCreateGroupChat;
   final VoidCallback onSwitchToChat;
   final VoidCallback onSwitchToLibrary;
   final VoidCallback onToggleSearch;
@@ -27,12 +26,11 @@ class HomeHeader extends StatelessWidget {
     required this.headerSwitch,
     required this.tabSwitch,
     required this.isLibraryMode,
-    required this.showContacts,
     required this.isIncognito,
     required this.onCloseConversation,
     required this.onShowConversationMenu,
     required this.onOpenDrawer,
-    required this.onToggleContacts,
+    required this.onCreateGroupChat,
     required this.onSwitchToChat,
     required this.onSwitchToLibrary,
     required this.onToggleSearch,
@@ -117,7 +115,7 @@ class HomeHeader extends StatelessWidget {
         children: [
           GestureDetector(
             behavior: HitTestBehavior.opaque,
-            onTap: isLibraryMode ? onToggleContacts : onOpenDrawer,
+            onTap: isLibraryMode ? onCreateGroupChat : onOpenDrawer,
             child: Container(
               width: 30,
               height: 30,
@@ -128,9 +126,7 @@ class HomeHeader extends StatelessWidget {
               child: isLibraryMode
                   ? Center(
                       child: Icon(
-                        showContacts
-                            ? LucideIcons.messageCircle
-                            : LucideIcons.users,
+                        LucideIcons.users,
                         size: 16,
                         color: AppColors.sec(context),
                       ),
