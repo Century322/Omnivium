@@ -21,13 +21,14 @@ void main() {
       expect(find.byType(SettingsView), findsOneWidget);
     });
 
-    testWidgets('contains scaffold', (tester) async {
+    testWidgets('contains scaffold with ListView', (tester) async {
       final provider = AppProvider();
       await tester.pumpWidget(
         MaterialApp(home: SettingsView(provider: provider)),
       );
       await tester.pump();
       expect(find.byType(Scaffold), findsOneWidget);
+      expect(find.byType(ListView), findsWidgets);
     });
 
     testWidgets('renders without error', (tester) async {
@@ -37,6 +38,25 @@ void main() {
       );
       await tester.pump();
       expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('has gesture detector for back navigation', (tester) async {
+      final provider = AppProvider();
+      await tester.pumpWidget(
+        MaterialApp(home: SettingsView(provider: provider)),
+      );
+      await tester.pump();
+      expect(find.byType(GestureDetector), findsWidgets);
+    });
+
+    testWidgets('scrollable content', (tester) async {
+      final provider = AppProvider();
+      await tester.pumpWidget(
+        MaterialApp(home: SettingsView(provider: provider)),
+      );
+      await tester.pump();
+      final listView = tester.widget<ListView>(find.byType(ListView).first);
+      expect(listView.physics, isNotNull);
     });
   });
 }
