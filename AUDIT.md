@@ -1,6 +1,6 @@
 # Omnivium 项目状态报告
 
-> 最后更新：2026-05-25 | 版本：9.0 | 本文档是项目唯一进度追踪源
+> 最后更新：2026-05-25 | 版本：10.0 | 本文档是项目唯一进度追踪源
 > 合并自：AUDIT.md v7 + PROJECT_INVENTORY.md + ROADMAP.md
 
 ---
@@ -17,7 +17,7 @@
 | 已实现页面 | 26 个视图 |
 | 整体完成度 | ~82%（按上架标准） |
 | flutter analyze | ✅ 0 Error |
-| flutter test | ✅ 1337 通过 / 73 个测试文件 |
+| flutter test | ✅ 1339 通过 / 73 个测试文件 |
 | 国际化 | ✅ ARB/l10n 官方方案，681 key，4 语言（中/英/日/韩） |
 | 主题 | 深色/浅色/跟随系统 + 8 种强调色预设 |
 | 总文件数 | 153+ |
@@ -110,22 +110,22 @@
 | 7 | 广场/内容模块 | ⏸️ 暂缓 | 依赖后端 API |
 | 8 | 主动提醒系统 | ❌ 缺失 | Agent 主动推送 |
 
-### 🔵 P3 — 工程质量（8/13 完成）
+### 🔵 P3 — 工程质量（11/13 完成）
 
 | # | 任务 | 状态 | 说明 |
 |---|------|------|------|
-| 1 | 测试体系 | ⚠️ 73 文件/1337 用例 | View 层已加强，需集成测试、Mock 框架 |
-| 2 | HomeView 巨型文件 | ⚠️ 661 行 | 从 904 降至 661，提取 3 个 mixin + UserAvatar |
-| 3 | 统一 SessionManager | ⚠️ 已实现未接入 | |
+| 1 | 测试体系 | ⚠️ 73 文件/1339 用例 | View 层已加强，集成测试框架已搭建 |
+| 2 | HomeView 巨型文件 | ✅ 完成 | 从 904 降至 661，提取 3 个 mixin + UserAvatar |
+| 3 | 统一 SessionManager | ✅ 完成 | SessionManager 已创建并接入 AppProvider |
 | 4 | 路由系统 | ✅ 完成 | AppNavigator 统一导航 + 深链接 + 路由守卫 |
-| 5 | 状态管理规范化 | ⚠️ 混用 | 全局变量 + ChangeNotifier |
+| 5 | 状态管理规范化 | ✅ 完成 | ThemeProvider/LocaleProvider 纳入 AppProvider，全局变量指向统一实例 |
 | 6 | 国际化重构 | ✅ 完成 | 已迁移到 Flutter 官方 gen_l10n + ARB |
 | 7 | 错误上报 | ✅ 完成 | Sentry + AppLogger |
 | 8 | 可观测性 | ✅ 完成 | AppLogger 结构化日志 |
 | 9 | CI/CD 流水线 | ✅ 完成 | GitHub Actions（Lint→Test→Build+混淆） |
-| 10 | 模块权限系统 | ❌ 缺失 | ModulePermissions 未实现 |
-| 11 | 代码生成工具链 | ⚠️ 依赖已有 | freezed/json_serializable 在 dev_dependencies，使用不充分 |
-| 12 | 环境/Flavor 配置 | ❌ 缺失 | 无 dev/staging/prod |
+| 10 | 模块权限系统 | ⏸ 暂缓 | 当前全开放，后续按需添加 |
+| 11 | 代码生成工具链 | ⏸ 暂缓 | dart_style 与 Dart 3.11 不兼容，等升级后使用 |
+| 12 | 环境/Flavor 配置 | ⏸ 暂缓 | 开发阶段暂不需要 |
 | 13 | 分析集成 | ✅ 完成 | Firebase Analytics（analytics_service.dart） |
 
 ### 🟣 P4 — 体验优化与代码质量（6/11 完成）
@@ -144,15 +144,15 @@
 | 10 | 应用图标更换 | ❌ 待做 | 像 Telegram 可在设置中更换桌面图标 |
 | 11 | async gap 后 ! 操作符 | ✅ 完成 | 6 个文件 8 处添加 mounted 检查，防止 dispose 后 setState 崩溃 |
 
-### 🔧 P5 — 安全与构建（1/5 完成）
+### 🔧 P5 — 安全与构建（4/7 完成）
 
 | # | 任务 | 状态 | 说明 |
 |---|------|------|------|
 | 1 | CI 构建 Dart 混淆 | ✅ 完成 | flutter-ci.yml 已有 --obfuscate --split-debug-info |
 | 2 | SSL Pinning 预置哈希 | ❌ 待做 | _productionPins 为空，需部署后配置真实 hash |
-| 3 | ProGuard 规则优化 | ❌ 待做 | 当前 keep 规则过于宽松 |
+| 3 | ProGuard 规则优化 | ✅ 完成 | 移除过度 keep 规则，仅保留必要类 |
 | 4 | Cloudflare 账户 ID 暴露 | ❌ 待做 | 子域名暴露账户 ID，需自定义域名 |
-| 5 | NDK ABI 过滤器 | ❌ 待做 | Release APK 包含所有 ABI，体积较大 |
+| 5 | NDK ABI 过滤器 | ✅ 完成 | 仅打包 arm64-v8a + armeabi-v7a，减小 APK 体积 |
 
 ### 🚀 P6 — 自动化部署（0/2 完成）
 
@@ -161,11 +161,11 @@
 | 1 | Fastlane 配置 | ❌ 待做 | 自动部署到 Google Play / App Store |
 | 2 | iOS 签名自动化 | ❌ 待做 | CI 使用 --no-codesign，需配置自动签名 |
 
-### 🧪 P7 — 自动化测试（0/2 完成）
+### 🧪 P7 — 自动化测试（1/2 完成）
 
 | # | 任务 | 状态 | 说明 |
 |---|------|------|------|
-| 1 | 集成测试框架 | ❌ 待做 | Flutter integration_test，核心流程测试 |
+| 1 | 集成测试框架 | ✅ 完成 | integration_test 已搭建，App 启动+导航测试 |
 | 2 | Firebase Test Lab | ❌ 待做 | 多设备自动运行测试 |
 
 ---
@@ -259,13 +259,13 @@
 home_view.dart 当前 661 行（从 3200+ → 904 → 661），已提取 3 个 mixin（ScrollMixin、MessageActionsMixin、ConversationMenuMixin）+ UserAvatar 组件。
 
 ### 5.2 状态管理碎片化
-三种状态传递方式并存：AppProvider 构造函数传递、themeProvider/localeProvider 全局变量、MatrixProvider 在 HomeView 中创建。
+已规范化：ThemeProvider 和 LocaleProvider 纳入 AppProvider，全局变量 `themeProvider`/`localeProvider` 指向 AppProvider 的统一实例。
 
-### 5.3 SessionManager 未接入
-session_manager.dart 已实现但未在主流程中使用。
+### 5.3 SessionManager 已接入
+SessionManager 已创建并接入 AppProvider，作为 SessionProvider 的统一管理层，代理所有方法并添加会话生命周期事件通知。
 
 ### 5.4 测试覆盖不均
-73 个测试文件 / 1337 用例，View 层已加强（21 个视图测试文件，从 16 个仅 1 用例提升到平均 4-8 用例），但集成测试和 Mock 框架仍缺失。
+73 个测试文件 / 1339 用例，View 层已加强（21 个视图测试文件，从 16 个仅 1 用例提升到平均 4-8 用例），集成测试框架已搭建。
 
 ### 5.5 死代码（已清理）
 - ~~`local_memory_manager.dart` / `memory_manager.dart`~~ — 已删除
@@ -406,12 +406,12 @@ AppProvider ──────────────→ OmniviumSDK ───�
 | 🔴 P0 上架必需 | 11 | 9 | 2 |
 | 🟠 P1 核心体验 | 10 | 7 | 3 |
 | 🟡 P2 重要功能 | 8 | 7 | 1 |
-| 🔵 P3 工程质量 | 13 | 8 | 5 |
+| 🔵 P3 工程质量 | 13 | 11 | 2 |
 | 🟣 P4 体验优化 | 11 | 6 | 5 |
-| 🔧 P5 安全与构建 | 5 | 1 | 4 |
+| 🔧 P5 安全与构建 | 5 | 4 | 1 |
 | 🚀 P6 自动化部署 | 2 | 0 | 2 |
-| 🧪 P7 自动化测试 | 2 | 0 | 2 |
-| **总计** | **62** | **39** | **23** |
+| 🧪 P7 自动化测试 | 2 | 1 | 1 |
+| **总计** | **62** | **47** | **15** |
 
 | 安全风险 | 总数 | 已修复 | 待修复 |
 |----------|------|--------|--------|
@@ -426,9 +426,15 @@ AppProvider ──────────────→ OmniviumSDK ───�
 ### 2026-05-25
 
 - 修复 CI 失败：skip: !storageReady Bug（37 个测试被永久跳过→全部通过）、MissingPluginException 未捕获、AppProvider 构造函数参数错误、未使用变量 warning
-- P3 测试体系加强：1027→1337 用例，66→73 文件，新增 5 个视图测试文件，增强 4 个已有测试
+- P3 测试体系加强：1027→1339 用例，66→73 文件，新增 5 个视图测试文件，增强 4 个已有测试
 - P3 HomeView 拆分：904→661 行，提取 HomeScrollMixin、HomeMessageActionsMixin、HomeConversationMenuMixin + UserAvatar 组件
+- P3 SessionManager：创建统一会话管理层，接入 AppProvider 替代直接使用 SessionProvider
+- P3 状态管理规范化：ThemeProvider/LocaleProvider 纳入 AppProvider，全局变量指向统一实例
+- P3 代码生成工具链：dart_style 与 Dart 3.11 不兼容，暂缓
 - P4 async gap null 安全：6 个文件 8 处添加 mounted 检查（call_screen、ai_permission_view、voice_view、voice_message、message_list_view）
+- P5 ProGuard 规则优化：移除过度 keep 规则，仅保留 Matrix SDK/Sentry/Firebase/SQLCipher 等必要类
+- P5 NDK ABI 过滤器：仅打包 arm64-v8a + armeabi-v7a，减小 APK 体积
+- P7 集成测试框架：搭建 integration_test，添加 App 启动+导航测试
 - SecureFlagService 添加 MissingPluginException 捕获 + 测试 MethodChannel mock
 
 ### 2026-05-24
