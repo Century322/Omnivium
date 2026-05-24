@@ -71,6 +71,7 @@ class _AiPermissionViewState extends State<AiPermissionView> {
   Future<void> _setGlobalMode(String mode) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('omnivium_agent_permission', mode);
+    if (!mounted) return;
     setState(() => _globalMode = mode);
   }
 
@@ -84,6 +85,7 @@ class _AiPermissionViewState extends State<AiPermissionView> {
       await prefs.setString(key, mode);
       _capabilityOverrides[capId] = mode;
     }
+    if (!mounted) return;
     setState(() {});
   }
 

@@ -45,7 +45,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
         if (call.isVideo) _initRenderers();
       } else if (call.state == CallState.ended) {
         _disposeRenderers();
-        Navigator.of(context).pop();
+        if (context.mounted) Navigator.of(context).pop();
       }
     });
   }
@@ -75,12 +75,14 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     _localRenderer = RTCVideoRenderer();
     _remoteRenderer = RTCVideoRenderer();
     await _localRenderer!.initialize();
+    if (!mounted) return;
     await _remoteRenderer!.initialize();
+    if (!mounted) return;
 
-    if (call.localStream != null) {
+    if (call.localStream != null && _localRenderer != null) {
       _localRenderer!.srcObject = call.localStream;
     }
-    if (call.remoteStream != null) {
+    if (call.remoteStream != null && _remoteRenderer != null) {
       _remoteRenderer!.srcObject = call.remoteStream;
     }
     _renderersInitialized = true;

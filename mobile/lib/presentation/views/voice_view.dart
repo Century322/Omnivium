@@ -143,6 +143,7 @@ class _VoiceViewState extends State<VoiceView> with TickerProviderStateMixin {
   Future<void> _toggleListening() async {
     if (_isSpeaking) {
       await _voice.stopSpeaking();
+      if (!mounted) return;
     }
 
     if (_isListening) {
@@ -189,6 +190,7 @@ class _VoiceViewState extends State<VoiceView> with TickerProviderStateMixin {
 
     _responseCompleter = Completer<void>();
     await _responseCompleter!.future;
+    if (!mounted) return;
     _onResponseComplete();
   }
 

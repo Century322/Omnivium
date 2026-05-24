@@ -423,6 +423,7 @@ class _MessageListViewState extends State<MessageListView> {
                   final roomId = await widget.provider.matrix.createGroupChat(
                     name,
                   );
+                  if (!mounted) return;
                   widget.provider.matrix.setActiveRoom(roomId);
                 } catch (e) {
                   if (mounted && context.mounted) {

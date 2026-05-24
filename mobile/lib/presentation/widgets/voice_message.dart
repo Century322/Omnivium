@@ -41,6 +41,7 @@ class _VoiceRecorderButtonState extends State<VoiceRecorderButton> {
         const RecordConfig(encoder: AudioEncoder.aacLc),
         path: _recordPath!,
       );
+      if (!mounted) return;
       setState(() {
         _isRecording = true;
         _duration = Duration.zero;
