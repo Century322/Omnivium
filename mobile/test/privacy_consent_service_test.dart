@@ -15,14 +15,14 @@ void main() {
       if (!storageReady) return;
       final service = PrivacyConsentService();
       expect(await service.hasConsented(), isFalse);
-    }, skip: !storageReady);
+    });
 
     test('grantConsent sets consented to true', () async {
       if (!storageReady) return;
       final service = PrivacyConsentService();
       await service.grantConsent();
       expect(await service.hasConsented(), isTrue);
-    }, skip: !storageReady);
+    });
 
     test('revokeConsent sets consented to false', () async {
       if (!storageReady) return;
@@ -30,7 +30,7 @@ void main() {
       await service.grantConsent();
       await service.revokeConsent();
       expect(await service.hasConsented(), isFalse);
-    }, skip: !storageReady);
+    });
 
     test('grantConsent persists across instances', () async {
       if (!storageReady) return;
@@ -38,7 +38,7 @@ void main() {
       await service1.grantConsent();
       final service2 = PrivacyConsentService();
       expect(await service2.hasConsented(), isTrue);
-    }, skip: !storageReady);
+    });
 
     test('revokeConsent persists across instances', () async {
       if (!storageReady) return;
@@ -47,6 +47,6 @@ void main() {
       await service1.revokeConsent();
       final service2 = PrivacyConsentService();
       expect(await service2.hasConsented(), isFalse);
-    }, skip: !storageReady);
+    });
   });
 }

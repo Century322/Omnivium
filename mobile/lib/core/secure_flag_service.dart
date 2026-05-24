@@ -27,6 +27,8 @@ class SecureFlagService {
         'SecureFlag: failed to set secure flag',
         error: e,
       );
+    } on MissingPluginException {
+      AppLogger.instance.info('SecureFlag: platform not supported');
     }
   }
 

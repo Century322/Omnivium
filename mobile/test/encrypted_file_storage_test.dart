@@ -22,6 +22,6 @@ void main() {
       if (!storageReady) return;
       final service = EncryptedFileStorage.instance;
       await service.init();
-    }, skip: !storageReady);
+    });
   });
 }
