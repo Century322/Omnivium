@@ -5,7 +5,7 @@ import 'matrix/matrix_provider.dart';
 import 'notification/notification_provider.dart';
 import 'navigation_provider.dart';
 import 'model_provider.dart';
-import 'session_provider.dart';
+import 'session_manager.dart';
 import 'quick_command_provider.dart';
 import 'note_provider.dart';
 import 'voice_service.dart';
@@ -28,11 +28,11 @@ class AppProvider {
   final QuickCommandProvider _quickCommands = QuickCommandProvider();
   final NoteProvider _notes = NoteProvider();
   late final ModelProvider _model;
-  late final SessionProvider _session;
+  late final SessionManager _session;
 
   AppProvider() {
     _model = ModelProvider(orchestrator: _orchestrator);
-    _session = SessionProvider(orchestrator: _orchestrator);
+    _session = SessionManager(orchestrator: _orchestrator);
     _connectRuntime();
   }
 
@@ -87,7 +87,7 @@ class AppProvider {
 
   NavigationProvider get navigation => _navigation;
   ModelProvider get model => _model;
-  SessionProvider get session => _session;
+  SessionManager get session => _session;
   MatrixProvider get matrix => _matrix;
   AgentOrchestrator get orchestrator => _orchestrator;
   NotificationProvider get notification => _notification;
