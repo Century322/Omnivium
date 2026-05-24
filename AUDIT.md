@@ -1,6 +1,6 @@
 # Omnivium 项目状态报告
 
-> 最后更新：2026-05-25 | 版本：12.0 | 本文档是项目唯一进度追踪源
+> 最后更新：2026-05-25 | 版本：13.0 | 本文档是项目唯一进度追踪源
 > 合并自：AUDIT.md v7 + PROJECT_INVENTORY.md + ROADMAP.md
 
 ---
@@ -440,6 +440,7 @@ AppProvider ──────────────→ OmniviumSDK ───�
 - P4 安全区颜色闪烁修复：原生Android深浅主题颜色对齐 + 加载画面AnnotatedRegion
 - P4 全项目国际化补全：21处硬编码文本修复，4语言ARB新增14个翻译键
 - P4 AI输入区重构：合并STT/发送/停止为单一accent圆形按钮，移除AI语音页入口，优化监听动画
+- P4 好友页面重构：Telegram模式-历史聊天=联系人列表，移除ContactsView/AddFriendView（-1434行），左上角创建群聊，右上角统一搜索
 - SecureFlagService 添加 MissingPluginException 捕获 + 测试 MethodChannel mock
 
 ### 2026-05-24
