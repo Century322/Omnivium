@@ -100,27 +100,13 @@
 
 ---
 
-## 问题 3：语音输入区重构
+## 问题 3：语音输入区重构 ✅ 已完成
 
-### 当前布局
-```
-左侧：[+选项] [model选择]          右侧：[隐身] [🎤STT] [多功能按钮]
-```
-
-多功能按钮3种状态：
-- 空输入 → VoiceBarsIcon（进入AI语音页）← 要移除
-- 有文字 → ↑发送
-- 生成中 → ■停止
-
-### 改动方案
-1. 移除 `onOpenVoice` 回调和 VoiceBarsIcon 按钮
-2. 有文字时：麦克风STT按钮位置变为发送按钮
-3. 空输入时：最右侧显示麦克风STT
-4. 动画优化：按钮切换更丝滑
-
-### 涉及文件
-- `lib/presentation/widgets/chat_input_area.dart`
-- `lib/presentation/views/home_view.dart`
+### 改动结果
+- 移除 `onOpenVoice` 回调和 VoiceBarsIcon 按钮
+- STT/发送/停止合并为单一accent色圆形按钮
+- 监听动画优化为 SizeTransition
+- 隐身按钮保留，和主按钮一起右对齐
 
 ---
 
