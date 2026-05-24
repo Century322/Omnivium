@@ -107,7 +107,7 @@
     "rename_conversation":  "重命名对话",
     "not_encrypted":  "未加密",
     "group_chats":  "群聊",
-    "default_model":  "Default",
+    "default_model":  "默认",
     "use_this_model":  "使用此模型",
     "orch_handling":  "好的，我来帮你处理...",
     "follow_up":  "提出后续问题...",
@@ -680,5 +680,17 @@
     "tos_dispute": "争议解决",
     "tos_dispute_content": "争议应通过仲裁解决。",
     "tos_update": "更新",
-    "tos_update_content": "我们可能会在事先通知的情况下更新这些条款。"
+    "tos_update_content": "我们可能会在事先通知的情况下更新这些条款。",
+    "pause_voice_message": "暂停语音消息",
+    "play_voice_message": "播放语音消息",
+    "send_message_semantic": "发送消息",
+    "voice_input_semantic": "语音输入",
+    "enabled": "已启用",
+    "disabled": "已禁用",
+    "unread": "未读",
+    "unit_b": "B",
+    "unit_kb": "KB",
+    "unit_mb": "MB",
+    "size_zero_mb": "0 MB",
+    "matrix_id_hint": "@用户:服务器.com"
 }

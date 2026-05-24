@@ -337,9 +337,10 @@ class _FileManagerViewState extends State<FileManagerView>
   String _formatTime(DateTime dt) =>
       '${dt.month}/${dt.day} ${dt.hour}:${dt.minute.toString().padLeft(2, '0')}';
   String _formatSize(int bytes) {
-    if (bytes < 1024) return '$bytes B';
-    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
-    return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    if (bytes < 1024) return '$bytes ${localeProvider.t('unit_b')}';
+    if (bytes < 1024 * 1024)
+      return '${(bytes / 1024).toStringAsFixed(1)} ${localeProvider.t('unit_kb')}';
+    return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} ${localeProvider.t('unit_mb')}';
   }
 }
 

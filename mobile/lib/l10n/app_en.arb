@@ -680,5 +680,17 @@
     "tos_dispute": "Dispute Resolution",
     "tos_dispute_content": "Disputes shall be resolved through arbitration.",
     "tos_update": "Updates",
-    "tos_update_content": "We may update these terms with prior notice."
+    "tos_update_content": "We may update these terms with prior notice.",
+    "pause_voice_message": "Pause voice message",
+    "play_voice_message": "Play voice message",
+    "send_message_semantic": "Send message",
+    "voice_input_semantic": "Voice input",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "unread": "unread",
+    "unit_b": "B",
+    "unit_kb": "KB",
+    "unit_mb": "MB",
+    "size_zero_mb": "0 MB",
+    "matrix_id_hint": "@user:server.com"
 }

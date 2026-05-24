@@ -43,7 +43,7 @@ class _SettingsViewState extends State<SettingsView>
   bool _agentEnabled = true;
   bool _lockEnabled = false;
   String _assistantLang = 'auto';
-  String _imageModel = 'Default';
+  String _imageModel = 'default_model';
   String _sttEngine = 'system';
   String _ttsVoice = 'Kyrin';
   String _voiceMode = 'hands_free';
@@ -74,7 +74,7 @@ class _SettingsViewState extends State<SettingsView>
       _agentEnabled = prefs.getBool('omnivium_agent_enabled') ?? true;
       _lockEnabled = prefs.getBool('lock_enabled') ?? false;
       _assistantLang = prefs.getString('omnivium_assistant_lang') ?? 'auto';
-      _imageModel = prefs.getString('omnivium_image_model') ?? 'Default';
+      _imageModel = prefs.getString('omnivium_image_model') ?? 'default_model';
       _sttEngine = prefs.getString('omnivium_stt_engine') ?? 'system';
       _ttsVoice = prefs.getString('omnivium_tts_voice') ?? 'Kyrin';
       _voiceMode = prefs.getString('omnivium_voice_mode') ?? 'hands_free';
@@ -331,7 +331,9 @@ class _SettingsViewState extends State<SettingsView>
                         SectionHeader(title: t('profile')),
                         SettingItem(
                           title: t('image_model'),
-                          subtitle: _imageModel,
+                          subtitle: _imageModel == 'default_model'
+                              ? t('default_model')
+                              : _imageModel,
                           onTap: _showImageModelDialog,
                         ),
                         SectionHeader(title: t('personalization')),
@@ -867,12 +869,23 @@ class _SettingsViewState extends State<SettingsView>
   }
 
   void _showImageModelDialog() {
-    final models = ['Default', 'DALL-E 3', 'Stable Diffusion XL', 'Midjourney'];
+    final modelKeys = [
+      'default_model',
+      'DALL-E 3',
+      'Stable Diffusion XL',
+      'Midjourney',
+    ];
+    final modelLabels = modelKeys
+        .map((k) => k == 'default_model' ? t('default_model') : k)
+        .toList();
     _showChoiceDialog(
       t('image_model'),
-      models,
-      _imageModel,
-      (v) => setState(() => _imageModel = v),
+      modelLabels,
+      _imageModel == 'default_model' ? t('default_model') : _imageModel,
+      (v) {
+        final key = modelKeys[modelLabels.indexOf(v)];
+        setState(() => _imageModel = key);
+      },
     );
   }
 

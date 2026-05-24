@@ -682,5 +682,17 @@
     "tos_dispute": "紛争解決",
     "tos_dispute_content": "紛争は仲裁により解決されるものとします。",
     "tos_update": "更新",
-    "tos_update_content": "事前通知の上、本規約を更新する場合があります。"
+    "tos_update_content": "事前通知の上、本規約を更新する場合があります。",
+    "pause_voice_message": "音声メッセージを一時停止",
+    "play_voice_message": "音声メッセージを再生",
+    "send_message_semantic": "メッセージを送信",
+    "voice_input_semantic": "音声入力",
+    "enabled": "有効",
+    "disabled": "無効",
+    "unread": "未読",
+    "unit_b": "B",
+    "unit_kb": "KB",
+    "unit_mb": "MB",
+    "size_zero_mb": "0 MB",
+    "matrix_id_hint": "@user:server.com"
 }

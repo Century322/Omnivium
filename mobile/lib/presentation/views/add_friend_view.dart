@@ -262,7 +262,7 @@ class _AddFriendViewState extends State<AddFriendView> {
                           fontSize: 14,
                         ),
                         decoration: InputDecoration(
-                          labelText: '@user:server.com',
+                          labelText: localeProvider.t('matrix_id_hint'),
                           hintStyle: TextStyle(
                             color: AppColors.textDisabled(context),
                             fontSize: 14,

@@ -74,9 +74,10 @@ class _StorageViewState extends State<StorageView> {
   double get _totalSize => _chatDataSize + _aiDataSize + _cacheSize;
 
   String _formatSize(double mb) {
-    if (mb < 0.01) return '0 MB';
-    if (mb < 1) return '${(mb * 1024).toStringAsFixed(1)} KB';
-    return '${mb.toStringAsFixed(1)} MB';
+    if (mb < 0.01) return localeProvider.t('size_zero_mb');
+    if (mb < 1)
+      return '${(mb * 1024).toStringAsFixed(1)} ${localeProvider.t('unit_kb')}';
+    return '${mb.toStringAsFixed(1)} ${localeProvider.t('unit_mb')}';
   }
 
   @override
@@ -147,7 +148,7 @@ class _StorageViewState extends State<StorageView> {
                       LucideIcons.video,
                       t('videos'),
                       t('videos_desc'),
-                      '0 MB',
+                      localeProvider.t('size_zero_mb'),
                       onTap: () =>
                           AppNavigator.go(context, '/files', args: {'tab': 1}),
                     ),

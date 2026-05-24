@@ -130,7 +130,7 @@ class NotificationView extends StatelessWidget {
     return Semantics(
       button: true,
       label:
-          '${notif.title}${notif.body.isNotEmpty ? ', ${notif.body}' : ''}${notif.read ? '' : ', unread'}',
+          '${notif.title}${notif.body.isNotEmpty ? ', ${notif.body}' : ''}${notif.read ? '' : ', ${localeProvider.t('unread')}'}',
       child: Dismissible(
         key: Key(notif.id),
         direction: DismissDirection.endToStart,

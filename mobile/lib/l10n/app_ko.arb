@@ -682,5 +682,17 @@
     "tos_dispute": "분쟁 해결",
     "tos_dispute_content": "분쟁은 중재를 통해 해결됩니다.",
     "tos_update": "업데이트",
-    "tos_update_content": "사전 통지 후 본 약관을 업데이트할 수 있습니다."
+    "tos_update_content": "사전 통지 후 본 약관을 업데이트할 수 있습니다.",
+    "pause_voice_message": "음성 메시지 일시정지",
+    "play_voice_message": "음성 메시지 재생",
+    "send_message_semantic": "메시지 보내기",
+    "voice_input_semantic": "음성 입력",
+    "enabled": "활성화",
+    "disabled": "비활성화",
+    "unread": "읽지 않음",
+    "unit_b": "B",
+    "unit_kb": "KB",
+    "unit_mb": "MB",
+    "size_zero_mb": "0 MB",
+    "matrix_id_hint": "@user:server.com"
 }

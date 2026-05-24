@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
+import '../theme/locale_provider.dart';
 import '../../core/haptic_service.dart';
 
 class AnimatedToggle extends StatefulWidget {
@@ -66,8 +67,10 @@ class _AnimatedToggleState extends State<AnimatedToggle>
       child: Semantics(
         toggled: widget.enabled,
         label: widget.semanticLabel != null
-            ? '${widget.semanticLabel}, ${widget.enabled ? 'Enabled' : 'Disabled'}'
-            : (widget.enabled ? 'Enabled' : 'Disabled'),
+            ? '${widget.semanticLabel}, ${widget.enabled ? localeProvider.t('enabled') : localeProvider.t('disabled')}'
+            : (widget.enabled
+                  ? localeProvider.t('enabled')
+                  : localeProvider.t('disabled')),
         child: AnimatedBuilder(
           animation: _position,
           builder: (context, child) {

@@ -629,14 +629,17 @@ class _AppShellState extends State<_AppShell>
   @override
   Widget build(BuildContext context) {
     if (!_initialized) {
-      return MaterialApp(
-        theme: themeProvider.lightTheme,
-        darkTheme: themeProvider.darkTheme,
-        themeMode: themeProvider.mode,
-        home: Scaffold(
-          backgroundColor: AppColors.bg(context),
-          body: Center(
-            child: CircularProgressIndicator(color: AppColors.acc(context)),
+      return AnnotatedRegion<SystemUiOverlayStyle>(
+        value: themeProvider.overlayStyle,
+        child: MaterialApp(
+          theme: themeProvider.lightTheme,
+          darkTheme: themeProvider.darkTheme,
+          themeMode: themeProvider.mode,
+          home: Scaffold(
+            backgroundColor: AppColors.bg(context),
+            body: Center(
+              child: CircularProgressIndicator(color: AppColors.acc(context)),
+            ),
           ),
         ),
       );

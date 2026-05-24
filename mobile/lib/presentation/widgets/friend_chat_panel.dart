@@ -1674,7 +1674,9 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                         onTap: hasText ? _sendFriendMessage : () {},
                         child: Semantics(
                           button: true,
-                          label: hasText ? 'Send message' : 'Voice input',
+                          label: hasText
+                              ? localeProvider.t('send_message_semantic')
+                              : localeProvider.t('voice_input_semantic'),
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 200),
                             width: 34,

@@ -283,7 +283,9 @@ class _VoiceMessagePlayerState extends State<VoiceMessagePlayer> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Semantics(
-            label: _isPlaying ? 'Pause voice message' : 'Play voice message',
+            label: _isPlaying
+                ? localeProvider.t('pause_voice_message')
+                : localeProvider.t('play_voice_message'),
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: _togglePlay,
