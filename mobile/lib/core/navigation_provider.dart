@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum ViewState { home, voice, discover, settings, search }
+enum ViewState { home, discover, settings, search }
 
 class NavigationProvider extends ChangeNotifier {
   ViewState _currentView = ViewState.home;

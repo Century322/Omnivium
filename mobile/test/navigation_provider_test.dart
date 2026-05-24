@@ -26,8 +26,8 @@ void main() {
     });
 
     test('setCurrentView updates view', () {
-      provider.setCurrentView(ViewState.voice);
-      expect(provider.currentView, ViewState.voice);
+      provider.setCurrentView(ViewState.discover);
+      expect(provider.currentView, ViewState.discover);
     });
 
     test('setCurrentView to all views', () {
@@ -169,7 +169,6 @@ void main() {
         ViewState.values,
         containsAll([
           ViewState.home,
-          ViewState.voice,
           ViewState.discover,
           ViewState.settings,
           ViewState.search,

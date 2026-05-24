@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../core/app_provider.dart';
-import '../presentation/views/voice_view.dart';
 import '../presentation/views/discover_view.dart';
 import '../presentation/views/search_view.dart';
 import '../presentation/views/settings_view.dart';
@@ -35,8 +34,6 @@ class AppNavigator {
 
     final Widget page;
     switch (path) {
-      case '/voice':
-        page = VoiceView(provider: provider);
       case '/discover':
         page = DiscoverView(provider: provider);
       case '/search':

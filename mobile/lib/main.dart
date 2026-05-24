@@ -52,7 +52,6 @@ import 'core/app_data_gateway.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:media_kit/media_kit.dart';
 import 'presentation/views/home_view.dart';
-import 'presentation/views/voice_view.dart';
 import 'presentation/views/discover_view.dart';
 import 'presentation/views/search_view.dart';
 import 'presentation/views/settings_view.dart';
@@ -693,9 +692,6 @@ class _AppShellState extends State<_AppShell>
                     switchInCurve: Curves.easeOutCubic,
                     switchOutCurve: Curves.easeInCubic,
                     transitionBuilder: (child, animation) {
-                      if (child is VoiceView) {
-                        return FadeTransition(opacity: animation, child: child);
-                      }
                       return SlideTransition(
                         position: Tween<Offset>(
                           begin: const Offset(1, 0),
@@ -720,8 +716,6 @@ class _AppShellState extends State<_AppShell>
       return SettingsView(key: const ValueKey('settings'), provider: _provider);
     }
     switch (_provider.navigation.currentView) {
-      case ViewState.voice:
-        return VoiceView(key: const ValueKey('voice'), provider: _provider);
       case ViewState.discover:
         return DiscoverView(
           key: const ValueKey('discover'),
