@@ -332,7 +332,12 @@ class _AppLockDialogState extends State<_AppLockDialog> {
             ),
           ],
         ),
-        actions: [FilledButton(onPressed: _submit, child: Text(localeProvider.t('unlock')))],
+        actions: [
+          FilledButton(
+            onPressed: _submit,
+            child: Text(localeProvider.t('unlock')),
+          ),
+        ],
       ),
     );
   }
@@ -739,7 +744,9 @@ class _PrivacyConsentScreen extends StatelessWidget {
     });
     return Scaffold(
       backgroundColor: AppColors.bg(context),
-      body: Center(child: CircularProgressIndicator(color: AppColors.acc(context))),
+      body: Center(
+        child: CircularProgressIndicator(color: AppColors.acc(context)),
+      ),
     );
   }
 }

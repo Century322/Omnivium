@@ -71,10 +71,7 @@ class AccentPreset {
   ];
 
   static AccentPreset fromKey(String key) {
-    return presets.firstWhere(
-      (p) => p.key == key,
-      orElse: () => teal,
-    );
+    return presets.firstWhere((p) => p.key == key, orElse: () => teal);
   }
 }
 
@@ -140,9 +137,7 @@ class AppColors {
   static Color accDark(BuildContext context) {
     final primary = Theme.of(context).colorScheme.primary;
     final hsl = HSLColor.fromColor(primary);
-    return hsl
-        .withLightness((hsl.lightness - 0.15).clamp(0.0, 1.0))
-        .toColor();
+    return hsl.withLightness((hsl.lightness - 0.15).clamp(0.0, 1.0)).toColor();
   }
 
   static Color accBg(BuildContext context) {
@@ -163,9 +158,7 @@ class AppColors {
   static Color accLight(BuildContext context) {
     final primary = Theme.of(context).colorScheme.primary;
     final hsl = HSLColor.fromColor(primary);
-    return hsl
-        .withLightness((hsl.lightness + 0.15).clamp(0.0, 1.0))
-        .toColor();
+    return hsl.withLightness((hsl.lightness + 0.15).clamp(0.0, 1.0)).toColor();
   }
 
   static Color sec(BuildContext context) =>

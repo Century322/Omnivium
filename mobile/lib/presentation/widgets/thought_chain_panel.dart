@@ -24,7 +24,9 @@ class ThoughtChainPanel extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.sfAlt(context).withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.acc(context).withValues(alpha: 0.15)),
+        border: Border.all(
+          color: AppColors.acc(context).withValues(alpha: 0.15),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

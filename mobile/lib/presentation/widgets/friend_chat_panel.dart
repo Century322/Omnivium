@@ -600,7 +600,9 @@ class _FriendChatPanelState extends State<FriendChatPanel>
           children: [
             Icon(
               isEncrypted ? LucideIcons.shieldCheck : LucideIcons.shieldAlert,
-              color: isEncrypted ? AppColors.acc(context) : AppColors.warn(context),
+              color: isEncrypted
+                  ? AppColors.acc(context)
+                  : AppColors.warn(context),
               size: 20,
             ),
             const SizedBox(width: 8),
@@ -714,7 +716,10 @@ class _FriendChatPanelState extends State<FriendChatPanel>
             ),
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(t('got_it'), style: TextStyle(color: AppColors.acc(context))),
+            child: Text(
+              t('got_it'),
+              style: TextStyle(color: AppColors.acc(context)),
+            ),
           ),
         ],
       ),
@@ -1163,7 +1168,10 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                     if (_isOtherTyping)
                       Text(
                         t('typing'),
-                        style: TextStyle(color: AppColors.acc(context), fontSize: 11),
+                        style: TextStyle(
+                          color: AppColors.acc(context),
+                          fontSize: 11,
+                        ),
                       )
                     else
                       FutureBuilder<CachedPresence?>(

@@ -57,7 +57,9 @@ class _FaqViewState extends State<FaqView> {
               color: AppColors.sf(context),
               borderRadius: BorderRadius.circular(14),
               border: isExpanded
-                  ? Border.all(color: AppColors.acc(context).withValues(alpha: 0.2))
+                  ? Border.all(
+                      color: AppColors.acc(context).withValues(alpha: 0.2),
+                    )
                   : null,
             ),
             child: Theme(

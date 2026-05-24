@@ -14,30 +14,30 @@ void mockSecureStorage() {
   final store = <String, String>{};
   TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
       .setMockMethodCallHandler(
-    const MethodChannel('plugins.it_nomads.com/flutter_secure_storage'),
-    (MethodCall methodCall) async {
-      switch (methodCall.method) {
-        case 'read':
-          return store[methodCall.arguments['key']];
-        case 'write':
-          store[methodCall.arguments['key']] =
-              methodCall.arguments['value'] as String;
-          return null;
-        case 'delete':
-          store.remove(methodCall.arguments['key']);
-          return null;
-        case 'deleteAll':
-          store.clear();
-          return null;
-        case 'containsKey':
-          return store.containsKey(methodCall.arguments['key']);
-        case 'readAll':
-          return store;
-        default:
-          return null;
-      }
-    },
-  );
+        const MethodChannel('plugins.it_nomads.com/flutter_secure_storage'),
+        (MethodCall methodCall) async {
+          switch (methodCall.method) {
+            case 'read':
+              return store[methodCall.arguments['key']];
+            case 'write':
+              store[methodCall.arguments['key']] =
+                  methodCall.arguments['value'] as String;
+              return null;
+            case 'delete':
+              store.remove(methodCall.arguments['key']);
+              return null;
+            case 'deleteAll':
+              store.clear();
+              return null;
+            case 'containsKey':
+              return store.containsKey(methodCall.arguments['key']);
+            case 'readAll':
+              return store;
+            default:
+              return null;
+          }
+        },
+      );
 }
 
 Future<void> initSecureStorage() async {

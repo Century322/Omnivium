@@ -267,10 +267,10 @@ class _VoiceMessagePlayerState extends State<VoiceMessagePlayer> {
     final progress = _duration.inMilliseconds > 0
         ? _position.inMilliseconds / _duration.inMilliseconds
         : 0.0;
-    final bgColor = widget.isMe
-        ? Colors.transparent
-        : AppColors.sfAlt(context);
-    final iconColor = widget.isMe ? AppColors.bg(context) : AppColors.sec(context);
+    final bgColor = widget.isMe ? Colors.transparent : AppColors.sfAlt(context);
+    final iconColor = widget.isMe
+        ? AppColors.bg(context)
+        : AppColors.sec(context);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),

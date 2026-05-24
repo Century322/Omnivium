@@ -56,13 +56,19 @@ void main() {
     test('darkTheme uses accent color as primary', () async {
       final provider = ThemeProvider();
       await provider.setAccent('teal');
-      expect(provider.darkTheme.colorScheme.primary, AccentPreset.teal.darkAccent);
+      expect(
+        provider.darkTheme.colorScheme.primary,
+        AccentPreset.teal.darkAccent,
+      );
     });
 
     test('lightTheme uses light accent as primary', () async {
       final provider = ThemeProvider();
       await provider.setAccent('teal');
-      expect(provider.lightTheme.colorScheme.primary, AccentPreset.teal.lightAccent);
+      expect(
+        provider.lightTheme.colorScheme.primary,
+        AccentPreset.teal.lightAccent,
+      );
     });
 
     test('currentModeKey returns correct string', () async {

@@ -14,18 +14,14 @@ void main() {
   group('VoiceView', () {
     testWidgets('renders voice view widget', (tester) async {
       final provider = AppProvider();
-      await tester.pumpWidget(MaterialApp(
-        home: VoiceView(provider: provider),
-      ));
+      await tester.pumpWidget(MaterialApp(home: VoiceView(provider: provider)));
       await tester.pump();
       expect(find.byType(VoiceView), findsOneWidget);
     });
 
     testWidgets('contains scaffold', (tester) async {
       final provider = AppProvider();
-      await tester.pumpWidget(MaterialApp(
-        home: VoiceView(provider: provider),
-      ));
+      await tester.pumpWidget(MaterialApp(home: VoiceView(provider: provider)));
       await tester.pump();
       expect(find.byType(Scaffold), findsOneWidget);
     });

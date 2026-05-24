@@ -47,7 +47,11 @@ class _DiscoverViewState extends State<DiscoverView> {
   }
 
   Future<void> _loadContent() async {
-    if (mounted) setState(() { _isLoading = true; _hasError = false; });
+    if (mounted)
+      setState(() {
+        _isLoading = true;
+        _hasError = false;
+      });
     try {
       final proxy = ApiProxyService.instance;
       if (proxy.isConfigured) {
@@ -115,7 +119,8 @@ class _DiscoverViewState extends State<DiscoverView> {
               author: m['author'] as String? ?? '',
               imgSrc: m['image'] as String? ?? '',
               avatarColor:
-                  _parseColor(m['avatar_color'] as String?) ?? AppColors.acc(context),
+                  _parseColor(m['avatar_color'] as String?) ??
+                  AppColors.acc(context),
               bgColor:
                   _parseColor(m['bg_color'] as String?) ??
                   AppColors.sf(context),
@@ -137,7 +142,8 @@ class _DiscoverViewState extends State<DiscoverView> {
                   desc: m['desc']!,
                   author: m['author']!,
                   imgSrc: m['img']!,
-                  avatarColor: _parseColor(m['avatar']) ?? AppColors.acc(context),
+                  avatarColor:
+                      _parseColor(m['avatar']) ?? AppColors.acc(context),
                   bgColor: _parseColor(m['bg']) ?? AppColors.sf(context),
                 ),
               )
@@ -197,35 +203,35 @@ class _DiscoverViewState extends State<DiscoverView> {
                           ),
                         )
                       : _hasError
-                          ? Center(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    LucideIcons.wifiOff,
-                                    size: 48,
-                                    color: AppColors.mut(context),
-                                  ),
-                                  const SizedBox(height: 16),
-                                  Text(
-                                    localeProvider.t('discover_load_error'),
-                                    style: TextStyle(
-                                      color: AppColors.textSecondary(context),
-                                      fontSize: 15,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 16),
-                                  FilledButton(
-                                    style: FilledButton.styleFrom(
-                                      backgroundColor: AppColors.acc(context),
-                                      foregroundColor: AppColors.bg(context),
-                                    ),
-                                    onPressed: _loadContent,
-                                    child: Text(localeProvider.t('retry')),
-                                  ),
-                                ],
+                      ? Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                LucideIcons.wifiOff,
+                                size: 48,
+                                color: AppColors.mut(context),
                               ),
-                            )
+                              const SizedBox(height: 16),
+                              Text(
+                                localeProvider.t('discover_load_error'),
+                                style: TextStyle(
+                                  color: AppColors.textSecondary(context),
+                                  fontSize: 15,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              FilledButton(
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: AppColors.acc(context),
+                                  foregroundColor: AppColors.bg(context),
+                                ),
+                                onPressed: _loadContent,
+                                child: Text(localeProvider.t('retry')),
+                              ),
+                            ],
+                          ),
+                        )
                       : PageView.builder(
                           scrollDirection: Axis.vertical,
                           itemCount: _items.length,

@@ -27,7 +27,9 @@ void main() {
     });
 
     test('loadPreference reads from SharedPreferences', () async {
-      SharedPreferences.setMockInitialValues({'omnivium_haptic_enabled': false});
+      SharedPreferences.setMockInitialValues({
+        'omnivium_haptic_enabled': false,
+      });
       await HapticService.loadPreference();
       expect(HapticService.enabled, isFalse);
     });

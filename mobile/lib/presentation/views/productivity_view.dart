@@ -268,7 +268,9 @@ class _ProductivityViewState extends State<ProductivityView>
               width: 24,
               height: 24,
               decoration: BoxDecoration(
-                color: todo.isDone ? AppColors.acc(context) : Colors.transparent,
+                color: todo.isDone
+                    ? AppColors.acc(context)
+                    : Colors.transparent,
                 border: Border.all(
                   color: todo.isDone
                       ? AppColors.acc(context)
@@ -356,7 +358,9 @@ class _ProductivityViewState extends State<ProductivityView>
               Text(
                 schedule.dueDate != null ? '${schedule.dueDate!.day}' : '-',
                 style: TextStyle(
-                  color: isOverdue ? AppColors.dng(context) : AppColors.acc(context),
+                  color: isOverdue
+                      ? AppColors.dng(context)
+                      : AppColors.acc(context),
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                 ),

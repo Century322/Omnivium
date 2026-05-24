@@ -205,7 +205,9 @@ class AppDrawerState extends State<AppDrawer>
         context: context,
         builder: (_) => AlertDialog(
           backgroundColor: AppColors.sf(context),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           title: Text(
             localeProvider.t('rename_conversation'),
             style: TextStyle(color: AppColors.textPrimary(context)),
@@ -326,7 +328,10 @@ class AppDrawerState extends State<AppDrawer>
                       ),
                       child: Row(
                         children: [
-                          IncognitoIcon(size: 14, color: AppColors.acc(context)),
+                          IncognitoIcon(
+                            size: 14,
+                            color: AppColors.acc(context),
+                          ),
                           const SizedBox(width: 8),
                           Text(
                             localeProvider.t('incognito_mode'),

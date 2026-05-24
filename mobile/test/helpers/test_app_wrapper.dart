@@ -13,9 +13,7 @@ class TestAppWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: child,
-    );
+    return MaterialApp(home: child);
   }
 
   static Future<AppProvider> createProvider() async {
@@ -30,10 +28,7 @@ class TestAppWrapper extends StatelessWidget {
   }
 }
 
-Future<void> pumpView(
-  WidgetTester tester,
-  Widget view,
-) async {
+Future<void> pumpView(WidgetTester tester, Widget view) async {
   await tester.pumpWidget(MaterialApp(home: view));
   await tester.pumpAndSettle();
 }

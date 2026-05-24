@@ -39,7 +39,11 @@ class PrivacyConsentDialog {
         backgroundColor: AppColors.sf(context),
         title: Row(
           children: [
-            Icon(Icons.shield_outlined, color: AppColors.acc(context), size: 24),
+            Icon(
+              Icons.shield_outlined,
+              color: AppColors.acc(context),
+              size: 24,
+            ),
             const SizedBox(width: 8),
             Text(
               t('privacy_policy'),

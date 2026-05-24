@@ -14,27 +14,27 @@ void main() {
   group('StorageView', () {
     testWidgets('renders storage view', (tester) async {
       final provider = AppProvider();
-      await tester.pumpWidget(MaterialApp(
-        home: StorageView(provider: provider),
-      ));
+      await tester.pumpWidget(
+        MaterialApp(home: StorageView(provider: provider)),
+      );
       await tester.pumpAndSettle();
       expect(find.byType(StorageView), findsOneWidget);
     });
 
     testWidgets('has scaffold structure', (tester) async {
       final provider = AppProvider();
-      await tester.pumpWidget(MaterialApp(
-        home: StorageView(provider: provider),
-      ));
+      await tester.pumpWidget(
+        MaterialApp(home: StorageView(provider: provider)),
+      );
       await tester.pumpAndSettle();
       expect(find.byType(Scaffold), findsOneWidget);
     });
 
     testWidgets('shows storage categories', (tester) async {
       final provider = AppProvider();
-      await tester.pumpWidget(MaterialApp(
-        home: StorageView(provider: provider),
-      ));
+      await tester.pumpWidget(
+        MaterialApp(home: StorageView(provider: provider)),
+      );
       await tester.pumpAndSettle();
       expect(find.byType(StorageView), findsOneWidget);
     });

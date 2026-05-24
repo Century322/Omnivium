@@ -139,7 +139,11 @@ class LinkPreviewCard extends StatelessWidget {
                 color: AppColors.accBg(context),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Icon(LucideIcons.link, size: 20, color: AppColors.acc(context)),
+              child: Icon(
+                LucideIcons.link,
+                size: 20,
+                color: AppColors.acc(context),
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(

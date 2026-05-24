@@ -395,7 +395,9 @@ class FriendProfileView extends StatelessWidget {
         context: context,
         builder: (_) => AlertDialog(
           backgroundColor: AppColors.sf(context),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           title: Text(
             t('edit_group_name'),
             style: TextStyle(color: AppColors.textPrimary(context)),
@@ -461,14 +463,19 @@ class FriendProfileView extends StatelessWidget {
         context: context,
         builder: (_) => AlertDialog(
           backgroundColor: AppColors.sf(context),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           title: Text(
             t('invite_member'),
             style: TextStyle(color: AppColors.textPrimary(context)),
           ),
           content: TextField(
             controller: ctrl,
-            style: TextStyle(color: AppColors.textPrimary(context), fontSize: 14),
+            style: TextStyle(
+              color: AppColors.textPrimary(context),
+              fontSize: 14,
+            ),
             decoration: InputDecoration(
               labelText: t('enter_matrix_id'),
               hintStyle: TextStyle(
@@ -506,7 +513,10 @@ class FriendProfileView extends StatelessWidget {
                   );
                 }
               },
-              child: Text(t('invite'), style: TextStyle(color: AppColors.acc(context))),
+              child: Text(
+                t('invite'),
+                style: TextStyle(color: AppColors.acc(context)),
+              ),
             ),
           ],
         ),

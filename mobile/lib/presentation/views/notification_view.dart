@@ -160,7 +160,9 @@ class NotificationView extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               border: notif.read
                   ? null
-                  : Border.all(color: AppColors.acc(context).withValues(alpha: 0.2)),
+                  : Border.all(
+                      color: AppColors.acc(context).withValues(alpha: 0.2),
+                    ),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,

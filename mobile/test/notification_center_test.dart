@@ -33,7 +33,10 @@ void main() {
       void callback(Map<String, dynamic>? data) => count++;
       NotificationCenter.observe(Event.messageUpdated, callback);
       NotificationCenter.post(Event.messageUpdated);
-      NotificationCenter.removeObserver(Event.messageUpdated, callback: callback);
+      NotificationCenter.removeObserver(
+        Event.messageUpdated,
+        callback: callback,
+      );
       NotificationCenter.post(Event.messageUpdated);
       expect(count, 1);
     });
@@ -50,7 +53,10 @@ void main() {
     test('postImmediate ignores debounce', () async {
       var count = 0;
       NotificationCenter.observe(Event.themeChanged, (data) => count++);
-      NotificationCenter.setDebounce(Event.themeChanged, const Duration(seconds: 5));
+      NotificationCenter.setDebounce(
+        Event.themeChanged,
+        const Duration(seconds: 5),
+      );
       NotificationCenter.postImmediate(Event.themeChanged);
       expect(count, 1);
     });
@@ -81,7 +87,10 @@ void main() {
     test('setDebounce delays notification', () async {
       var count = 0;
       NotificationCenter.observe(Event.localeChanged, (data) => count++);
-      NotificationCenter.setDebounce(Event.localeChanged, const Duration(milliseconds: 50));
+      NotificationCenter.setDebounce(
+        Event.localeChanged,
+        const Duration(milliseconds: 50),
+      );
       NotificationCenter.post(Event.localeChanged);
       expect(count, 0);
       await Future.delayed(const Duration(milliseconds: 100));

@@ -35,7 +35,9 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
 
-    _callStateSubscription = CallService.instance.callStateStream.listen((call) {
+    _callStateSubscription = CallService.instance.callStateStream.listen((
+      call,
+    ) {
       if (!mounted) return;
       setState(() {});
       if (call.state == CallState.connected) {
@@ -178,8 +180,12 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
       children: [
         _buildControlButton(
           icon: _isMuted ? Icons.mic_off : Icons.mic,
-          label: _isMuted ? localeProvider.t('unmute') : localeProvider.t('mute'),
-          color: _isMuted ? AppColors.dng(context) : AppColors.textSecondary(context),
+          label: _isMuted
+              ? localeProvider.t('unmute')
+              : localeProvider.t('mute'),
+          color: _isMuted
+              ? AppColors.dng(context)
+              : AppColors.textSecondary(context),
           onTap: () {
             setState(() => _isMuted = !_isMuted);
             _toggleMute(_isMuted);
@@ -187,7 +193,9 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
         ),
         _buildControlButton(
           icon: _isSpeakerOn ? Icons.volume_up : Icons.volume_off,
-          label: _isSpeakerOn ? localeProvider.t('speaker') : localeProvider.t('earpiece'),
+          label: _isSpeakerOn
+              ? localeProvider.t('speaker')
+              : localeProvider.t('earpiece'),
           color: _isSpeakerOn
               ? AppColors.acc(context)
               : AppColors.textSecondary(context),
@@ -321,7 +329,9 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                   children: [
                     _buildControlButton(
                       icon: _isMuted ? Icons.mic_off : Icons.mic,
-                      label: _isMuted ? localeProvider.t('unmute') : localeProvider.t('mute'),
+                      label: _isMuted
+                          ? localeProvider.t('unmute')
+                          : localeProvider.t('mute'),
                       color: _isMuted ? AppColors.dng(context) : Colors.white,
                       onTap: () {
                         setState(() => _isMuted = !_isMuted);
@@ -330,8 +340,12 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                     ),
                     _buildControlButton(
                       icon: _isCameraOff ? Icons.videocam_off : Icons.videocam,
-                      label: _isCameraOff ? localeProvider.t('open_camera') : localeProvider.t('close_camera'),
-                      color: _isCameraOff ? AppColors.dng(context) : Colors.white,
+                      label: _isCameraOff
+                          ? localeProvider.t('open_camera')
+                          : localeProvider.t('close_camera'),
+                      color: _isCameraOff
+                          ? AppColors.dng(context)
+                          : Colors.white,
                       onTap: () {
                         setState(() => _isCameraOff = !_isCameraOff);
                         _toggleCamera();

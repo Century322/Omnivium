@@ -55,7 +55,11 @@ class _MessageListViewState extends State<MessageListView> {
         actions: [
           IconButton(
             tooltip: localeProvider.t('new_chat'),
-            icon: Icon(LucideIcons.edit, color: AppColors.acc(context), size: 20),
+            icon: Icon(
+              LucideIcons.edit,
+              color: AppColors.acc(context),
+              size: 20,
+            ),
             onPressed: () => _showNewChatOptions(context),
           ),
         ],

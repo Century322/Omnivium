@@ -14,27 +14,27 @@ void main() {
   group('SettingsView', () {
     testWidgets('renders settings view', (tester) async {
       final provider = AppProvider();
-      await tester.pumpWidget(MaterialApp(
-        home: SettingsView(provider: provider),
-      ));
+      await tester.pumpWidget(
+        MaterialApp(home: SettingsView(provider: provider)),
+      );
       await tester.pump();
       expect(find.byType(SettingsView), findsOneWidget);
     });
 
     testWidgets('contains scaffold', (tester) async {
       final provider = AppProvider();
-      await tester.pumpWidget(MaterialApp(
-        home: SettingsView(provider: provider),
-      ));
+      await tester.pumpWidget(
+        MaterialApp(home: SettingsView(provider: provider)),
+      );
       await tester.pump();
       expect(find.byType(Scaffold), findsOneWidget);
     });
 
     testWidgets('renders without error', (tester) async {
       final provider = AppProvider();
-      await tester.pumpWidget(MaterialApp(
-        home: SettingsView(provider: provider),
-      ));
+      await tester.pumpWidget(
+        MaterialApp(home: SettingsView(provider: provider)),
+      );
       await tester.pump();
       expect(tester.takeException(), isNull);
     });

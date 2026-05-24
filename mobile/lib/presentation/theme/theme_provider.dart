@@ -212,8 +212,10 @@ class ThemeProvider extends ChangeNotifier {
           borderRadius: BorderRadius.circular(16),
           borderSide: const BorderSide(color: AppColors.danger, width: 1),
         ),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
       ),
       cardTheme: CardThemeData(
         color: AppColors.surface,
@@ -234,8 +236,9 @@ class ThemeProvider extends ChangeNotifier {
           backgroundColor: accent,
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: 16),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           elevation: 0,
           textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
         ),
@@ -382,11 +385,12 @@ class ThemeProvider extends ChangeNotifier {
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide:
-              const BorderSide(color: AppColors.lightDanger, width: 1),
+          borderSide: const BorderSide(color: AppColors.lightDanger, width: 1),
         ),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
       ),
       cardTheme: CardThemeData(
         color: AppColors.lightSurface,
@@ -407,8 +411,9 @@ class ThemeProvider extends ChangeNotifier {
           backgroundColor: accent,
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: 16),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           elevation: 0,
           textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
         ),

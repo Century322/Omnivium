@@ -173,7 +173,10 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
                     height: 80,
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [AppColors.acc(context), AppColors.accentPurple],
+                        colors: [
+                          AppColors.acc(context),
+                          AppColors.accentPurple,
+                        ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),

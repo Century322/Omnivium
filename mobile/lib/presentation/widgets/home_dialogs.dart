@@ -160,7 +160,9 @@ class HomeDialogs {
         context: context,
         builder: (_) => AlertDialog(
           backgroundColor: AppColors.sf(context),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           title: Text(
             t('new_group'),
             style: TextStyle(color: AppColors.textPrimary(context)),
@@ -193,43 +195,46 @@ class HomeDialogs {
                   labelText: t('enter_matrix_id'),
                   hintStyle: TextStyle(
                     color: AppColors.textDisabled(context),
-                  fontSize: 13,
+                    fontSize: 13,
+                  ),
+                  filled: true,
+                  fillColor: AppColors.sfAlt(context),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
                 ),
-                filled: true,
-                fillColor: AppColors.sfAlt(context),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                t('cancel'),
+                style: TextStyle(color: AppColors.sec(context)),
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                final name = nameCtrl.text.trim();
+                if (name.isEmpty) return;
+                final members = membersCtrl.text
+                    .split(',')
+                    .map((s) => s.trim())
+                    .where((s) => s.isNotEmpty)
+                    .toList();
+                Navigator.pop(context);
+                await onCreate(name, members);
+              },
+              child: Text(
+                t('create'),
+                style: TextStyle(color: AppColors.acc(context)),
               ),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              t('cancel'),
-              style: TextStyle(color: AppColors.sec(context)),
-            ),
-          ),
-          TextButton(
-            onPressed: () async {
-              final name = nameCtrl.text.trim();
-              if (name.isEmpty) return;
-              final members = membersCtrl.text
-                  .split(',')
-                  .map((s) => s.trim())
-                  .where((s) => s.isNotEmpty)
-                  .toList();
-              Navigator.pop(context);
-              await onCreate(name, members);
-            },
-            child: Text(t('create'), style: TextStyle(color: AppColors.acc(context))),
-          ),
-        ],
-      ),
-    );
+      );
     } finally {
       nameCtrl.dispose();
       membersCtrl.dispose();
@@ -245,50 +250,58 @@ class HomeDialogs {
     try {
       showDialog(
         context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: AppColors.sf(context),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          t('add_contact'),
-          style: TextStyle(color: AppColors.textPrimary(context)),
+        builder: (_) => AlertDialog(
+          backgroundColor: AppColors.sf(context),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Text(
+            t('add_contact'),
+            style: TextStyle(color: AppColors.textPrimary(context)),
+          ),
+          content: TextField(
+            controller: idCtrl,
+            style: TextStyle(
+              color: AppColors.textPrimary(context),
+              fontSize: 14,
+            ),
+            decoration: InputDecoration(
+              labelText: t('enter_matrix_id'),
+              hintStyle: TextStyle(
+                color: AppColors.textDisabled(context),
+                fontSize: 13,
+              ),
+              filled: true,
+              fillColor: AppColors.sfAlt(context),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                t('cancel'),
+                style: TextStyle(color: AppColors.sec(context)),
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                final userId = idCtrl.text.trim();
+                if (userId.isEmpty) return;
+                Navigator.pop(context);
+                await onAdd(userId);
+              },
+              child: Text(
+                t('add'),
+                style: TextStyle(color: AppColors.acc(context)),
+              ),
+            ),
+          ],
         ),
-        content: TextField(
-          controller: idCtrl,
-          style: TextStyle(color: AppColors.textPrimary(context), fontSize: 14),
-          decoration: InputDecoration(
-            labelText: t('enter_matrix_id'),
-            hintStyle: TextStyle(
-              color: AppColors.textDisabled(context),
-              fontSize: 13,
-            ),
-            filled: true,
-            fillColor: AppColors.sfAlt(context),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              t('cancel'),
-              style: TextStyle(color: AppColors.sec(context)),
-            ),
-          ),
-          TextButton(
-            onPressed: () async {
-              final userId = idCtrl.text.trim();
-              if (userId.isEmpty) return;
-              Navigator.pop(context);
-              await onAdd(userId);
-            },
-            child: Text(t('add'), style: TextStyle(color: AppColors.acc(context))),
-          ),
-        ],
-      ),
-    );
+      );
     } finally {
       idCtrl.dispose();
     }

@@ -53,13 +53,16 @@ void main() {
       expect(key1, equals(key2));
     });
 
-    test('deriveKey produces different results for different passwords', () async {
-      final service = SrpService.instance;
-      await service.clear();
-      final key1 = await service.deriveKey('pass1');
-      final key2 = await service.deriveKey('pass2');
-      expect(key1, isNot(equals(key2)));
-    });
+    test(
+      'deriveKey produces different results for different passwords',
+      () async {
+        final service = SrpService.instance;
+        await service.clear();
+        final key1 = await service.deriveKey('pass1');
+        final key2 = await service.deriveKey('pass2');
+        expect(key1, isNot(equals(key2)));
+      },
+    );
 
     test('clear removes all data', () async {
       final service = SrpService.instance;
@@ -69,13 +72,16 @@ void main() {
       expect(service.username, isNull);
     });
 
-    test('createVerifier with different users produces different verifiers', () async {
-      final service = SrpService.instance;
-      await service.clear();
-      final v1 = await service.createVerifier('user1', 'samepass');
-      await service.clear();
-      final v2 = await service.createVerifier('user2', 'samepass');
-      expect(v1, isNot(equals(v2)));
-    });
+    test(
+      'createVerifier with different users produces different verifiers',
+      () async {
+        final service = SrpService.instance;
+        await service.clear();
+        final v1 = await service.createVerifier('user1', 'samepass');
+        await service.clear();
+        final v2 = await service.createVerifier('user2', 'samepass');
+        expect(v1, isNot(equals(v2)));
+      },
+    );
   });
 }

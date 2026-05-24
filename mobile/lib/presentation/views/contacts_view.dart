@@ -73,7 +73,11 @@ class _ContactsViewState extends State<ContactsView> {
         actions: [
           IconButton(
             tooltip: localeProvider.t('add_contact'),
-            icon: Icon(LucideIcons.userPlus, color: AppColors.acc(context), size: 20),
+            icon: Icon(
+              LucideIcons.userPlus,
+              color: AppColors.acc(context),
+              size: 20,
+            ),
             onPressed: () async {
               final result = await Navigator.push(
                 context,
@@ -166,7 +170,9 @@ class _ContactsViewState extends State<ContactsView> {
             decoration: BoxDecoration(
               color: AppColors.bg(context),
               borderRadius: BorderRadius.circular(20),
-              border: isFocused ? Border.all(color: AppColors.acc(context)) : null,
+              border: isFocused
+                  ? Border.all(color: AppColors.acc(context))
+                  : null,
             ),
             padding: const EdgeInsets.symmetric(horizontal: 14),
             child: Row(

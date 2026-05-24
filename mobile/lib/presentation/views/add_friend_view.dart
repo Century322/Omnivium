@@ -38,7 +38,10 @@ class _AddFriendViewState extends State<AddFriendView> {
   Future<void> _doSearch() async {
     final query = _searchController.text.trim();
     if (query.isEmpty) return;
-    setState(() { _isSearching = true; _searchError = false; });
+    setState(() {
+      _isSearching = true;
+      _searchError = false;
+    });
     try {
       final results = await widget.provider.matrix.searchUsers(query);
       if (mounted) {
@@ -173,16 +176,26 @@ class _AddFriendViewState extends State<AddFriendView> {
                 child: Center(
                   child: Column(
                     children: [
-                      Icon(LucideIcons.searchX, size: 36, color: AppColors.mut(context)),
+                      Icon(
+                        LucideIcons.searchX,
+                        size: 36,
+                        color: AppColors.mut(context),
+                      ),
                       const SizedBox(height: 8),
                       Text(
                         localeProvider.t('search_error'),
-                        style: TextStyle(color: AppColors.textSecondary(context), fontSize: 14),
+                        style: TextStyle(
+                          color: AppColors.textSecondary(context),
+                          fontSize: 14,
+                        ),
                       ),
                       const SizedBox(height: 12),
                       TextButton(
                         onPressed: _doSearch,
-                        child: Text(localeProvider.t('retry'), style: TextStyle(color: AppColors.acc(context))),
+                        child: Text(
+                          localeProvider.t('retry'),
+                          style: TextStyle(color: AppColors.acc(context)),
+                        ),
                       ),
                     ],
                   ),
@@ -465,7 +478,11 @@ class _AddFriendViewState extends State<AddFriendView> {
                       color: AppColors.acc(context),
                     ),
                   )
-                : Icon(LucideIcons.userPlus, color: AppColors.acc(context), size: 22),
+                : Icon(
+                    LucideIcons.userPlus,
+                    color: AppColors.acc(context),
+                    size: 22,
+                  ),
             onTap: isAddingThis
                 ? null
                 : () => _startChatWith(profile.userId, index),

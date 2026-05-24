@@ -328,243 +328,247 @@ class _QuickCommandsViewState extends State<QuickCommandsView>
     try {
       showDialog(
         context: context,
-      builder: (ctx) {
-        return StatefulBuilder(
-          builder: (ctx, setDialogState) {
-            return AlertDialog(
-              backgroundColor: AppColors.sf(context),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              title: Text(
-                isEdit ? t('edit_command') : t('add_command'),
-                style: TextStyle(
-                  color: AppColors.textPrimary(context),
-                  fontSize: 17,
-                  fontWeight: FontWeight.w600,
+        builder: (ctx) {
+          return StatefulBuilder(
+            builder: (ctx, setDialogState) {
+              return AlertDialog(
+                backgroundColor: AppColors.sf(context),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
                 ),
-              ),
-              content: SingleChildScrollView(
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.85,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        t('command_emoji'),
-                        style: TextStyle(
-                          color: AppColors.textSecondary(context),
-                          fontSize: 13,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: emojiOptions.map((emoji) {
-                          final isSelected = emojiCtrl.text == emoji;
-                          return GestureDetector(
-                            behavior: HitTestBehavior.opaque,
-                            onTap: () {
-                              emojiCtrl.text = emoji;
-                              setDialogState(() {});
-                            },
-                            child: Container(
-                              width: 36,
-                              height: 36,
-                              decoration: BoxDecoration(
-                                color: isSelected
-                                    ? AppColors.acc(context).withValues(alpha: 0.15)
-                                    : AppColors.sfAlt(context),
-                                borderRadius: BorderRadius.circular(8),
-                                border: isSelected
-                                    ? Border.all(
-                                        color: AppColors.acc(context),
-                                        width: 2,
-                                      )
-                                    : null,
-                              ),
-                              alignment: Alignment.center,
-                              child: Text(
-                                emoji,
-                                style: const TextStyle(fontSize: 18),
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        t('command_name'),
-                        style: TextStyle(
-                          color: AppColors.textSecondary(context),
-                          fontSize: 13,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      TextField(
-                        controller: nameCtrl,
-                        style: TextStyle(
-                          color: AppColors.textPrimary(context),
-                          fontSize: 15,
-                        ),
-                        decoration: InputDecoration(
-                          labelText: t('command_name_hint'),
-                          hintStyle: TextStyle(
-                            color: AppColors.textDisabled(context),
-                            fontSize: 14,
-                          ),
-                          filled: true,
-                          fillColor: AppColors.sfAlt(context),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide.none,
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 10,
+                title: Text(
+                  isEdit ? t('edit_command') : t('add_command'),
+                  style: TextStyle(
+                    color: AppColors.textPrimary(context),
+                    fontSize: 17,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                content: SingleChildScrollView(
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.85,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          t('command_emoji'),
+                          style: TextStyle(
+                            color: AppColors.textSecondary(context),
+                            fontSize: 13,
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        t('command_prompt'),
-                        style: TextStyle(
-                          color: AppColors.textSecondary(context),
-                          fontSize: 13,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      TextField(
-                        controller: promptCtrl,
-                        maxLines: 3,
-                        style: TextStyle(
-                          color: AppColors.textPrimary(context),
-                          fontSize: 15,
-                        ),
-                        decoration: InputDecoration(
-                          labelText: t('command_prompt_hint'),
-                          hintStyle: TextStyle(
-                            color: AppColors.textDisabled(context),
-                            fontSize: 14,
-                          ),
-                          filled: true,
-                          fillColor: AppColors.sfAlt(context),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide.none,
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 10,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        t('command_category'),
-                        style: TextStyle(
-                          color: AppColors.textSecondary(context),
-                          fontSize: 13,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 6,
-                        children: categoryOptions.map((opt) {
-                          final (value, label) = opt;
-                          final isSelected = selectedCategory == value;
-                          return GestureDetector(
-                            behavior: HitTestBehavior.opaque,
-                            onTap: () {
-                              selectedCategory = value;
-                              setDialogState(() {});
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: isSelected
-                                    ? AppColors.acc(context).withValues(alpha: 0.15)
-                                    : AppColors.sfAlt(context),
-                                borderRadius: BorderRadius.circular(8),
-                                border: isSelected
-                                    ? Border.all(
-                                        color: AppColors.acc(context),
-                                        width: 1.5,
-                                      )
-                                    : null,
-                              ),
-                              child: Text(
-                                label,
-                                style: TextStyle(
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: emojiOptions.map((emoji) {
+                            final isSelected = emojiCtrl.text == emoji;
+                            return GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onTap: () {
+                                emojiCtrl.text = emoji;
+                                setDialogState(() {});
+                              },
+                              child: Container(
+                                width: 36,
+                                height: 36,
+                                decoration: BoxDecoration(
                                   color: isSelected
-                                      ? AppColors.acc(context)
-                                      : AppColors.textSecondary(context),
-                                  fontSize: 13,
-                                  fontWeight: isSelected
-                                      ? FontWeight.w600
-                                      : FontWeight.normal,
+                                      ? AppColors.acc(
+                                          context,
+                                        ).withValues(alpha: 0.15)
+                                      : AppColors.sfAlt(context),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: isSelected
+                                      ? Border.all(
+                                          color: AppColors.acc(context),
+                                          width: 2,
+                                        )
+                                      : null,
+                                ),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  emoji,
+                                  style: const TextStyle(fontSize: 18),
                                 ),
                               ),
+                            );
+                          }).toList(),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          t('command_name'),
+                          style: TextStyle(
+                            color: AppColors.textSecondary(context),
+                            fontSize: 13,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        TextField(
+                          controller: nameCtrl,
+                          style: TextStyle(
+                            color: AppColors.textPrimary(context),
+                            fontSize: 15,
+                          ),
+                          decoration: InputDecoration(
+                            labelText: t('command_name_hint'),
+                            hintStyle: TextStyle(
+                              color: AppColors.textDisabled(context),
+                              fontSize: 14,
                             ),
-                          );
-                        }).toList(),
-                      ),
-                    ],
+                            filled: true,
+                            fillColor: AppColors.sfAlt(context),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide.none,
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 10,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          t('command_prompt'),
+                          style: TextStyle(
+                            color: AppColors.textSecondary(context),
+                            fontSize: 13,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        TextField(
+                          controller: promptCtrl,
+                          maxLines: 3,
+                          style: TextStyle(
+                            color: AppColors.textPrimary(context),
+                            fontSize: 15,
+                          ),
+                          decoration: InputDecoration(
+                            labelText: t('command_prompt_hint'),
+                            hintStyle: TextStyle(
+                              color: AppColors.textDisabled(context),
+                              fontSize: 14,
+                            ),
+                            filled: true,
+                            fillColor: AppColors.sfAlt(context),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide.none,
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 10,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          t('command_category'),
+                          style: TextStyle(
+                            color: AppColors.textSecondary(context),
+                            fontSize: 13,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 6,
+                          children: categoryOptions.map((opt) {
+                            final (value, label) = opt;
+                            final isSelected = selectedCategory == value;
+                            return GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onTap: () {
+                                selectedCategory = value;
+                                setDialogState(() {});
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: isSelected
+                                      ? AppColors.acc(
+                                          context,
+                                        ).withValues(alpha: 0.15)
+                                      : AppColors.sfAlt(context),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: isSelected
+                                      ? Border.all(
+                                          color: AppColors.acc(context),
+                                          width: 1.5,
+                                        )
+                                      : null,
+                                ),
+                                child: Text(
+                                  label,
+                                  style: TextStyle(
+                                    color: isSelected
+                                        ? AppColors.acc(context)
+                                        : AppColors.textSecondary(context),
+                                    fontSize: 13,
+                                    fontWeight: isSelected
+                                        ? FontWeight.w600
+                                        : FontWeight.normal,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(ctx),
-                  child: Text(t('cancel')),
-                ),
-                TextButton(
-                  onPressed: () async {
-                    final name = nameCtrl.text.trim();
-                    final emoji = emojiCtrl.text.trim();
-                    final prompt = promptCtrl.text.trim();
-                    if (name.isEmpty || prompt.isEmpty) return;
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: Text(t('cancel')),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      final name = nameCtrl.text.trim();
+                      final emoji = emojiCtrl.text.trim();
+                      final prompt = promptCtrl.text.trim();
+                      if (name.isEmpty || prompt.isEmpty) return;
 
-                    final now = DateTime.now();
-                    if (isEdit) {
-                      final updated = existing.copyWith(
-                        name: name,
-                        emoji: emoji,
-                        prompt: prompt,
-                        category: selectedCategory,
-                      );
-                      await widget.provider.updateCommand(updated);
-                    } else {
-                      final cmd = QuickCommand(
-                        id: 'qc_${now.millisecondsSinceEpoch}',
-                        name: name,
-                        emoji: emoji.isEmpty ? '?' : emoji,
-                        prompt: prompt,
-                        category: selectedCategory,
-                        createdAt: now,
-                        updatedAt: now,
-                      );
-                      await widget.provider.addCommand(cmd);
-                    }
-                    if (ctx.mounted) Navigator.pop(ctx);
-                  },
-                  child: Text(
-                    isEdit ? t('save') : t('create'),
-                    style: TextStyle(color: AppColors.acc(context)),
+                      final now = DateTime.now();
+                      if (isEdit) {
+                        final updated = existing.copyWith(
+                          name: name,
+                          emoji: emoji,
+                          prompt: prompt,
+                          category: selectedCategory,
+                        );
+                        await widget.provider.updateCommand(updated);
+                      } else {
+                        final cmd = QuickCommand(
+                          id: 'qc_${now.millisecondsSinceEpoch}',
+                          name: name,
+                          emoji: emoji.isEmpty ? '?' : emoji,
+                          prompt: prompt,
+                          category: selectedCategory,
+                          createdAt: now,
+                          updatedAt: now,
+                        );
+                        await widget.provider.addCommand(cmd);
+                      }
+                      if (ctx.mounted) Navigator.pop(ctx);
+                    },
+                    child: Text(
+                      isEdit ? t('save') : t('create'),
+                      style: TextStyle(color: AppColors.acc(context)),
+                    ),
                   ),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
+                ],
+              );
+            },
+          );
+        },
+      );
     } finally {
       nameCtrl.dispose();
       emojiCtrl.dispose();

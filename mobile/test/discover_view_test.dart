@@ -14,36 +14,38 @@ void main() {
   group('DiscoverView', () {
     testWidgets('renders discover view', (tester) async {
       final provider = AppProvider();
-      await tester.pumpWidget(MaterialApp(
-        home: DiscoverView(provider: provider),
-      ));
+      await tester.pumpWidget(
+        MaterialApp(home: DiscoverView(provider: provider)),
+      );
       await tester.pumpAndSettle();
       expect(find.byType(DiscoverView), findsOneWidget);
     });
 
     testWidgets('shows loading indicator initially', (tester) async {
       final provider = AppProvider();
-      await tester.pumpWidget(MaterialApp(
-        home: DiscoverView(provider: provider),
-      ));
+      await tester.pumpWidget(
+        MaterialApp(home: DiscoverView(provider: provider)),
+      );
       await tester.pump();
       expect(find.byType(DiscoverView), findsOneWidget);
     });
 
     testWidgets('has scaffold structure', (tester) async {
       final provider = AppProvider();
-      await tester.pumpWidget(MaterialApp(
-        home: DiscoverView(provider: provider),
-      ));
+      await tester.pumpWidget(
+        MaterialApp(home: DiscoverView(provider: provider)),
+      );
       await tester.pumpAndSettle();
       expect(find.byType(Scaffold), findsOneWidget);
     });
 
-    testWidgets('renders fallback content when API unavailable', (tester) async {
+    testWidgets('renders fallback content when API unavailable', (
+      tester,
+    ) async {
       final provider = AppProvider();
-      await tester.pumpWidget(MaterialApp(
-        home: DiscoverView(provider: provider),
-      ));
+      await tester.pumpWidget(
+        MaterialApp(home: DiscoverView(provider: provider)),
+      );
       await tester.pumpAndSettle(const Duration(seconds: 5));
       expect(find.byType(DiscoverView), findsOneWidget);
     });

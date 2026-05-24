@@ -7,17 +7,13 @@ void main() {
 
   group('CallScreen', () {
     testWidgets('renders call screen widget', (tester) async {
-      await tester.pumpWidget(const MaterialApp(
-        home: CallScreen(),
-      ));
+      await tester.pumpWidget(const MaterialApp(home: CallScreen()));
       await tester.pump();
       expect(find.byType(CallScreen), findsOneWidget);
     });
 
     testWidgets('renders without crash', (tester) async {
-      await tester.pumpWidget(const MaterialApp(
-        home: CallScreen(),
-      ));
+      await tester.pumpWidget(const MaterialApp(home: CallScreen()));
       await tester.pump();
       expect(find.byType(CallScreen), findsOneWidget);
       await tester.pumpWidget(const SizedBox.shrink());

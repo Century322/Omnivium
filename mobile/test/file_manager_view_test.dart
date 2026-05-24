@@ -14,18 +14,18 @@ void main() {
   group('FileManagerView', () {
     testWidgets('renders file manager view', (tester) async {
       final provider = AppProvider();
-      await tester.pumpWidget(MaterialApp(
-        home: FileManagerView(provider: provider),
-      ));
+      await tester.pumpWidget(
+        MaterialApp(home: FileManagerView(provider: provider)),
+      );
       await tester.pumpAndSettle();
       expect(find.byType(FileManagerView), findsOneWidget);
     });
 
     testWidgets('has scaffold structure', (tester) async {
       final provider = AppProvider();
-      await tester.pumpWidget(MaterialApp(
-        home: FileManagerView(provider: provider),
-      ));
+      await tester.pumpWidget(
+        MaterialApp(home: FileManagerView(provider: provider)),
+      );
       await tester.pumpAndSettle();
       expect(find.byType(Scaffold), findsOneWidget);
     });

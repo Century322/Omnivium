@@ -556,7 +556,11 @@ class _SettingsViewState extends State<SettingsView>
                 ),
               ),
               trailing: _assistantLang == value
-                  ? Icon(LucideIcons.check, color: AppColors.acc(context), size: 18)
+                  ? Icon(
+                      LucideIcons.check,
+                      color: AppColors.acc(context),
+                      size: 18,
+                    )
                   : null,
               onTap: () {
                 setState(() => _assistantLang = value);
@@ -608,7 +612,11 @@ class _SettingsViewState extends State<SettingsView>
                 ),
               ),
               trailing: currentKey == key
-                  ? Icon(LucideIcons.check, color: AppColors.acc(context), size: 18)
+                  ? Icon(
+                      LucideIcons.check,
+                      color: AppColors.acc(context),
+                      size: 18,
+                    )
                   : null,
               onTap: () {
                 themeProvider.setModeFromString(key);
@@ -664,8 +672,11 @@ class _SettingsViewState extends State<SettingsView>
                           : null,
                     ),
                     child: isSelected
-                        ? Icon(Icons.check,
-                            color: AppColors.bg(context), size: 22)
+                        ? Icon(
+                            Icons.check,
+                            color: AppColors.bg(context),
+                            size: 22,
+                          )
                         : null,
                   ),
                   const SizedBox(height: 4),
@@ -895,7 +906,11 @@ class _SettingsViewState extends State<SettingsView>
                 ),
               ),
               trailing: _sttEngine == key
-                  ? Icon(LucideIcons.check, color: AppColors.acc(context), size: 18)
+                  ? Icon(
+                      LucideIcons.check,
+                      color: AppColors.acc(context),
+                      size: 18,
+                    )
                   : null,
               onTap: () {
                 setState(() => _sttEngine = key);
@@ -966,7 +981,11 @@ class _SettingsViewState extends State<SettingsView>
                 ),
               ),
               trailing: _voiceMode == key
-                  ? Icon(LucideIcons.check, color: AppColors.acc(context), size: 18)
+                  ? Icon(
+                      LucideIcons.check,
+                      color: AppColors.acc(context),
+                      size: 18,
+                    )
                   : null,
               onTap: () {
                 setState(() => _voiceMode = key);
@@ -1062,7 +1081,11 @@ class _SettingsViewState extends State<SettingsView>
                 ),
               ),
               trailing: localeProvider.locale.languageCode == code
-                  ? Icon(LucideIcons.check, color: AppColors.acc(context), size: 18)
+                  ? Icon(
+                      LucideIcons.check,
+                      color: AppColors.acc(context),
+                      size: 18,
+                    )
                   : null,
               onTap: () {
                 localeProvider.setLocaleFromLabel(code);
