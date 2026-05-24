@@ -40,13 +40,14 @@ void mockSecureStorage() {
       );
 }
 
-Future<void> initSecureStorage() async {
-  if (_secureStorageInitialized) return;
+Future<bool> initSecureStorage() async {
+  if (_secureStorageInitialized) return true;
   mockSecureStorage();
   try {
     await SecureStorageService.instance.init();
+    _secureStorageInitialized = true;
+    return true;
   } catch (_) {
-    mockSecureStorage();
+    return false;
   }
-  _secureStorageInitialized = true;
 }

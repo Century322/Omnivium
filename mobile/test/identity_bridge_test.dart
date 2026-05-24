@@ -3,9 +3,11 @@ import 'package:omnivium/core/identity_bridge.dart';
 import 'helpers/test_helpers.dart';
 
 void main() {
+  bool storageReady = false;
+
   setUp(() async {
     await setupTestEnv();
-    await initSecureStorage();
+    storageReady = await initSecureStorage();
   });
 
   group('IdentityBridge', () {
