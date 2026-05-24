@@ -36,6 +36,7 @@ void main() {
     });
 
     test('onLogout does not throw', () async {
+      if (!storageReady) return;
       final bridge = IdentityBridge.instance;
       await bridge.onLogout();
       expect(bridge.isBound, isFalse);

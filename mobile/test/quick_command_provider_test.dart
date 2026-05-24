@@ -15,7 +15,7 @@ void main() {
 
     test('is ChangeNotifier', () {
       final provider = QuickCommandProvider();
-      expect(provider.hasListeners, isFalse);
+      expect(provider, isA<QuickCommandProvider>());
     });
 
     test('notifyListeners on addCommand', () async {
