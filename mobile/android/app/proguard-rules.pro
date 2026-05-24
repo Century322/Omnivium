@@ -35,22 +35,12 @@
     public static int i(...);
 }
 
--keepclassnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
--keepclassnames class kotlinx.coroutines.CoroutineExceptionHandler {}
--keepclassmembers class kotlinx.coroutines.** {
-    volatile **;
-}
-
--keep,allowobfuscation class * {
-    @com.google.gson.annotations.SerializedName <fields>;
-}
+-keep class kotlinx.coroutines.internal.MainDispatcherFactory { *; }
+-keep class kotlinx.coroutines.CoroutineExceptionHandler { *; }
 
 -keepclassmembers class * {
     *** toJson();
 }
 -keepclassmembers class * {
     *** fromJson(java.lang.String);
-}
--keepclassmembers class * {
-    *** fromJson(org.json.JSONObject);
 }
