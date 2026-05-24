@@ -1,6 +1,6 @@
 # Omnivium 项目状态报告
 
-> 最后更新：2026-05-24 | 版本：8.0 | 本文档是项目唯一进度追踪源
+> 最后更新：2026-05-25 | 版本：9.0 | 本文档是项目唯一进度追踪源
 > 合并自：AUDIT.md v7 + PROJECT_INVENTORY.md + ROADMAP.md
 
 ---
@@ -17,7 +17,7 @@
 | 已实现页面 | 26 个视图 |
 | 整体完成度 | ~82%（按上架标准） |
 | flutter analyze | ✅ 0 Error |
-| flutter test | ✅ 1027 通过 / 66 个测试文件 |
+| flutter test | ✅ 1337 通过 / 73 个测试文件 |
 | 国际化 | ✅ ARB/l10n 官方方案，681 key，4 语言（中/英/日/韩） |
 | 主题 | 深色/浅色/跟随系统 + 8 种强调色预设 |
 | 总文件数 | 153+ |
@@ -110,12 +110,12 @@
 | 7 | 广场/内容模块 | ⏸️ 暂缓 | 依赖后端 API |
 | 8 | 主动提醒系统 | ❌ 缺失 | Agent 主动推送 |
 
-### 🔵 P3 — 工程质量（6/13 完成）
+### 🔵 P3 — 工程质量（8/13 完成）
 
 | # | 任务 | 状态 | 说明 |
 |---|------|------|------|
-| 1 | 测试体系 | ⚠️ 66 文件/1027 用例 | 需集成测试、Mock 框架、View 层加强 |
-| 2 | HomeView 巨型文件 | ⚠️ 904 行 | 从 3200+ 降至 904，仍需继续拆分 |
+| 1 | 测试体系 | ⚠️ 73 文件/1337 用例 | View 层已加强，需集成测试、Mock 框架 |
+| 2 | HomeView 巨型文件 | ⚠️ 661 行 | 从 904 降至 661，提取 3 个 mixin + UserAvatar |
 | 3 | 统一 SessionManager | ⚠️ 已实现未接入 | |
 | 4 | 路由系统 | ✅ 完成 | AppNavigator 统一导航 + 深链接 + 路由守卫 |
 | 5 | 状态管理规范化 | ⚠️ 混用 | 全局变量 + ChangeNotifier |
@@ -128,7 +128,7 @@
 | 12 | 环境/Flavor 配置 | ❌ 缺失 | 无 dev/staging/prod |
 | 13 | 分析集成 | ✅ 完成 | Firebase Analytics（analytics_service.dart） |
 
-### 🟣 P4 — 体验优化与代码质量（5/11 完成）
+### 🟣 P4 — 体验优化与代码质量（6/11 完成）
 
 | # | 任务 | 状态 | 说明 |
 |---|------|------|------|
@@ -142,7 +142,7 @@
 | 8 | 主题文件导入/导出 | ❌ 待做 | JSON 格式主题文件，可分享 |
 | 9 | 聊天壁纸系统 | ❌ 待做 | 预设壁纸 + 自定义图片 + 半透明覆盖层 |
 | 10 | 应用图标更换 | ❌ 待做 | 像 Telegram 可在设置中更换桌面图标 |
-| 11 | async gap 后 ! 操作符 | ⚠️ 待验证 | call_screen RTCVideoRenderer、ai_workbench_view 可能 null 异常 |
+| 11 | async gap 后 ! 操作符 | ✅ 完成 | 6 个文件 8 处添加 mounted 检查，防止 dispose 后 setState 崩溃 |
 
 ### 🔧 P5 — 安全与构建（1/5 完成）
 
@@ -256,7 +256,7 @@
 ## 五、架构问题
 
 ### 5.1 HomeView 巨型文件
-home_view.dart 当前 904 行（从 3200+ 降至 588 后又增长），需继续拆分。
+home_view.dart 当前 661 行（从 3200+ → 904 → 661），已提取 3 个 mixin（ScrollMixin、MessageActionsMixin、ConversationMenuMixin）+ UserAvatar 组件。
 
 ### 5.2 状态管理碎片化
 三种状态传递方式并存：AppProvider 构造函数传递、themeProvider/localeProvider 全局变量、MatrixProvider 在 HomeView 中创建。
@@ -265,7 +265,7 @@ home_view.dart 当前 904 行（从 3200+ 降至 588 后又增长），需继续
 session_manager.dart 已实现但未在主流程中使用。
 
 ### 5.4 测试覆盖不均
-66 个测试文件 / 1027 用例，但分布不均：核心架构模块测试密集，View 层测试薄弱（16 个视图仅 1 个用例），无集成测试，无 Mock 框架。
+73 个测试文件 / 1337 用例，View 层已加强（21 个视图测试文件，从 16 个仅 1 用例提升到平均 4-8 用例），但集成测试和 Mock 框架仍缺失。
 
 ### 5.5 死代码（已清理）
 - ~~`local_memory_manager.dart` / `memory_manager.dart`~~ — 已删除
@@ -337,8 +337,8 @@ AppProvider ──────────────→ OmniviumSDK ───�
 
 | 指标 | 值 |
 |------|-----|
-| 测试文件 | 66 个 |
-| 测试用例 | 1027 个 |
+| 测试文件 | 73 个 |
+| 测试用例 | 1337 个 |
 | 测试框架 | flutter_test（仅此一个） |
 | Mock 框架 | ❌ 无（mockito/mocktail 均未引入） |
 | 集成测试 | ❌ 无（integration_test/ 不存在） |
@@ -351,8 +351,8 @@ AppProvider ──────────────→ OmniviumSDK ───�
 |------|--------|--------|------|
 | Runtime 核心 | ~30 | ~700 | 覆盖密集 |
 | 服务层 | ~15 | ~200 | 中等覆盖 |
-| View 层 | ~16 | ~16 | 每个视图仅 1 个用例，极薄弱 |
-| Widget 层 | ~5 | ~30 | 基础覆盖 |
+| View 层 | ~21 | ~80 | 已加强，平均 4-8 用例/视图 |
+| Widget 层 | ~7 | ~50 | 基础覆盖 |
 
 ### 测试规划
 
@@ -406,12 +406,12 @@ AppProvider ──────────────→ OmniviumSDK ───�
 | 🔴 P0 上架必需 | 11 | 9 | 2 |
 | 🟠 P1 核心体验 | 10 | 7 | 3 |
 | 🟡 P2 重要功能 | 8 | 7 | 1 |
-| 🔵 P3 工程质量 | 13 | 6 | 7 |
-| 🟣 P4 体验优化 | 11 | 5 | 6 |
+| 🔵 P3 工程质量 | 13 | 8 | 5 |
+| 🟣 P4 体验优化 | 11 | 6 | 5 |
 | 🔧 P5 安全与构建 | 5 | 1 | 4 |
 | 🚀 P6 自动化部署 | 2 | 0 | 2 |
 | 🧪 P7 自动化测试 | 2 | 0 | 2 |
-| **总计** | **62** | **35** | **27** |
+| **总计** | **62** | **39** | **23** |
 
 | 安全风险 | 总数 | 已修复 | 待修复 |
 |----------|------|--------|--------|
@@ -422,6 +422,14 @@ AppProvider ──────────────→ OmniviumSDK ───�
 ---
 
 ## 九、变更记录
+
+### 2026-05-25
+
+- 修复 CI 失败：skip: !storageReady Bug（37 个测试被永久跳过→全部通过）、MissingPluginException 未捕获、AppProvider 构造函数参数错误、未使用变量 warning
+- P3 测试体系加强：1027→1337 用例，66→73 文件，新增 5 个视图测试文件，增强 4 个已有测试
+- P3 HomeView 拆分：904→661 行，提取 HomeScrollMixin、HomeMessageActionsMixin、HomeConversationMenuMixin + UserAvatar 组件
+- P4 async gap null 安全：6 个文件 8 处添加 mounted 检查（call_screen、ai_permission_view、voice_view、voice_message、message_list_view）
+- SecureFlagService 添加 MissingPluginException 捕获 + 测试 MethodChannel mock
 
 ### 2026-05-24
 
