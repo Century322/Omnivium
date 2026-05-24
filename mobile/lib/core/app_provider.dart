@@ -15,8 +15,12 @@ import 'runtime/vocabulary/runtime_event.dart';
 import 'runtime/vocabulary/runtime_identity.dart';
 import 'notification_center.dart' as nc;
 import 'identity_bridge.dart';
+import '../presentation/theme/theme_provider.dart';
+import '../presentation/theme/locale_provider.dart';
 
 class AppProvider {
+  static AppProvider? instance;
+
   RemoteConfigService get remoteConfig => RemoteConfigService.instance;
   bool getFeatureFlag(String key, {bool defaultValue = false}) =>
       remoteConfig.getFeatureFlag(key, defaultValue: defaultValue);
@@ -27,10 +31,13 @@ class AppProvider {
   final NotificationProvider _notification = NotificationProvider();
   final QuickCommandProvider _quickCommands = QuickCommandProvider();
   final NoteProvider _notes = NoteProvider();
+  final ThemeProvider _theme = ThemeProvider();
+  final LocaleProvider _locale = LocaleProvider();
   late final ModelProvider _model;
   late final SessionManager _session;
 
   AppProvider() {
+    instance = this;
     _model = ModelProvider(orchestrator: _orchestrator);
     _session = SessionManager(orchestrator: _orchestrator);
     _connectRuntime();
@@ -93,6 +100,8 @@ class AppProvider {
   NotificationProvider get notification => _notification;
   QuickCommandProvider get quickCommands => _quickCommands;
   NoteProvider get notes => _notes;
+  ThemeProvider get theme => _theme;
+  LocaleProvider get locale => _locale;
 
   void activateModel(String modelId) {
     _model.switchModel(modelId);

@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:omnivium/core/app_provider.dart';
 import 'package:omnivium/core/navigation_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   group('AppProvider', () {
@@ -8,6 +9,7 @@ void main() {
 
     setUp(() {
       TestWidgetsFlutterBinding.ensureInitialized();
+      SharedPreferences.setMockInitialValues({});
       provider = AppProvider();
     });
 
@@ -20,6 +22,8 @@ void main() {
       expect(provider.notification, isNotNull);
       expect(provider.quickCommands, isNotNull);
       expect(provider.notes, isNotNull);
+      expect(provider.theme, isNotNull);
+      expect(provider.locale, isNotNull);
     });
 
     test('navigation is NavigationProvider', () {
@@ -53,6 +57,15 @@ void main() {
         identical(provider.model.orchestrator, provider.orchestrator),
         true,
       );
+    });
+
+    test('static instance is set after construction', () {
+      expect(AppProvider.instance, same(provider));
+    });
+
+    test('theme and locale are accessible', () {
+      expect(provider.theme, isNotNull);
+      expect(provider.locale, isNotNull);
     });
   });
 }

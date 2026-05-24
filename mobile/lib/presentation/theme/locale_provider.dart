@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../l10n/app_localizations.dart';
+import '../../core/app_provider.dart';
 
 class LocaleProvider extends ChangeNotifier {
   Locale _locale = const Locale('zh');
@@ -719,4 +720,4 @@ class LocaleProvider extends ChangeNotifier {
   ];
 }
 
-final localeProvider = LocaleProvider();
+final localeProvider = AppProvider.instance?.locale ?? LocaleProvider();

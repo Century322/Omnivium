@@ -379,7 +379,7 @@ class OmniviumApp extends StatelessWidget {
   }
 }
 
-final themeProvider = ThemeProvider();
+final themeProvider = AppProvider.instance?.theme ?? ThemeProvider();
 
 class _AppShell extends StatefulWidget {
   const _AppShell();
