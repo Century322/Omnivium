@@ -176,8 +176,8 @@ void main() {
       );
     });
 
-    test('ViewState has exactly 5 values', () {
-      expect(ViewState.values.length, 5);
+    test('ViewState has exactly 4 values', () {
+      expect(ViewState.values.length, 4);
     });
 
     test('all ViewState values are distinct', () {

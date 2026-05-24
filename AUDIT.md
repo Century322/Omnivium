@@ -137,8 +137,8 @@
 | 3 | call_screen 国际化 | ✅ 完成 | 14 处中文硬编码改为 t() |
 | 4 | TextEditingController 内存泄漏 | ✅ 完成 | 9 处 Dialog 使用 try/finally 确保 dispose |
 | 5 | StreamSubscription + setState 修复 | ✅ 完成 | call_screen subscription 保存取消；home_view/friend_chat_panel setState mounted 检查 |
-| 6 | 4 区域独立强调色 | ❌ 待做 | 主强调色/图标色/状态色/聊天色独立可调 |
-| 7 | 内置多套主题 | ❌ 待做 | 5-8 套预设主题（午夜蓝/日落橙/森林绿等） |
+| 6 | 4 区域独立强调色 | ❌ 取消 | 当前8种强调色已够用，不需要各区域不同色 |
+| 7 | 内置多套主题 | ❌ 取消 | 深色/浅色+8种强调色已够用，后续按需添加 |
 | 8 | 主题文件导入/导出 | ❌ 待做 | JSON 格式主题文件，可分享 |
 | 9 | 聊天壁纸系统 | ❌ 待做 | 预设壁纸 + 自定义图片 + 半透明覆盖层 |
 | 10 | 应用图标更换 | ❌ 待做 | 像 Telegram 可在设置中更换桌面图标 |
