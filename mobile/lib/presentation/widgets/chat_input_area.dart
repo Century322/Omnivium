@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../theme/app_colors.dart';
 import '../theme/locale_provider.dart';
-import 'home_components.dart';
 
 class ChatInputArea extends StatelessWidget {
   final TextEditingController textController;
@@ -21,7 +20,6 @@ class ChatInputArea extends StatelessWidget {
   final VoidCallback onToggleIncognito;
   final VoidCallback onShowOptions;
   final VoidCallback onShowModels;
-  final VoidCallback onOpenVoice;
   final VoidCallback onChanged;
   final VoidCallback? onStopGeneration;
 
@@ -43,7 +41,6 @@ class ChatInputArea extends StatelessWidget {
     required this.onToggleIncognito,
     required this.onShowOptions,
     required this.onShowModels,
-    required this.onOpenVoice,
     required this.onChanged,
     this.onStopGeneration,
   });
@@ -195,37 +192,25 @@ class ChatInputArea extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
-            transitionBuilder: (child, anim) => SlideTransition(
-              position:
-                  Tween<Offset>(
-                    begin: const Offset(-0.3, 0),
-                    end: Offset.zero,
-                  ).animate(
-                    CurvedAnimation(parent: anim, curve: Curves.easeOutCubic),
-                  ),
+            duration: const Duration(milliseconds: 250),
+            transitionBuilder: (child, anim) => SizeTransition(
+              sizeFactor: anim,
+              axis: Axis.horizontal,
+              axisAlignment: -1,
               child: FadeTransition(opacity: anim, child: child),
             ),
             child: isListening
-                ? GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    key: const ValueKey('stop'),
-                    onTap: onToggleListening,
-                    child: Container(
-                      width: 34,
-                      height: 34,
-                      decoration: BoxDecoration(
-                        color: AppColors.sfHover(context),
-                        borderRadius: BorderRadius.circular(17),
-                      ),
-                      child: Center(
-                        child: Container(
-                          width: 12,
-                          height: 12,
-                          decoration: BoxDecoration(
-                            color: AppColors.textPrimary(context),
-                            borderRadius: BorderRadius.circular(2),
-                          ),
+                ? SizedBox(
+                    key: const ValueKey('listening-left'),
+                    width: 34,
+                    height: 34,
+                    child: Center(
+                      child: Container(
+                        width: 12,
+                        height: 12,
+                        decoration: BoxDecoration(
+                          color: AppColors.textPrimary(context),
+                          borderRadius: BorderRadius.circular(2),
                         ),
                       ),
                     ),
@@ -244,52 +229,46 @@ class ChatInputArea extends StatelessWidget {
                   ),
           ),
           AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
-            transitionBuilder: (child, anim) {
-              if (child.key == const ValueKey('confirm')) {
-                return ScaleTransition(
-                  scale: CurvedAnimation(
-                    parent: anim,
-                    curve: Curves.elasticOut,
-                  ),
-                  child: RotationTransition(
-                    turns: Tween(begin: -0.12, end: 0.0).animate(anim),
-                    child: FadeTransition(opacity: anim, child: child),
-                  ),
-                );
-              }
-              return ScaleTransition(
-                scale: anim,
-                child: FadeTransition(opacity: anim, child: child),
-              );
-            },
+            duration: const Duration(milliseconds: 250),
+            transitionBuilder: (child, anim) => SizeTransition(
+              sizeFactor: anim,
+              axis: Axis.horizontal,
+              axisAlignment: 1,
+              child: FadeTransition(opacity: anim, child: child),
+            ),
             child: isListening
-                ? GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    key: const ValueKey('confirm'),
-                    onTap: onToggleListening,
-                    child: Container(
-                      width: 34,
-                      height: 34,
-                      decoration: BoxDecoration(
-                        color: AppColors.acc(context),
-                        borderRadius: BorderRadius.circular(17),
+                ? Row(
+                    key: const ValueKey('listening-right'),
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: onToggleListening,
+                        child: Container(
+                          width: 34,
+                          height: 34,
+                          decoration: BoxDecoration(
+                            color: AppColors.acc(context),
+                            borderRadius: BorderRadius.circular(17),
+                          ),
+                          child: Icon(
+                            LucideIcons.check,
+                            size: 18,
+                            color: AppColors.textPrimary(context),
+                          ),
+                        ),
                       ),
-                      child: Icon(
-                        LucideIcons.check,
-                        size: 18,
-                        color: AppColors.textPrimary(context),
-                      ),
-                    ),
+                    ],
                   )
                 : Row(
                     key: const ValueKey('normal-right'),
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       GestureDetector(
                         behavior: HitTestBehavior.opaque,
                         onTap: onToggleIncognito,
                         child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
+                          duration: const Duration(milliseconds: 200),
                           width: 34,
                           height: 34,
                           decoration: BoxDecoration(
@@ -308,33 +287,11 @@ class ChatInputArea extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 6),
-                      Semantics(
-                        button: true,
-                        label: isListening
-                            ? t('stop_listening')
-                            : t('voice_input'),
-                        child: GestureDetector(
-                          behavior: HitTestBehavior.opaque,
-                          onTap: onToggleListening,
-                          child: SizedBox(
-                            width: 34,
-                            height: 34,
-                            child: Center(
-                              child: Icon(
-                                LucideIcons.mic,
-                                size: 20,
-                                color: AppColors.sec(context),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 6),
                       GestureDetector(
                         behavior: HitTestBehavior.opaque,
                         onTap: isGenerating
                             ? (onStopGeneration ?? () {})
-                            : (hasText ? onSend : onOpenVoice),
+                            : (hasText ? onSend : onToggleListening),
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
                           width: 34,
@@ -343,19 +300,29 @@ class ChatInputArea extends StatelessWidget {
                             color: AppColors.acc(context),
                             borderRadius: BorderRadius.circular(17),
                           ),
-                          child: isGenerating
-                              ? Icon(
-                                  LucideIcons.square,
-                                  size: 16,
-                                  color: AppColors.textPrimary(context),
-                                )
-                              : hasText
-                              ? Icon(
-                                  LucideIcons.arrowUp,
-                                  size: 18,
-                                  color: AppColors.textPrimary(context),
-                                )
-                              : const VoiceBarsIcon(),
+                          child: AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 150),
+                            child: isGenerating
+                                ? Icon(
+                                    LucideIcons.square,
+                                    size: 16,
+                                    color: AppColors.textPrimary(context),
+                                    key: const ValueKey('stop'),
+                                  )
+                                : hasText
+                                ? Icon(
+                                    LucideIcons.arrowUp,
+                                    size: 18,
+                                    color: AppColors.textPrimary(context),
+                                    key: const ValueKey('send'),
+                                  )
+                                : Icon(
+                                    LucideIcons.mic,
+                                    size: 18,
+                                    color: AppColors.textPrimary(context),
+                                    key: const ValueKey('mic'),
+                                  ),
+                          ),
                         ),
                       ),
                     ],

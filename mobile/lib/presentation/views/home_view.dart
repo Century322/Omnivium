@@ -435,8 +435,6 @@ class _HomeViewState extends State<HomeView>
                                   ),
                               onShowOptions: _showOptionsSheet,
                               onShowModels: _showModelsSheet,
-                              onOpenVoice: () => widget.provider.navigation
-                                  .setCurrentView(ViewState.voice),
                               onChanged: () => setState(() {}),
                               onStopGeneration: () =>
                                   widget.provider.orchestrator.interrupt(),
