@@ -135,7 +135,7 @@ class IdentityBridge {
       'X-Node-Id': _identity!.nodeId,
       'X-Public-Key': _identity!.publicKey,
       'X-Trust-Level': _identity!.trustLevel.name,
-      if (_omniviumId != null) 'X-Omnivium-Id': _omniviumId,
+      'X-Omnivium-Id': ?_omniviumId,
     };
   }
 
