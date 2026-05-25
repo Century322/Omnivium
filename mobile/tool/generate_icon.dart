@@ -6,7 +6,7 @@ void main() {
 
   for (final size in sizes) {
     final img = generateIcon(size);
-    final file = File('assets/icon/app_icon_${size}x${size}.png');
+    final file = File('assets/icon/app_icon_${size}x$size.png');
     file.writeAsBytesSync(encodePng(img));
   }
 
