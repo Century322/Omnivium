@@ -18,7 +18,6 @@ class MyIdView extends StatefulWidget {
 }
 
 class _MyIdViewState extends State<MyIdView> {
-
   @override
   Widget build(BuildContext context) {
     final t = localeProvider.t;
@@ -53,14 +52,20 @@ class _MyIdViewState extends State<MyIdView> {
         child: Column(
           children: [
             const SizedBox(height: 24),
-            _buildAvatar(context, userId, notLoggedIn, activeIdentity, isShadow),
+            _buildAvatar(
+              context,
+              userId,
+              notLoggedIn,
+              activeIdentity,
+              isShadow,
+            ),
             const SizedBox(height: 20),
             Text(
               isShadow
                   ? activeIdentity.nodeId.split('.').last
                   : (userId != notLoggedIn
-                      ? userId.split(':').first.replaceAll('@', '')
-                      : notLoggedIn),
+                        ? userId.split(':').first.replaceAll('@', '')
+                        : notLoggedIn),
               style: TextStyle(
                 color: AppColors.textPrimary(context),
                 fontSize: 22,
@@ -73,7 +78,10 @@ class _MyIdViewState extends State<MyIdView> {
               children: [
                 if (isShadow) ...[
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.sec(context).withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(6),
@@ -90,7 +98,9 @@ class _MyIdViewState extends State<MyIdView> {
                   const SizedBox(width: 6),
                 ],
                 Text(
-                  isShadow ? activeIdentity.federationId ?? homeserver : homeserver,
+                  isShadow
+                      ? activeIdentity.federationId ?? homeserver
+                      : homeserver,
                   style: TextStyle(
                     color: AppColors.iconGray(context),
                     fontSize: 13,
@@ -103,12 +113,10 @@ class _MyIdViewState extends State<MyIdView> {
             const SizedBox(height: 16),
             if (bridge.supabaseUserId != null)
               _buildSupabaseIdCard(context, bridge.supabaseUserId!),
-            if (bridge.supabaseUserId != null)
-              const SizedBox(height: 16),
+            if (bridge.supabaseUserId != null) const SizedBox(height: 16),
             if (bridge.omniviumId != null)
               _buildOmniviumIdCard(context, bridge.omniviumId!),
-            if (bridge.omniviumId != null)
-              const SizedBox(height: 16),
+            if (bridge.omniviumId != null) const SizedBox(height: 16),
             if (identity != null) ...[
               _buildSovereignIdCard(context, activeIdentity, isShadow),
               const SizedBox(height: 16),
@@ -264,7 +272,11 @@ class _MyIdViewState extends State<MyIdView> {
         children: [
           Row(
             children: [
-              Icon(LucideIcons.database, size: 14, color: AppColors.sec(context)),
+              Icon(
+                LucideIcons.database,
+                size: 14,
+                color: AppColors.sec(context),
+              ),
               const SizedBox(width: 6),
               Text(
                 t('supabase_id'),
@@ -331,7 +343,11 @@ class _MyIdViewState extends State<MyIdView> {
     );
   }
 
-  Widget _buildSovereignIdCard(BuildContext context, dynamic identity, bool isShadow) {
+  Widget _buildSovereignIdCard(
+    BuildContext context,
+    dynamic identity,
+    bool isShadow,
+  ) {
     final t = localeProvider.t;
     final did = identity.did;
     final nodeId = identity.nodeId;
@@ -360,13 +376,17 @@ class _MyIdViewState extends State<MyIdView> {
               Icon(
                 isShadow ? LucideIcons.ghost : LucideIcons.shieldCheck,
                 size: 14,
-                color: isShadow ? AppColors.sec(context) : AppColors.acc(context),
+                color: isShadow
+                    ? AppColors.sec(context)
+                    : AppColors.acc(context),
               ),
               const SizedBox(width: 6),
               Text(
                 isShadow ? t('shadow_identity') : t('sovereign_identity'),
                 style: TextStyle(
-                  color: isShadow ? AppColors.sec(context) : AppColors.acc(context),
+                  color: isShadow
+                      ? AppColors.sec(context)
+                      : AppColors.acc(context),
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                 ),
@@ -692,7 +712,8 @@ class _MyIdViewState extends State<MyIdView> {
                   borderRadius: BorderRadius.circular(10),
                   border: shadow.nodeId == activeId
                       ? Border.all(
-                          color: AppColors.sec(context).withValues(alpha: 0.3))
+                          color: AppColors.sec(context).withValues(alpha: 0.3),
+                        )
                       : null,
                 ),
                 child: Row(
@@ -733,7 +754,9 @@ class _MyIdViewState extends State<MyIdView> {
                     if (shadow.nodeId == activeId)
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 2),
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.sec(context).withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(4),
@@ -748,8 +771,11 @@ class _MyIdViewState extends State<MyIdView> {
                         ),
                       ),
                     PopupMenuButton<String>(
-                      icon: Icon(LucideIcons.moreVertical,
-                          size: 16, color: AppColors.iconGray(context)),
+                      icon: Icon(
+                        LucideIcons.moreVertical,
+                        size: 16,
+                        color: AppColors.iconGray(context),
+                      ),
                       onSelected: (action) async {
                         if (action == 'activate') {
                           await bridge.activateShadow(shadow.nodeId);
@@ -762,22 +788,32 @@ class _MyIdViewState extends State<MyIdView> {
                             context: context,
                             builder: (_) => AlertDialog(
                               backgroundColor: AppColors.sf(context),
-                              title: Text(t('revoke_shadow_title'),
-                                  style: TextStyle(
-                                      color: AppColors.textPrimary(context))),
-                              content: Text(t('revoke_shadow_desc'),
-                                  style: TextStyle(
-                                      color: AppColors.textSecondary(context))),
+                              title: Text(
+                                t('revoke_shadow_title'),
+                                style: TextStyle(
+                                  color: AppColors.textPrimary(context),
+                                ),
+                              ),
+                              content: Text(
+                                t('revoke_shadow_desc'),
+                                style: TextStyle(
+                                  color: AppColors.textSecondary(context),
+                                ),
+                              ),
                               actions: [
                                 TextButton(
-                                  onPressed: () => Navigator.pop(context, false),
+                                  onPressed: () =>
+                                      Navigator.pop(context, false),
                                   child: Text(t('cancel')),
                                 ),
                                 TextButton(
                                   onPressed: () => Navigator.pop(context, true),
-                                  child: Text(t('revoke'),
-                                      style: TextStyle(
-                                          color: AppColors.dng(context))),
+                                  child: Text(
+                                    t('revoke'),
+                                    style: TextStyle(
+                                      color: AppColors.dng(context),
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
@@ -794,8 +830,11 @@ class _MyIdViewState extends State<MyIdView> {
                             value: 'activate',
                             child: Row(
                               children: [
-                                Icon(LucideIcons.eye, size: 16,
-                                    color: AppColors.sec(context)),
+                                Icon(
+                                  LucideIcons.eye,
+                                  size: 16,
+                                  color: AppColors.sec(context),
+                                ),
                                 const SizedBox(width: 8),
                                 Text(t('activate_shadow')),
                               ],
@@ -806,8 +845,11 @@ class _MyIdViewState extends State<MyIdView> {
                             value: 'deactivate',
                             child: Row(
                               children: [
-                                Icon(LucideIcons.eyeOff, size: 16,
-                                    color: AppColors.textTertiary(context)),
+                                Icon(
+                                  LucideIcons.eyeOff,
+                                  size: 16,
+                                  color: AppColors.textTertiary(context),
+                                ),
                                 const SizedBox(width: 8),
                                 Text(t('deactivate_shadow')),
                               ],
@@ -817,11 +859,16 @@ class _MyIdViewState extends State<MyIdView> {
                           value: 'revoke',
                           child: Row(
                             children: [
-                              Icon(LucideIcons.trash2, size: 16,
-                                  color: AppColors.dng(context)),
+                              Icon(
+                                LucideIcons.trash2,
+                                size: 16,
+                                color: AppColors.dng(context),
+                              ),
                               const SizedBox(width: 8),
-                              Text(t('revoke_shadow'),
-                                  style: TextStyle(color: AppColors.dng(context))),
+                              Text(
+                                t('revoke_shadow'),
+                                style: TextStyle(color: AppColors.dng(context)),
+                              ),
                             ],
                           ),
                         ),
@@ -841,7 +888,8 @@ class _MyIdViewState extends State<MyIdView> {
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.sec(context),
                 side: BorderSide(
-                    color: AppColors.sec(context).withValues(alpha: 0.5)),
+                  color: AppColors.sec(context).withValues(alpha: 0.5),
+                ),
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -940,7 +988,11 @@ class _MyIdViewState extends State<MyIdView> {
         children: [
           Row(
             children: [
-              Icon(LucideIcons.refreshCw, size: 14, color: AppColors.warn(context)),
+              Icon(
+                LucideIcons.refreshCw,
+                size: 14,
+                color: AppColors.warn(context),
+              ),
               const SizedBox(width: 6),
               Text(
                 t('key_rotation'),
@@ -978,7 +1030,8 @@ class _MyIdViewState extends State<MyIdView> {
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.warn(context),
                 side: BorderSide(
-                    color: AppColors.warn(context).withValues(alpha: 0.5)),
+                  color: AppColors.warn(context).withValues(alpha: 0.5),
+                ),
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -989,10 +1042,14 @@ class _MyIdViewState extends State<MyIdView> {
                   context: context,
                   builder: (_) => AlertDialog(
                     backgroundColor: AppColors.sf(context),
-                    title: Text(t('rotate_key_title'),
-                        style: TextStyle(color: AppColors.textPrimary(context))),
-                    content: Text(t('rotate_key_desc'),
-                        style: TextStyle(color: AppColors.textSecondary(context))),
+                    title: Text(
+                      t('rotate_key_title'),
+                      style: TextStyle(color: AppColors.textPrimary(context)),
+                    ),
+                    content: Text(
+                      t('rotate_key_desc'),
+                      style: TextStyle(color: AppColors.textSecondary(context)),
+                    ),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(context, false),
@@ -1000,8 +1057,10 @@ class _MyIdViewState extends State<MyIdView> {
                       ),
                       TextButton(
                         onPressed: () => Navigator.pop(context, true),
-                        child: Text(t('rotate'),
-                            style: TextStyle(color: AppColors.warn(context))),
+                        child: Text(
+                          t('rotate'),
+                          style: TextStyle(color: AppColors.warn(context)),
+                        ),
                       ),
                     ],
                   ),

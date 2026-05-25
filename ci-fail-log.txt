@@ -1,0 +1,9 @@
+﻿gh : failed to get run log: creating cache entry: open C:\Users\19468\AppData\Local\GitH
+ub CLI\run-log-26386703070-1779690386.zip: The system cannot find the file specified.
+At line:1 char:1
++ gh run view 26386703070 --log-failed 2>&1 | Out-File -FilePath c:\Use ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (failed to get r...file specified.:String)  
+   [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 

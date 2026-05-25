@@ -44,8 +44,7 @@ class IdentityBridge {
   String get did => activeIdentity.did;
   String get nodeId => activeIdentity.nodeId;
   String get publicKey => activeIdentity.publicKey;
-  TrustLevel get trustLevel =>
-      activeIdentity.trustLevel;
+  TrustLevel get trustLevel => activeIdentity.trustLevel;
 
   Future<void> onRegistration(String email, {String? matrixId}) async {
     _omniviumId = email.split('@').first;
@@ -312,8 +311,8 @@ class IdentityBridge {
         (t) => t.name == json['trust'],
         orElse: () => TrustLevel.untrusted,
       ),
-      constitutionalAncestry:
-          (json['ancestry'] as List<dynamic>).cast<String>(),
+      constitutionalAncestry: (json['ancestry'] as List<dynamic>)
+          .cast<String>(),
       createdAt: json['created'] as int,
       selfSignature: SovereignSignature.fromJson(sigJson),
       credentials: credsJson
