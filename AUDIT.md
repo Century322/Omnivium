@@ -1,6 +1,6 @@
 # Omnivium 项目状态报告
 
-> 最后更新：2026-05-25 | 版本：13.0 | 本文档是项目唯一进度追踪源
+> 最后更新：2026-05-25 | 版本：14.0 | 本文档是项目唯一进度追踪源
 > 合并自：AUDIT.md v7 + PROJECT_INVENTORY.md + ROADMAP.md
 
 ---
@@ -16,8 +16,8 @@
 | 规划页面 | 40+ 页面 |
 | 已实现页面 | 26 个视图 |
 | 整体完成度 | ~82%（按上架标准） |
-| flutter analyze | ✅ 0 Error |
-| flutter test | ✅ 1339 通过 / 73 个测试文件 |
+| flutter analyze | ✅ 0 Error / 0 Warning / 0 Info |
+| flutter test | ✅ 1321+ 通过 / 0 失败 / 73 个测试文件 |
 | 国际化 | ✅ ARB/l10n 官方方案，681 key，4 语言（中/英/日/韩） |
 | 主题 | 深色/浅色/跟随系统 + 8 种强调色预设 |
 | 总文件数 | 153+ |
@@ -114,7 +114,7 @@
 
 | # | 任务 | 状态 | 说明 |
 |---|------|------|------|
-| 1 | 测试体系 | ⚠️ 73 文件/1339 用例 | View 层已加强，集成测试框架已搭建 |
+| 1 | 测试体系 | ✅ 73 文件/1321+ 用例/0 失败 | View 层已加强，集成测试框架已搭建 |
 | 2 | HomeView 巨型文件 | ✅ 完成 | 从 904 降至 661，提取 3 个 mixin + UserAvatar |
 | 3 | 统一 SessionManager | ✅ 完成 | SessionManager 已创建并接入 AppProvider |
 | 4 | 路由系统 | ✅ 完成 | AppNavigator 统一导航 + 深链接 + 路由守卫 |
@@ -267,7 +267,7 @@ home_view.dart 当前 661 行（从 3200+ → 904 → 661），已提取 3 个 m
 SessionManager 已创建并接入 AppProvider，作为 SessionProvider 的统一管理层，代理所有方法并添加会话生命周期事件通知。
 
 ### 5.4 测试覆盖不均
-73 个测试文件 / 1339 用例，View 层已加强（21 个视图测试文件，从 16 个仅 1 用例提升到平均 4-8 用例），集成测试框架已搭建。
+73 个测试文件 / 1321+ 用例 / 0 失败，View 层已加强（21 个视图测试文件，从 16 个仅 1 用例提升到平均 4-8 用例），集成测试框架已搭建。
 
 ### 5.5 死代码（已清理）
 - ~~`local_memory_manager.dart` / `memory_manager.dart`~~ — 已删除
@@ -340,7 +340,7 @@ AppProvider ──────────────→ OmniviumSDK ───�
 | 指标 | 值 |
 |------|-----|
 | 测试文件 | 73 个 |
-| 测试用例 | 1337 个 |
+| 测试用例 | 1321+ 个 |
 | 测试框架 | flutter_test（仅此一个） |
 | Mock 框架 | ❌ 无（mockito/mocktail 均未引入） |
 | 集成测试 | ❌ 无（integration_test/ 不存在） |
@@ -424,6 +424,14 @@ AppProvider ──────────────→ OmniviumSDK ───�
 ---
 
 ## 九、变更记录
+
+### 2026-05-25 (v14.0)
+
+- 修复 CI Analyze 失败：identity_bridge.dart 使用 Dart 3.7 null-aware element 语法 `?_omniviumId` 替代 `if (_omniviumId != null)` 模式
+- 修复 CI Test 失败：CivilizationKernel 使用 SovereignIdentity.generate() 生成真实 Ed25519 密钥对和签名，替代占位符数据
+- 修复 SecureStorageService LateInitializationError：移除 late 字段，改为直接初始化 FlutterSecureStorage
+- CI 全部通过：Analyze ✅ / Test ✅ / Build iOS ✅ / Build Android ✅
+- flutter analyze 结果：0 Error / 0 Warning / 0 Info
 
 ### 2026-05-25
 

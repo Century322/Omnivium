@@ -9,18 +9,27 @@ import '../../core/app_provider.dart';
 import '../../core/identity_bridge.dart';
 import '../../core/runtime/stability/security.dart';
 
-class MyIdView extends StatelessWidget {
+class MyIdView extends StatefulWidget {
   final AppProvider provider;
   const MyIdView({super.key, required this.provider});
 
   @override
+  State<MyIdView> createState() => _MyIdViewState();
+}
+
+class _MyIdViewState extends State<MyIdView> {
+
+  @override
   Widget build(BuildContext context) {
     final t = localeProvider.t;
-    final matrix = provider.matrix;
+    final matrix = widget.provider.matrix;
     final notLoggedIn = t('not_logged_in_short');
     final userId = matrix.userId ?? notLoggedIn;
     final homeserver = matrix.homeserver ?? '';
-    final identity = IdentityBridge.instance.identity;
+    final bridge = IdentityBridge.instance;
+    final identity = bridge.identity;
+    final activeIdentity = bridge.activeIdentity;
+    final isShadow = bridge.isShadowActive;
 
     return Scaffold(
       appBar: AppBar(
@@ -44,12 +53,14 @@ class MyIdView extends StatelessWidget {
         child: Column(
           children: [
             const SizedBox(height: 24),
-            _buildAvatar(context, userId, notLoggedIn, identity),
+            _buildAvatar(context, userId, notLoggedIn, activeIdentity, isShadow),
             const SizedBox(height: 20),
             Text(
-              userId != notLoggedIn
-                  ? userId.split(':').first.replaceAll('@', '')
-                  : notLoggedIn,
+              isShadow
+                  ? activeIdentity.nodeId.split('.').last
+                  : (userId != notLoggedIn
+                      ? userId.split(':').first.replaceAll('@', '')
+                      : notLoggedIn),
               style: TextStyle(
                 color: AppColors.textPrimary(context),
                 fontSize: 22,
@@ -57,22 +68,57 @@ class MyIdView extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 4),
-            Text(
-              homeserver,
-              style: TextStyle(
-                color: AppColors.iconGray(context),
-                fontSize: 13,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (isShadow) ...[
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: AppColors.sec(context).withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      t('shadow_identity'),
+                      style: TextStyle(
+                        color: AppColors.sec(context),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                ],
+                Text(
+                  isShadow ? activeIdentity.federationId ?? homeserver : homeserver,
+                  style: TextStyle(
+                    color: AppColors.iconGray(context),
+                    fontSize: 13,
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 32),
             _buildMatrixIdCard(context, userId, notLoggedIn),
             const SizedBox(height: 16),
+            if (bridge.supabaseUserId != null)
+              _buildSupabaseIdCard(context, bridge.supabaseUserId!),
+            if (bridge.supabaseUserId != null)
+              const SizedBox(height: 16),
+            if (bridge.omniviumId != null)
+              _buildOmniviumIdCard(context, bridge.omniviumId!),
+            if (bridge.omniviumId != null)
+              const SizedBox(height: 16),
             if (identity != null) ...[
-              _buildSovereignIdCard(context, identity),
+              _buildSovereignIdCard(context, activeIdentity, isShadow),
               const SizedBox(height: 16),
-              _buildTrustCard(context, identity),
+              _buildTrustCard(context, activeIdentity),
               const SizedBox(height: 16),
-              _buildCredentialsCard(context, identity),
+              _buildCredentialsCard(context, activeIdentity),
+              const SizedBox(height: 16),
+              _buildShadowIdentitiesCard(context),
+              const SizedBox(height: 16),
+              _buildKeyRotationCard(context),
             ] else ...[
               _buildNoIdentityCard(context),
             ],
@@ -90,9 +136,12 @@ class MyIdView extends StatelessWidget {
     String userId,
     String notLoggedIn,
     dynamic identity,
+    bool isShadow,
   ) {
     final trustLevel = identity?.trustLevel ?? TrustLevel.untrusted;
-    final borderColor = _trustColor(context, trustLevel);
+    final borderColor = isShadow
+        ? AppColors.sec(context)
+        : _trustColor(context, trustLevel);
     return Container(
       width: 100,
       height: 100,
@@ -111,16 +160,18 @@ class MyIdView extends StatelessWidget {
             : null,
       ),
       child: Center(
-        child: Text(
-          userId != notLoggedIn && userId.isNotEmpty
-              ? userId[1].toUpperCase()
-              : '?',
-          style: TextStyle(
-            color: borderColor,
-            fontSize: 42,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
+        child: isShadow
+            ? Icon(LucideIcons.ghost, size: 42, color: borderColor)
+            : Text(
+                userId != notLoggedIn && userId.isNotEmpty
+                    ? userId[1].toUpperCase()
+                    : '?',
+                style: TextStyle(
+                  color: borderColor,
+                  fontSize: 42,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
       ),
     );
   }
@@ -199,7 +250,88 @@ class MyIdView extends StatelessWidget {
     );
   }
 
-  Widget _buildSovereignIdCard(BuildContext context, dynamic identity) {
+  Widget _buildSupabaseIdCard(BuildContext context, String supabaseId) {
+    final t = localeProvider.t;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.sf(context),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(LucideIcons.database, size: 14, color: AppColors.sec(context)),
+              const SizedBox(width: 6),
+              Text(
+                t('supabase_id'),
+                style: TextStyle(
+                  color: AppColors.textHint(context),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          SelectableText(
+            supabaseId,
+            style: TextStyle(
+              color: AppColors.textPrimary(context),
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              fontFamily: 'monospace',
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOmniviumIdCard(BuildContext context, String omniviumId) {
+    final t = localeProvider.t;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.sf(context),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(LucideIcons.atSign, size: 14, color: AppColors.acc(context)),
+              const SizedBox(width: 6),
+              Text(
+                t('omnivium_id'),
+                style: TextStyle(
+                  color: AppColors.textHint(context),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          SelectableText(
+            omniviumId,
+            style: TextStyle(
+              color: AppColors.textPrimary(context),
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSovereignIdCard(BuildContext context, dynamic identity, bool isShadow) {
     final t = localeProvider.t;
     final did = identity.did;
     final nodeId = identity.nodeId;
@@ -215,7 +347,9 @@ class MyIdView extends StatelessWidget {
         color: AppColors.sf(context),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: AppColors.acc(context).withValues(alpha: 0.15),
+          color: isShadow
+              ? AppColors.sec(context).withValues(alpha: 0.3)
+              : AppColors.acc(context).withValues(alpha: 0.15),
         ),
       ),
       child: Column(
@@ -224,15 +358,15 @@ class MyIdView extends StatelessWidget {
           Row(
             children: [
               Icon(
-                LucideIcons.shieldCheck,
+                isShadow ? LucideIcons.ghost : LucideIcons.shieldCheck,
                 size: 14,
-                color: AppColors.acc(context),
+                color: isShadow ? AppColors.sec(context) : AppColors.acc(context),
               ),
               const SizedBox(width: 6),
               Text(
-                t('sovereign_identity'),
+                isShadow ? t('shadow_identity') : t('sovereign_identity'),
                 style: TextStyle(
-                  color: AppColors.acc(context),
+                  color: isShadow ? AppColors.sec(context) : AppColors.acc(context),
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                 ),
@@ -494,6 +628,396 @@ class MyIdView extends StatelessWidget {
     );
   }
 
+  Widget _buildShadowIdentitiesCard(BuildContext context) {
+    final t = localeProvider.t;
+    final bridge = IdentityBridge.instance;
+    final shadows = bridge.shadowIdentities;
+    final activeId = bridge.activeShadowId;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.sf(context),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppColors.sec(context).withValues(alpha: 0.15),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(LucideIcons.ghost, size: 14, color: AppColors.sec(context)),
+              const SizedBox(width: 6),
+              Text(
+                t('shadow_identities'),
+                style: TextStyle(
+                  color: AppColors.sec(context),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const Spacer(),
+              Text(
+                '${shadows.length}',
+                style: TextStyle(
+                  color: AppColors.textTertiary(context),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          if (shadows.isEmpty) ...[
+            const SizedBox(height: 8),
+            Text(
+              t('no_shadow_identities'),
+              style: TextStyle(
+                color: AppColors.textTertiary(context),
+                fontSize: 12,
+              ),
+            ),
+          ],
+          ...shadows.map(
+            (shadow) => Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: shadow.nodeId == activeId
+                      ? AppColors.sec(context).withValues(alpha: 0.1)
+                      : AppColors.sfAlt(context),
+                  borderRadius: BorderRadius.circular(10),
+                  border: shadow.nodeId == activeId
+                      ? Border.all(
+                          color: AppColors.sec(context).withValues(alpha: 0.3))
+                      : null,
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      shadow.nodeId == activeId
+                          ? LucideIcons.ghost
+                          : LucideIcons.userX,
+                      size: 16,
+                      color: shadow.nodeId == activeId
+                          ? AppColors.sec(context)
+                          : AppColors.textTertiary(context),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            shadow.nodeId.split('.').last,
+                            style: TextStyle(
+                              color: AppColors.textPrimary(context),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          Text(
+                            _truncateKey(shadow.did),
+                            style: TextStyle(
+                              color: AppColors.textTertiary(context),
+                              fontSize: 10,
+                              fontFamily: 'monospace',
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (shadow.nodeId == activeId)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: AppColors.sec(context).withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          t('active'),
+                          style: TextStyle(
+                            color: AppColors.sec(context),
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    PopupMenuButton<String>(
+                      icon: Icon(LucideIcons.moreVertical,
+                          size: 16, color: AppColors.iconGray(context)),
+                      onSelected: (action) async {
+                        if (action == 'activate') {
+                          await bridge.activateShadow(shadow.nodeId);
+                          setState(() {});
+                        } else if (action == 'deactivate') {
+                          await bridge.activateShadow(null);
+                          setState(() {});
+                        } else if (action == 'revoke') {
+                          final confirmed = await showDialog<bool>(
+                            context: context,
+                            builder: (_) => AlertDialog(
+                              backgroundColor: AppColors.sf(context),
+                              title: Text(t('revoke_shadow_title'),
+                                  style: TextStyle(
+                                      color: AppColors.textPrimary(context))),
+                              content: Text(t('revoke_shadow_desc'),
+                                  style: TextStyle(
+                                      color: AppColors.textSecondary(context))),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context, false),
+                                  child: Text(t('cancel')),
+                                ),
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context, true),
+                                  child: Text(t('revoke'),
+                                      style: TextStyle(
+                                          color: AppColors.dng(context))),
+                                ),
+                              ],
+                            ),
+                          );
+                          if (confirmed == true) {
+                            await bridge.revokeShadow(shadow.nodeId);
+                            setState(() {});
+                          }
+                        }
+                      },
+                      itemBuilder: (_) => [
+                        if (shadow.nodeId != activeId)
+                          PopupMenuItem(
+                            value: 'activate',
+                            child: Row(
+                              children: [
+                                Icon(LucideIcons.eye, size: 16,
+                                    color: AppColors.sec(context)),
+                                const SizedBox(width: 8),
+                                Text(t('activate_shadow')),
+                              ],
+                            ),
+                          ),
+                        if (shadow.nodeId == activeId)
+                          PopupMenuItem(
+                            value: 'deactivate',
+                            child: Row(
+                              children: [
+                                Icon(LucideIcons.eyeOff, size: 16,
+                                    color: AppColors.textTertiary(context)),
+                                const SizedBox(width: 8),
+                                Text(t('deactivate_shadow')),
+                              ],
+                            ),
+                          ),
+                        PopupMenuItem(
+                          value: 'revoke',
+                          child: Row(
+                            children: [
+                              Icon(LucideIcons.trash2, size: 16,
+                                  color: AppColors.dng(context)),
+                              const SizedBox(width: 8),
+                              Text(t('revoke_shadow'),
+                                  style: TextStyle(color: AppColors.dng(context))),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              icon: Icon(LucideIcons.plus, size: 16),
+              label: Text(t('create_shadow_identity')),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.sec(context),
+                side: BorderSide(
+                    color: AppColors.sec(context).withValues(alpha: 0.5)),
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              onPressed: () => _showCreateShadowDialog(context),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showCreateShadowDialog(BuildContext context) {
+    final t = localeProvider.t;
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: AppColors.sf(context),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          t('create_shadow_identity'),
+          style: TextStyle(color: AppColors.textPrimary(context)),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              t('shadow_identity_desc'),
+              style: TextStyle(
+                color: AppColors.textSecondary(context),
+                fontSize: 13,
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: controller,
+              style: TextStyle(
+                color: AppColors.textPrimary(context),
+                fontSize: 14,
+              ),
+              decoration: InputDecoration(
+                labelText: t('shadow_label'),
+                hintText: t('shadow_label_hint'),
+                hintStyle: TextStyle(
+                  color: AppColors.iconGray(context),
+                  fontSize: 14,
+                ),
+                filled: true,
+                fillColor: AppColors.sfAlt(context),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(t('cancel')),
+          ),
+          TextButton(
+            onPressed: () async {
+              final label = controller.text.trim();
+              if (label.isEmpty) return;
+              await IdentityBridge.instance.createShadowIdentity(label);
+              if (context.mounted) {
+                Navigator.pop(context);
+                setState(() {});
+              }
+            },
+            child: Text(t('create')),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildKeyRotationCard(BuildContext context) {
+    final t = localeProvider.t;
+    final bridge = IdentityBridge.instance;
+    final rotationCount = bridge.identity?.keyRotationHistory.length ?? 0;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.sf(context),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(LucideIcons.refreshCw, size: 14, color: AppColors.warn(context)),
+              const SizedBox(width: 6),
+              Text(
+                t('key_rotation'),
+                style: TextStyle(
+                  color: AppColors.warn(context),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const Spacer(),
+              Text(
+                '$rotationCount',
+                style: TextStyle(
+                  color: AppColors.textTertiary(context),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            t('key_rotation_desc'),
+            style: TextStyle(
+              color: AppColors.textTertiary(context),
+              fontSize: 12,
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              icon: Icon(LucideIcons.refreshCw, size: 16),
+              label: Text(t('rotate_key')),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.warn(context),
+                side: BorderSide(
+                    color: AppColors.warn(context).withValues(alpha: 0.5)),
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              onPressed: () async {
+                final confirmed = await showDialog<bool>(
+                  context: context,
+                  builder: (_) => AlertDialog(
+                    backgroundColor: AppColors.sf(context),
+                    title: Text(t('rotate_key_title'),
+                        style: TextStyle(color: AppColors.textPrimary(context))),
+                    content: Text(t('rotate_key_desc'),
+                        style: TextStyle(color: AppColors.textSecondary(context))),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        child: Text(t('cancel')),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        child: Text(t('rotate'),
+                            style: TextStyle(color: AppColors.warn(context))),
+                      ),
+                    ],
+                  ),
+                );
+                if (confirmed == true) {
+                  await bridge.rotateKey();
+                  setState(() {});
+                }
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildNoIdentityCard(BuildContext context) {
     final t = localeProvider.t;
     return Container(
@@ -533,9 +1057,8 @@ class MyIdView extends StatelessWidget {
 
   Widget _buildShareCard(BuildContext context) {
     final t = localeProvider.t;
-    final userId = provider.matrix.userId ?? '';
-    final identity = IdentityBridge.instance.identity;
-    final shareId = identity?.did ?? userId;
+    final bridge = IdentityBridge.instance;
+    final shareId = bridge.activeIdentity.did;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),

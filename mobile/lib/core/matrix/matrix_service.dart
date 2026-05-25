@@ -113,6 +113,12 @@ class MatrixService {
     await client.register(username: username, password: password);
     await _saveCredentials(client);
     client.backgroundSync = true;
+    final matrixId = client.userID ?? '';
+    await IdentityBridge.instance.onRegistration(
+      username,
+      matrixId: matrixId.isNotEmpty ? matrixId : null,
+    );
+    await IdentityBridge.instance.onMatrixLinked(matrixId);
   }
 
   Future<bool> tryRestoreSession() async {
@@ -153,6 +159,10 @@ class MatrixService {
         }
         _client = client;
         client.backgroundSync = true;
+        final restoredUserId = client.userID ?? '';
+        if (restoredUserId.isNotEmpty) {
+          await IdentityBridge.instance.onMatrixLinked(restoredUserId);
+        }
         return true;
       } catch (e, stackTrace) {
         AppLogger.instance.warning(

@@ -11,6 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'network_security_service.dart';
 import 'matrix/matrix_service.dart';
 import 'encryption_service.dart';
+import 'identity_bridge.dart';
 
 class ApiProxyService {
   static final ApiProxyService _instance = ApiProxyService._();
@@ -118,6 +119,7 @@ class ApiProxyService {
       headers['X-Auth-Source'] = 'matrix';
       headers['X-User-Id'] = matrix.userId ?? '';
     }
+    headers.addAll(IdentityBridge.instance.authHeaders());
     final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
     headers['X-Timestamp'] = timestamp;
     if (body != null && body.isNotEmpty && token != null) {

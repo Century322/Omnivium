@@ -5,6 +5,7 @@ import '../theme/app_colors.dart';
 import '../theme/locale_provider.dart';
 import '../../core/analytics_service.dart';
 import '../../core/app_provider.dart';
+import '../../core/auth_service.dart';
 import '../../core/totp_service.dart';
 import '../../core/password_key_service.dart';
 
@@ -118,6 +119,9 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
         AnalyticsService.instance.logLogin(method: 'matrix');
       }
       if (mounted && widget.provider.matrix.isLoggedIn) {
+        try {
+          AuthService.instance.onMatrixLogin();
+        } catch (_) {}
         if (TotpService.instance.isEnabled) {
           setState(() {
             _showTotp = true;
