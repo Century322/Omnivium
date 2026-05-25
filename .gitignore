@@ -25,9 +25,6 @@ Thumbs.db
 rust_sandbox/target/
 rust_sandbox/src/frb_generated/
 
-# Flutter Rust Bridge
-mobile/lib/core/runtime/sandbox/wasm_bridge/
-
 # Gradle
 .gradle/
 
