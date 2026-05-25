@@ -181,7 +181,9 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
                       color: AppColors.textPrimary(context),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                ),
+                const SizedBox(height: 12),
+                if (_showAdvanced && !_showTotp)
                   Container(
                     decoration: BoxDecoration(
                       color: AppColors.sf(context),
@@ -226,7 +228,6 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
                       ),
                     ),
                   ),
-                ),
                 const SizedBox(height: 24),
                 Center(
                   child: Text(
