@@ -5,6 +5,11 @@ import 'package:flutter/foundation.dart';
 import 'push_notification_service.dart';
 import 'notification_queue.dart';
 
+@pragma('vm:entry-point')
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+}
+
 final List<StreamSubscription> _firebaseSubs = [];
 
 Future<void> initFirebaseMessaging(PushNotificationService service) async {
@@ -18,6 +23,8 @@ Future<void> initFirebaseMessaging(PushNotificationService service) async {
   }
 
   try {
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+
     final messaging = FirebaseMessaging.instance;
 
     final settings = await messaging.requestPermission(
@@ -31,6 +38,12 @@ Future<void> initFirebaseMessaging(PushNotificationService service) async {
     );
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      await messaging.setForegroundNotificationPresentationOptions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+
       final token = await messaging.getToken();
       if (token != null) {
         service.setFcmToken(token);
@@ -62,6 +75,11 @@ Future<void> initFirebaseMessaging(PushNotificationService service) async {
           service.handleMessageOpened(message.data);
         }),
       );
+
+      final initialMessage = await messaging.getInitialMessage();
+      if (initialMessage != null) {
+        service.handleMessageOpened(initialMessage.data);
+      }
     }
   } catch (e) {
     debugPrint('Firebase messaging setup failed: $e');

@@ -18,6 +18,20 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
+fun resolveKeyStoreProp(key: String): String? {
+    val fileValue = keystoreProperties[key] as? String
+    if (fileValue != null && !fileValue.startsWith("\${") && fileValue.isNotEmpty()) {
+        return fileValue
+    }
+    val envKey = when (key) {
+        "storePassword" -> "KEYSTORE_PASSWORD"
+        "keyPassword" -> "KEY_PASSWORD"
+        "keyAlias" -> "KEY_ALIAS"
+        else -> key.uppercase()
+    }
+    return System.getenv(envKey) ?: fileValue
+}
+
 android {
     namespace = "com.omnivium.mobile"
     compileSdk = 36
@@ -36,10 +50,10 @@ android {
     signingConfigs {
         if (keystorePropertiesFile.exists()) {
             create("release") {
-                keyAlias = keystoreProperties["keyAlias"] as String?
-                keyPassword = keystoreProperties["keyPassword"] as String?
-                storeFile = keystoreProperties["storeFile"]?.let { file(it as String) }
-                storePassword = keystoreProperties["storePassword"] as String?
+                keyAlias = resolveKeyStoreProp("keyAlias")
+                keyPassword = resolveKeyStoreProp("keyPassword")
+                storeFile = resolveKeyStoreProp("storeFile")?.let { file(it) }
+                storePassword = resolveKeyStoreProp("storePassword")
             }
         }
     }

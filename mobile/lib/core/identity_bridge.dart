@@ -10,14 +10,17 @@ class IdentityBridge {
   IdentityBridge._();
 
   static const _storageKey = 'omnivium_sovereign_identity';
+  static const _omniviumIdKey = 'omnivium_user_id';
 
   SovereignIdentity? _identity;
-  String? _supabaseUserId;
+  String? _omniviumId;
   String? _matrixUserId;
+  String? _supabaseUserId;
 
   SovereignIdentity? get identity => _identity;
-  String? get supabaseUserId => _supabaseUserId;
+  String? get omniviumId => _omniviumId;
   String? get matrixUserId => _matrixUserId;
+  String? get supabaseUserId => _supabaseUserId;
   bool get isBound => _identity != null;
 
   String get did => _identity?.did ?? '';
@@ -25,12 +28,29 @@ class IdentityBridge {
   String get publicKey => _identity?.publicKey ?? '';
   TrustLevel get trustLevel => _identity?.trustLevel ?? TrustLevel.untrusted;
 
+  Future<void> onRegistration(String email, {String? omniviumId}) async {
+    _omniviumId = omniviumId ?? email.split('@').first;
+    final existing = await _loadFromStorage();
+    if (existing != null) {
+      _identity = existing;
+      AppLogger.instance.info(
+        'IdentityBridge: restored identity ${_identity!.did}',
+      );
+      return;
+    }
+    _identity = SovereignIdentity.generate(federationId: _omniviumId);
+    await _persistToStorage(_identity!);
+    await _persistOmniviumId(_omniviumId!);
+    AppLogger.instance.info(
+      'IdentityBridge: generated root identity ${_identity!.did}',
+    );
+  }
+
   Future<void> onUserAuthenticated(String userId, {String? matrixId}) async {
     _supabaseUserId = userId;
     _matrixUserId = matrixId;
-
     final existing = await _loadFromStorage();
-    if (existing != null && existing.nodeId == userId) {
+    if (existing != null) {
       _identity = existing;
       if (matrixId != null && existing.federationId != matrixId) {
         _identity = existing.joinFederation(matrixId);
@@ -41,8 +61,7 @@ class IdentityBridge {
       );
       return;
     }
-
-    _identity = SovereignIdentity.generate(userId, federationId: matrixId);
+    _identity = SovereignIdentity.generate(nodeId: userId, federationId: matrixId);
     await _persistToStorage(_identity!);
     AppLogger.instance.info(
       'IdentityBridge: generated identity ${_identity!.did}',
@@ -57,12 +76,48 @@ class IdentityBridge {
     }
   }
 
+  Future<void> updateOmniviumId(String newId) async {
+    _omniviumId = newId;
+    await _persistOmniviumId(newId);
+    AppLogger.instance.info(
+      'IdentityBridge: updated Omnivium ID to $newId',
+    );
+  }
+
+  Future<void> rotateKey() async {
+    if (_identity == null) return;
+    _identity = _identity!.rotateKey();
+    await _persistToStorage(_identity!);
+    AppLogger.instance.info(
+      'IdentityBridge: rotated key for ${_identity!.did}',
+    );
+  }
+
+  SovereignIdentity deriveShadowIdentity(String shadowId) {
+    if (_identity == null) throw StateError('No root identity bound');
+    return SovereignIdentity.deriveSubIdentity(
+      _identity!,
+      'shadow.$shadowId',
+      federationId: _matrixUserId,
+    );
+  }
+
+  SovereignIdentity deriveAgentIdentity(String agentId) {
+    if (_identity == null) throw StateError('No root identity bound');
+    return SovereignIdentity.deriveSubIdentity(
+      _identity!,
+      'agent.$agentId',
+    );
+  }
+
   Future<void> onLogout() async {
     _identity = null;
-    _supabaseUserId = null;
+    _omniviumId = null;
     _matrixUserId = null;
+    _supabaseUserId = null;
     final storage = SecureStorageService.instance;
     await storage.delete(_storageKey);
+    await storage.delete(_omniviumIdKey);
     AppLogger.instance.info('IdentityBridge: identity cleared');
   }
 
@@ -82,6 +137,7 @@ class IdentityBridge {
       'X-Node-Id': _identity!.nodeId,
       'X-Public-Key': _identity!.publicKey,
       'X-Trust-Level': _identity!.trustLevel.name,
+      if (_omniviumId != null) 'X-Omnivium-Id': _omniviumId!,
     };
   }
 
@@ -113,21 +169,40 @@ class IdentityBridge {
     }
   }
 
+  Future<void> _persistOmniviumId(String id) async {
+    try {
+      final storage = SecureStorageService.instance;
+      await storage.write(_omniviumIdKey, id);
+    } catch (e) {
+      AppLogger.instance.warning(
+        'IdentityBridge: failed to persist Omnivium ID',
+        error: e,
+      );
+    }
+  }
+
+  Future<void> _loadOmniviumId() async {
+    try {
+      final storage = SecureStorageService.instance;
+      _omniviumId = await storage.read(_omniviumIdKey);
+    } catch (e) {
+      AppLogger.instance.warning(
+        'IdentityBridge: failed to load Omnivium ID',
+        error: e,
+      );
+    }
+  }
+
   SovereignIdentity _deserializeIdentity(Map<String, dynamic> json) {
     final keyPairJson = json['keyPair'] as Map<String, dynamic>;
     final sigJson = json['selfSig'] as Map<String, dynamic>;
     final credsJson = json['credentials'] as List<dynamic>? ?? [];
+    final rotationsJson = json['keyRotations'] as List<dynamic>? ?? [];
 
     return SovereignIdentity(
       did: json['did'] as String,
       nodeId: json['nodeId'] as String,
-      keyPair: SovereignKeyPair(
-        publicKey: keyPairJson['publicKey'] as String,
-        signingKey: keyPairJson['signingKey'] as String,
-        verificationKey: keyPairJson['verificationKey'] as String,
-        algorithm: SovereignIdentityAlgorithm.hmacSha256,
-        createdAt: keyPairJson['createdAt'] as int,
-      ),
+      keyPair: SovereignKeyPair.fromJson(keyPairJson),
       civilizationEpoch: json['epoch'] as int,
       federationId: json['federation'] as String?,
       trustLevel: TrustLevel.values.firstWhere(
@@ -137,15 +212,12 @@ class IdentityBridge {
       constitutionalAncestry: (json['ancestry'] as List<dynamic>)
           .cast<String>(),
       createdAt: json['created'] as int,
-      selfSignature: SovereignSignature(
-        data: sigJson['data'] as String,
-        signerPublicKey: sigJson['signer'] as String,
-        algorithm: sigJson['algorithm'] as String,
-        timestamp: sigJson['timestamp'] as int,
-        verificationTag: sigJson['verificationTag'] as String,
-      ),
+      selfSignature: SovereignSignature.fromJson(sigJson),
       credentials: credsJson
           .map((c) => _deserializeCredential(c as Map<String, dynamic>))
+          .toList(),
+      keyRotationHistory: rotationsJson
+          .map((r) => KeyRotationRecord.fromJson(r as Map<String, dynamic>))
           .toList(),
     );
   }

@@ -1,0 +1,27 @@
+server_name: "${SYNAPSE_SERVER_NAME:-localhost}"
+pid_file: /data/homeserver.pid
+listeners:
+  - port: 8008
+    resources:
+    - compress: false
+      names:
+      - client
+      - federation
+    tls: false
+    type: http
+    x_forwarded: true
+database:
+  name: sqlite3
+  args:
+    database: /data/homeserver.db
+log_config: "/data/${SYNAPSE_SERVER_NAME:-localhost}.log.config"
+media_store_path: /data/media_store
+enable_registration: ${SYNAPSE_ENABLE_REGISTRATION:-false}
+enable_registration_without_verification: ${SYNAPSE_ENABLE_REGISTRATION_WITHOUT_VERIFICATION:-false}
+registration_shared_secret: "${SYNAPSE_REGISTRATION_SHARED_SECRET}"
+report_stats: false
+macaroon_secret_key: "${SYNAPSE_MACAROON_SECRET_KEY}"
+form_secret: "${SYNAPSE_FORM_SECRET}"
+signing_key_path: "/data/${SYNAPSE_SERVER_NAME:-localhost}.signing.key"
+trusted_key_servers:
+  - server_name: "matrix.org"

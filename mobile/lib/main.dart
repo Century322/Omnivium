@@ -30,7 +30,7 @@ import 'core/app_lock_service.dart';
 import 'core/biometric_service.dart';
 import 'core/secure_flag_service.dart';
 import 'core/encrypted_file_storage.dart';
-import 'core/srp_service.dart';
+import 'core/password_key_service.dart';
 import 'core/api_proxy_service.dart';
 import 'core/providers/ai_provider.dart';
 import 'core/security_check_service.dart';
@@ -46,6 +46,7 @@ import 'core/supabase_sync_service.dart';
 import 'core/app_logger.dart';
 import 'core/connectivity_service.dart';
 import 'core/service_locator.dart';
+import 'core/runtime/sandbox/wasm_sandbox_service.dart';
 import 'core/runtime/sdk/omnivium_sdk.dart';
 import 'core/database_persistence_backend.dart';
 import 'core/app_data_gateway.dart';
@@ -220,6 +221,7 @@ void _initDeferred() {
   Future.wait([
     _safeInit(() => VoiceService.instance.init(), 'Voice'),
     _safeInit(() => ReminderService.instance.init(), 'Reminder'),
+    _safeInit(() => ApiProxyService.instance.loadUserConfiguredUrl(), 'ApiProxyUserUrl'),
     _safeInit(() => ApiProxyService.instance.init(), 'ApiProxy'),
     _safeInit(
       () => NetworkSecurityService.instance.initWithDynamicPins(),
@@ -236,7 +238,7 @@ void _initDeferred() {
       () => EncryptedFileStorage.instance.init(),
       'EncryptedFileStorage',
     ),
-    _safeInit(() => SrpService.instance.init(), 'SRP'),
+    _safeInit(() => PasswordKeyService.instance.init(), 'PasswordKey'),
     _safeInit(() => ConnectivityService.instance.init(), 'Connectivity'),
     _safeInit(
       () => PushNotificationService.instance.init(),
@@ -247,6 +249,7 @@ void _initDeferred() {
     _safeInit(() => RemoteConfigService.instance.init(), 'RemoteConfig'),
     _safeInit(() => AuthService.instance.initFromBackend(), 'Auth'),
     _safeInit(() => SupabaseSyncService.instance.init(), 'SupabaseSync'),
+    _safeInit(() => WasmSandboxService.instance.init(), 'WasmSandbox'),
   ]).then((_) {});
 }
 
@@ -629,15 +632,40 @@ class _AppShellState extends State<_AppShell>
   Widget build(BuildContext context) {
     if (!_initialized) {
       return AnnotatedRegion<SystemUiOverlayStyle>(
-        value: themeProvider.overlayStyle,
+        value: const SystemUiOverlayStyle(
+          statusBarColor: Color(0xFFFFFFFF),
+          statusBarIconBrightness: Brightness.dark,
+          statusBarBrightness: Brightness.light,
+          systemNavigationBarColor: Color(0xFFFFFFFF),
+          systemNavigationBarIconBrightness: Brightness.dark,
+        ),
         child: MaterialApp(
-          theme: themeProvider.lightTheme,
-          darkTheme: themeProvider.darkTheme,
-          themeMode: themeProvider.mode,
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            scaffoldBackgroundColor: const Color(0xFFFFFFFF),
+          ),
           home: Scaffold(
-            backgroundColor: AppColors.bg(context),
+            backgroundColor: const Color(0xFFFFFFFF),
             body: Center(
-              child: CircularProgressIndicator(color: AppColors.acc(context)),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset(
+                    'assets/icon/app_icon.png',
+                    width: 120,
+                    height: 120,
+                  ),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppColors.acc(context),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -645,9 +673,12 @@ class _AppShellState extends State<_AppShell>
     }
 
     if (_showPrivacyConsent) {
-      return MaterialApp(
-        theme: themeProvider.darkTheme,
-        home: _PrivacyConsentScreen(onResult: _onPrivacyConsentResult),
+      return AnnotatedRegion<SystemUiOverlayStyle>(
+        value: themeProvider.overlayStyle,
+        child: MaterialApp(
+          theme: themeProvider.darkTheme,
+          home: _PrivacyConsentScreen(onResult: _onPrivacyConsentResult),
+        ),
       );
     }
 

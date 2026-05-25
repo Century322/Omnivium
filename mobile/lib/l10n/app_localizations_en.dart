@@ -12,6 +12,9 @@ class SEn extends S {
   String get server_address => 'Server Address';
 
   @override
+  String get api_server_address => 'API Server Address';
+
+  @override
   String get confirm => 'Confirm';
 
   @override
@@ -34,9 +37,6 @@ class SEn extends S {
 
   @override
   String get for_you => 'For You';
-
-  @override
-  String get close => 'Close';
 
   @override
   String get group_chat => 'Group Chat';
@@ -128,9 +128,6 @@ class SEn extends S {
   String get push_to_talk => 'Push to Talk';
 
   @override
-  String get share => 'Share';
-
-  @override
   String get image => 'Image';
 
   @override
@@ -209,12 +206,6 @@ class SEn extends S {
   @override
   String get tpl_translate_system =>
       'You are a professional translator. Translate the user\\\'s text into the target language while maintaining the original tone and style. If no target language is specified, default to Chinese.';
-
-  @override
-  String get mute => 'Mute';
-
-  @override
-  String get send => 'Send';
 
   @override
   String get delete_chat => 'Delete Chat';
@@ -319,9 +310,6 @@ class SEn extends S {
 
   @override
   String get set_pin_desc => 'Set a 4-6 digit PIN to protect your app';
-
-  @override
-  String get enter_pin => 'Enter PIN';
 
   @override
   String get quick_summarize => 'Summarize our conversation';
@@ -553,6 +541,9 @@ class SEn extends S {
   String get call_ended => 'Call ended';
 
   @override
+  String get mute => 'Mute';
+
+  @override
   String get unmute => 'Unmute';
 
   @override
@@ -581,6 +572,9 @@ class SEn extends S {
 
   @override
   String get incorrect_pin => 'Incorrect PIN';
+
+  @override
+  String get enter_pin => 'Enter PIN';
 
   @override
   String get unlock => 'Unlock';
@@ -888,9 +882,6 @@ class SEn extends S {
   String get chat => 'Chat';
 
   @override
-  String get permissions => 'Permissions';
-
-  @override
   String get delete_account => 'Delete Account';
 
   @override
@@ -1014,7 +1005,7 @@ class SEn extends S {
   String get incognito => 'Incognito Mode';
 
   @override
-  String get incognito_mode => 'Incognito mode';
+  String get incognito_mode => 'Incognito Mode';
 
   @override
   String get private_chat => 'Private Chat';
@@ -1260,6 +1251,9 @@ class SEn extends S {
   String get all => 'All';
 
   @override
+  String get permissions => 'Permissions';
+
+  @override
   String get violations => 'Violations';
 
   @override
@@ -1385,9 +1379,6 @@ class SEn extends S {
   }
 
   @override
-  String get allow => 'Allow';
-
-  @override
   String get report_confirm_msg => 'Are you sure you want to report this user?';
 
   @override
@@ -1415,9 +1406,6 @@ class SEn extends S {
   String get open_chat => 'Open Chat';
 
   @override
-  String get leave_group_confirm => 'Leave this group?';
-
-  @override
   String get remove_friend => 'Remove Friend';
 
   @override
@@ -1428,9 +1416,6 @@ class SEn extends S {
   String get remove => 'Remove';
 
   @override
-  String get select_date => 'Select date';
-
-  @override
   String get clear_all => 'Clear All';
 
   @override
@@ -1439,6 +1424,9 @@ class SEn extends S {
 
   @override
   String get add_me_omnivium => 'Add me on Omnivium';
+
+  @override
+  String get close => 'Close';
 
   @override
   String get something_went_wrong => 'Something went wrong';
@@ -1530,6 +1518,9 @@ class SEn extends S {
 
   @override
   String get leave_group => 'Leave Group';
+
+  @override
+  String get leave_group_confirm => 'Leave this group?';
 
   @override
   String get listening => 'Listening';
@@ -1690,6 +1681,9 @@ class SEn extends S {
   String get content_hint => 'Enter content...';
 
   @override
+  String get select_date => 'Select date';
+
+  @override
   String get select_time => 'Select time';
 
   @override
@@ -1754,6 +1748,9 @@ class SEn extends S {
 
   @override
   String get deny => 'Deny';
+
+  @override
+  String get allow => 'Allow';
 
   @override
   String get delete_message_pair => 'Delete Message Pair';
@@ -1834,10 +1831,13 @@ class SEn extends S {
   String get close_conversation => 'Close conversation';
 
   @override
+  String get share => 'Share';
+
+  @override
   String get stop_generating => 'Stop generating';
 
   @override
-  String get clear_search => 'Clear search';
+  String get send => 'Send';
 
   @override
   String get clear_search_history => 'Clear search history';
@@ -2068,4 +2068,40 @@ class SEn extends S {
   @override
   String get tos_update_content =>
       'We may update these terms with prior notice.';
+
+  @override
+  String get pause_voice_message => 'Pause voice message';
+
+  @override
+  String get play_voice_message => 'Play voice message';
+
+  @override
+  String get send_message_semantic => 'Send message';
+
+  @override
+  String get voice_input_semantic => 'Voice input';
+
+  @override
+  String get enabled => 'Enabled';
+
+  @override
+  String get disabled => 'Disabled';
+
+  @override
+  String get unread => 'unread';
+
+  @override
+  String get unit_b => 'B';
+
+  @override
+  String get unit_kb => 'KB';
+
+  @override
+  String get unit_mb => 'MB';
+
+  @override
+  String get size_zero_mb => '0 MB';
+
+  @override
+  String get matrix_id_hint => '@user:server.com';
 }

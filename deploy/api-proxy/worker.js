@@ -1341,6 +1341,144 @@ async function handleTTS(request, env) {
   }
 }
 
+async function handleContentDiscover(request, env, url, origin) {
+  const category = url.searchParams.get('category') || 'all';
+  const count = Math.min(parseInt(url.searchParams.get('count') || '5'), 20);
+
+  const KV = env.KV;
+  const cacheKey = `discover:${category}:${new Date().toISOString().split('T')[0]}`;
+
+  if (KV) {
+    try {
+      const cached = await KV.get(cacheKey, { type: 'json' });
+      if (cached && cached.articles && cached.articles.length > 0) {
+        return jsonResponse(cached, 200, {
+          'Cache-Control': 'public, max-age=300',
+          'X-Cache': 'HIT',
+        }, origin);
+      }
+    } catch (e) {}
+  }
+
+  const categoryPrompts = {
+    all: 'general interesting topics across technology, science, culture, and innovation',
+    news: 'breaking news and current events worldwide',
+    tech: 'latest technology breakthroughs, AI developments, and software engineering trends',
+    business: 'business innovation, startups, and economic insights',
+    art: 'art, culture, creative works, and design trends',
+  };
+
+  const prompt = categoryPrompts[category] || categoryPrompts.all;
+
+  const systemPrompt = `You are a content curator for a futuristic social platform called Omnivium. Generate ${count} unique, engaging article summaries about ${prompt}. Each article should be concise, thought-provoking, and relevant to forward-thinking users. Return ONLY valid JSON in this exact format, no markdown fences:
+{"articles":[{"title":"Article Title","description":"2-3 sentence engaging description","author":"Author Name","image":"","bg_color":"#1a1a2e","avatar_color":"#4a4a6a"}]}
+
+Use varied, realistic-sounding author names. Use dark theme hex colors for bg_color (deep navy/purple tones) and lighter accent colors for avatar_color. Make titles compelling and descriptions informative.`;
+
+  try {
+    const provider = detectProvider('deepseek-chat', null);
+    const apiKey = getApiKey(provider, env);
+
+    if (!apiKey) {
+      return jsonResponse({
+        articles: [getDefaultDiscoverItem(category)],
+        category,
+        generated_at: new Date().toISOString(),
+      }, 200, {}, origin);
+    }
+
+    const config = PROVIDERS[provider];
+    const chatBody = {
+      model: 'deepseek-chat',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: prompt },
+      ],
+      temperature: 0.8,
+      max_tokens: 2048,
+      stream: false,
+    };
+
+    let aiResponse;
+    if (config.format === 'claude') {
+      const claudeReq = convertToClaudeRequest(chatBody);
+      const claudeRes = await fetch(`${config.baseUrl}${config.pathPrefix}/messages`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+        },
+        body: JSON.stringify(claudeReq),
+      });
+      const claudeData = await claudeRes.json();
+      aiResponse = claudeData.content?.[0]?.text || '';
+    } else {
+      const res = await fetch(`${config.baseUrl}${config.pathPrefix}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify(chatBody),
+      });
+      const data = await res.json();
+      aiResponse = data.choices?.[0]?.message?.content || '';
+    }
+
+    let text = aiResponse.trim();
+    if (text.startsWith('```')) {
+      text = text.replace(/^```(?:json)?\s*/, '').replace(/\s*```$/, '');
+    }
+
+    const parsed = JSON.parse(text);
+    if (!parsed.articles || !Array.isArray(parsed.articles)) {
+      throw new Error('Invalid response format');
+    }
+
+    const result = {
+      articles: parsed.articles.slice(0, count).map(a => ({
+        title: a.title || 'Untitled',
+        description: a.description || '',
+        author: a.author || 'Omnivium',
+        image: a.image || '',
+        bg_color: a.bg_color || '#1a1a2e',
+        avatar_color: a.avatar_color || '#4a4a6a',
+      })),
+      category,
+      generated_at: new Date().toISOString(),
+    };
+
+    if (KV) {
+      try {
+        await KV.put(cacheKey, JSON.stringify(result), { expirationTtl: 3600 });
+      } catch (e) {}
+    }
+
+    return jsonResponse(result, 200, {
+      'Cache-Control': 'public, max-age=300',
+      'X-Cache': 'MISS',
+    }, origin);
+  } catch (e) {
+    return jsonResponse({
+      articles: [getDefaultDiscoverItem(category)],
+      category,
+      generated_at: new Date().toISOString(),
+    }, 200, {}, origin);
+  }
+}
+
+function getDefaultDiscoverItem(category) {
+  return {
+    title: 'Welcome to Omnivium',
+    description: 'Discover curated content powered by AI. Stay tuned for the latest updates and insights from around the world.',
+    author: 'Omnivium',
+    image: '',
+    bg_color: '#1a1a2e',
+    avatar_color: '#4a4a6a',
+  };
+}
+
 export default {
   async fetch(request, env) {
     const origin = request.headers.get('Origin') || '';
@@ -1539,6 +1677,12 @@ export default {
 
     if (path === '/ui/schemas') {
       return handleUISchemas(request, env);
+    }
+
+    if (path === '/content/discover') {
+      const user = await authenticate(request, env);
+      if (!user) return jsonResponse({ error: 'Unauthorized' }, 401, {}, origin);
+      return handleContentDiscover(request, env, url, origin);
     }
 
     return jsonResponse({ error: 'Not found' }, 404);

@@ -12,6 +12,9 @@ class SKo extends S {
   String get server_address => '서버 주소';
 
   @override
+  String get api_server_address => 'API 서버 주소';
+
+  @override
   String get confirm => '확인';
 
   @override
@@ -34,9 +37,6 @@ class SKo extends S {
 
   @override
   String get for_you => '추천';
-
-  @override
-  String get close => '닫기';
 
   @override
   String get group_chat => '그룹 채팅';
@@ -126,9 +126,6 @@ class SKo extends S {
   String get push_to_talk => '눌러서 말하기';
 
   @override
-  String get share => '공유';
-
-  @override
   String get image => '이미지';
 
   @override
@@ -204,12 +201,6 @@ class SKo extends S {
   @override
   String get tpl_translate_system =>
       '당신은 전문 번역가입니다. 원문의 어조와 스타일을 유지하면서 텍스트를 번역해주세요.';
-
-  @override
-  String get mute => '음소거';
-
-  @override
-  String get send => '보내기';
 
   @override
   String get delete_chat => '채팅 삭제';
@@ -309,9 +300,6 @@ class SKo extends S {
 
   @override
   String get set_pin_desc => '4-6자리 PIN 코드를 설정하여 앱을 보호';
-
-  @override
-  String get enter_pin => 'PIN 코드 입력';
 
   @override
   String get quick_summarize => '대화를 요약해줘';
@@ -540,6 +528,9 @@ class SKo extends S {
   String get call_ended => '통화 종료';
 
   @override
+  String get mute => '음소거';
+
+  @override
   String get unmute => '음소거 해제';
 
   @override
@@ -568,6 +559,9 @@ class SKo extends S {
 
   @override
   String get incorrect_pin => 'PIN 코드가 올바르지 않습니다';
+
+  @override
+  String get enter_pin => 'PIN 코드 입력';
 
   @override
   String get unlock => '잠금 해제';
@@ -867,9 +861,6 @@ class SKo extends S {
 
   @override
   String get chat => '채팅';
-
-  @override
-  String get permissions => '권한';
 
   @override
   String get delete_account => '계정 삭제';
@@ -1231,6 +1222,9 @@ class SKo extends S {
   String get all => '전체';
 
   @override
+  String get permissions => '권한';
+
+  @override
   String get violations => '위반';
 
   @override
@@ -1354,9 +1348,6 @@ class SKo extends S {
   }
 
   @override
-  String get allow => '허용';
-
-  @override
   String get report_confirm_msg => '이 사용자를 신고하시겠습니까?';
 
   @override
@@ -1381,9 +1372,6 @@ class SKo extends S {
   String get open_chat => '채팅 열기';
 
   @override
-  String get leave_group_confirm => '이 그룹에서 나가시겠습니까?';
-
-  @override
   String get remove_friend => '친구 삭제';
 
   @override
@@ -1393,16 +1381,16 @@ class SKo extends S {
   String get remove => '삭제';
 
   @override
-  String get select_date => '날짜 선택';
-
-  @override
   String get clear_all => '전체 삭제';
 
   @override
-  String get clear_all_confirm => '모든 알림을 삭제하시겠습니까?';
+  String get clear_all_confirm => '모든 알림을 지우시겠습니까?';
 
   @override
   String get add_me_omnivium => 'Omnivium에서 나를 추가';
+
+  @override
+  String get close => '닫기';
 
   @override
   String get something_went_wrong => '문제가 발생했습니다';
@@ -1493,6 +1481,9 @@ class SKo extends S {
 
   @override
   String get leave_group => '그룹 나가기';
+
+  @override
+  String get leave_group_confirm => '이 그룹에서 나가시겠습니까?';
 
   @override
   String get listening => '듣고 있습니다';
@@ -1652,6 +1643,9 @@ class SKo extends S {
   String get content_hint => '내용 입력...';
 
   @override
+  String get select_date => '날짜 선택';
+
+  @override
   String get select_time => '시간 선택';
 
   @override
@@ -1718,6 +1712,9 @@ class SKo extends S {
   String get deny => '거부';
 
   @override
+  String get allow => '허용';
+
+  @override
   String get delete_message_pair => '메시지 쌍 삭제';
 
   @override
@@ -1781,7 +1778,7 @@ class SKo extends S {
   String get forward => '빨리감기';
 
   @override
-  String get toggle_completion => '완료 전환';
+  String get toggle_completion => '완료 상태 전환';
 
   @override
   String get close_voice_mode => '음성 모드 닫기';
@@ -1796,10 +1793,13 @@ class SKo extends S {
   String get close_conversation => '대화 닫기';
 
   @override
+  String get share => '공유';
+
+  @override
   String get stop_generating => '생성 중지';
 
   @override
-  String get clear_search => '검색 지우기';
+  String get send => '보내기';
 
   @override
   String get clear_search_history => '검색 기록 지우기';
@@ -2005,4 +2005,40 @@ class SKo extends S {
 
   @override
   String get tos_update_content => '사전 통지 후 본 약관을 업데이트할 수 있습니다.';
+
+  @override
+  String get pause_voice_message => '음성 메시지 일시정지';
+
+  @override
+  String get play_voice_message => '음성 메시지 재생';
+
+  @override
+  String get send_message_semantic => '메시지 보내기';
+
+  @override
+  String get voice_input_semantic => '음성 입력';
+
+  @override
+  String get enabled => '활성화';
+
+  @override
+  String get disabled => '비활성화';
+
+  @override
+  String get unread => '읽지 않음';
+
+  @override
+  String get unit_b => 'B';
+
+  @override
+  String get unit_kb => 'KB';
+
+  @override
+  String get unit_mb => 'MB';
+
+  @override
+  String get size_zero_mb => '0 MB';
+
+  @override
+  String get matrix_id_hint => '@user:server.com';
 }

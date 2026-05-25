@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:crypto/crypto.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'network_security_service.dart';
 import 'matrix/matrix_service.dart';
 import 'encryption_service.dart';
@@ -32,12 +33,22 @@ class ApiProxyService {
     return _fallbackUrls[_activeUrlIndex];
   }
 
+  String? _userConfiguredUrl;
   int _activeUrlIndex = 0;
   final Map<String, int> _failureCounts = {};
-
   final Map<String, Completer<http.Response>> _inFlightRequests = {};
 
+  Future<void> loadUserConfiguredUrl() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      _userConfiguredUrl = prefs.getString('omnivium_api_base_url');
+    } catch (_) {}
+  }
+
   String get backendUrl {
+    if (_userConfiguredUrl != null && _userConfiguredUrl!.isNotEmpty) {
+      return _userConfiguredUrl!;
+    }
     final remote = _remoteConfig?['backend_url'] as String?;
     if (remote != null && remote.isNotEmpty) return remote;
     return _effectiveBaseUrl;

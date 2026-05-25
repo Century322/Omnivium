@@ -107,6 +107,12 @@ abstract class S {
   /// **'服务器地址'**
   String get server_address;
 
+  /// No description provided for @api_server_address.
+  ///
+  /// In zh, this message translates to:
+  /// **'API 服务器地址'**
+  String get api_server_address;
+
   /// No description provided for @confirm.
   ///
   /// In zh, this message translates to:
@@ -154,12 +160,6 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'为您'**
   String get for_you;
-
-  /// No description provided for @close.
-  ///
-  /// In zh, this message translates to:
-  /// **'关闭'**
-  String get close;
 
   /// No description provided for @group_chat.
   ///
@@ -335,12 +335,6 @@ abstract class S {
   /// **'按键说话'**
   String get push_to_talk;
 
-  /// No description provided for @share.
-  ///
-  /// In zh, this message translates to:
-  /// **'分享'**
-  String get share;
-
   /// No description provided for @image.
   ///
   /// In zh, this message translates to:
@@ -490,18 +484,6 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'你是一位专业翻译。请将用户提供的文本翻译成目标语言，保持原文的语气和风格。如果用户没有指定目标语言，默认翻译成英文。'**
   String get tpl_translate_system;
-
-  /// No description provided for @mute.
-  ///
-  /// In zh, this message translates to:
-  /// **'静音'**
-  String get mute;
-
-  /// No description provided for @send.
-  ///
-  /// In zh, this message translates to:
-  /// **'发送'**
-  String get send;
 
   /// No description provided for @delete_chat.
   ///
@@ -701,12 +683,6 @@ abstract class S {
   /// **'设置4-6位数字PIN码来保护你的应用'**
   String get set_pin_desc;
 
-  /// No description provided for @enter_pin.
-  ///
-  /// In zh, this message translates to:
-  /// **'输入PIN码'**
-  String get enter_pin;
-
   /// No description provided for @quick_summarize.
   ///
   /// In zh, this message translates to:
@@ -752,7 +728,7 @@ abstract class S {
   /// No description provided for @default_model.
   ///
   /// In zh, this message translates to:
-  /// **'Default'**
+  /// **'默认'**
   String get default_model;
 
   /// No description provided for @use_this_model.
@@ -1157,6 +1133,12 @@ abstract class S {
   /// **'通话已结束'**
   String get call_ended;
 
+  /// No description provided for @mute.
+  ///
+  /// In zh, this message translates to:
+  /// **'静音'**
+  String get mute;
+
   /// No description provided for @unmute.
   ///
   /// In zh, this message translates to:
@@ -1216,6 +1198,12 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'PIN码错误'**
   String get incorrect_pin;
+
+  /// No description provided for @enter_pin.
+  ///
+  /// In zh, this message translates to:
+  /// **'输入PIN码'**
+  String get enter_pin;
 
   /// No description provided for @unlock.
   ///
@@ -1544,7 +1532,7 @@ abstract class S {
   /// No description provided for @clear.
   ///
   /// In zh, this message translates to:
-  /// **'清空'**
+  /// **'清除'**
   String get clear;
 
   /// No description provided for @settings.
@@ -1804,12 +1792,6 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'聊天'**
   String get chat;
-
-  /// No description provided for @permissions.
-  ///
-  /// In zh, this message translates to:
-  /// **'权限'**
-  String get permissions;
 
   /// No description provided for @delete_account.
   ///
@@ -2525,6 +2507,12 @@ abstract class S {
   /// **'全部'**
   String get all;
 
+  /// No description provided for @permissions.
+  ///
+  /// In zh, this message translates to:
+  /// **'权限'**
+  String get permissions;
+
   /// No description provided for @violations.
   ///
   /// In zh, this message translates to:
@@ -2765,12 +2753,6 @@ abstract class S {
   /// **'AI 请求执行: {capability}。是否允许？'**
   String capability_confirm_msg(Object capability);
 
-  /// No description provided for @allow.
-  ///
-  /// In zh, this message translates to:
-  /// **'允许'**
-  String get allow;
-
   /// No description provided for @report_confirm_msg.
   ///
   /// In zh, this message translates to:
@@ -2819,12 +2801,6 @@ abstract class S {
   /// **'打开聊天'**
   String get open_chat;
 
-  /// No description provided for @leave_group_confirm.
-  ///
-  /// In zh, this message translates to:
-  /// **'确认退出群聊？'**
-  String get leave_group_confirm;
-
   /// No description provided for @remove_friend.
   ///
   /// In zh, this message translates to:
@@ -2843,12 +2819,6 @@ abstract class S {
   /// **'删除'**
   String get remove;
 
-  /// No description provided for @select_date.
-  ///
-  /// In zh, this message translates to:
-  /// **'选择日期'**
-  String get select_date;
-
   /// No description provided for @clear_all.
   ///
   /// In zh, this message translates to:
@@ -2866,6 +2836,12 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'在 Omnivium 上添加我'**
   String get add_me_omnivium;
+
+  /// No description provided for @close.
+  ///
+  /// In zh, this message translates to:
+  /// **'关闭'**
+  String get close;
 
   /// No description provided for @something_went_wrong.
   ///
@@ -3046,6 +3022,12 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'退出群聊'**
   String get leave_group;
+
+  /// No description provided for @leave_group_confirm.
+  ///
+  /// In zh, this message translates to:
+  /// **'确认退出群聊？'**
+  String get leave_group_confirm;
 
   /// No description provided for @listening.
   ///
@@ -3359,6 +3341,12 @@ abstract class S {
   /// **'输入内容...'**
   String get content_hint;
 
+  /// No description provided for @select_date.
+  ///
+  /// In zh, this message translates to:
+  /// **'选择日期'**
+  String get select_date;
+
   /// No description provided for @select_time.
   ///
   /// In zh, this message translates to:
@@ -3490,6 +3478,12 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'拒绝'**
   String get deny;
+
+  /// No description provided for @allow.
+  ///
+  /// In zh, this message translates to:
+  /// **'允许'**
+  String get allow;
 
   /// No description provided for @delete_message_pair.
   ///
@@ -3647,17 +3641,23 @@ abstract class S {
   /// **'关闭对话'**
   String get close_conversation;
 
+  /// No description provided for @share.
+  ///
+  /// In zh, this message translates to:
+  /// **'分享'**
+  String get share;
+
   /// No description provided for @stop_generating.
   ///
   /// In zh, this message translates to:
   /// **'停止生成'**
   String get stop_generating;
 
-  /// No description provided for @clear_search.
+  /// No description provided for @send.
   ///
   /// In zh, this message translates to:
-  /// **'清除搜索'**
-  String get clear_search;
+  /// **'发送'**
+  String get send;
 
   /// No description provided for @clear_search_history.
   ///
@@ -4066,6 +4066,78 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'我们可能会在事先通知的情况下更新这些条款。'**
   String get tos_update_content;
+
+  /// No description provided for @pause_voice_message.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂停语音消息'**
+  String get pause_voice_message;
+
+  /// No description provided for @play_voice_message.
+  ///
+  /// In zh, this message translates to:
+  /// **'播放语音消息'**
+  String get play_voice_message;
+
+  /// No description provided for @send_message_semantic.
+  ///
+  /// In zh, this message translates to:
+  /// **'发送消息'**
+  String get send_message_semantic;
+
+  /// No description provided for @voice_input_semantic.
+  ///
+  /// In zh, this message translates to:
+  /// **'语音输入'**
+  String get voice_input_semantic;
+
+  /// No description provided for @enabled.
+  ///
+  /// In zh, this message translates to:
+  /// **'已启用'**
+  String get enabled;
+
+  /// No description provided for @disabled.
+  ///
+  /// In zh, this message translates to:
+  /// **'已禁用'**
+  String get disabled;
+
+  /// No description provided for @unread.
+  ///
+  /// In zh, this message translates to:
+  /// **'未读'**
+  String get unread;
+
+  /// No description provided for @unit_b.
+  ///
+  /// In zh, this message translates to:
+  /// **'B'**
+  String get unit_b;
+
+  /// No description provided for @unit_kb.
+  ///
+  /// In zh, this message translates to:
+  /// **'KB'**
+  String get unit_kb;
+
+  /// No description provided for @unit_mb.
+  ///
+  /// In zh, this message translates to:
+  /// **'MB'**
+  String get unit_mb;
+
+  /// No description provided for @size_zero_mb.
+  ///
+  /// In zh, this message translates to:
+  /// **'0 MB'**
+  String get size_zero_mb;
+
+  /// No description provided for @matrix_id_hint.
+  ///
+  /// In zh, this message translates to:
+  /// **'@用户:服务器.com'**
+  String get matrix_id_hint;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

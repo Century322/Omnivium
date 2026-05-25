@@ -6,7 +6,7 @@ import '../theme/locale_provider.dart';
 import '../../core/analytics_service.dart';
 import '../../core/app_provider.dart';
 import '../../core/totp_service.dart';
-import '../../core/srp_service.dart';
+import '../../core/password_key_service.dart';
 
 class MatrixLoginView extends StatefulWidget {
   final AppProvider provider;
@@ -27,6 +27,7 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
   final _homeserverCtrl = TextEditingController(
     text: 'https://matrix.omnivium.app',
   );
+  final _apiUrlCtrl = TextEditingController();
   final _usernameFocus = FocusNode();
   final _passwordFocus = FocusNode();
   final _homeserverFocus = FocusNode();
@@ -45,6 +46,7 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
     _usernameCtrl.dispose();
     _passwordCtrl.dispose();
     _homeserverCtrl.dispose();
+    _apiUrlCtrl.dispose();
     _totpCtrl.dispose();
     _usernameFocus.dispose();
     _passwordFocus.dispose();
@@ -95,40 +97,24 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
     });
     try {
       final homeserver = await _getHomeserver();
-      final srp = SrpService.instance;
 
-      if (!_isRegister && srp.hasVerifier && srp.username == username) {
-        final srpResult = await srp.srpLogin(username, password);
-        if (srpResult != null && srpResult['access_token'] != null) {
-          await widget.provider.matrix.loginWithToken(
-            srpResult['access_token'],
-            srpResult['homeserver'] ?? homeserver,
-          );
-          if (mounted && widget.provider.matrix.isLoggedIn) {
-            if (TotpService.instance.isEnabled) {
-              setState(() {
-                _showTotp = true;
-                _isLoading = false;
-              });
-              Future.delayed(
-                const Duration(milliseconds: 100),
-                () => _totpFocus.requestFocus(),
-              );
-            } else {
-              widget.onLoginSuccess?.call();
-            }
-            return;
-          }
+      if (_showAdvanced) {
+        final apiUrl = _apiUrlCtrl.text.trim();
+        if (apiUrl.isNotEmpty) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('omnivium_api_base_url', apiUrl);
         }
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('omnivium_matrix_homeserver', homeserver);
       }
 
       if (_isRegister) {
         await widget.provider.matrix.register(username, password, homeserver);
-        await srp.createVerifier(username, password);
+        await PasswordKeyService.instance.deriveKey(password);
         AnalyticsService.instance.logSignUp(method: 'matrix');
       } else {
         await widget.provider.matrix.login(username, password, homeserver);
-        await srp.createVerifier(username, password);
+        await PasswordKeyService.instance.deriveKey(password);
         AnalyticsService.instance.logLogin(method: 'matrix');
       }
       if (mounted && widget.provider.matrix.isLoggedIn) {
@@ -193,6 +179,51 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
                       LucideIcons.messageCircle,
                       size: 40,
                       color: AppColors.textPrimary(context),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.sf(context),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: TextField(
+                      controller: _apiUrlCtrl,
+                      style: TextStyle(
+                        color: AppColors.textPrimary(context),
+                        fontSize: 14,
+                      ),
+                      decoration: InputDecoration(
+                        labelText: t('api_server_address'),
+                        hintText: 'https://api.omnivium.app',
+                        hintStyle: TextStyle(
+                          color: AppColors.iconGray(context),
+                          fontSize: 14,
+                        ),
+                        prefixIcon: Icon(
+                          LucideIcons.cloud,
+                          color: AppColors.iconGray(context),
+                          size: 18,
+                        ),
+                        filled: true,
+                        fillColor: AppColors.sf(context),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide.none,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                      ),
                     ),
                   ),
                 ),

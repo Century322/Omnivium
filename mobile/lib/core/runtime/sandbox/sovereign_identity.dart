@@ -1,19 +1,21 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
+import 'package:ed25519_edwards/ed25519_edwards.dart' as ed;
 import '../stability/security.dart';
 
-enum SovereignIdentityAlgorithm { hmacSha256 }
+enum SovereignIdentityAlgorithm { ed25519 }
 
 class SovereignKeyPair {
   final String publicKey;
-  final String signingKey;
+  final String privateKey;
   final String verificationKey;
   final SovereignIdentityAlgorithm algorithm;
   final int createdAt;
 
   const SovereignKeyPair({
     required this.publicKey,
-    required this.signingKey,
+    required this.privateKey,
     required this.verificationKey,
     required this.algorithm,
     required this.createdAt,
@@ -21,11 +23,23 @@ class SovereignKeyPair {
 
   Map<String, dynamic> toJson() => {
     'publicKey': publicKey,
-    'signingKey': signingKey,
+    'privateKey': privateKey,
     'verificationKey': verificationKey,
     'algorithm': algorithm.name,
     'createdAt': createdAt,
   };
+
+  static SovereignKeyPair fromJson(Map<String, dynamic> json) =>
+      SovereignKeyPair(
+        publicKey: json['publicKey'] as String,
+        privateKey: json['privateKey'] as String,
+        verificationKey: json['verificationKey'] as String,
+        algorithm: SovereignIdentityAlgorithm.values.firstWhere(
+          (a) => a.name == json['algorithm'],
+          orElse: () => SovereignIdentityAlgorithm.ed25519,
+        ),
+        createdAt: json['createdAt'] as int,
+      );
 }
 
 class SovereignSignature {
@@ -50,6 +64,44 @@ class SovereignSignature {
     'timestamp': timestamp,
     'verificationTag': verificationTag,
   };
+
+  static SovereignSignature fromJson(Map<String, dynamic> json) =>
+      SovereignSignature(
+        data: json['data'] as String,
+        signerPublicKey: json['signer'] as String,
+        algorithm: json['algorithm'] as String,
+        timestamp: json['timestamp'] as int,
+        verificationTag: json['verificationTag'] as String,
+      );
+}
+
+class KeyRotationRecord {
+  final String oldPublicKey;
+  final String newPublicKey;
+  final int rotatedAt;
+  final String rotationSignature;
+
+  const KeyRotationRecord({
+    required this.oldPublicKey,
+    required this.newPublicKey,
+    required this.rotatedAt,
+    required this.rotationSignature,
+  });
+
+  Map<String, dynamic> toJson() => {
+    'oldPublicKey': oldPublicKey,
+    'newPublicKey': newPublicKey,
+    'rotatedAt': rotatedAt,
+    'rotationSignature': rotationSignature,
+  };
+
+  static KeyRotationRecord fromJson(Map<String, dynamic> json) =>
+      KeyRotationRecord(
+        oldPublicKey: json['oldPublicKey'] as String,
+        newPublicKey: json['newPublicKey'] as String,
+        rotatedAt: json['rotatedAt'] as int,
+        rotationSignature: json['rotationSignature'] as String,
+      );
 }
 
 class SovereignIdentity {
@@ -63,6 +115,7 @@ class SovereignIdentity {
   final int createdAt;
   final SovereignSignature selfSignature;
   final List<VerifiableCredential> credentials;
+  final List<KeyRotationRecord> keyRotationHistory;
 
   const SovereignIdentity({
     required this.did,
@@ -75,6 +128,7 @@ class SovereignIdentity {
     required this.createdAt,
     required this.selfSignature,
     this.credentials = const [],
+    this.keyRotationHistory = const [],
   });
 
   String get publicKey => keyPair.publicKey;
@@ -91,6 +145,7 @@ class SovereignIdentity {
     'created': createdAt,
     'selfSig': selfSignature.toJson(),
     'credentials': credentials.map((c) => c.toJson()).toList(),
+    'keyRotations': keyRotationHistory.map((r) => r.toJson()).toList(),
   };
 
   SovereignIdentity bumpEpoch() => SovereignIdentity(
@@ -104,6 +159,7 @@ class SovereignIdentity {
     createdAt: createdAt,
     selfSignature: selfSignature,
     credentials: credentials,
+    keyRotationHistory: keyRotationHistory,
   );
 
   SovereignIdentity joinFederation(String fedId) => SovereignIdentity(
@@ -117,6 +173,7 @@ class SovereignIdentity {
     createdAt: createdAt,
     selfSignature: selfSignature,
     credentials: credentials,
+    keyRotationHistory: keyRotationHistory,
   );
 
   SovereignIdentity updateTrust(TrustLevel newLevel) => SovereignIdentity(
@@ -130,6 +187,7 @@ class SovereignIdentity {
     createdAt: createdAt,
     selfSignature: selfSignature,
     credentials: credentials,
+    keyRotationHistory: keyRotationHistory,
   );
 
   SovereignIdentity addCredential(VerifiableCredential credential) =>
@@ -144,16 +202,53 @@ class SovereignIdentity {
         createdAt: createdAt,
         selfSignature: selfSignature,
         credentials: [...credentials, credential],
+        keyRotationHistory: keyRotationHistory,
       );
 
-  static SovereignIdentity generate(String nodeId, {String? federationId}) {
-    final createdAt = DateTime.now().millisecondsSinceEpoch;
-    final keyPair = _generateKeyPair(nodeId, createdAt);
-    final did = _computeDid(nodeId, keyPair.publicKey);
-    final selfSignature = _signSelf(did, keyPair, createdAt);
+  SovereignIdentity rotateKey() {
+    final newKeyPair = _generateKeyPair();
+    final rotatedAt = DateTime.now().millisecondsSinceEpoch;
+    final rotationData = '${keyPair.publicKey}|${newKeyPair.publicKey}|$rotatedAt';
+    final oldPrivateKey = _decodePrivateKey(keyPair.privateKey);
+    final rotationSignature = ed.sign(oldPrivateKey, utf8.encode(rotationData));
+    final newSelfSignature = _signSelf(did, newKeyPair, createdAt);
+    final rotationRecord = KeyRotationRecord(
+      oldPublicKey: keyPair.publicKey,
+      newPublicKey: newKeyPair.publicKey,
+      rotatedAt: rotatedAt,
+      rotationSignature: base64Encode(rotationSignature),
+    );
     return SovereignIdentity(
       did: did,
       nodeId: nodeId,
+      keyPair: newKeyPair,
+      civilizationEpoch: civilizationEpoch,
+      federationId: federationId,
+      trustLevel: trustLevel,
+      constitutionalAncestry: constitutionalAncestry,
+      createdAt: createdAt,
+      selfSignature: newSelfSignature,
+      credentials: credentials,
+      keyRotationHistory: [...keyRotationHistory, rotationRecord],
+    );
+  }
+
+  bool verifyKeyRotation(KeyRotationRecord record) {
+    final rotationData = '${record.oldPublicKey}|${record.newPublicKey}|${record.rotatedAt}';
+    final oldPublicKey = _decodePublicKey(record.oldPublicKey);
+    final signature = base64Decode(record.rotationSignature);
+    return ed.verify(oldPublicKey, utf8.encode(rotationData), signature);
+  }
+
+  static SovereignIdentity generate({String? nodeId, String? federationId}) {
+    final createdAt = DateTime.now().millisecondsSinceEpoch;
+    final effectiveNodeId = nodeId ?? _generateNodeId();
+    final keyPair = _generateKeyPair();
+    final did = _computeDid(effectiveNodeId, keyPair.publicKey);
+    final selfSignature = _signSelf(did, keyPair, createdAt);
+    return SovereignIdentity(
+      did: did,
+      nodeId: effectiveNodeId,
       keyPair: keyPair,
       civilizationEpoch: 0,
       federationId: federationId,
@@ -165,51 +260,102 @@ class SovereignIdentity {
   }
 
   static bool verify(SovereignIdentity identity) {
+    if (identity.keyRotationHistory.isNotEmpty) {
+      final originalPublicKey = identity.keyRotationHistory.first.oldPublicKey;
+      final expectedDid = _computeDid(identity.nodeId, originalPublicKey);
+      if (identity.did != expectedDid) return false;
+      final sigData = _computeSignatureData(
+        identity.did,
+        identity.keyPair.publicKey,
+        identity.createdAt,
+      );
+      final publicKey = _decodePublicKey(identity.keyPair.publicKey);
+      final signature = base64Decode(identity.selfSignature.data);
+      return ed.verify(publicKey, utf8.encode(sigData), signature);
+    }
     final expectedDid = _computeDid(
       identity.nodeId,
       identity.keyPair.publicKey,
     );
     if (identity.did != expectedDid) return false;
-
     final sigData = _computeSignatureData(
       identity.did,
       identity.keyPair.publicKey,
       identity.createdAt,
     );
-    return _verify(
-      sigData,
-      identity.selfSignature.data,
-      identity.keyPair.verificationKey,
-      identity.selfSignature.verificationTag,
-    );
+    final publicKey = _decodePublicKey(identity.keyPair.publicKey);
+    final signature = base64Decode(identity.selfSignature.data);
+    return ed.verify(publicKey, utf8.encode(sigData), signature);
   }
 
   static bool verifySignature(
     String data,
     SovereignSignature signature,
-    String verificationKey,
+    String publicKeyBase64,
   ) {
-    return _verify(
-      data,
-      signature.data,
-      verificationKey,
-      signature.verificationTag,
+    final publicKey = _decodePublicKey(publicKeyBase64);
+    final sig = base64Decode(signature.data);
+    return ed.verify(publicKey, utf8.encode(data), sig);
+  }
+
+  static SovereignIdentity deriveSubIdentity(
+    SovereignIdentity parent,
+    String subId, {
+    String? federationId,
+  }) {
+    final privateKey = _decodePrivateKey(parent.keyPair.privateKey);
+    final derivationInput = '${parent.did}|$subId|${parent.civilizationEpoch}';
+    final signature = ed.sign(privateKey, utf8.encode(derivationInput));
+    final subNodeId = '${parent.nodeId}.$subId';
+    final keyPair = _generateKeyPair();
+    final did = _computeDid(subNodeId, keyPair.publicKey);
+    final createdAt = DateTime.now().millisecondsSinceEpoch;
+    final selfSignature = _signSelf(did, keyPair, createdAt);
+    final credential = VerifiableCredential.issue(
+      issuerDid: parent.did,
+      subjectDid: did,
+      credentialType: 'DerivedIdentity',
+      claims: {
+        'subId': subId,
+        'parentDid': parent.did,
+        'derivationProof': base64Encode(signature),
+      },
+      ttl: 0,
+      issuerPrivateKey: parent.keyPair.privateKey,
+      issuerPublicKey: parent.keyPair.publicKey,
+    );
+    return SovereignIdentity(
+      did: did,
+      nodeId: subNodeId,
+      keyPair: keyPair,
+      civilizationEpoch: 0,
+      federationId: federationId ?? parent.federationId,
+      trustLevel: TrustLevel.verified,
+      constitutionalAncestry: [...parent.constitutionalAncestry, parent.did],
+      createdAt: createdAt,
+      selfSignature: selfSignature,
+      credentials: [credential],
     );
   }
 
-  static SovereignKeyPair _generateKeyPair(String nodeId, int createdAt) {
-    final seed = utf8.encode('sovereign_seed_$nodeId|$createdAt');
-    final signingKey = sha256.convert(seed).toString();
-    final pubSeed = utf8.encode('sovereign_pub_${signingKey}_$nodeId');
-    final publicKey = sha256.convert(pubSeed).toString().substring(0, 64);
-    final vkSeed = utf8.encode('sovereign_vk_${signingKey}_$nodeId');
+  static String _generateNodeId() {
+    final random = DateTime.now().microsecondsSinceEpoch.toString() +
+        DateTime.now().millisecond.toString();
+    return sha256.convert(utf8.encode(random)).toString().substring(0, 16);
+  }
+
+  static SovereignKeyPair _generateKeyPair() {
+    final keyPair = ed.generateKey();
+    final publicKeyBase64 = base64Encode(keyPair.publicKey.bytes);
+    final privateKeyBase64 = base64Encode(keyPair.privateKey.bytes);
+    final vkSeed = utf8.encode('vk_$publicKeyBase64');
     final verificationKey = sha256.convert(vkSeed).toString().substring(0, 64);
     return SovereignKeyPair(
-      publicKey: publicKey,
-      signingKey: signingKey,
+      publicKey: publicKeyBase64,
+      privateKey: privateKeyBase64,
       verificationKey: verificationKey,
-      algorithm: SovereignIdentityAlgorithm.hmacSha256,
-      createdAt: createdAt,
+      algorithm: SovereignIdentityAlgorithm.ed25519,
+      createdAt: DateTime.now().millisecondsSinceEpoch,
     );
   }
 
@@ -233,14 +379,13 @@ class SovereignIdentity {
     int createdAt,
   ) {
     final data = _computeSignatureData(did, keyPair.publicKey, createdAt);
-    final signature = _sign(data, keyPair.signingKey);
-    final verificationTag = _computeVerificationTag(
-      data,
-      signature,
-      keyPair.verificationKey,
-    );
+    final privateKey = _decodePrivateKey(keyPair.privateKey);
+    final signature = ed.sign(privateKey, utf8.encode(data));
+    final verificationTag = sha256
+        .convert(utf8.encode('${keyPair.publicKey}|${base64Encode(signature)}'))
+        .toString();
     return SovereignSignature(
-      data: signature,
+      data: base64Encode(signature),
       signerPublicKey: keyPair.publicKey,
       algorithm: keyPair.algorithm.name,
       timestamp: createdAt,
@@ -248,37 +393,14 @@ class SovereignIdentity {
     );
   }
 
-  static String _sign(String data, String signingKey) {
-    final key = utf8.encode(signingKey);
-    final message = utf8.encode(data);
-    final hmac = Hmac(sha256, key);
-    final digest = hmac.convert(message);
-    return digest.toString();
+  static ed.PrivateKey _decodePrivateKey(String privateKeyBase64) {
+    final bytes = base64Decode(privateKeyBase64);
+    return ed.PrivateKey(bytes);
   }
 
-  static bool _verify(
-    String data,
-    String signature,
-    String verificationKey,
-    String verificationTag,
-  ) {
-    final expectedTag = _computeVerificationTag(
-      data,
-      signature,
-      verificationKey,
-    );
-    return verificationTag == expectedTag;
-  }
-
-  static String _computeVerificationTag(
-    String data,
-    String signature,
-    String verificationKey,
-  ) {
-    final key = utf8.encode(verificationKey);
-    final message = utf8.encode('$data|$signature');
-    final hmac = Hmac(sha256, key);
-    return hmac.convert(message).toString();
+  static ed.PublicKey _decodePublicKey(String publicKeyBase64) {
+    final bytes = base64Decode(publicKeyBase64);
+    return ed.PublicKey(bytes);
   }
 }
 
@@ -305,7 +427,7 @@ class VerifiableCredential {
     required this.verificationTag,
   });
 
-  bool get isValid => DateTime.now().millisecondsSinceEpoch < expiresAt;
+  bool get isValid => expiresAt == 0 || DateTime.now().millisecondsSinceEpoch < expiresAt;
 
   Map<String, dynamic> toJson() => {
     'id': credentialId,
@@ -325,17 +447,20 @@ class VerifiableCredential {
     required String credentialType,
     required Map<String, dynamic> claims,
     required int ttl,
-    required String issuerSigningKey,
+    required String issuerPrivateKey,
     required String issuerPublicKey,
-    required String issuerVerificationKey,
   }) {
     final issuedAt = DateTime.now().millisecondsSinceEpoch;
     final credentialId =
         'vc:${sha256.convert(utf8.encode('$issuerDid|$subjectDid|$issuedAt')).toString().substring(0, 16)}';
     final proofInput =
         '$credentialId|$issuerDid|$subjectDid|$issuedAt|${claims.toString()}';
-    final proof = _hmacSign(issuerSigningKey, proofInput);
-    final verificationTag = _hmacSign(issuerPublicKey, '$proofInput|$proof');
+    final privateKey = ed.PrivateKey(base64Decode(issuerPrivateKey));
+    final signature = ed.sign(privateKey, utf8.encode(proofInput));
+    final proof = base64Encode(signature);
+    final verificationTag = sha256
+        .convert(utf8.encode('$issuerPublicKey|$proof'))
+        .toString();
     return VerifiableCredential(
       credentialId: credentialId,
       issuerDid: issuerDid,
@@ -343,7 +468,7 @@ class VerifiableCredential {
       credentialType: credentialType,
       claims: claims,
       issuedAt: issuedAt,
-      expiresAt: issuedAt + ttl,
+      expiresAt: ttl == 0 ? 0 : issuedAt + ttl,
       proof: proof,
       verificationTag: verificationTag,
     );
@@ -351,34 +476,14 @@ class VerifiableCredential {
 
   static bool verifyCredential(
     VerifiableCredential credential,
-    String issuerPublicKey,
+    String issuerPublicKeyBase64,
   ) {
     if (!credential.isValid) return false;
     final proofInput =
         '${credential.credentialId}|${credential.issuerDid}|${credential.subjectDid}|${credential.issuedAt}|${credential.claims.toString()}';
-    final expectedTag = _hmacSign(
-      issuerPublicKey,
-      '$proofInput|${credential.proof}',
-    );
-    return credential.verificationTag == expectedTag;
-  }
-
-  static bool verifyCredentialWithSigningKey(
-    VerifiableCredential credential,
-    String issuerSigningKey,
-  ) {
-    if (!credential.isValid) return false;
-    final proofInput =
-        '${credential.credentialId}|${credential.issuerDid}|${credential.subjectDid}|${credential.issuedAt}|${credential.claims.toString()}';
-    final expectedProof = _hmacSign(issuerSigningKey, proofInput);
-    return credential.proof == expectedProof;
-  }
-
-  static String _hmacSign(String key, String data) {
-    final hmacKey = utf8.encode(key);
-    final message = utf8.encode(data);
-    final hmac = Hmac(sha256, hmacKey);
-    return hmac.convert(message).toString();
+    final publicKey = ed.PublicKey(base64Decode(issuerPublicKeyBase64));
+    final signature = base64Decode(credential.proof);
+    return ed.verify(publicKey, utf8.encode(proofInput), signature);
   }
 }
 
@@ -423,9 +528,8 @@ class ConstitutionalPassport {
     required SovereignIdentity holder,
     required double reputationScore,
     required String federationId,
-    required String issuerSigningKey,
+    required String issuerPrivateKey,
     required String issuerPublicKey,
-    required String issuerVerificationKey,
     int ttl = 3600000,
   }) {
     final issuedAt = DateTime.now().millisecondsSinceEpoch;
@@ -438,9 +542,8 @@ class ConstitutionalPassport {
       credentialType: 'ConstitutionalIdentity',
       claims: {'nodeId': holder.nodeId, 'epoch': holder.civilizationEpoch},
       ttl: ttl,
-      issuerSigningKey: issuerSigningKey,
+      issuerPrivateKey: issuerPrivateKey,
       issuerPublicKey: issuerPublicKey,
-      issuerVerificationKey: issuerVerificationKey,
     );
 
     final reputationCredential = VerifiableCredential.issue(
@@ -449,9 +552,8 @@ class ConstitutionalPassport {
       credentialType: 'ReputationScore',
       claims: {'score': reputationScore, 'trustLevel': holder.trustLevel.name},
       ttl: ttl,
-      issuerSigningKey: issuerSigningKey,
+      issuerPrivateKey: issuerPrivateKey,
       issuerPublicKey: issuerPublicKey,
-      issuerVerificationKey: issuerVerificationKey,
     );
 
     final federationCredential = VerifiableCredential.issue(
@@ -460,18 +562,18 @@ class ConstitutionalPassport {
       credentialType: 'FederationMembership',
       claims: {'federationId': federationId, 'memberSince': issuedAt},
       ttl: ttl,
-      issuerSigningKey: issuerSigningKey,
+      issuerPrivateKey: issuerPrivateKey,
       issuerPublicKey: issuerPublicKey,
-      issuerVerificationKey: issuerVerificationKey,
     );
 
     final proofInput =
         '$passportId|${holder.did}|$issuedAt|$reputationScore|$federationId';
-    final proof = VerifiableCredential._hmacSign(issuerSigningKey, proofInput);
-    final verificationTag = VerifiableCredential._hmacSign(
-      issuerPublicKey,
-      '$proofInput|$proof',
-    );
+    final privateKey = ed.PrivateKey(base64Decode(issuerPrivateKey));
+    final signature = ed.sign(privateKey, utf8.encode(proofInput));
+    final proof = base64Encode(signature);
+    final verificationTag = sha256
+        .convert(utf8.encode('$issuerPublicKey|$proof'))
+        .toString();
 
     return ConstitutionalPassport(
       passportId: passportId,
@@ -488,33 +590,15 @@ class ConstitutionalPassport {
 
   static bool verifyPassport(
     ConstitutionalPassport passport,
-    String issuerPublicKey,
+    String issuerPublicKeyBase64,
   ) {
     if (!passport.isValid) return false;
     if (!SovereignIdentity.verify(passport.holder)) return false;
 
     final proofInput =
         '${passport.passportId}|${passport.holder.did}|${passport.issuedAt}|${passport.reputationCredential.claims['score']}|${passport.federationCredential.claims['federationId']}';
-    final expectedTag = VerifiableCredential._hmacSign(
-      issuerPublicKey,
-      '$proofInput|${passport.proof}',
-    );
-    return passport.verificationTag == expectedTag;
-  }
-
-  static bool verifyPassportWithSigningKey(
-    ConstitutionalPassport passport,
-    String issuerSigningKey,
-  ) {
-    if (!passport.isValid) return false;
-    if (!SovereignIdentity.verify(passport.holder)) return false;
-
-    final proofInput =
-        '${passport.passportId}|${passport.holder.did}|${passport.issuedAt}|${passport.reputationCredential.claims['score']}|${passport.federationCredential.claims['federationId']}';
-    final expectedProof = VerifiableCredential._hmacSign(
-      issuerSigningKey,
-      proofInput,
-    );
-    return passport.proof == expectedProof;
+    final publicKey = ed.PublicKey(base64Decode(issuerPublicKeyBase64));
+    final signature = base64Decode(passport.proof);
+    return ed.verify(publicKey, utf8.encode(proofInput), signature);
   }
 }

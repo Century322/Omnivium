@@ -3,6 +3,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/runtime/sdk/omnivium_sdk.dart';
 import '../../core/runtime/capability_router.dart';
+import '../../core/runtime/governance/policy_engine.dart';
 import '../theme/app_colors.dart';
 import '../theme/locale_provider.dart';
 
@@ -33,8 +34,10 @@ class _AiPermissionViewState extends State<AiPermissionView> {
   void _loadGlobalMode() {
     SharedPreferences.getInstance().then((prefs) {
       if (!mounted) return;
+      final mode = prefs.getString('omnivium_agent_permission') ?? 'confirm';
+      _syncGlobalModeToPolicyEngine(mode);
       setState(() {
-        _globalMode = prefs.getString('omnivium_agent_permission') ?? 'confirm';
+        _globalMode = mode;
       });
     });
   }
@@ -54,7 +57,9 @@ class _AiPermissionViewState extends State<AiPermissionView> {
       final overrides = <String, String>{};
       for (final key in keys) {
         final capId = key.replaceFirst('omnivium_perm_', '');
-        overrides[capId] = prefs.getString(key) ?? 'confirm';
+        final mode = prefs.getString(key) ?? 'confirm';
+        overrides[capId] = mode;
+        _syncCapabilityOverrideToPolicyEngine(capId, mode);
       }
       setState(() {
         _capabilityOverrides = overrides;
@@ -71,6 +76,7 @@ class _AiPermissionViewState extends State<AiPermissionView> {
   Future<void> _setGlobalMode(String mode) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('omnivium_agent_permission', mode);
+    _syncGlobalModeToPolicyEngine(mode);
     if (!mounted) return;
     setState(() => _globalMode = mode);
   }
@@ -85,8 +91,62 @@ class _AiPermissionViewState extends State<AiPermissionView> {
       await prefs.setString(key, mode);
       _capabilityOverrides[capId] = mode;
     }
+    _syncCapabilityOverrideToPolicyEngine(capId, mode);
     if (!mounted) return;
     setState(() {});
+  }
+
+  void _syncGlobalModeToPolicyEngine(String mode) {
+    final sdk = OmniviumSDK.instance;
+    if (!sdk.isInitialized) return;
+    final engine = sdk.container.policyEngine;
+    engine.removeRule('user-global-permission');
+    if (mode == 'deny') {
+      engine.addRule(PolicyRule(
+        id: 'user-global-permission',
+        description: 'User denied all capability invocations',
+        effect: PolicyEffect.deny,
+        callerPattern: 'agent.*',
+        targetPattern: '*',
+        priority: 300,
+      ));
+    } else if (mode == 'auto') {
+      engine.addRule(PolicyRule(
+        id: 'user-global-permission',
+        description: 'User allowed all capability invocations',
+        effect: PolicyEffect.allow,
+        callerPattern: 'agent.*',
+        targetPattern: '*',
+        priority: 300,
+      ));
+    }
+  }
+
+  void _syncCapabilityOverrideToPolicyEngine(String capId, String mode) {
+    final sdk = OmniviumSDK.instance;
+    if (!sdk.isInitialized) return;
+    final engine = sdk.container.policyEngine;
+    final ruleId = 'user-perm-$capId';
+    engine.removeRule(ruleId);
+    if (mode == 'deny') {
+      engine.addRule(PolicyRule(
+        id: ruleId,
+        description: 'User denied: $capId',
+        effect: PolicyEffect.deny,
+        callerPattern: 'agent.*',
+        targetPattern: capId,
+        priority: 350,
+      ));
+    } else if (mode == 'auto') {
+      engine.addRule(PolicyRule(
+        id: ruleId,
+        description: 'User auto-allowed: $capId',
+        effect: PolicyEffect.allow,
+        callerPattern: 'agent.*',
+        targetPattern: capId,
+        priority: 350,
+      ));
+    }
   }
 
   @override

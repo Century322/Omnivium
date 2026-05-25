@@ -12,6 +12,9 @@ class SJa extends S {
   String get server_address => 'サーバーアドレス';
 
   @override
+  String get api_server_address => 'APIサーバーアドレス';
+
+  @override
   String get confirm => '確認';
 
   @override
@@ -34,9 +37,6 @@ class SJa extends S {
 
   @override
   String get for_you => 'おすすめ';
-
-  @override
-  String get close => '閉じる';
 
   @override
   String get group_chat => 'グループチャット';
@@ -127,9 +127,6 @@ class SJa extends S {
   String get push_to_talk => 'プッシュトーク';
 
   @override
-  String get share => '共有';
-
-  @override
   String get image => '画像';
 
   @override
@@ -207,12 +204,6 @@ class SJa extends S {
       'あなたはプロの翻訳者です。原文のトーンとスタイルを保ちながらテキストを翻訳してください。';
 
   @override
-  String get mute => 'ミュート';
-
-  @override
-  String get send => '送信';
-
-  @override
   String get delete_chat => 'チャットを削除';
 
   @override
@@ -270,7 +261,7 @@ class SJa extends S {
   String get security => 'セキュリティ';
 
   @override
-  String get add_contact => '連絡先追加';
+  String get add_contact => '連絡先を追加';
 
   @override
   String get storage_used => '使用ストレージ';
@@ -310,9 +301,6 @@ class SJa extends S {
 
   @override
   String get set_pin_desc => '4-6桁のPINコードを設定してアプリを保護';
-
-  @override
-  String get enter_pin => 'PINコードを入力';
 
   @override
   String get quick_summarize => '会話を要約して';
@@ -541,6 +529,9 @@ class SJa extends S {
   String get call_ended => '通話終了';
 
   @override
+  String get mute => 'ミュート';
+
+  @override
   String get unmute => 'ミュート解除';
 
   @override
@@ -569,6 +560,9 @@ class SJa extends S {
 
   @override
   String get incorrect_pin => 'PINコードが間違っています';
+
+  @override
+  String get enter_pin => 'PINコードを入力';
 
   @override
   String get unlock => 'ロック解除';
@@ -734,7 +728,7 @@ class SJa extends S {
   String get chat_messages_desc => 'テキスト、絵文字、システムメッセージ';
 
   @override
-  String get clear => '消去';
+  String get clear => 'クリア';
 
   @override
   String get settings => '設定';
@@ -867,9 +861,6 @@ class SJa extends S {
 
   @override
   String get chat => 'チャット';
-
-  @override
-  String get permissions => '権限';
 
   @override
   String get delete_account => 'アカウント削除';
@@ -1232,6 +1223,9 @@ class SJa extends S {
   String get all => 'すべて';
 
   @override
+  String get permissions => '権限';
+
+  @override
   String get violations => '違反';
 
   @override
@@ -1354,9 +1348,6 @@ class SJa extends S {
   }
 
   @override
-  String get allow => '許可';
-
-  @override
   String get report_confirm_msg => 'このユーザーを報告しますか？';
 
   @override
@@ -1381,9 +1372,6 @@ class SJa extends S {
   String get open_chat => 'チャットを開く';
 
   @override
-  String get leave_group_confirm => 'このグループを退出しますか？';
-
-  @override
   String get remove_friend => '友達を削除';
 
   @override
@@ -1393,9 +1381,6 @@ class SJa extends S {
   String get remove => '削除';
 
   @override
-  String get select_date => '日付選択';
-
-  @override
   String get clear_all => 'すべて消去';
 
   @override
@@ -1403,6 +1388,9 @@ class SJa extends S {
 
   @override
   String get add_me_omnivium => 'Omniviumで追加';
+
+  @override
+  String get close => '閉じる';
 
   @override
   String get something_went_wrong => '問題が発生しました';
@@ -1493,6 +1481,9 @@ class SJa extends S {
 
   @override
   String get leave_group => 'グループを退出';
+
+  @override
+  String get leave_group_confirm => 'このグループを退出しますか？';
 
   @override
   String get listening => '聞いています';
@@ -1652,7 +1643,10 @@ class SJa extends S {
   String get content_hint => '内容を入力...';
 
   @override
-  String get select_time => '時間選択';
+  String get select_date => '日付を選択';
+
+  @override
+  String get select_time => '時間を選択';
 
   @override
   String get edit_note => 'メモを編集';
@@ -1716,6 +1710,9 @@ class SJa extends S {
 
   @override
   String get deny => '拒否';
+
+  @override
+  String get allow => '許可';
 
   @override
   String get delete_message_pair => 'メッセージペアを削除';
@@ -1796,10 +1793,13 @@ class SJa extends S {
   String get close_conversation => '会話を閉じる';
 
   @override
+  String get share => '共有';
+
+  @override
   String get stop_generating => '生成停止';
 
   @override
-  String get clear_search => '検索クリア';
+  String get send => '送信';
 
   @override
   String get clear_search_history => '検索履歴クリア';
@@ -2004,4 +2004,40 @@ class SJa extends S {
 
   @override
   String get tos_update_content => '事前通知の上、本規約を更新する場合があります。';
+
+  @override
+  String get pause_voice_message => '音声メッセージを一時停止';
+
+  @override
+  String get play_voice_message => '音声メッセージを再生';
+
+  @override
+  String get send_message_semantic => 'メッセージを送信';
+
+  @override
+  String get voice_input_semantic => '音声入力';
+
+  @override
+  String get enabled => '有効';
+
+  @override
+  String get disabled => '無効';
+
+  @override
+  String get unread => '未読';
+
+  @override
+  String get unit_b => 'B';
+
+  @override
+  String get unit_kb => 'KB';
+
+  @override
+  String get unit_mb => 'MB';
+
+  @override
+  String get size_zero_mb => '0 MB';
+
+  @override
+  String get matrix_id_hint => '@user:server.com';
 }

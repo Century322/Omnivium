@@ -12,6 +12,9 @@ class SZh extends S {
   String get server_address => '服务器地址';
 
   @override
+  String get api_server_address => 'API 服务器地址';
+
+  @override
   String get confirm => '确认';
 
   @override
@@ -34,9 +37,6 @@ class SZh extends S {
 
   @override
   String get for_you => '为您';
-
-  @override
-  String get close => '关闭';
 
   @override
   String get group_chat => '群聊';
@@ -126,9 +126,6 @@ class SZh extends S {
   String get push_to_talk => '按键说话';
 
   @override
-  String get share => '分享';
-
-  @override
   String get image => '图片';
 
   @override
@@ -204,12 +201,6 @@ class SZh extends S {
   @override
   String get tpl_translate_system =>
       '你是一位专业翻译。请将用户提供的文本翻译成目标语言，保持原文的语气和风格。如果用户没有指定目标语言，默认翻译成英文。';
-
-  @override
-  String get mute => '静音';
-
-  @override
-  String get send => '发送';
 
   @override
   String get delete_chat => '删除聊天';
@@ -311,9 +302,6 @@ class SZh extends S {
   String get set_pin_desc => '设置4-6位数字PIN码来保护你的应用';
 
   @override
-  String get enter_pin => '输入PIN码';
-
-  @override
   String get quick_summarize => '请总结一下我们之前的对话';
 
   @override
@@ -335,7 +323,7 @@ class SZh extends S {
   String get group_chats => '群聊';
 
   @override
-  String get default_model => 'Default';
+  String get default_model => '默认';
 
   @override
   String get use_this_model => '使用此模型';
@@ -539,6 +527,9 @@ class SZh extends S {
   String get call_ended => '通话已结束';
 
   @override
+  String get mute => '静音';
+
+  @override
   String get unmute => '取消静音';
 
   @override
@@ -567,6 +558,9 @@ class SZh extends S {
 
   @override
   String get incorrect_pin => 'PIN码错误';
+
+  @override
+  String get enter_pin => '输入PIN码';
 
   @override
   String get unlock => '解锁';
@@ -732,7 +726,7 @@ class SZh extends S {
   String get chat_messages_desc => '包括文字、表情和系统消息';
 
   @override
-  String get clear => '清空';
+  String get clear => '清除';
 
   @override
   String get settings => '设置';
@@ -866,9 +860,6 @@ class SZh extends S {
 
   @override
   String get chat => '聊天';
-
-  @override
-  String get permissions => '权限';
 
   @override
   String get delete_account => '删除帐户';
@@ -1229,6 +1220,9 @@ class SZh extends S {
   String get all => '全部';
 
   @override
+  String get permissions => '权限';
+
+  @override
   String get violations => '违规';
 
   @override
@@ -1351,9 +1345,6 @@ class SZh extends S {
   }
 
   @override
-  String get allow => '允许';
-
-  @override
   String get report_confirm_msg => '确定要举报此用户吗？';
 
   @override
@@ -1378,9 +1369,6 @@ class SZh extends S {
   String get open_chat => '打开聊天';
 
   @override
-  String get leave_group_confirm => '确认退出群聊？';
-
-  @override
   String get remove_friend => '删除好友';
 
   @override
@@ -1390,9 +1378,6 @@ class SZh extends S {
   String get remove => '删除';
 
   @override
-  String get select_date => '选择日期';
-
-  @override
   String get clear_all => '清空全部';
 
   @override
@@ -1400,6 +1385,9 @@ class SZh extends S {
 
   @override
   String get add_me_omnivium => '在 Omnivium 上添加我';
+
+  @override
+  String get close => '关闭';
 
   @override
   String get something_went_wrong => '出了点问题';
@@ -1490,6 +1478,9 @@ class SZh extends S {
 
   @override
   String get leave_group => '退出群聊';
+
+  @override
+  String get leave_group_confirm => '确认退出群聊？';
 
   @override
   String get listening => '正在聆听';
@@ -1648,6 +1639,9 @@ class SZh extends S {
   String get content_hint => '输入内容...';
 
   @override
+  String get select_date => '选择日期';
+
+  @override
   String get select_time => '选择时间';
 
   @override
@@ -1712,6 +1706,9 @@ class SZh extends S {
 
   @override
   String get deny => '拒绝';
+
+  @override
+  String get allow => '允许';
 
   @override
   String get delete_message_pair => '删除消息对';
@@ -1792,10 +1789,13 @@ class SZh extends S {
   String get close_conversation => '关闭对话';
 
   @override
+  String get share => '分享';
+
+  @override
   String get stop_generating => '停止生成';
 
   @override
-  String get clear_search => '清除搜索';
+  String get send => '发送';
 
   @override
   String get clear_search_history => '清除搜索历史';
@@ -2000,4 +2000,40 @@ class SZh extends S {
 
   @override
   String get tos_update_content => '我们可能会在事先通知的情况下更新这些条款。';
+
+  @override
+  String get pause_voice_message => '暂停语音消息';
+
+  @override
+  String get play_voice_message => '播放语音消息';
+
+  @override
+  String get send_message_semantic => '发送消息';
+
+  @override
+  String get voice_input_semantic => '语音输入';
+
+  @override
+  String get enabled => '已启用';
+
+  @override
+  String get disabled => '已禁用';
+
+  @override
+  String get unread => '未读';
+
+  @override
+  String get unit_b => 'B';
+
+  @override
+  String get unit_kb => 'KB';
+
+  @override
+  String get unit_mb => 'MB';
+
+  @override
+  String get size_zero_mb => '0 MB';
+
+  @override
+  String get matrix_id_hint => '@用户:服务器.com';
 }

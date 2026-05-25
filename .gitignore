@@ -22,6 +22,11 @@ Thumbs.db
 # Rust
 .cargo/
 .rustup/
+rust_sandbox/target/
+rust_sandbox/src/frb_generated/
+
+# Flutter Rust Bridge
+mobile/lib/core/runtime/sandbox/wasm_bridge/
 
 # Gradle
 .gradle/
@@ -40,6 +45,8 @@ stdin_pipe
 deploy/synapse-data/*.signing.key
 deploy/synapse-data/homeserver.db*
 deploy/synapse-data/homeserver.yaml
+deploy/.env
+deploy/api-proxy/.wrangler-config/
 mobile/android/key.properties
 mobile/android/*.jks
 mobile/android/*.keystore

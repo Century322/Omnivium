@@ -78,7 +78,9 @@ class AuditLogService {
 
     final journal = sdk.container.eventJournal;
     final metrics = sdk.container.metricsService;
+    final traceService = sdk.container.traceService;
     final entries = journal.entries;
+    final traces = traceService.recentTraces();
 
     return {
       'available': true,
@@ -86,6 +88,16 @@ class AuditLogService {
       'metricsCount': metrics.counterCount,
       'pluginsActive': sdk.container.pluginRegistry.activeCount,
       'containerStatus': sdk.container.status.name,
+      'traceCount': traces.length,
+      'recentTraceDurations': traces
+          .take(10)
+          .map((t) => {
+                'traceId': t.traceId,
+                'totalDurationMs': t.totalDurationMs,
+                'spanCount': t.spans.length,
+                'rootOperation': t.rootSpan?.operation ?? '',
+              })
+          .toList(),
     };
   }
 

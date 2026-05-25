@@ -10,8 +10,15 @@ services:
     volumes:
       - ./synapse-data:/data
     environment:
-      - SYNAPSE_SERVER_NAME=localhost
+      - SYNAPSE_SERVER_NAME=${SYNAPSE_SERVER_NAME:-localhost}
       - SYNAPSE_REPORT_STATS=no
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        if [ ! -f /data/homeserver.yaml ]; then
+          envsubst < /data/homeserver.yaml.template > /data/homeserver.yaml
+        fi
+        /start.py run
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8008/health"]
       interval: 30s

@@ -18,6 +18,9 @@ class VoIPCall {
   MediaStream? _localStream;
   MediaStream? _remoteStream;
   final List<RTCIceCandidate> _pendingCandidates = [];
+  void Function(VoIPCall call, RTCIceCandidate candidate)? onIceCandidate;
+  void Function(VoIPCall call)? onStateChanged;
+  void Function(VoIPCall call, MediaStream stream)? onRemoteStream;
 
   VoIPCall({
     required this.callId,
@@ -43,15 +46,26 @@ class VoIPCall {
 
     _peerConnection = await createPeerConnection(config);
 
-    _peerConnection!.onIceCandidate = (candidate) {};
+    _peerConnection!.onIceCandidate = (candidate) {
+      onIceCandidate?.call(this, candidate);
+    };
 
     _peerConnection!.onIceConnectionState = (iceState) {
       AppLogger.instance.info('ICE state: $iceState');
+      if (iceState == RTCIceConnectionState.RTCIceConnectionStateConnected) {
+        state = CallState.connected;
+        onStateChanged?.call(this);
+      } else if (iceState == RTCIceConnectionState.RTCIceConnectionStateFailed ||
+          iceState == RTCIceConnectionState.RTCIceConnectionStateDisconnected) {
+        state = CallState.ended;
+        onStateChanged?.call(this);
+      }
     };
 
     _peerConnection!.onTrack = (event) {
       if (event.streams.isNotEmpty) {
         _remoteStream = event.streams[0];
+        onRemoteStream?.call(this, _remoteStream!);
       }
     };
 
@@ -212,6 +226,24 @@ class CallService {
       isVideo: isVideo,
     );
 
+    call.onIceCandidate = (c, candidate) {
+      _sendCallEvent(roomId, 'm.call.candidates', {
+        'call_id': callId,
+        'version': 1,
+        'candidates': [
+          {
+            'candidate': candidate.candidate,
+            'sdpMid': candidate.sdpMid,
+            'sdpMLineIndex': candidate.sdpMLineIndex,
+          },
+        ],
+      });
+    };
+
+    call.onStateChanged = (c) {
+      _notifyState();
+    };
+
     final offerSdp = await call.createOffer();
     if (offerSdp == null) {
       call.end();
@@ -257,6 +289,24 @@ class CallService {
       isOutgoing: false,
       state: CallState.ringing,
     );
+
+    _currentCall!.onIceCandidate = (c, candidate) {
+      _sendCallEvent(roomId, 'm.call.candidates', {
+        'call_id': callId,
+        'version': 1,
+        'candidates': [
+          {
+            'candidate': candidate.candidate,
+            'sdpMid': candidate.sdpMid,
+            'sdpMLineIndex': candidate.sdpMLineIndex,
+          },
+        ],
+      });
+    };
+
+    _currentCall!.onStateChanged = (c) {
+      _notifyState();
+    };
 
     _notifyState();
     AppLogger.instance.info('Incoming call: $callId from $senderId');
