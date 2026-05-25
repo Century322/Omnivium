@@ -91,12 +91,14 @@ class AuditLogService {
       'traceCount': traces.length,
       'recentTraceDurations': traces
           .take(10)
-          .map((t) => {
-                'traceId': t.traceId,
-                'totalDurationMs': t.totalDurationMs,
-                'spanCount': t.spans.length,
-                'rootOperation': t.rootSpan?.operation ?? '',
-              })
+          .map(
+            (t) => {
+              'traceId': t.traceId,
+              'totalDurationMs': t.totalDurationMs,
+              'spanCount': t.spans.length,
+              'rootOperation': t.rootSpan?.operation ?? '',
+            },
+          )
           .toList(),
     };
   }

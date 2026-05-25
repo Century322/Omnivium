@@ -102,23 +102,27 @@ class _AiPermissionViewState extends State<AiPermissionView> {
     final engine = sdk.container.policyEngine;
     engine.removeRule('user-global-permission');
     if (mode == 'deny') {
-      engine.addRule(PolicyRule(
-        id: 'user-global-permission',
-        description: 'User denied all capability invocations',
-        effect: PolicyEffect.deny,
-        callerPattern: 'agent.*',
-        targetPattern: '*',
-        priority: 300,
-      ));
+      engine.addRule(
+        PolicyRule(
+          id: 'user-global-permission',
+          description: 'User denied all capability invocations',
+          effect: PolicyEffect.deny,
+          callerPattern: 'agent.*',
+          targetPattern: '*',
+          priority: 300,
+        ),
+      );
     } else if (mode == 'auto') {
-      engine.addRule(PolicyRule(
-        id: 'user-global-permission',
-        description: 'User allowed all capability invocations',
-        effect: PolicyEffect.allow,
-        callerPattern: 'agent.*',
-        targetPattern: '*',
-        priority: 300,
-      ));
+      engine.addRule(
+        PolicyRule(
+          id: 'user-global-permission',
+          description: 'User allowed all capability invocations',
+          effect: PolicyEffect.allow,
+          callerPattern: 'agent.*',
+          targetPattern: '*',
+          priority: 300,
+        ),
+      );
     }
   }
 
@@ -129,23 +133,27 @@ class _AiPermissionViewState extends State<AiPermissionView> {
     final ruleId = 'user-perm-$capId';
     engine.removeRule(ruleId);
     if (mode == 'deny') {
-      engine.addRule(PolicyRule(
-        id: ruleId,
-        description: 'User denied: $capId',
-        effect: PolicyEffect.deny,
-        callerPattern: 'agent.*',
-        targetPattern: capId,
-        priority: 350,
-      ));
+      engine.addRule(
+        PolicyRule(
+          id: ruleId,
+          description: 'User denied: $capId',
+          effect: PolicyEffect.deny,
+          callerPattern: 'agent.*',
+          targetPattern: capId,
+          priority: 350,
+        ),
+      );
     } else if (mode == 'auto') {
-      engine.addRule(PolicyRule(
-        id: ruleId,
-        description: 'User auto-allowed: $capId',
-        effect: PolicyEffect.allow,
-        callerPattern: 'agent.*',
-        targetPattern: capId,
-        priority: 350,
-      ));
+      engine.addRule(
+        PolicyRule(
+          id: ruleId,
+          description: 'User auto-allowed: $capId',
+          effect: PolicyEffect.allow,
+          callerPattern: 'agent.*',
+          targetPattern: capId,
+          priority: 350,
+        ),
+      );
     }
   }
 

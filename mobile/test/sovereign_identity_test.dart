@@ -238,91 +238,94 @@ void main() {
     });
   });
 
-  group('VerifiableCredential — Ed25519 Credential Issuance and Verification', () {
-    test('issue creates valid credential', () {
-      final issuer = SovereignIdentity.generate(nodeId: 'authority');
-      final vc = VerifiableCredential.issue(
-        issuerDid: issuer.did,
-        subjectDid: 'did:omnivium:1234',
-        credentialType: 'ConstitutionalIdentity',
-        claims: {'nodeId': 'node-A'},
-        ttl: 3600000,
-        issuerPrivateKey: issuer.keyPair.privateKey,
-        issuerPublicKey: issuer.keyPair.publicKey,
-      );
-      expect(vc.credentialId, startsWith('vc:'));
-      expect(vc.issuerDid, issuer.did);
-      expect(vc.subjectDid, 'did:omnivium:1234');
-      expect(vc.credentialType, 'ConstitutionalIdentity');
-      expect(vc.isValid, isTrue);
-    });
+  group(
+    'VerifiableCredential — Ed25519 Credential Issuance and Verification',
+    () {
+      test('issue creates valid credential', () {
+        final issuer = SovereignIdentity.generate(nodeId: 'authority');
+        final vc = VerifiableCredential.issue(
+          issuerDid: issuer.did,
+          subjectDid: 'did:omnivium:1234',
+          credentialType: 'ConstitutionalIdentity',
+          claims: {'nodeId': 'node-A'},
+          ttl: 3600000,
+          issuerPrivateKey: issuer.keyPair.privateKey,
+          issuerPublicKey: issuer.keyPair.publicKey,
+        );
+        expect(vc.credentialId, startsWith('vc:'));
+        expect(vc.issuerDid, issuer.did);
+        expect(vc.subjectDid, 'did:omnivium:1234');
+        expect(vc.credentialType, 'ConstitutionalIdentity');
+        expect(vc.isValid, isTrue);
+      });
 
-    test('verifyCredential returns true with correct issuer public key', () {
-      final issuer = SovereignIdentity.generate(nodeId: 'authority');
-      final vc = VerifiableCredential.issue(
-        issuerDid: issuer.did,
-        subjectDid: 'did:omnivium:1234',
-        credentialType: 'Test',
-        claims: {'test': true},
-        ttl: 3600000,
-        issuerPrivateKey: issuer.keyPair.privateKey,
-        issuerPublicKey: issuer.keyPair.publicKey,
-      );
-      expect(
-        VerifiableCredential.verifyCredential(vc, issuer.keyPair.publicKey),
-        isTrue,
-      );
-    });
+      test('verifyCredential returns true with correct issuer public key', () {
+        final issuer = SovereignIdentity.generate(nodeId: 'authority');
+        final vc = VerifiableCredential.issue(
+          issuerDid: issuer.did,
+          subjectDid: 'did:omnivium:1234',
+          credentialType: 'Test',
+          claims: {'test': true},
+          ttl: 3600000,
+          issuerPrivateKey: issuer.keyPair.privateKey,
+          issuerPublicKey: issuer.keyPair.publicKey,
+        );
+        expect(
+          VerifiableCredential.verifyCredential(vc, issuer.keyPair.publicKey),
+          isTrue,
+        );
+      });
 
-    test('verifyCredential returns false for wrong public key', () {
-      final issuer = SovereignIdentity.generate(nodeId: 'authority');
-      final other = SovereignIdentity.generate(nodeId: 'other');
-      final vc = VerifiableCredential.issue(
-        issuerDid: issuer.did,
-        subjectDid: 'did:omnivium:1234',
-        credentialType: 'Test',
-        claims: {'test': true},
-        ttl: 3600000,
-        issuerPrivateKey: issuer.keyPair.privateKey,
-        issuerPublicKey: issuer.keyPair.publicKey,
-      );
-      expect(
-        VerifiableCredential.verifyCredential(vc, other.keyPair.publicKey),
-        isFalse,
-      );
-    });
+      test('verifyCredential returns false for wrong public key', () {
+        final issuer = SovereignIdentity.generate(nodeId: 'authority');
+        final other = SovereignIdentity.generate(nodeId: 'other');
+        final vc = VerifiableCredential.issue(
+          issuerDid: issuer.did,
+          subjectDid: 'did:omnivium:1234',
+          credentialType: 'Test',
+          claims: {'test': true},
+          ttl: 3600000,
+          issuerPrivateKey: issuer.keyPair.privateKey,
+          issuerPublicKey: issuer.keyPair.publicKey,
+        );
+        expect(
+          VerifiableCredential.verifyCredential(vc, other.keyPair.publicKey),
+          isFalse,
+        );
+      });
 
-    test('verifyCredential returns false for tampered claims', () {
-      final issuer = SovereignIdentity.generate(nodeId: 'authority');
-      final vc = VerifiableCredential.issue(
-        issuerDid: issuer.did,
-        subjectDid: 'did:omnivium:1234',
-        credentialType: 'Test',
-        claims: {'test': true},
-        ttl: 3600000,
-        issuerPrivateKey: issuer.keyPair.privateKey,
-        issuerPublicKey: issuer.keyPair.publicKey,
-      );
-      final tampered = VerifiableCredential(
-        credentialId: vc.credentialId,
-        issuerDid: vc.issuerDid,
-        subjectDid: vc.subjectDid,
-        credentialType: vc.credentialType,
-        claims: {'test': false},
-        issuedAt: vc.issuedAt,
-        expiresAt: vc.expiresAt,
-        proof: vc.proof,
-        verificationTag: vc.verificationTag,
-      );
-      expect(
-        VerifiableCredential.verifyCredential(
-          tampered,
-          issuer.keyPair.publicKey,
-        ),
-        isFalse,
-      );
-    });
-  });
+      test('verifyCredential returns false for tampered claims', () {
+        final issuer = SovereignIdentity.generate(nodeId: 'authority');
+        final vc = VerifiableCredential.issue(
+          issuerDid: issuer.did,
+          subjectDid: 'did:omnivium:1234',
+          credentialType: 'Test',
+          claims: {'test': true},
+          ttl: 3600000,
+          issuerPrivateKey: issuer.keyPair.privateKey,
+          issuerPublicKey: issuer.keyPair.publicKey,
+        );
+        final tampered = VerifiableCredential(
+          credentialId: vc.credentialId,
+          issuerDid: vc.issuerDid,
+          subjectDid: vc.subjectDid,
+          credentialType: vc.credentialType,
+          claims: {'test': false},
+          issuedAt: vc.issuedAt,
+          expiresAt: vc.expiresAt,
+          proof: vc.proof,
+          verificationTag: vc.verificationTag,
+        );
+        expect(
+          VerifiableCredential.verifyCredential(
+            tampered,
+            issuer.keyPair.publicKey,
+          ),
+          isFalse,
+        );
+      });
+    },
+  );
 
   group('ConstitutionalPassport — Machine Sovereign Identity', () {
     test('issue creates valid passport', () {
@@ -341,9 +344,15 @@ void main() {
       expect(passport.passportId, startsWith('passport:'));
       expect(passport.holder.did, holder.did);
       expect(passport.isValid, isTrue);
-      expect(passport.identityCredential.credentialType, 'ConstitutionalIdentity');
+      expect(
+        passport.identityCredential.credentialType,
+        'ConstitutionalIdentity',
+      );
       expect(passport.reputationCredential.credentialType, 'ReputationScore');
-      expect(passport.federationCredential.credentialType, 'FederationMembership');
+      expect(
+        passport.federationCredential.credentialType,
+        'FederationMembership',
+      );
     });
 
     test('verifyPassport returns true with correct authority public key', () {
@@ -357,7 +366,10 @@ void main() {
         issuerPublicKey: authority.keyPair.publicKey,
       );
       expect(
-        ConstitutionalPassport.verifyPassport(passport, authority.keyPair.publicKey),
+        ConstitutionalPassport.verifyPassport(
+          passport,
+          authority.keyPair.publicKey,
+        ),
         isTrue,
       );
     });
@@ -374,7 +386,10 @@ void main() {
         issuerPublicKey: authority.keyPair.publicKey,
       );
       expect(
-        ConstitutionalPassport.verifyPassport(passport, other.keyPair.publicKey),
+        ConstitutionalPassport.verifyPassport(
+          passport,
+          other.keyPair.publicKey,
+        ),
         isFalse,
       );
     });

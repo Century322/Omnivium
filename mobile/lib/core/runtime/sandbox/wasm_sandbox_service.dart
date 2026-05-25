@@ -8,7 +8,8 @@ class WasmSandboxService {
 
   WasmSandboxService._();
 
-  static WasmSandboxService get instance => _instance ??= WasmSandboxService._();
+  static WasmSandboxService get instance =>
+      _instance ??= WasmSandboxService._();
 
   bool get isInitialized => _initialized;
 

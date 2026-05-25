@@ -61,7 +61,10 @@ class IdentityBridge {
       );
       return;
     }
-    _identity = SovereignIdentity.generate(nodeId: userId, federationId: matrixId);
+    _identity = SovereignIdentity.generate(
+      nodeId: userId,
+      federationId: matrixId,
+    );
     await _persistToStorage(_identity!);
     AppLogger.instance.info(
       'IdentityBridge: generated identity ${_identity!.did}',
@@ -79,9 +82,7 @@ class IdentityBridge {
   Future<void> updateOmniviumId(String newId) async {
     _omniviumId = newId;
     await _persistOmniviumId(newId);
-    AppLogger.instance.info(
-      'IdentityBridge: updated Omnivium ID to $newId',
-    );
+    AppLogger.instance.info('IdentityBridge: updated Omnivium ID to $newId');
   }
 
   Future<void> rotateKey() async {
@@ -104,10 +105,7 @@ class IdentityBridge {
 
   SovereignIdentity deriveAgentIdentity(String agentId) {
     if (_identity == null) throw StateError('No root identity bound');
-    return SovereignIdentity.deriveSubIdentity(
-      _identity!,
-      'agent.$agentId',
-    );
+    return SovereignIdentity.deriveSubIdentity(_identity!, 'agent.$agentId');
   }
 
   Future<void> onLogout() async {

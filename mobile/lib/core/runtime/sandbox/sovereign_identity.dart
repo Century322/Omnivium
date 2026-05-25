@@ -207,7 +207,8 @@ class SovereignIdentity {
   SovereignIdentity rotateKey() {
     final newKeyPair = _generateKeyPair();
     final rotatedAt = DateTime.now().millisecondsSinceEpoch;
-    final rotationData = '${keyPair.publicKey}|${newKeyPair.publicKey}|$rotatedAt';
+    final rotationData =
+        '${keyPair.publicKey}|${newKeyPair.publicKey}|$rotatedAt';
     final oldPrivateKey = _decodePrivateKey(keyPair.privateKey);
     final rotationSignature = ed.sign(oldPrivateKey, utf8.encode(rotationData));
     final newSelfSignature = _signSelf(did, newKeyPair, createdAt);
@@ -233,7 +234,8 @@ class SovereignIdentity {
   }
 
   bool verifyKeyRotation(KeyRotationRecord record) {
-    final rotationData = '${record.oldPublicKey}|${record.newPublicKey}|${record.rotatedAt}';
+    final rotationData =
+        '${record.oldPublicKey}|${record.newPublicKey}|${record.rotatedAt}';
     final oldPublicKey = _decodePublicKey(record.oldPublicKey);
     final signature = base64Decode(record.rotationSignature);
     return ed.verify(oldPublicKey, utf8.encode(rotationData), signature);
@@ -338,7 +340,8 @@ class SovereignIdentity {
   }
 
   static String _generateNodeId() {
-    final random = DateTime.now().microsecondsSinceEpoch.toString() +
+    final random =
+        DateTime.now().microsecondsSinceEpoch.toString() +
         DateTime.now().millisecond.toString();
     return sha256.convert(utf8.encode(random)).toString().substring(0, 16);
   }
@@ -426,7 +429,8 @@ class VerifiableCredential {
     required this.verificationTag,
   });
 
-  bool get isValid => expiresAt == 0 || DateTime.now().millisecondsSinceEpoch < expiresAt;
+  bool get isValid =>
+      expiresAt == 0 || DateTime.now().millisecondsSinceEpoch < expiresAt;
 
   Map<String, dynamic> toJson() => {
     'id': credentialId,

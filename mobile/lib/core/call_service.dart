@@ -55,7 +55,8 @@ class VoIPCall {
       if (iceState == RTCIceConnectionState.RTCIceConnectionStateConnected) {
         state = CallState.connected;
         onStateChanged?.call(this);
-      } else if (iceState == RTCIceConnectionState.RTCIceConnectionStateFailed ||
+      } else if (iceState ==
+              RTCIceConnectionState.RTCIceConnectionStateFailed ||
           iceState == RTCIceConnectionState.RTCIceConnectionStateDisconnected) {
         state = CallState.ended;
         onStateChanged?.call(this);

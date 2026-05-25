@@ -221,7 +221,10 @@ void _initDeferred() {
   Future.wait([
     _safeInit(() => VoiceService.instance.init(), 'Voice'),
     _safeInit(() => ReminderService.instance.init(), 'Reminder'),
-    _safeInit(() => ApiProxyService.instance.loadUserConfiguredUrl(), 'ApiProxyUserUrl'),
+    _safeInit(
+      () => ApiProxyService.instance.loadUserConfiguredUrl(),
+      'ApiProxyUserUrl',
+    ),
     _safeInit(() => ApiProxyService.instance.init(), 'ApiProxy'),
     _safeInit(
       () => NetworkSecurityService.instance.initWithDynamicPins(),
@@ -641,9 +644,7 @@ class _AppShellState extends State<_AppShell>
         ),
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            scaffoldBackgroundColor: const Color(0xFFFFFFFF),
-          ),
+          theme: ThemeData(scaffoldBackgroundColor: const Color(0xFFFFFFFF)),
           home: Scaffold(
             backgroundColor: const Color(0xFFFFFFFF),
             body: Center(
