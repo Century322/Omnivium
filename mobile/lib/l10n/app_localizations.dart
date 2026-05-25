@@ -3659,6 +3659,12 @@ abstract class S {
   /// **'发送'**
   String get send;
 
+  /// No description provided for @clear_search.
+  ///
+  /// In zh, this message translates to:
+  /// **'清除搜索'**
+  String get clear_search;
+
   /// No description provided for @clear_search_history.
   ///
   /// In zh, this message translates to:

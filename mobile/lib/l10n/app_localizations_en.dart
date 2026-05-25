@@ -1840,6 +1840,9 @@ class SEn extends S {
   String get send => 'Send';
 
   @override
+  String get clear_search => 'Clear search';
+
+  @override
   String get clear_search_history => 'Clear search history';
 
   @override

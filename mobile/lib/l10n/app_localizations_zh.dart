@@ -1798,6 +1798,9 @@ class SZh extends S {
   String get send => '发送';
 
   @override
+  String get clear_search => '清除搜索';
+
+  @override
   String get clear_search_history => '清除搜索历史';
 
   @override

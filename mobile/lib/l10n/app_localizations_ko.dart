@@ -1802,6 +1802,9 @@ class SKo extends S {
   String get send => '보내기';
 
   @override
+  String get clear_search => '검색 지우기';
+
+  @override
   String get clear_search_history => '검색 기록 지우기';
 
   @override

@@ -1802,6 +1802,9 @@ class SJa extends S {
   String get send => '送信';
 
   @override
+  String get clear_search => '検索クリア';
+
+  @override
   String get clear_search_history => '検索履歴クリア';
 
   @override
