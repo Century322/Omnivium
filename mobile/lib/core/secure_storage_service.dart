@@ -12,13 +12,21 @@ class SecureStorageService {
     accessibility: KeychainAccessibility.first_unlock,
   );
 
-  late final FlutterSecureStorage _storage;
+  FlutterSecureStorage _storage = const FlutterSecureStorage(
+    aOptions: _androidOptions,
+    iOptions: _iosOptions,
+  );
+
+  bool _initialized = false;
+
+  bool get isInitialized => _initialized;
 
   Future<void> init() async {
     _storage = const FlutterSecureStorage(
       aOptions: _androidOptions,
       iOptions: _iosOptions,
     );
+    _initialized = true;
   }
 
   Future<String?> read(String key) => _storage.read(key: key);
