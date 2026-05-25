@@ -3,7 +3,6 @@ import 'dart:math';
 import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 import 'secure_storage_service.dart';
-import 'app_logger.dart';
 
 class PasswordKeyService {
   static final PasswordKeyService _instance = PasswordKeyService._();

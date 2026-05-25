@@ -181,6 +181,7 @@ class IdentityBridge {
     }
   }
 
+  // ignore: unused_element
   Future<void> _loadOmniviumId() async {
     try {
       final storage = SecureStorageService.instance;

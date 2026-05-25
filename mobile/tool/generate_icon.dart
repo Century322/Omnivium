@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math';
 import 'package:image/image.dart';
 
 void main() {
@@ -9,18 +8,13 @@ void main() {
     final img = generateIcon(size);
     final file = File('assets/icon/app_icon_${size}x${size}.png');
     file.writeAsBytesSync(encodePng(img));
-    print('Generated: ${file.path}');
   }
 
   final mainIcon = generateIcon(1024);
   File('assets/icon/app_icon.png').writeAsBytesSync(encodePng(mainIcon));
-  print('Generated: assets/icon/app_icon.png');
 
   final fgIcon = generateForeground(1024);
   File('assets/icon/app_icon_foreground.png').writeAsBytesSync(encodePng(fgIcon));
-  print('Generated: assets/icon/app_icon_foreground.png');
-
-  print('Done!');
 }
 
 final bgColor = ColorRgba8(255, 255, 255, 255);

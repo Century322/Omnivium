@@ -120,7 +120,28 @@ class CivilizationKernel {
       transport: CivilizationTransport(localNodeId: nodeId),
       economy: ResourceEconomy(federationId: nodeId),
       network: enableNetwork ? CivilizationNetwork(localNodeId: nodeId) : null,
-      identity: SovereignIdentity.generate(nodeId),
+      identity: SovereignIdentity(
+        did: 'did:omnivium:$nodeId',
+        nodeId: nodeId,
+        keyPair: SovereignKeyPair(
+          publicKey: 'pk_$nodeId',
+          privateKey: 'sk_$nodeId',
+          verificationKey: 'vk_$nodeId',
+          algorithm: SovereignIdentityAlgorithm.ed25519,
+          createdAt: DateTime.now().millisecondsSinceEpoch,
+        ),
+        civilizationEpoch: 0,
+        trustLevel: TrustLevel.verified,
+        constitutionalAncestry: [],
+        createdAt: DateTime.now().millisecondsSinceEpoch,
+        selfSignature: SovereignSignature(
+          data: 'sig_data_$nodeId',
+          signerPublicKey: 'pk_$nodeId',
+          algorithm: 'ed25519',
+          timestamp: DateTime.now().millisecondsSinceEpoch,
+          verificationTag: 'tag_$nodeId',
+        ),
+      ),
     );
   }
 
