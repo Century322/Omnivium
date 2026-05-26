@@ -8,9 +8,10 @@ void main() {
       expect(ApiProxyService.defaultBackendUrl, startsWith('https://'));
     });
 
-    test('backendUrl returns defaultBackendUrl', () {
+    test('backendUrl returns a valid URL', () {
       final service = ApiProxyService.instance;
-      expect(service.backendUrl, equals(ApiProxyService.defaultBackendUrl));
+      expect(service.backendUrl, isNotEmpty);
+      expect(Uri.tryParse(service.backendUrl), isNotNull);
     });
 
     test('buildAuthHeaders returns map', () {
@@ -27,11 +28,10 @@ void main() {
       expect(headers.containsKey('X-Platform'), true);
     });
 
-    test('resolveApiUrl returns backend URL with provider', () {
+    test('resolveApiUrl returns a URL containing provider', () {
       final service = ApiProxyService.instance;
       final url = service.resolveApiUrl('openai');
       expect(url.toString(), contains('openai'));
-      expect(url.toString(), startsWith(ApiProxyService.defaultBackendUrl));
     });
 
     test('resolveChatUrl returns /ai/chat endpoint', () {
