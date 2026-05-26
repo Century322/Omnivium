@@ -18,6 +18,7 @@ import '../presentation/views/storage_view.dart';
 import '../presentation/views/file_manager_view.dart';
 import '../presentation/views/my_id_view.dart';
 import '../presentation/views/about_view.dart';
+import '../presentation/views/create_group_view.dart';
 
 class AppNavigator {
   static AppProvider? _provider;
@@ -74,6 +75,8 @@ class AppNavigator {
         page = FileManagerView(provider: provider, initialTab: tab);
       case '/my-id':
         page = MyIdView(provider: provider);
+      case '/create-group':
+        page = CreateGroupView(provider: provider);
       case '/about':
         page = AboutView(provider: provider);
       default:

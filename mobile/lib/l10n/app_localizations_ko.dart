@@ -2111,4 +2111,10 @@ class SKo extends S {
 
   @override
   String get rotate => '轮换';
+
+  @override
+  String get group_description => '群简介';
+
+  @override
+  String get search_friends => '搜索好友';
 }

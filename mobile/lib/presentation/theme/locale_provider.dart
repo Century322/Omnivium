@@ -773,6 +773,8 @@ class LocaleProvider extends ChangeNotifier {
       'rotate_key_title': s.rotate_key_title,
       'rotate_key_desc': s.rotate_key_desc,
       'rotate': s.rotate,
+      'group_description': s.group_description,
+      'search_friends': s.search_friends,
     };
   }
 

@@ -695,5 +695,7 @@
     "rotate_key": "Rotate Key",
     "rotate_key_title": "Confirm Key Rotation",
     "rotate_key_desc": "After rotation, the old key will be invalidated but your DID remains unchanged. Make sure you have backed up your identity.",
-    "rotate": "Rotate"
+    "rotate": "Rotate",
+    "group_description": "Group Description",
+    "search_friends": "Search Friends"
 }

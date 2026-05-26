@@ -1,5 +1,5 @@
-import '../../core/app_logger.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../theme/app_colors.dart';
 import '../../core/app_provider.dart';
 import '../../core/analytics_service.dart';
@@ -583,20 +583,7 @@ class _HomeViewState extends State<HomeView>
   }
 
   void _showCreateGroupChat() {
-    HomeDialogs.showCreateGroupChat(
-      context,
-      onCreate: (name, members) async {
-        try {
-          await widget.provider.matrix.createGroupChat(name, userIds: members);
-        } catch (e, stackTrace) {
-          AppLogger.instance.error(
-            'Operation failed',
-            error: e,
-            stackTrace: stackTrace,
-          );
-        }
-      },
-    );
+    nav.AppNavigator.go(context, '/create-group');
   }
 
   void _showOptionsSheet() {
@@ -604,10 +591,17 @@ class _HomeViewState extends State<HomeView>
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (context) => SlidingSheet(
-        child: OptionsContent(
-          onClose: () => Navigator.pop(context),
-          provider: widget.provider,
+      builder: (context) => AnnotatedRegion<SystemUiOverlayStyle>(
+        value: SystemUiOverlayStyle(
+          statusBarColor: Colors.black.withValues(alpha: 0.54),
+          statusBarIconBrightness: Brightness.light,
+          statusBarBrightness: Brightness.dark,
+        ),
+        child: SlidingSheet(
+          child: OptionsContent(
+            onClose: () => Navigator.pop(context),
+            provider: widget.provider,
+          ),
         ),
       ),
     );
@@ -618,10 +612,17 @@ class _HomeViewState extends State<HomeView>
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (context) => SlidingSheet(
-        child: ModelsContent(
-          onClose: () => Navigator.pop(context),
-          provider: widget.provider,
+      builder: (context) => AnnotatedRegion<SystemUiOverlayStyle>(
+        value: SystemUiOverlayStyle(
+          statusBarColor: Colors.black.withValues(alpha: 0.54),
+          statusBarIconBrightness: Brightness.light,
+          statusBarBrightness: Brightness.dark,
+        ),
+        child: SlidingSheet(
+          child: ModelsContent(
+            onClose: () => Navigator.pop(context),
+            provider: widget.provider,
+          ),
         ),
       ),
     );

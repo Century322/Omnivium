@@ -4276,6 +4276,18 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'轮换'**
   String get rotate;
+
+  /// No description provided for @group_description.
+  ///
+  /// In zh, this message translates to:
+  /// **'群简介'**
+  String get group_description;
+
+  /// No description provided for @search_friends.
+  ///
+  /// In zh, this message translates to:
+  /// **'搜索好友'**
+  String get search_friends;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

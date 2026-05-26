@@ -2177,4 +2177,10 @@ class SEn extends S {
 
   @override
   String get rotate => 'Rotate';
+
+  @override
+  String get group_description => 'Group Description';
+
+  @override
+  String get search_friends => 'Search Friends';
 }

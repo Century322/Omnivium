@@ -695,5 +695,7 @@
     "rotate_key": "轮换密钥",
     "rotate_key_title": "确认轮换密钥",
     "rotate_key_desc": "轮换后旧密钥将失效，但 DID 保持不变。确保您已备份当前身份。",
-    "rotate": "轮换"
+    "rotate": "轮换",
+    "group_description": "群简介",
+    "search_friends": "搜索好友"
 }
