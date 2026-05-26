@@ -1714,8 +1714,14 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                         builder: (ctx) {
                           final client = widget.provider.matrix.client;
                           final room = client?.getRoomById(widget.chatTargetId);
-                          final isRead =
-                              room != null && room.notificationCount == 0;
+                          if (room == null) {
+                            return Icon(
+                              LucideIcons.check,
+                              size: 14,
+                              color: AppColors.iconGray(context),
+                            );
+                          }
+                          final isRead = _isMessageRead(room, msg);
                           if (isRead) {
                             return Row(
                               mainAxisSize: MainAxisSize.min,
@@ -1959,6 +1965,30 @@ class _FriendChatPanelState extends State<FriendChatPanel>
       result.add(line);
     }
     return result.join('\n').trim();
+  }
+
+  bool _isMessageRead(Room room, FriendMessageData msg) {
+    if (msg.eventId == null) return false;
+    try {
+      final receipts = room.receipts;
+      for (final receipt in receipts) {
+        if (receipt.userId == widget.provider.matrix.userId) continue;
+        final receiptEventId = receipt.eventId;
+        if (receiptEventId == null) continue;
+        final msgIndex = _friendMessages.indexWhere(
+          (m) => m.eventId == msg.eventId,
+        );
+        final receiptIndex = _friendMessages.indexWhere(
+          (m) => m.eventId == receiptEventId,
+        );
+        if (receiptIndex >= 0 && msgIndex >= 0 && receiptIndex >= msgIndex) {
+          return true;
+        }
+      }
+      return false;
+    } catch (_) {
+      return room.notificationCount == 0;
+    }
   }
 
   Widget _buildLinkPreviews(String text) {
