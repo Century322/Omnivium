@@ -115,8 +115,7 @@ jobs:
           K_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           K_ALIAS: ${{ secrets.KEY_ALIAS }}
         run: |
-          if [ -n "$KEYSTORE_BASE64" ]; then
-            echo "$KEYSTORE_BASE64" | base64 --decode > android/app/keystore.jks
+          if [ -n "$KEYSTORE_BASE64" ] && echo "$KEYSTORE_BASE64" | base64 --decode > android/app/keystore.jks 2>/dev/null; then
             cat > android/key.properties << EOF
           storePassword=$KS_PASSWORD
           keyPassword=$K_PASSWORD
@@ -125,7 +124,7 @@ jobs:
           EOF
           echo "Keystore configured for release signing"
           else
-          echo "No keystore secret found, building with debug signing"
+          echo "No valid keystore found, building with debug signing"
           fi
 
       - name: Build APK
