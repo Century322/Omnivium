@@ -4366,6 +4366,12 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'暂无远程配置'**
   String get no_remote_config;
+
+  /// No description provided for @today.
+  ///
+  /// In zh, this message translates to:
+  /// **'今天'**
+  String get today;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

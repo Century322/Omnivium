@@ -2156,4 +2156,7 @@ class SKo extends S {
 
   @override
   String get no_remote_config => '暂无远程配置';
+
+  @override
+  String get today => '今天';
 }

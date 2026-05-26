@@ -711,5 +711,8 @@
     "ui_schemas": "UI 模板",
     "no_feature_flags": "暂无功能开关",
     "no_remote_config": "暂无远程配置",
-    "voice_not_available": "语音输入不可用"
+    "voice_not_available": "语音输入不可用",
+    "typing": "正在输入…",
+    "today": "今天",
+    "yesterday": "昨天"
 }

@@ -67,7 +67,7 @@ class SEn extends S {
   String get orch_cancelled => 'Operation cancelled';
 
   @override
-  String get typing => 'Typing…';
+  String get typing => 'typing…';
 
   @override
   String get delete => 'Delete';
@@ -2222,4 +2222,7 @@ class SEn extends S {
 
   @override
   String get no_remote_config => 'No remote config';
+
+  @override
+  String get today => 'Today';
 }

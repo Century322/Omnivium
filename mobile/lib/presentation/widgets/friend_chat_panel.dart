@@ -283,6 +283,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
             replyToSender: replyToSender,
             formattedContent: formattedContent,
             senderId: event.senderId,
+          timestamp: event.originServerTs,
           ),
         );
       }
@@ -1618,16 +1619,43 @@ class _FriendChatPanelState extends State<FriendChatPanel>
       itemCount: _friendMessages.length,
       itemBuilder: (_, i) {
         final msg = _friendMessages[i];
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 4),
-          child: Align(
-            alignment: msg.isMe ? Alignment.centerRight : Alignment.centerLeft,
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onLongPress: () => _showMessageActions(i),
-              child: Container(
-                constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).size.width * 0.7,
+        final showDateHeader = i == 0 ||
+            _shouldShowDateSeparator(_friendMessages[i - 1], msg);
+        return Column(
+          children: [
+            if (showDateHeader)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Center(
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.sfAlt(context),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      _formatDateHeader(msg.timestamp),
+                      style: TextStyle(
+                        color: AppColors.textTertiary(context),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Align(
+                alignment:
+                    msg.isMe ? Alignment.centerRight : Alignment.centerLeft,
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onLongPress: () => _showMessageActions(i),
+                  child: Container(
+                    constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width * 0.7,
                 ),
                 padding: msg.isImage || msg.isFile
                     ? EdgeInsets.zero
@@ -1698,6 +1726,19 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                       _buildMessageContent(msg),
                       _buildLinkPreviews(msg.content),
                     ],
+                    if (msg.timestamp != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Text(
+                          _formatMessageTime(msg.timestamp!),
+                          style: TextStyle(
+                            color: msg.isMe
+                                ? AppColors.bg(context).withValues(alpha: 0.5)
+                                : AppColors.textDisabled(context),
+                            fontSize: 10,
+                          ),
+                        ),
+                      ),
                     if (msg.isMe) ...[
                       const SizedBox(height: 4),
                       Builder(
@@ -1749,8 +1790,9 @@ class _FriendChatPanelState extends State<FriendChatPanel>
               ),
             ),
           ),
-        );
-      },
+        ],
+      );
+    },
     );
   }
 
@@ -1866,6 +1908,31 @@ class _FriendChatPanelState extends State<FriendChatPanel>
         ),
       ),
     );
+  }
+
+  bool _shouldShowDateSeparator(FriendMessageData prev, FriendMessageData curr) {
+    if (prev.timestamp == null || curr.timestamp == null) return false;
+    return _dateOnly(prev.timestamp!) != _dateOnly(curr.timestamp!);
+  }
+
+  String _dateOnly(DateTime dt) =>
+      '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}';
+
+  String _formatDateHeader(DateTime? dt) {
+    if (dt == null) return '';
+    final now = DateTime.now();
+    final today = _dateOnly(now);
+    final yesterday = _dateOnly(now.subtract(const Duration(days: 1)));
+    final dateStr = _dateOnly(dt);
+    if (dateStr == today) return t('today');
+    if (dateStr == yesterday) return t('yesterday');
+    return '${dt.month}/${dt.day}/${dt.year}';
+  }
+
+  String _formatMessageTime(DateTime dt) {
+    final h = dt.hour.toString().padLeft(2, '0');
+    final m = dt.minute.toString().padLeft(2, '0');
+    return '$h:$m';
   }
 
   Widget _buildMessageContent(FriendMessageData msg) {

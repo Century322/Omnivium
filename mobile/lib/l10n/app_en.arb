@@ -711,5 +711,8 @@
     "ui_schemas": "UI Schemas",
     "no_feature_flags": "No feature flags",
     "no_remote_config": "No remote config",
-    "voice_not_available": "Voice input not available"
+    "voice_not_available": "Voice input not available",
+    "typing": "typing…",
+    "today": "Today",
+    "yesterday": "Yesterday"
 }

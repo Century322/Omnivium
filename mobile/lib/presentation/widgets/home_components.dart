@@ -45,6 +45,7 @@ class FriendMessageData {
   final String? replyToSender;
   final String? formattedContent;
   final String? senderId;
+  final DateTime? timestamp;
   const FriendMessageData({
     required this.isMe,
     required this.content,
@@ -57,6 +58,7 @@ class FriendMessageData {
     this.replyToSender,
     this.formattedContent,
     this.senderId,
+    this.timestamp,
   });
   bool get isVoice => msgType == 'm.audio' || content.startsWith('🎙️');
   bool get isImage => msgType == 'm.image';

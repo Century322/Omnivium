@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:matrix/matrix.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../theme/app_colors.dart';
 import '../theme/locale_provider.dart';
 import '../../core/app_provider.dart';
@@ -160,26 +161,7 @@ class _MessageListViewState extends State<MessageListView> {
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         leading: Stack(
           children: [
-            CircleAvatar(
-              radius: 24,
-              backgroundColor: isDirect
-                  ? AppColors.accBg(context)
-                  : AppColors.sfActive(context),
-              child: isDirect
-                  ? Text(
-                      initial,
-                      style: TextStyle(
-                        color: AppColors.acc(context),
-                        fontWeight: FontWeight.w600,
-                        fontSize: 18,
-                      ),
-                    )
-                  : Icon(
-                      LucideIcons.users,
-                      size: 20,
-                      color: AppColors.textSecondary(context),
-                    ),
-            ),
+            _buildAvatar(room, initial, isDirect),
             if (isEncrypted)
               Positioned(
                 right: 0,
@@ -227,14 +209,46 @@ class _MessageListViewState extends State<MessageListView> {
         ),
         subtitle: Row(
           children: [
-            Expanded(
-              child: Text(
-                lastMessage,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: AppColors.mut(context), fontSize: 13),
+            if (room.isMuted)
+              Padding(
+                padding: const EdgeInsets.only(right: 4),
+                child: Icon(
+                  LucideIcons.bellOff,
+                  size: 12,
+                  color: AppColors.textDisabled(context),
+                ),
               ),
+            Expanded(
+              child: room.typingUsers.isNotEmpty
+                  ? Text(
+                      localeProvider.t('typing'),
+                      style: TextStyle(
+                        color: AppColors.acc(context),
+                        fontSize: 13,
+                        fontStyle: FontStyle.italic,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    )
+                  : Text(
+                      lastMessage,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: AppColors.mut(context),
+                        fontSize: 13,
+                      ),
+                    ),
             ),
+            if (room.isPinned)
+              Padding(
+                padding: const EdgeInsets.only(left: 4),
+                child: Icon(
+                  LucideIcons.pin,
+                  size: 12,
+                  color: AppColors.textDisabled(context),
+                ),
+              ),
             if (unreadCount > 0)
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -564,6 +578,46 @@ class _MessageListViewState extends State<MessageListView> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildAvatar(Room room, String initial, bool isDirect) {
+    final avatarUrl = room.avatar;
+    if (avatarUrl != null) {
+      final client = widget.provider.matrix.client;
+      if (client != null) {
+        final httpUrl = avatarUrl.getDownloadUri(client);
+        return CircleAvatar(
+          radius: 24,
+          backgroundColor: AppColors.accBg(context),
+          backgroundImage: CachedNetworkImageProvider(
+            httpUrl.toString(),
+            headers: client.accessToken != null
+                ? {'authorization': 'Bearer ${client.accessToken}'}
+                : null,
+          ),
+        );
+      }
+    }
+    return CircleAvatar(
+      radius: 24,
+      backgroundColor: isDirect
+          ? AppColors.accBg(context)
+          : AppColors.sfActive(context),
+      child: isDirect
+          ? Text(
+              initial,
+              style: TextStyle(
+                color: AppColors.acc(context),
+                fontWeight: FontWeight.w600,
+                fontSize: 18,
+              ),
+            )
+          : Icon(
+              LucideIcons.users,
+              size: 20,
+              color: AppColors.textSecondary(context),
+            ),
     );
   }
 
