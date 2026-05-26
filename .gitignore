@@ -6,6 +6,9 @@ build/
 *.lock
 !pubspec.lock
 
+# Reference source code (not part of project)
+Telegram-master/
+
 # IDE
 .idea/
 *.iml
