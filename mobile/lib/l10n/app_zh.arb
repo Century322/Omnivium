@@ -49,7 +49,7 @@
     "model":  "模型",
     "voice_recognition":  "语音识别",
     "tpl_code_user":  "请帮我编写以下功能的代码：\n\n",
-    "no_models":  "暂无模型，点击下方添加",
+    "no_models": "暂无模型",
     "execution_running":  "执行中…",
     "notifications_desc":  "来自\"发现\"的每日主题",
     "orch_error":  "出错了：",

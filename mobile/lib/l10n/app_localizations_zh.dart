@@ -160,7 +160,7 @@ class SZh extends S {
   String get tpl_code_user => '请帮我编写以下功能的代码：\n\n';
 
   @override
-  String get no_models => '暂无模型，点击下方添加';
+  String get no_models => '暂无模型';
 
   @override
   String get execution_running => '执行中…';

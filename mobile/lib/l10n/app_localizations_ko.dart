@@ -160,7 +160,7 @@ class SKo extends S {
   String get tpl_code_user => '다음 기능의 코드를 작성해주세요:\n\n';
 
   @override
-  String get no_models => '모델 없음. 아래 버튼으로 추가';
+  String get no_models => '모델 없음';
 
   @override
   String get execution_running => '실행 중…';

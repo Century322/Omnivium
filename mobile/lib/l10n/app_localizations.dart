@@ -404,7 +404,7 @@ abstract class S {
   /// No description provided for @no_models.
   ///
   /// In zh, this message translates to:
-  /// **'暂无模型，点击下方添加'**
+  /// **'暂无模型'**
   String get no_models;
 
   /// No description provided for @execution_running.

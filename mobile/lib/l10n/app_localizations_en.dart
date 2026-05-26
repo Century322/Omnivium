@@ -163,7 +163,7 @@ class SEn extends S {
       'Please write code for the following feature:\n\n';
 
   @override
-  String get no_models => 'No models yet, tap below to add';
+  String get no_models => 'No models yet';
 
   @override
   String get execution_running => 'Running…';

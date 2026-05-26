@@ -49,7 +49,7 @@
     "model":  "Model",
     "voice_recognition":  "Voice Recognition",
     "tpl_code_user":  "Please write code for the following feature:\n\n",
-    "no_models":  "No models yet, tap below to add",
+    "no_models": "No models yet",
     "execution_running":  "Running…",
     "notifications_desc":  "Daily topics from Discover",
     "orch_error":  "Error: ",

@@ -49,7 +49,7 @@
     "model":  "モデル",
     "voice_recognition":  "音声認識",
     "tpl_code_user":  "以下の機能のコードを書いてください：\n\n",
-    "no_models":  "モデルなし。下のボタンから追加",
+    "no_models": "モデルなし",
     "execution_running":  "実行中…",
     "notifications_desc":  "発見からのデイリートピック",
     "orch_error":  "エラー：",

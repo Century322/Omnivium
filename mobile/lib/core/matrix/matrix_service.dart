@@ -152,10 +152,27 @@ class MatrixService {
             newDeviceID: deviceId ?? '',
           );
         } catch (e) {
-          AppLogger.instance.warning('Session restore failed', error: e);
-          client.dispose();
-          await _closeDatabase();
-          return false;
+          AppLogger.instance.warning(
+            'Session restore network failed, trying offline',
+            error: e,
+          );
+          try {
+            await client.init(
+              newToken: token,
+              newUserID: userId,
+              newHomeserver: Uri.parse(homeserver),
+              newDeviceName: deviceName ?? 'Omnivium',
+              newDeviceID: deviceId ?? '',
+            );
+          } catch (e2) {
+            AppLogger.instance.warning(
+              'Offline session restore also failed',
+              error: e2,
+            );
+            client.dispose();
+            await _closeDatabase();
+            return false;
+          }
         }
         _client = client;
         client.backgroundSync = true;

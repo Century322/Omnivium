@@ -161,7 +161,7 @@ class SJa extends S {
   String get tpl_code_user => '以下の機能のコードを書いてください：\n\n';
 
   @override
-  String get no_models => 'モデルなし。下のボタンから追加';
+  String get no_models => 'モデルなし';
 
   @override
   String get execution_running => '実行中…';

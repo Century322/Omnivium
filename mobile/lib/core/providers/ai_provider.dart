@@ -3,8 +3,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../app_logger.dart';
 import '../api_proxy_service.dart';
-import '../auth_service.dart';
-import '../matrix/matrix_service.dart';
 
 class ChatMessage {
   final String role;
@@ -56,21 +54,9 @@ class ChatService {
   }
 
   void _handleAuthFailure() {
-    final matrix = MatrixService.instance;
-    if (matrix.isLoggedIn) {
-      final auth = AuthService.instance;
-      auth
-          .refreshSession()
-          .then((success) {
-            if (!success) {
-              matrix.logout();
-              _authEventController.add(AuthEvent.tokenExpired);
-            }
-          })
-          .catchError((_) {
-            _authEventController.add(AuthEvent.tokenExpired);
-          });
-    }
+    AppLogger.instance.warning(
+      'AI API auth failure, not affecting Matrix session',
+    );
   }
 
   Map<String, String> _headersWithBody(String body) {

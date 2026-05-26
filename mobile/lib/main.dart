@@ -556,9 +556,11 @@ class _AppShellState extends State<_AppShell>
       _provider.session.startAutoSave();
       _authEventSub = ChatService.onAuthEvent.listen((event) {
         if (event == AuthEvent.tokenExpired && mounted) {
-          setState(() {
-            _showLogin = true;
-          });
+          if (!_provider.matrix.isLoggedIn) {
+            setState(() {
+              _showLogin = true;
+            });
+          }
         }
       });
       setState(() {

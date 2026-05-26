@@ -330,7 +330,7 @@ class _LibraryPanelState extends State<LibraryPanel> {
       behavior: HitTestBehavior.opaque,
       onTap: () {
         final room = widget.provider.matrix.client?.getRoomById(data.id);
-        if (room != null && room.isDirectChat) {
+        if (room != null) {
           widget.onOpenFriendChat?.call(data.id, data.name);
         }
       },
