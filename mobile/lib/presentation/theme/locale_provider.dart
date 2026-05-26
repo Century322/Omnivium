@@ -394,6 +394,8 @@ class LocaleProvider extends ChangeNotifier {
       'read': s.read,
       'voice_call': s.voice_call,
       'yesterday': s.yesterday,
+      'edited': s.edited,
+      'forwarded_from': s.forwarded_from,
       'orch_quality_score': s.orch_quality_score,
       'no_match_msg': s.no_match_msg,
       'offline': s.offline,

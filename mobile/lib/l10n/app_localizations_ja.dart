@@ -2158,4 +2158,10 @@ class SJa extends S {
 
   @override
   String get today => '今天';
+
+  @override
+  String get edited => '已编辑';
+
+  @override
+  String get forwarded_from => '转发自';
 }

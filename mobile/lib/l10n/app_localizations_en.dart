@@ -2225,4 +2225,10 @@ class SEn extends S {
 
   @override
   String get today => 'Today';
+
+  @override
+  String get edited => 'edited';
+
+  @override
+  String get forwarded_from => 'Forwarded from';
 }

@@ -58,6 +58,7 @@ import 'presentation/views/discover_view.dart';
 import 'presentation/views/search_view.dart';
 import 'presentation/views/settings_view.dart';
 import 'presentation/views/matrix_login_view.dart';
+import 'presentation/widgets/friend_chat_panel.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
@@ -565,6 +566,10 @@ class _AppShellState extends State<_AppShell>
 
     final restored = results[2] as bool;
     final hasConsented = results[5] as bool;
+
+    if (restored) {
+      FriendChatPanel.flushOutbox();
+    }
 
     if (mounted) {
       _provider.session.startAutoSave();

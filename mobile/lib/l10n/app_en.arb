@@ -714,5 +714,7 @@
     "voice_not_available": "Voice input not available",
     "typing": "typing…",
     "today": "Today",
-    "yesterday": "Yesterday"
+    "yesterday": "Yesterday",
+    "edited": "edited",
+    "forwarded_from": "Forwarded from"
 }

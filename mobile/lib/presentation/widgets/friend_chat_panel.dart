@@ -14,6 +14,8 @@ import '../theme/locale_provider.dart';
 import '../../core/app_provider.dart';
 import '../../core/analytics_service.dart';
 import '../../core/app_logger.dart';
+import '../../core/database_service.dart';
+import '../../core/matrix/matrix_service.dart';
 import '../../core/call_service.dart';
 import '../../core/haptic_service.dart';
 import '../../core/file_download_service.dart';
@@ -83,6 +85,28 @@ class _FriendChatPanelState extends State<FriendChatPanel>
     _loadMatrixMessages(widget.chatTargetId);
     _markRoomAsRead(widget.chatTargetId);
     _scrollController.addListener(_onScroll);
+    _restoreDraft();
+  }
+
+  void _restoreDraft() {
+    final db = DatabaseService.instance;
+    final draft = db.getData('draft_${widget.chatTargetId}');
+    if (draft != null) {
+      final text = draft['text'] as String? ?? '';
+      if (text.isNotEmpty) {
+        _textController.text = text;
+      }
+    }
+  }
+
+  void _saveDraft() {
+    final db = DatabaseService.instance;
+    final text = _textController.text.trim();
+    if (text.isEmpty) {
+      db.deleteData('draft_${widget.chatTargetId}');
+    } else {
+      db.putData('draft_${widget.chatTargetId}', {'text': text});
+    }
   }
 
   void _onScroll() {
@@ -96,6 +120,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
 
   @override
   void dispose() {
+    _saveDraft();
     _presenceTimer?.cancel();
     _textController.dispose();
     _focusNode.dispose();
@@ -284,7 +309,12 @@ class _FriendChatPanelState extends State<FriendChatPanel>
             formattedContent: formattedContent,
             senderId: event.senderId,
           timestamp: event.originServerTs,
-          ),
+          isEdited: event.content['m.new_content'] != null ||
+              event.content['m.relates_to']?['rel_type'] == 'm.replace',
+          forwardFrom: event.content['formatted_body'] != null
+              ? _extractForwardFrom(event.content['formatted_body'] as String?)
+              : null,
+        ),
         );
       }
     }
@@ -315,6 +345,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
     HapticService.sendMessage();
     _textController.clear();
     _focusNode.unfocus();
+    _saveDraft();
 
     final matrix = widget.provider.matrix;
     if (matrix.isLoggedIn && widget.chatTargetId.isNotEmpty) {
@@ -333,12 +364,62 @@ class _FriendChatPanelState extends State<FriendChatPanel>
         AnalyticsService.instance.logSendMessage(type: 'text');
       }
       setState(() => _replyingTo = null);
+    } else {
+      _enqueueOutbox(text);
     }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!_scrollController.hasClients) return;
       _scrollToLatest();
     });
+  }
+
+  void _enqueueOutbox(String text) {
+    final db = DatabaseService.instance;
+    final outbox = db.getData('outbox') ?? {'messages': <Map>[]};
+    final messages = List<Map<String, dynamic>>.from(
+      outbox['messages'] as List? ?? [],
+    );
+    messages.add({
+      'roomId': widget.chatTargetId,
+      'text': text,
+      'timestamp': DateTime.now().millisecondsSinceEpoch,
+    });
+    db.putData('outbox', {'messages': messages});
+    setState(() {
+      _friendMessages.add(FriendMessageData(
+        isMe: true,
+        content: text,
+        timestamp: DateTime.now(),
+      ));
+    });
+  }
+
+  static Future<void> flushOutbox() async {
+    final db = DatabaseService.instance;
+    final outbox = db.getData('outbox');
+    if (outbox == null) return;
+    final messages = List<Map<String, dynamic>>.from(
+      outbox['messages'] as List? ?? [],
+    );
+    if (messages.isEmpty) return;
+    db.deleteData('outbox');
+    for (final msg in messages) {
+      final roomId = msg['roomId'] as String?;
+      final text = msg['text'] as String?;
+      if (roomId == null || text == null) continue;
+      try {
+        final matrix = MatrixService.instance;
+        if (matrix.isLoggedIn) {
+          final room = matrix.client?.getRoomById(roomId);
+          if (room != null) {
+            await room.sendTextEvent(text);
+          }
+        }
+      } catch (e) {
+        AppLogger.instance.warning('Outbox flush failed', error: e);
+      }
+    }
   }
 
   void _sendVoiceMessage(String path, Duration duration) async {
@@ -1723,20 +1804,68 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                           ),
                         ),
                       ],
+                      if (msg.forwardFrom != null)
+                        Container(
+                          margin: const EdgeInsets.only(bottom: 6),
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: msg.isMe
+                                ? AppColors.bg(context).withValues(alpha: 0.1)
+                                : AppColors.sfAlt(context),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                LucideIcons.forward,
+                                size: 12,
+                                color: AppColors.textTertiary(context),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                '${t('forwarded_from')} ${msg.forwardFrom}',
+                                style: TextStyle(
+                                  color: AppColors.textTertiary(context),
+                                  fontSize: 11,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       _buildMessageContent(msg),
                       _buildLinkPreviews(msg.content),
                     ],
                     if (msg.timestamp != null)
                       Padding(
                         padding: const EdgeInsets.only(top: 4),
-                        child: Text(
-                          _formatMessageTime(msg.timestamp!),
-                          style: TextStyle(
-                            color: msg.isMe
-                                ? AppColors.bg(context).withValues(alpha: 0.5)
-                                : AppColors.textDisabled(context),
-                            fontSize: 10,
-                          ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              _formatMessageTime(msg.timestamp!),
+                              style: TextStyle(
+                                color: msg.isMe
+                                    ? AppColors.bg(context).withValues(alpha: 0.5)
+                                    : AppColors.textDisabled(context),
+                                fontSize: 10,
+                              ),
+                            ),
+                            if (msg.isEdited) ...[
+                              const SizedBox(width: 4),
+                              Text(
+                                '(${t('edited')})',
+                                style: TextStyle(
+                                  color: msg.isMe
+                                      ? AppColors.bg(context).withValues(alpha: 0.4)
+                                      : AppColors.textDisabled(context),
+                                  fontSize: 9,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                       ),
                     if (msg.isMe) ...[
@@ -1908,6 +2037,12 @@ class _FriendChatPanelState extends State<FriendChatPanel>
         ),
       ),
     );
+  }
+
+  String? _extractForwardFrom(String? formattedBody) {
+    if (formattedBody == null) return null;
+    final forwardMatch = RegExp(r'Forwarded from\s+([^<]+)').firstMatch(formattedBody);
+    return forwardMatch?.group(1)?.trim();
   }
 
   bool _shouldShowDateSeparator(FriendMessageData prev, FriendMessageData curr) {

@@ -46,6 +46,8 @@ class FriendMessageData {
   final String? formattedContent;
   final String? senderId;
   final DateTime? timestamp;
+  final bool isEdited;
+  final String? forwardFrom;
   const FriendMessageData({
     required this.isMe,
     required this.content,
@@ -59,6 +61,8 @@ class FriendMessageData {
     this.formattedContent,
     this.senderId,
     this.timestamp,
+    this.isEdited = false,
+    this.forwardFrom,
   });
   bool get isVoice => msgType == 'm.audio' || content.startsWith('🎙️');
   bool get isImage => msgType == 'm.image';

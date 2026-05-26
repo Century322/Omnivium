@@ -4372,6 +4372,18 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'今天'**
   String get today;
+
+  /// No description provided for @edited.
+  ///
+  /// In zh, this message translates to:
+  /// **'已编辑'**
+  String get edited;
+
+  /// No description provided for @forwarded_from.
+  ///
+  /// In zh, this message translates to:
+  /// **'转发自'**
+  String get forwarded_from;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {
