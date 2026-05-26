@@ -14,6 +14,7 @@ import '../theme/locale_provider.dart';
 import '../../core/app_provider.dart';
 import '../../core/analytics_service.dart';
 import '../../core/app_logger.dart';
+import '../../core/voice_service.dart';
 import '../../core/database_service.dart';
 import '../../core/matrix/matrix_service.dart';
 import '../../core/call_service.dart';
@@ -114,6 +115,15 @@ class _FriendChatPanelState extends State<FriendChatPanel>
     _markRoomAsRead(widget.chatTargetId);
     _scrollController.addListener(_onScroll);
     _restoreDraft();
+    VoiceService.instance.onFinalResult.listen((text) {
+      if (!mounted || text.isEmpty) return;
+      final current = _textController.text;
+      _textController.text = current.isEmpty ? text : '$current $text';
+      _textController.selection = TextSelection.collapsed(
+        offset: _textController.text.length,
+      );
+      setState(() {});
+    });
   }
 
   void _restoreDraft() {
@@ -354,12 +364,18 @@ class _FriendChatPanelState extends State<FriendChatPanel>
     return messages;
   }
 
-  void _toggleListening() {
-    setState(() => _isListening = !_isListening);
+  void _toggleListening() async {
+    final voice = VoiceService.instance;
     if (_isListening) {
-      _listeningGlow.forward();
-    } else {
+      await voice.stopListening();
+      setState(() => _isListening = false);
       _listeningGlow.reverse();
+    } else {
+      final ok = await voice.startListening();
+      if (ok) {
+        setState(() => _isListening = true);
+        _listeningGlow.forward();
+      }
     }
   }
 

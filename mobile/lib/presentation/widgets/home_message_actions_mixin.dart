@@ -15,7 +15,6 @@ mixin HomeMessageActionsMixin<T extends StatefulWidget> on State<T> {
   int get editingIndex;
   set editingIndex(int value);
   void markNeedsRebuild();
-  void resetMaxScrollOffset();
 
   void editQuery(int index) {
     if (index <= 0 || index >= messages.length) return;
@@ -32,7 +31,6 @@ mixin HomeMessageActionsMixin<T extends StatefulWidget> on State<T> {
     setState(() {
       editingIndex = -1;
     });
-    resetMaxScrollOffset();
     provider.session.saveCurrentSession();
   }
 

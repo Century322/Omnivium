@@ -77,7 +77,8 @@ class ThemeProvider extends ChangeNotifier {
   }
 
   SystemUiOverlayStyle get overlayStyle {
-    final isDark = _mode == ThemeMode.dark ||
+    final isDark =
+        _mode == ThemeMode.dark ||
         (_mode == ThemeMode.system &&
             WidgetsBinding.instance.platformDispatcher.platformBrightness ==
                 Brightness.dark);

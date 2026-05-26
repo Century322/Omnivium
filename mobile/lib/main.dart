@@ -715,43 +715,43 @@ class _AppShellState extends State<_AppShell>
         }
 
         return PopScope(
-            canPop:
-                !_provider.navigation.isSettingsOpen &&
-                _provider.navigation.currentView == ViewState.home,
-            onPopInvokedWithResult: (didPop, _) {
-              if (didPop) return;
-              if (_provider.navigation.isSettingsOpen) {
-                _provider.navigation.closeSettingsAndReturnToDrawer();
-              } else if (_provider.navigation.currentView != ViewState.home) {
-                _provider.navigation.goBack();
-              }
-            },
-            child: AppErrorBoundary(
-              child: Stack(
-                children: [
-                  HomeView(provider: _provider),
-                  if (_showLogin && !isLoggedIn)
-                    MatrixLoginView(
-                      provider: _provider,
-                      onLoginSuccess: _onLoginSuccess,
-                    ),
-                  AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 350),
-                    switchInCurve: Curves.easeOutCubic,
-                    switchOutCurve: Curves.easeInCubic,
-                    transitionBuilder: (child, animation) {
-                      return SlideTransition(
-                        position: Tween<Offset>(
-                          begin: const Offset(1, 0),
-                          end: Offset.zero,
-                        ).animate(animation),
-                        child: child,
-                      );
-                    },
-                    child: _buildCurrentOverlay(),
+          canPop:
+              !_provider.navigation.isSettingsOpen &&
+              _provider.navigation.currentView == ViewState.home,
+          onPopInvokedWithResult: (didPop, _) {
+            if (didPop) return;
+            if (_provider.navigation.isSettingsOpen) {
+              _provider.navigation.closeSettingsAndReturnToDrawer();
+            } else if (_provider.navigation.currentView != ViewState.home) {
+              _provider.navigation.goBack();
+            }
+          },
+          child: AppErrorBoundary(
+            child: Stack(
+              children: [
+                HomeView(provider: _provider),
+                if (_showLogin && !isLoggedIn)
+                  MatrixLoginView(
+                    provider: _provider,
+                    onLoginSuccess: _onLoginSuccess,
                   ),
-                ],
-              ),
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 350),
+                  switchInCurve: Curves.easeOutCubic,
+                  switchOutCurve: Curves.easeInCubic,
+                  transitionBuilder: (child, animation) {
+                    return SlideTransition(
+                      position: Tween<Offset>(
+                        begin: const Offset(1, 0),
+                        end: Offset.zero,
+                      ).animate(animation),
+                      child: child,
+                    );
+                  },
+                  child: _buildCurrentOverlay(),
+                ),
+              ],
+            ),
           ),
         );
       },

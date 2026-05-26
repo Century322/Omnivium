@@ -237,7 +237,6 @@ class _HomeViewState extends State<HomeView>
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!scrollController.hasClients) return;
-      calcMaxScrollOffset();
       if (orchestrator.isStreaming) {
         scrollToLatest();
       }
@@ -309,7 +308,6 @@ class _HomeViewState extends State<HomeView>
       _messages.removeAt(_editingIndex + 1);
       _messages.removeAt(_editingIndex);
       _editingIndex = -1;
-      maxScrollOffset = 0;
     }
 
     if (!_hasSentMessage) {
@@ -338,7 +336,6 @@ class _HomeViewState extends State<HomeView>
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!scrollController.hasClients) return;
-      calcMaxScrollOffset();
       scrollToLatest();
     });
   }
@@ -353,7 +350,6 @@ class _HomeViewState extends State<HomeView>
           _textController.clear();
           _focusNode.unfocus();
           showScrollBtn = false;
-          maxScrollOffset = 0;
         });
       }
     });

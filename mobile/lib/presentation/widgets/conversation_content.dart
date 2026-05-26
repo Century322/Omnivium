@@ -43,8 +43,6 @@ class ConversationContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userCount = messages.where((m) => m.role == 'user').length;
-    final needSpacer = userCount > 1;
     final items = _buildItems(context);
 
     return LayoutBuilder(
@@ -60,7 +58,7 @@ class ConversationContent extends StatelessWidget {
                   horizontal: 20,
                   vertical: 8,
                 ),
-                itemCount: needSpacer ? items.length + 1 : items.length,
+                itemCount: items.length + 1,
                 itemBuilder: (_, index) {
                   if (index == items.length) {
                     return SizedBox(height: constraints.maxHeight);
@@ -113,13 +111,11 @@ class ConversationContent extends StatelessWidget {
     final items = <ListItemData>[];
     for (var i = 0; i < messages.length; i++) {
       final msg = messages[i];
-      final isLastUser = msg.role == 'user' && i == messages.length - 2;
       if (msg.role == 'user') {
         items.add(
           ListItemData(
             UserBubble(
               content: msg.content,
-              key: isLastUser ? lastUserBubbleKey : null,
               onLongPress: onMessageLongPress != null
                   ? () => onMessageLongPress!(i)
                   : null,
