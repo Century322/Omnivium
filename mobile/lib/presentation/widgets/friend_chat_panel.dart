@@ -308,13 +308,18 @@ class _FriendChatPanelState extends State<FriendChatPanel>
             replyToSender: replyToSender,
             formattedContent: formattedContent,
             senderId: event.senderId,
-          timestamp: event.originServerTs,
-          isEdited: event.content['m.new_content'] != null ||
-              event.content['m.relates_to']?['rel_type'] == 'm.replace',
-          forwardFrom: event.content['formatted_body'] != null
-              ? _extractForwardFrom(event.content['formatted_body'] as String?)
-              : null,
-        ),
+            timestamp: event.originServerTs,
+            isEdited:
+                (event.content['m.new_content'] != null ||
+                (event.content['m.relates_to']
+                        as Map<String, dynamic>?)?['rel_type'] ==
+                    'm.replace'),
+            forwardFrom: event.content['formatted_body'] != null
+                ? _extractForwardFrom(
+                    event.content['formatted_body'] as String?,
+                  )
+                : null,
+          ),
         );
       }
     }
@@ -387,11 +392,9 @@ class _FriendChatPanelState extends State<FriendChatPanel>
     });
     db.putData('outbox', {'messages': messages});
     setState(() {
-      _friendMessages.add(FriendMessageData(
-        isMe: true,
-        content: text,
-        timestamp: DateTime.now(),
-      ));
+      _friendMessages.add(
+        FriendMessageData(isMe: true, content: text, timestamp: DateTime.now()),
+      );
     });
   }
 
@@ -1700,8 +1703,8 @@ class _FriendChatPanelState extends State<FriendChatPanel>
       itemCount: _friendMessages.length,
       itemBuilder: (_, i) {
         final msg = _friendMessages[i];
-        final showDateHeader = i == 0 ||
-            _shouldShowDateSeparator(_friendMessages[i - 1], msg);
+        final showDateHeader =
+            i == 0 || _shouldShowDateSeparator(_friendMessages[i - 1], msg);
         return Column(
           children: [
             if (showDateHeader)
@@ -1709,8 +1712,10 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 child: Center(
                   child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.sfAlt(context),
                       borderRadius: BorderRadius.circular(12),
@@ -1729,199 +1734,214 @@ class _FriendChatPanelState extends State<FriendChatPanel>
             Padding(
               padding: const EdgeInsets.only(bottom: 4),
               child: Align(
-                alignment:
-                    msg.isMe ? Alignment.centerRight : Alignment.centerLeft,
+                alignment: msg.isMe
+                    ? Alignment.centerRight
+                    : Alignment.centerLeft,
                 child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
                   onLongPress: () => _showMessageActions(i),
                   child: Container(
                     constraints: BoxConstraints(
                       maxWidth: MediaQuery.of(context).size.width * 0.7,
-                ),
-                padding: msg.isImage || msg.isFile
-                    ? EdgeInsets.zero
-                    : const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                  color: msg.isMe
-                      ? AppColors.acc(context)
-                      : AppColors.sf(context),
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                child: Column(
-                  crossAxisAlignment: msg.isMe
-                      ? CrossAxisAlignment.end
-                      : CrossAxisAlignment.start,
-                  children: [
-                    if (msg.isVoice && msg.url != null)
-                      VoiceMessagePlayer(url: msg.url!, isMe: msg.isMe)
-                    else if (msg.isImage && msg.url != null)
-                      _buildImageBubble(msg)
-                    else if (msg.isFile)
-                      _buildFileBubble(msg)
-                    else ...[
-                      if (msg.hasReply) ...[
-                        Container(
-                          margin: const EdgeInsets.only(bottom: 6),
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: msg.isMe
-                                ? AppColors.bg(context).withValues(alpha: 0.15)
-                                : AppColors.accBg(context),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border(
-                              left: BorderSide(
-                                color: AppColors.acc(context),
-                                width: 3,
-                              ),
-                            ),
+                    ),
+                    padding: msg.isImage || msg.isFile
+                        ? EdgeInsets.zero
+                        : const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 10,
                           ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                msg.replyToSender ?? '',
-                                style: TextStyle(
-                                  color: AppColors.acc(context),
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                msg.replyToContent ?? '',
-                                style: TextStyle(
-                                  color: msg.isMe
-                                      ? AppColors.bg(
-                                          context,
-                                        ).withValues(alpha: 0.7)
-                                      : AppColors.textTertiary(context),
-                                  fontSize: 12,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                      if (msg.forwardFrom != null)
-                        Container(
-                          margin: const EdgeInsets.only(bottom: 6),
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: msg.isMe
-                                ? AppColors.bg(context).withValues(alpha: 0.1)
-                                : AppColors.sfAlt(context),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                LucideIcons.forward,
-                                size: 12,
-                                color: AppColors.textTertiary(context),
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                '${t('forwarded_from')} ${msg.forwardFrom}',
-                                style: TextStyle(
-                                  color: AppColors.textTertiary(context),
-                                  fontSize: 11,
-                                  fontStyle: FontStyle.italic,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      _buildMessageContent(msg),
-                      _buildLinkPreviews(msg.content),
-                    ],
-                    if (msg.timestamp != null)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 4),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              _formatMessageTime(msg.timestamp!),
-                              style: TextStyle(
+                    decoration: BoxDecoration(
+                      color: msg.isMe
+                          ? AppColors.acc(context)
+                          : AppColors.sf(context),
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: msg.isMe
+                          ? CrossAxisAlignment.end
+                          : CrossAxisAlignment.start,
+                      children: [
+                        if (msg.isVoice && msg.url != null)
+                          VoiceMessagePlayer(url: msg.url!, isMe: msg.isMe)
+                        else if (msg.isImage && msg.url != null)
+                          _buildImageBubble(msg)
+                        else if (msg.isFile)
+                          _buildFileBubble(msg)
+                        else ...[
+                          if (msg.hasReply) ...[
+                            Container(
+                              margin: const EdgeInsets.only(bottom: 6),
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
                                 color: msg.isMe
-                                    ? AppColors.bg(context).withValues(alpha: 0.5)
-                                    : AppColors.textDisabled(context),
-                                fontSize: 10,
-                              ),
-                            ),
-                            if (msg.isEdited) ...[
-                              const SizedBox(width: 4),
-                              Text(
-                                '(${t('edited')})',
-                                style: TextStyle(
-                                  color: msg.isMe
-                                      ? AppColors.bg(context).withValues(alpha: 0.4)
-                                      : AppColors.textDisabled(context),
-                                  fontSize: 9,
-                                  fontStyle: FontStyle.italic,
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                    if (msg.isMe) ...[
-                      const SizedBox(height: 4),
-                      Builder(
-                        builder: (ctx) {
-                          final client = widget.provider.matrix.client;
-                          final room = client?.getRoomById(widget.chatTargetId);
-                          if (room == null) {
-                            return Icon(
-                              LucideIcons.check,
-                              size: 14,
-                              color: AppColors.iconGray(context),
-                            );
-                          }
-                          final isRead = _isMessageRead(room, msg);
-                          if (isRead) {
-                            return Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  LucideIcons.checkCheck,
-                                  size: 14,
-                                  color: AppColors.acc(
-                                    context,
-                                  ).withValues(alpha: 0.7),
-                                ),
-                                const SizedBox(width: 3),
-                                Text(
-                                  t('read'),
-                                  style: TextStyle(
-                                    color: AppColors.acc(
-                                      context,
-                                    ).withValues(alpha: 0.7),
-                                    fontSize: 11,
+                                    ? AppColors.bg(
+                                        context,
+                                      ).withValues(alpha: 0.15)
+                                    : AppColors.accBg(context),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border(
+                                  left: BorderSide(
+                                    color: AppColors.acc(context),
+                                    width: 3,
                                   ),
                                 ),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    msg.replyToSender ?? '',
+                                    style: TextStyle(
+                                      color: AppColors.acc(context),
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    msg.replyToContent ?? '',
+                                    style: TextStyle(
+                                      color: msg.isMe
+                                          ? AppColors.bg(
+                                              context,
+                                            ).withValues(alpha: 0.7)
+                                          : AppColors.textTertiary(context),
+                                      fontSize: 12,
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                          if (msg.forwardFrom != null)
+                            Container(
+                              margin: const EdgeInsets.only(bottom: 6),
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: msg.isMe
+                                    ? AppColors.bg(
+                                        context,
+                                      ).withValues(alpha: 0.1)
+                                    : AppColors.sfAlt(context),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    LucideIcons.forward,
+                                    size: 12,
+                                    color: AppColors.textTertiary(context),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    '${t('forwarded_from')} ${msg.forwardFrom}',
+                                    style: TextStyle(
+                                      color: AppColors.textTertiary(context),
+                                      fontSize: 11,
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          _buildMessageContent(msg),
+                          _buildLinkPreviews(msg.content),
+                        ],
+                        if (msg.timestamp != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  _formatMessageTime(msg.timestamp!),
+                                  style: TextStyle(
+                                    color: msg.isMe
+                                        ? AppColors.bg(
+                                            context,
+                                          ).withValues(alpha: 0.5)
+                                        : AppColors.textDisabled(context),
+                                    fontSize: 10,
+                                  ),
+                                ),
+                                if (msg.isEdited) ...[
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    '(${t('edited')})',
+                                    style: TextStyle(
+                                      color: msg.isMe
+                                          ? AppColors.bg(
+                                              context,
+                                            ).withValues(alpha: 0.4)
+                                          : AppColors.textDisabled(context),
+                                      fontSize: 9,
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                  ),
+                                ],
                               ],
-                            );
-                          }
-                          return Icon(
-                            LucideIcons.check,
-                            size: 14,
-                            color: AppColors.iconGray(context),
-                          );
-                        },
-                      ),
-                    ],
-                  ],
+                            ),
+                          ),
+                        if (msg.isMe) ...[
+                          const SizedBox(height: 4),
+                          Builder(
+                            builder: (ctx) {
+                              final client = widget.provider.matrix.client;
+                              final room = client?.getRoomById(
+                                widget.chatTargetId,
+                              );
+                              if (room == null) {
+                                return Icon(
+                                  LucideIcons.check,
+                                  size: 14,
+                                  color: AppColors.iconGray(context),
+                                );
+                              }
+                              final isRead = _isMessageRead(room, msg);
+                              if (isRead) {
+                                return Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      LucideIcons.checkCheck,
+                                      size: 14,
+                                      color: AppColors.acc(
+                                        context,
+                                      ).withValues(alpha: 0.7),
+                                    ),
+                                    const SizedBox(width: 3),
+                                    Text(
+                                      t('read'),
+                                      style: TextStyle(
+                                        color: AppColors.acc(
+                                          context,
+                                        ).withValues(alpha: 0.7),
+                                        fontSize: 11,
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              }
+                              return Icon(
+                                LucideIcons.check,
+                                size: 14,
+                                color: AppColors.iconGray(context),
+                              );
+                            },
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
-      );
-    },
+          ],
+        );
+      },
     );
   }
 
@@ -2041,11 +2061,16 @@ class _FriendChatPanelState extends State<FriendChatPanel>
 
   String? _extractForwardFrom(String? formattedBody) {
     if (formattedBody == null) return null;
-    final forwardMatch = RegExp(r'Forwarded from\s+([^<]+)').firstMatch(formattedBody);
+    final forwardMatch = RegExp(
+      r'Forwarded from\s+([^<]+)',
+    ).firstMatch(formattedBody);
     return forwardMatch?.group(1)?.trim();
   }
 
-  bool _shouldShowDateSeparator(FriendMessageData prev, FriendMessageData curr) {
+  bool _shouldShowDateSeparator(
+    FriendMessageData prev,
+    FriendMessageData curr,
+  ) {
     if (prev.timestamp == null || curr.timestamp == null) return false;
     return _dateOnly(prev.timestamp!) != _dateOnly(curr.timestamp!);
   }
