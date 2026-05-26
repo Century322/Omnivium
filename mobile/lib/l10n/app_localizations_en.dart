@@ -2231,4 +2231,19 @@ class SEn extends S {
 
   @override
   String get forwarded_from => 'Forwarded from';
+
+  @override
+  String get chat_wallpaper => 'Chat Wallpaper';
+
+  @override
+  String get chat_wallpaper_desc => 'Customize chat background';
+
+  @override
+  String get preset_wallpapers => 'Preset Wallpapers';
+
+  @override
+  String get custom_wallpaper => 'Custom Wallpaper';
+
+  @override
+  String get choose_from_gallery => 'Choose from Gallery';
 }

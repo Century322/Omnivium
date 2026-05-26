@@ -2165,4 +2165,19 @@ class SKo extends S {
 
   @override
   String get forwarded_from => '转发自';
+
+  @override
+  String get chat_wallpaper => '聊天壁纸';
+
+  @override
+  String get chat_wallpaper_desc => '自定义聊天背景';
+
+  @override
+  String get preset_wallpapers => '预设壁纸';
+
+  @override
+  String get custom_wallpaper => '自定义壁纸';
+
+  @override
+  String get choose_from_gallery => '从相册选择';
 }

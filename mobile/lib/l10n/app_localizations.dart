@@ -4384,6 +4384,36 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'转发自'**
   String get forwarded_from;
+
+  /// No description provided for @chat_wallpaper.
+  ///
+  /// In zh, this message translates to:
+  /// **'聊天壁纸'**
+  String get chat_wallpaper;
+
+  /// No description provided for @chat_wallpaper_desc.
+  ///
+  /// In zh, this message translates to:
+  /// **'自定义聊天背景'**
+  String get chat_wallpaper_desc;
+
+  /// No description provided for @preset_wallpapers.
+  ///
+  /// In zh, this message translates to:
+  /// **'预设壁纸'**
+  String get preset_wallpapers;
+
+  /// No description provided for @custom_wallpaper.
+  ///
+  /// In zh, this message translates to:
+  /// **'自定义壁纸'**
+  String get custom_wallpaper;
+
+  /// No description provided for @choose_from_gallery.
+  ///
+  /// In zh, this message translates to:
+  /// **'从相册选择'**
+  String get choose_from_gallery;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

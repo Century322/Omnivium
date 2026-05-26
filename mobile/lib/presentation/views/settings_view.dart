@@ -13,6 +13,8 @@ import '../../core/app_provider.dart';
 import '../../core/analytics_service.dart';
 import '../../core/remote_ui_engine.dart';
 import '../../core/remote_config_service.dart';
+import '../../core/database_service.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../core/auth_service.dart';
 import '../widgets/section_header.dart';
 import '../widgets/setting_item.dart';
@@ -406,6 +408,19 @@ class _SettingsViewState extends State<SettingsView>
                               context,
                               MaterialPageRoute(
                                 builder: (_) => const TermsOfServiceView(),
+                              ),
+                            );
+                          },
+                        ),
+                        SettingItem(
+                          title: t('chat_wallpaper'),
+                          subtitle: t('chat_wallpaper_desc'),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    _WallpaperView(provider: widget.provider),
                               ),
                             );
                           },
@@ -1123,6 +1138,230 @@ class _SettingsViewState extends State<SettingsView>
             );
           }).toList(),
         ),
+      ),
+    );
+  }
+}
+
+class _WallpaperView extends StatefulWidget {
+  final AppProvider provider;
+  const _WallpaperView({required this.provider});
+
+  @override
+  State<_WallpaperView> createState() => _WallpaperViewState();
+}
+
+class _WallpaperViewState extends State<_WallpaperView> {
+  String? _currentWallpaper;
+  final _presets = [
+    'none',
+    'gradient_sunset',
+    'gradient_ocean',
+    'gradient_forest',
+    'gradient_night',
+    'gradient_rose',
+    'solid_dark',
+    'solid_midnight',
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadWallpaper();
+  }
+
+  void _loadWallpaper() {
+    final db = DatabaseService.instance;
+    final data = db.getData('chat_wallpaper');
+    if (data != null) {
+      setState(() => _currentWallpaper = data['id'] as String?);
+    }
+  }
+
+  void _setWallpaper(String id) {
+    final db = DatabaseService.instance;
+    if (id == 'none') {
+      db.deleteData('chat_wallpaper');
+      setState(() => _currentWallpaper = null);
+    } else {
+      db.putData('chat_wallpaper', {'id': id});
+      setState(() => _currentWallpaper = id);
+    }
+  }
+
+  Future<void> _pickCustomImage() async {
+    final picker = ImagePicker();
+    final xfile = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1080,
+      maxHeight: 1920,
+      imageQuality: 80,
+    );
+    if (xfile == null) return;
+    final db = DatabaseService.instance;
+    db.putData('chat_wallpaper', {'id': 'custom', 'path': xfile.path});
+    setState(() => _currentWallpaper = 'custom');
+  }
+
+  BoxDecoration _buildPresetDecoration(String id) {
+    switch (id) {
+      case 'gradient_sunset':
+        return const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFFFF6B35), Color(0xFFF7931E), Color(0xFFFFD700)],
+          ),
+        );
+      case 'gradient_ocean':
+        return const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF0077B6), Color(0xFF00B4D8), Color(0xFF90E0EF)],
+          ),
+        );
+      case 'gradient_forest':
+        return const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF2D6A4F), Color(0xFF40916C), Color(0xFF95D5B2)],
+          ),
+        );
+      case 'gradient_night':
+        return const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF0D1B2A), Color(0xFF1B2838), Color(0xFF2C3E50)],
+          ),
+        );
+      case 'gradient_rose':
+        return const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFFE91E63), Color(0xFFF06292), Color(0xFFF8BBD0)],
+          ),
+        );
+      case 'solid_dark':
+        return const BoxDecoration(color: Color(0xFF1A1A2E));
+      case 'solid_midnight':
+        return const BoxDecoration(color: Color(0xFF16213E));
+      default:
+        return const BoxDecoration(color: Colors.transparent);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = localeProvider.t;
+    return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(LucideIcons.arrowLeft, color: AppColors.sec(context)),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          t('chat_wallpaper'),
+          style: TextStyle(
+            color: AppColors.textPrimary(context),
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          SectionHeader(title: t('preset_wallpapers')),
+          const SizedBox(height: 8),
+          GridView.count(
+            crossAxisCount: 4,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 8,
+            children: _presets.map((id) {
+              final isSelected =
+                  _currentWallpaper == id ||
+                  (id == 'none' && _currentWallpaper == null);
+              return GestureDetector(
+                onTap: () => _setWallpaper(id),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    border: isSelected
+                        ? Border.all(color: AppColors.acc(context), width: 3)
+                        : null,
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Container(
+                      decoration: id == 'none'
+                          ? BoxDecoration(
+                              color: AppColors.bg(context),
+                              border: Border.all(
+                                color: AppColors.divider(context),
+                              ),
+                            )
+                          : _buildPresetDecoration(id),
+                      child: id == 'none'
+                          ? Center(
+                              child: Icon(
+                                LucideIcons.x,
+                                size: 20,
+                                color: AppColors.textDisabled(context),
+                              ),
+                            )
+                          : null,
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 24),
+          SectionHeader(title: t('custom_wallpaper')),
+          const SizedBox(height: 8),
+          GestureDetector(
+            onTap: _pickCustomImage,
+            child: Container(
+              height: 80,
+              decoration: BoxDecoration(
+                color: AppColors.sf(context),
+                borderRadius: BorderRadius.circular(12),
+                border: _currentWallpaper == 'custom'
+                    ? Border.all(color: AppColors.acc(context), width: 3)
+                    : Border.all(color: AppColors.divider(context)),
+              ),
+              child: Center(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      LucideIcons.imagePlus,
+                      size: 20,
+                      color: AppColors.sec(context),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      t('choose_from_gallery'),
+                      style: TextStyle(
+                        color: AppColors.sec(context),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 40),
+        ],
       ),
     );
   }
