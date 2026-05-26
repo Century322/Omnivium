@@ -77,24 +77,26 @@ class ThemeProvider extends ChangeNotifier {
   }
 
   SystemUiOverlayStyle get overlayStyle {
-    switch (_mode) {
-      case ThemeMode.light:
-        return const SystemUiOverlayStyle(
-          statusBarColor: AppColors.lightBackground,
-          statusBarIconBrightness: Brightness.dark,
-          statusBarBrightness: Brightness.light,
-          systemNavigationBarColor: AppColors.lightBackground,
-          systemNavigationBarIconBrightness: Brightness.dark,
-        );
-      default:
-        return const SystemUiOverlayStyle(
-          statusBarColor: AppColors.background,
-          statusBarIconBrightness: Brightness.light,
-          statusBarBrightness: Brightness.dark,
-          systemNavigationBarColor: AppColors.background,
-          systemNavigationBarIconBrightness: Brightness.light,
-        );
+    final isDark = _mode == ThemeMode.dark ||
+        (_mode == ThemeMode.system &&
+            WidgetsBinding.instance.platformDispatcher.platformBrightness ==
+                Brightness.dark);
+    if (isDark) {
+      return const SystemUiOverlayStyle(
+        statusBarColor: AppColors.background,
+        statusBarIconBrightness: Brightness.light,
+        statusBarBrightness: Brightness.dark,
+        systemNavigationBarColor: AppColors.background,
+        systemNavigationBarIconBrightness: Brightness.light,
+      );
     }
+    return const SystemUiOverlayStyle(
+      statusBarColor: AppColors.lightBackground,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.light,
+      systemNavigationBarColor: AppColors.lightBackground,
+      systemNavigationBarIconBrightness: Brightness.dark,
+    );
   }
 
   ThemeData get darkTheme => _buildDarkTheme(accentPreset);

@@ -695,12 +695,9 @@ class _AppShellState extends State<_AppShell>
     }
 
     if (_showPrivacyConsent) {
-      return AnnotatedRegion<SystemUiOverlayStyle>(
-        value: themeProvider.overlayStyle,
-        child: MaterialApp(
-          theme: themeProvider.darkTheme,
-          home: _PrivacyConsentScreen(onResult: _onPrivacyConsentResult),
-        ),
+      return MaterialApp(
+        theme: themeProvider.darkTheme,
+        home: _PrivacyConsentScreen(onResult: _onPrivacyConsentResult),
       );
     }
 
@@ -717,9 +714,7 @@ class _AppShellState extends State<_AppShell>
           _showLogin = true;
         }
 
-        return AnnotatedRegion<SystemUiOverlayStyle>(
-          value: themeProvider.overlayStyle,
-          child: PopScope(
+        return PopScope(
             canPop:
                 !_provider.navigation.isSettingsOpen &&
                 _provider.navigation.currentView == ViewState.home,
@@ -757,7 +752,6 @@ class _AppShellState extends State<_AppShell>
                   ),
                 ],
               ),
-            ),
           ),
         );
       },
