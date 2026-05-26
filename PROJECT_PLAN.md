@@ -1,6 +1,6 @@
 # Omnivium 项目规划文档
 
-> 版本：5.1.0 | 最后更新：2026-05-21 | 状态：**开发中**
+> 版本：5.2.0 | 最后更新：2026-05-26 | 状态：**开发中**
 
 ---
 
@@ -460,3 +460,95 @@ Agent 不只被动响应，还能主动推送：
 - 代码清理 ✅（dart fix 自动清理未使用 import）
 - PWA 离线支持 ❌
 - Matrix 桥接 ❌
+
+---
+
+## 十一、Telegram 对比差距清单（v5.2.0 审计）
+
+基于 Telegram Android 源码逐行审查，共发现 136 项差距。
+
+### 已完成（v5.2.0 新增）
+
+| 功能 | 说明 |
+|------|------|
+| 消息分页加载 | Timeline-based 分页，50条/页，滚动到顶自动加载更多 |
+| 消息回复/引用 | 长按→回复，输入框上方预览，气泡中彩色左边框引用 |
+| 消息转发 | 长按→转发到任意聊天房间 |
+| 消息编辑 | 长按自己的消息→编辑，Matrix m.replace 关系 |
+| 富文本渲染 | flutter_markdown，自动检测格式（粗体/代码/标题/引用/链接） |
+| 已读回执 | 基于 notificationCount 判断，单勾/双勾+文字 |
+| 启动速度优化 | _initCritical 和 _init 全部改为 Future.wait 并行 |
+| 视频通话入口 | initiateCallWithVideo(isVideo: true) |
+| 远程配置接入 | 设置页"功能实验"入口，feature flags + 配置值 + UI Schema 预览 |
+| 语音输入修复 | 连接 VoiceService + 呼吸灯动画 + 平滑边框过渡 |
+| 模型获取修复 | 移除 10.0.2.2 bypass，增加超时到 10s，添加 lastError |
+| 真实头像加载 | Matrix mxc:// URL → CachedNetworkImage + auth header |
+| 消息时间戳 | 每条消息下方显示 HH:MM |
+| 日期分隔符 | "今天"/"昨天"/日期头部 |
+| 正在输入指示器 | 聊天列表显示 "正在输入…" |
+| 静音/置顶图标 | 聊天列表行内 bell-off / pin 图标 |
+| 草稿消息保存 | 退出聊天保存输入内容，进入时恢复 |
+| 发件箱队列 | 离线发送存入 DB，登录恢复后自动发送 |
+| 编辑标记 | "(已编辑)" 显示在时间戳旁 |
+| 转发信息显示 | "转发自 XXX" 显示在消息内容上方 |
+| CI 修复 | 锁定 matrix SDK 7.1.2，修复 API 兼容性 |
+
+### 待做 — CLIENT_ONLY（纯客户端可实现）
+
+| # | 功能 | 优先级 |
+|---|------|--------|
+| 1 | 表情键盘/选择器 | 高 |
+| 2 | 聊天壁纸自定义 | 高 |
+| 3 | 滑动回复手势 | 高 |
+| 4 | 文件下载进度环 | 中 |
+| 5 | 搜索结果上下导航 | 中 |
+| 6 | 消息选择模式（多选转发/删除） | 中 |
+| 7 | 媒体相册分组（多图并排） | 中 |
+| 8 | 渐进式图片加载（先缩略图后高清） | 中 |
+| 9 | 对话文件夹/标签 | 中 |
+| 10 | 文字大小设置 | 低 |
+| 11 | 自动夜间模式 | 低 |
+| 12 | 画板（涂鸦发送） | 低 |
+| 13 | 代理设置 | 低 |
+
+### 待做 — NEEDS_SERVER（需要服务端支持）
+
+| # | 功能 | 服务端需求 |
+|---|------|-----------|
+| 1 | 表情反应 Reaction | Matrix m.reaction (MSC2677)，需服务端存储 |
+| 2 | 贴纸系统 | Matrix Sticker pack，需服务端托管贴纸文件 |
+| 3 | 群组通话 | SFU 服务器（Jitsi/LiveKit/MediaSoup） |
+| 4 | 后台通话服务 | Android 前台 Service + FCM VoIP 推送 |
+| 5 | TURN 服务器 | coturn 或类似 NAT 穿透服务 |
+| 6 | 降噪/回声消除 | rnnoise C 库 + Flutter FFI |
+| 7 | 消息定时发送 | 服务端调度器 |
+| 8 | 消息自动删除 | 服务端定时清理（Matrix redaction） |
+| 9 | 投票/测验 | Matrix polls 事件类型 |
+| 10 | 通知内回复 | 服务端消息发送 API + Android RemoteInput |
+| 11 | 共享媒体浏览 | 服务端媒体索引 |
+| 12 | 实时位置分享 | 位置服务 + 持续 GPS 上报 |
+| 13 | 联系人管理 | 服务端联系人 API |
+| 14 | 消息翻译 | 翻译 API（Google/DeepL） |
+| 15 | GIF 搜索 | GIF API（Tenor/GIPHY） |
+| 16 | 频道订阅 | Matrix 空间/频道功能 |
+| 17 | 管理员工具 | Matrix 权限管理 API |
+| 18 | 邀请链接管理 | Matrix 邀请 API |
+| 19 | 活跃会话管理 | Matrix 设备管理 API |
+| 20 | 隐私设置 | Matrix 隐私 API |
+| 21 | 两步验证 | Matrix 3PID 验证 |
+| 22 | 账号删除 | Matrix 账号停用 API |
+| 23 | 故事（Stories） | 自定义 MSC 或独立服务 |
+| 24 | 付费/Stars 系统 | 支付集成 |
+
+### 待做 — NEEDS_NATIVE（需要原生平台代码）
+
+| # | 功能 | 技术需求 |
+|---|------|---------|
+| 1 | 降噪/回声消除 | rnnoise C 库 + Flutter FFI |
+| 2 | 视频转码压缩 | FFmpeg + Platform Channel |
+| 3 | 通知内直接回复 | Android RemoteInput |
+| 4 | 应用图标未读徽章 | flutter_app_badger |
+| 5 | 屏幕安全标志 | FLAG_SECURE |
+| 6 | VoIP 推送通知 | CallKit (iOS) + ConnectionService (Android) |
+| 7 | 媒体保存到相册 | image_gallery_saver |
+| 8 | 视频缩略图生成 | Platform Channel + ffmpeg |
