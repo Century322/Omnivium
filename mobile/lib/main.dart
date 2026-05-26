@@ -190,27 +190,28 @@ Future<void> _initCritical() async {
   );
   if (_criticalInitFailed) return;
 
-  await _safeInit(
-    () => DatabaseService.instance.migrateFromSharedPreferences(),
-    'DBMigration',
-  );
+  await Future.wait([
+    _safeInit(
+      () => DatabaseService.instance.migrateFromSharedPreferences(),
+      'DBMigration',
+    ),
+    _safeInit(() async {
+      final packageInfo = await PackageInfo.fromPlatform();
+      final storage = SecureStorageService.instance;
+      String? deviceId = await storage.read('omnivium_device_id');
+      if (deviceId == null) {
+        deviceId =
+            'dev_${DateTime.now().millisecondsSinceEpoch}_${packageInfo.buildNumber}';
+        await storage.write('omnivium_device_id', deviceId);
+      }
+      ApiProxyService.instance.setDeviceInfo(
+        deviceId: deviceId,
+        appVersion: '${packageInfo.version}+${packageInfo.buildNumber}',
+      );
+    }, 'DeviceInfo'),
+    _safeInit(() => setupLocator(), 'ServiceLocator'),
+  ]);
 
-  await _safeInit(() async {
-    final packageInfo = await PackageInfo.fromPlatform();
-    final storage = SecureStorageService.instance;
-    String? deviceId = await storage.read('omnivium_device_id');
-    if (deviceId == null) {
-      deviceId =
-          'dev_${DateTime.now().millisecondsSinceEpoch}_${packageInfo.buildNumber}';
-      await storage.write('omnivium_device_id', deviceId);
-    }
-    ApiProxyService.instance.setDeviceInfo(
-      deviceId: deviceId,
-      appVersion: '${packageInfo.version}+${packageInfo.buildNumber}',
-    );
-  }, 'DeviceInfo');
-
-  await setupLocator();
   await _safeInit(
     () => OmniviumSDK.init(persistence: DatabasePersistenceBackend()),
     'RuntimeSDK',
@@ -503,56 +504,68 @@ class _AppShellState extends State<_AppShell>
   }
 
   Future<void> _init() async {
-    try {
-      await SecurityCheckService.instance.check();
-    } catch (e) {
-      AppLogger.instance.warning('SecurityCheck init failed', error: e);
-    }
-    try {
-      NetworkSecurityService.instance.enablePinning();
-    } catch (e) {
-      AppLogger.instance.warning(
-        'NetworkSecurity enablePinning failed',
-        error: e,
-      );
-    }
-    bool restored = false;
-    try {
-      restored = await _provider.matrix.tryRestoreSession();
-    } catch (e) {
-      AppLogger.instance.warning('Matrix session restore failed', error: e);
-    }
-    try {
-      await ApiProxyService.instance.init();
-    } catch (e) {
-      AppLogger.instance.warning('ApiProxy init failed', error: e);
-    }
-    try {
-      await _provider.initSubProviders();
-    } catch (e) {
-      AppLogger.instance.warning('Provider init failed', error: e);
-    }
-    bool hasConsented = false;
-    try {
-      hasConsented = await _privacyService.hasConsented();
-    } catch (e) {
-      AppLogger.instance.warning('PrivacyConsent check failed', error: e);
-    }
-    try {
-      await DeepLinkService.instance.init();
-      DeepLinkService.instance.onDeepLink = (uri) {
-        final sessionId = DeepLinkService.instance.parseSessionId(uri);
-        if (sessionId != null) {
-          _provider.session.switchSession(sessionId);
+    final results = await Future.wait([
+      Future(() async {
+        try {
+          await SecurityCheckService.instance.check();
+        } catch (e) {
+          AppLogger.instance.warning('SecurityCheck init failed', error: e);
         }
-      };
-      final initialLink = DeepLinkService.instance.initialLink;
-      if (initialLink != null) {
-        DeepLinkService.instance.onDeepLink?.call(initialLink);
-      }
-    } catch (e) {
-      AppLogger.instance.warning('DeepLink init failed', error: e);
-    }
+      }),
+      Future(() async {
+        try {
+          NetworkSecurityService.instance.enablePinning();
+        } catch (e) {
+          AppLogger.instance.warning(
+            'NetworkSecurity enablePinning failed',
+            error: e,
+          );
+        }
+      }),
+      _provider.matrix.tryRestoreSession().catchError((e) {
+        AppLogger.instance.warning('Matrix session restore failed', error: e);
+        return false;
+      }),
+      Future(() async {
+        try {
+          await ApiProxyService.instance.init();
+        } catch (e) {
+          AppLogger.instance.warning('ApiProxy init failed', error: e);
+        }
+      }),
+      Future(() async {
+        try {
+          await _provider.initSubProviders();
+        } catch (e) {
+          AppLogger.instance.warning('Provider init failed', error: e);
+        }
+      }),
+      _privacyService.hasConsented().catchError((e) {
+        AppLogger.instance.warning('PrivacyConsent check failed', error: e);
+        return true;
+      }),
+      Future(() async {
+        try {
+          await DeepLinkService.instance.init();
+          DeepLinkService.instance.onDeepLink = (uri) {
+            final sessionId = DeepLinkService.instance.parseSessionId(uri);
+            if (sessionId != null) {
+              _provider.session.switchSession(sessionId);
+            }
+          };
+          final initialLink = DeepLinkService.instance.initialLink;
+          if (initialLink != null) {
+            DeepLinkService.instance.onDeepLink?.call(initialLink);
+          }
+        } catch (e) {
+          AppLogger.instance.warning('DeepLink init failed', error: e);
+        }
+      }),
+    ]);
+
+    final restored = results[2] as bool;
+    final hasConsented = results[5] as bool;
+
     if (mounted) {
       _provider.session.startAutoSave();
       _authEventSub = ChatService.onAuthEvent.listen((event) {

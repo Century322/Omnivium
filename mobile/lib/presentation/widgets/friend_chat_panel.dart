@@ -641,7 +641,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                   _plusMenuItem(
                     LucideIcons.video,
                     localeProvider.t('video_call'),
-                    onTap: () => _showComingSoon(),
+                    onTap: _startVideoCall,
                   ),
                 ],
               ),
@@ -701,6 +701,28 @@ class _FriendChatPanelState extends State<FriendChatPanel>
     if (remoteUser == null) return;
 
     CallService.instance.initiateCall(room.id, remoteUser.id);
+    AnalyticsService.instance.logVoiceCall();
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const CallScreen()));
+  }
+
+  void _startVideoCall() {
+    final client = widget.provider.matrix.client;
+    if (client == null) return;
+    final room = client.getRoomById(widget.chatTargetId);
+    if (room == null) return;
+    final remoteMembers = room.getParticipants();
+    final remoteUser = remoteMembers
+        .where((m) => m.id != client.userID)
+        .firstOrNull;
+    if (remoteUser == null) return;
+
+    CallService.instance.initiateCallWithVideo(
+      room.id,
+      remoteUser.id,
+      isVideo: true,
+    );
     AnalyticsService.instance.logVoiceCall();
     Navigator.of(
       context,
