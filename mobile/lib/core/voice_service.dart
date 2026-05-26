@@ -72,6 +72,11 @@ class VoiceService {
     }
   }
 
+  Future<bool> isAvailable() async {
+    if (!_sttInitialized) await _initSTT();
+    return _sttInitialized && _stt.isAvailable;
+  }
+
   Future<void> _initTTS() async {
     try {
       await _tts.setLanguage('zh-CN');

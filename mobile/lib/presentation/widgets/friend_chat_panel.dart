@@ -549,8 +549,8 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                       ),
                       child: Center(
                         child: Text(
-                          room.displayName.isNotEmpty
-                              ? room.displayName[0].toUpperCase()
+                          room.name.isNotEmpty
+                              ? room.name[0].toUpperCase()
                               : '?',
                           style: TextStyle(
                             color: AppColors.acc(context),
@@ -560,7 +560,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                       ),
                     ),
                     title: Text(
-                      room.displayName,
+                      room.name,
                       style: TextStyle(color: AppColors.textPrimary(context)),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -781,16 +781,6 @@ class _FriendChatPanelState extends State<FriendChatPanel>
     for (final file in result.files) {
       _sendFileMessage(localeProvider.t('file_msg'), file.name, file.path);
     }
-  }
-
-  void _showComingSoon() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(localeProvider.t('coming_soon')),
-        backgroundColor: AppColors.acc(context),
-        duration: const Duration(seconds: 2),
-      ),
-    );
   }
 
   void _startVoiceCall() {
@@ -1970,22 +1960,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
   bool _isMessageRead(Room room, FriendMessageData msg) {
     if (msg.eventId == null) return false;
     try {
-      final receipts = room.receipts;
-      for (final receipt in receipts) {
-        if (receipt.userId == widget.provider.matrix.userId) continue;
-        final receiptEventId = receipt.eventId;
-        if (receiptEventId == null) continue;
-        final msgIndex = _friendMessages.indexWhere(
-          (m) => m.eventId == msg.eventId,
-        );
-        final receiptIndex = _friendMessages.indexWhere(
-          (m) => m.eventId == receiptEventId,
-        );
-        if (receiptIndex >= 0 && msgIndex >= 0 && receiptIndex >= msgIndex) {
-          return true;
-        }
-      }
-      return false;
+      return room.notificationCount == 0;
     } catch (_) {
       return room.notificationCount == 0;
     }

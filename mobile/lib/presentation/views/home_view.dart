@@ -273,7 +273,7 @@ class _HomeViewState extends State<HomeView>
       _listeningGlow.reverse();
       setState(() => _isListening = false);
     } else {
-      final available = await voice.isAvailable;
+      final available = await VoiceService.instance.isAvailable();
       if (!available) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(

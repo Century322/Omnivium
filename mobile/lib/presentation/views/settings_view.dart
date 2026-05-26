@@ -1361,19 +1361,7 @@ class _LabsViewState extends State<_LabsView> {
   void _previewSchema(String screenId) {
     final schema = _uiSchemas[screenId];
     if (schema == null) return;
-    final engine = RemoteUIEngine(
-      actionHandler: RemoteUIActionHandler()
-        ..register('navigate', (args) {
-          final route = args['route'] as String?;
-          if (route != null) Navigator.pop(context);
-        })
-        ..register('show_snackbar', (args) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('${args['message'] ?? 'OK'}')));
-        }),
-    );
-    final widget = engine.build(schema);
+    final widget = RemoteUIEngine.render(schema, context);
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,

@@ -32,7 +32,7 @@ class _CreateGroupViewState extends State<CreateGroupView> {
     final client = widget.provider.matrix.client;
     if (client == null) return [];
     final rooms = client.rooms.where((r) => r.isDirectChat).toList();
-    rooms.sort((a, b) => a.displayName.compareTo(b.displayName));
+    rooms.sort((a, b) => a.name.compareTo(b.name));
     return rooms;
   }
 
@@ -42,7 +42,7 @@ class _CreateGroupViewState extends State<CreateGroupView> {
     return _directChats
         .where(
           (r) =>
-              r.displayName.toLowerCase().contains(q) ||
+              r.name.toLowerCase().contains(q) ||
               r.directChatMatrixID!.toLowerCase().contains(q),
         )
         .toList();
@@ -316,7 +316,7 @@ class _CreateGroupViewState extends State<CreateGroupView> {
           final userId = room.directChatMatrixID ?? '';
           if (userId.isEmpty) return const SizedBox.shrink();
           final isSelected = _selectedMembers.contains(userId);
-          final name = room.displayName;
+          final name = room.name;
           final initial = name.isNotEmpty ? name[0].toUpperCase() : '?';
 
           return GestureDetector(
