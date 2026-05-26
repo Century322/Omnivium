@@ -4144,6 +4144,138 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'@用户:服务器.com'**
   String get matrix_id_hint;
+
+  /// No description provided for @supabase_id.
+  ///
+  /// In zh, this message translates to:
+  /// **'Supabase ID'**
+  String get supabase_id;
+
+  /// No description provided for @omnivium_id.
+  ///
+  /// In zh, this message translates to:
+  /// **'Omnivium ID'**
+  String get omnivium_id;
+
+  /// No description provided for @shadow_identities.
+  ///
+  /// In zh, this message translates to:
+  /// **'影子身份'**
+  String get shadow_identities;
+
+  /// No description provided for @shadow_identity.
+  ///
+  /// In zh, this message translates to:
+  /// **'影子身份'**
+  String get shadow_identity;
+
+  /// No description provided for @no_shadow_identities.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无影子身份'**
+  String get no_shadow_identities;
+
+  /// No description provided for @create_shadow_identity.
+  ///
+  /// In zh, this message translates to:
+  /// **'创建影子身份'**
+  String get create_shadow_identity;
+
+  /// No description provided for @shadow_identity_desc.
+  ///
+  /// In zh, this message translates to:
+  /// **'影子身份是从您的主权身份派生的独立身份，拥有独立的 DID 和密钥，可用于隐私保护场景。'**
+  String get shadow_identity_desc;
+
+  /// No description provided for @shadow_label.
+  ///
+  /// In zh, this message translates to:
+  /// **'标签名称'**
+  String get shadow_label;
+
+  /// No description provided for @shadow_label_hint.
+  ///
+  /// In zh, this message translates to:
+  /// **'例如：工作、社交'**
+  String get shadow_label_hint;
+
+  /// No description provided for @activate_shadow.
+  ///
+  /// In zh, this message translates to:
+  /// **'激活'**
+  String get activate_shadow;
+
+  /// No description provided for @deactivate_shadow.
+  ///
+  /// In zh, this message translates to:
+  /// **'切回主身份'**
+  String get deactivate_shadow;
+
+  /// No description provided for @revoke_shadow.
+  ///
+  /// In zh, this message translates to:
+  /// **'撤销'**
+  String get revoke_shadow;
+
+  /// No description provided for @revoke_shadow_title.
+  ///
+  /// In zh, this message translates to:
+  /// **'撤销影子身份'**
+  String get revoke_shadow_title;
+
+  /// No description provided for @revoke_shadow_desc.
+  ///
+  /// In zh, this message translates to:
+  /// **'撤销后该影子身份将永久删除，此操作不可撤销。'**
+  String get revoke_shadow_desc;
+
+  /// No description provided for @revoke.
+  ///
+  /// In zh, this message translates to:
+  /// **'撤销'**
+  String get revoke;
+
+  /// No description provided for @active.
+  ///
+  /// In zh, this message translates to:
+  /// **'活跃'**
+  String get active;
+
+  /// No description provided for @key_rotation.
+  ///
+  /// In zh, this message translates to:
+  /// **'密钥轮换'**
+  String get key_rotation;
+
+  /// No description provided for @key_rotation_desc.
+  ///
+  /// In zh, this message translates to:
+  /// **'轮换密钥会生成新的密钥对，旧公钥将保留在历史记录中，DID 不会改变。'**
+  String get key_rotation_desc;
+
+  /// No description provided for @rotate_key.
+  ///
+  /// In zh, this message translates to:
+  /// **'轮换密钥'**
+  String get rotate_key;
+
+  /// No description provided for @rotate_key_title.
+  ///
+  /// In zh, this message translates to:
+  /// **'确认轮换密钥'**
+  String get rotate_key_title;
+
+  /// No description provided for @rotate_key_desc.
+  ///
+  /// In zh, this message translates to:
+  /// **'轮换后旧密钥将失效，但 DID 保持不变。确保您已备份当前身份。'**
+  String get rotate_key_desc;
+
+  /// No description provided for @rotate.
+  ///
+  /// In zh, this message translates to:
+  /// **'轮换'**
+  String get rotate;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

@@ -2039,4 +2039,71 @@ class SZh extends S {
 
   @override
   String get matrix_id_hint => '@用户:服务器.com';
+
+  @override
+  String get supabase_id => 'Supabase ID';
+
+  @override
+  String get omnivium_id => 'Omnivium ID';
+
+  @override
+  String get shadow_identities => '影子身份';
+
+  @override
+  String get shadow_identity => '影子身份';
+
+  @override
+  String get no_shadow_identities => '暂无影子身份';
+
+  @override
+  String get create_shadow_identity => '创建影子身份';
+
+  @override
+  String get shadow_identity_desc =>
+      '影子身份是从您的主权身份派生的独立身份，拥有独立的 DID 和密钥，可用于隐私保护场景。';
+
+  @override
+  String get shadow_label => '标签名称';
+
+  @override
+  String get shadow_label_hint => '例如：工作、社交';
+
+  @override
+  String get activate_shadow => '激活';
+
+  @override
+  String get deactivate_shadow => '切回主身份';
+
+  @override
+  String get revoke_shadow => '撤销';
+
+  @override
+  String get revoke_shadow_title => '撤销影子身份';
+
+  @override
+  String get revoke_shadow_desc => '撤销后该影子身份将永久删除，此操作不可撤销。';
+
+  @override
+  String get revoke => '撤销';
+
+  @override
+  String get active => '活跃';
+
+  @override
+  String get key_rotation => '密钥轮换';
+
+  @override
+  String get key_rotation_desc => '轮换密钥会生成新的密钥对，旧公钥将保留在历史记录中，DID 不会改变。';
+
+  @override
+  String get rotate_key => '轮换密钥';
+
+  @override
+  String get rotate_key_title => '确认轮换密钥';
+
+  @override
+  String get rotate_key_desc => '轮换后旧密钥将失效，但 DID 保持不变。确保您已备份当前身份。';
+
+  @override
+  String get rotate => '轮换';
 }

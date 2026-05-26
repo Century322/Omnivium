@@ -2107,4 +2107,74 @@ class SEn extends S {
 
   @override
   String get matrix_id_hint => '@user:server.com';
+
+  @override
+  String get supabase_id => 'Supabase ID';
+
+  @override
+  String get omnivium_id => 'Omnivium ID';
+
+  @override
+  String get shadow_identities => 'Shadow Identities';
+
+  @override
+  String get shadow_identity => 'Shadow Identity';
+
+  @override
+  String get no_shadow_identities => 'No shadow identities';
+
+  @override
+  String get create_shadow_identity => 'Create Shadow Identity';
+
+  @override
+  String get shadow_identity_desc =>
+      'A shadow identity is derived from your sovereign identity with its own DID and keys, useful for privacy scenarios.';
+
+  @override
+  String get shadow_label => 'Label';
+
+  @override
+  String get shadow_label_hint => 'e.g. work, social';
+
+  @override
+  String get activate_shadow => 'Activate';
+
+  @override
+  String get deactivate_shadow => 'Switch to Main';
+
+  @override
+  String get revoke_shadow => 'Revoke';
+
+  @override
+  String get revoke_shadow_title => 'Revoke Shadow Identity';
+
+  @override
+  String get revoke_shadow_desc =>
+      'This will permanently delete the shadow identity. This action cannot be undone.';
+
+  @override
+  String get revoke => 'Revoke';
+
+  @override
+  String get active => 'Active';
+
+  @override
+  String get key_rotation => 'Key Rotation';
+
+  @override
+  String get key_rotation_desc =>
+      'Rotating keys generates a new key pair. The old public key is preserved in history. Your DID will not change.';
+
+  @override
+  String get rotate_key => 'Rotate Key';
+
+  @override
+  String get rotate_key_title => 'Confirm Key Rotation';
+
+  @override
+  String get rotate_key_desc =>
+      'After rotation, the old key will be invalidated but your DID remains unchanged. Make sure you have backed up your identity.';
+
+  @override
+  String get rotate => 'Rotate';
 }
