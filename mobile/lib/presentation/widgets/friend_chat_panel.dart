@@ -8,6 +8,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:matrix/matrix.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import '../theme/app_colors.dart';
 import '../theme/locale_provider.dart';
 import '../../core/app_provider.dart';
@@ -447,7 +448,21 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                 );
               },
             ),
-            if (msg.isMe)
+            if (msg.isMe) ...[
+              ListTile(
+                leading: Icon(
+                  LucideIcons.pencil,
+                  color: AppColors.sec(context),
+                ),
+                title: Text(
+                  t('edit'),
+                  style: TextStyle(color: AppColors.textPrimary(context)),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  _editMessage(msg);
+                },
+              ),
               ListTile(
                 leading: Icon(
                   LucideIcons.rotateCcw,
@@ -462,6 +477,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                   _recallMessage(index);
                 },
               ),
+            ],
             const SizedBox(height: 8),
           ],
         ),
@@ -600,6 +616,94 @@ class _FriendChatPanelState extends State<FriendChatPanel>
         eventId: msg.eventId,
       );
     });
+  }
+
+  void _editMessage(FriendMessageData msg) {
+    if (msg.eventId == null) return;
+    final editCtrl = TextEditingController(text: msg.content);
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: AppColors.sf(context),
+        title: Text(
+          t('edit'),
+          style: TextStyle(color: AppColors.textPrimary(context)),
+        ),
+        content: TextField(
+          controller: editCtrl,
+          style: TextStyle(color: AppColors.textPrimary(context), fontSize: 15),
+          autofocus: true,
+          maxLines: 5,
+          minLines: 1,
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: AppColors.bg(context),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              t('cancel'),
+              style: TextStyle(color: AppColors.textTertiary(context)),
+            ),
+          ),
+          TextButton(
+            onPressed: () async {
+              final newText = editCtrl.text.trim();
+              Navigator.pop(context);
+              if (newText.isEmpty || newText == msg.content) return;
+              final room = widget.provider.matrix.client?.getRoomById(
+                widget.chatTargetId,
+              );
+              if (room == null) return;
+              try {
+                final content = <String, dynamic>{
+                  'msgtype': 'm.text',
+                  'body': '* $newText',
+                  'm.new_content': {'msgtype': 'm.text', 'body': newText},
+                  'm.relates_to': {
+                    'rel_type': 'm.replace',
+                    'event_id': msg.eventId,
+                  },
+                };
+                await room.sendEvent(content, type: EventTypes.Message);
+                setState(() {
+                  final idx = _friendMessages.indexWhere(
+                    (m) => m.eventId == msg.eventId,
+                  );
+                  if (idx >= 0) {
+                    _friendMessages[idx] = FriendMessageData(
+                      isMe: true,
+                      content: newText,
+                      eventId: msg.eventId,
+                      msgType: msg.msgType,
+                    );
+                  }
+                });
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(e.toString()),
+                      backgroundColor: AppColors.dng(context),
+                    ),
+                  );
+                }
+              }
+            },
+            child: Text(
+              t('save'),
+              style: TextStyle(color: AppColors.acc(context)),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showPlusMenu() {
@@ -1601,18 +1705,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                           ),
                         ),
                       ],
-                      Text(
-                        msg.content,
-                        style: TextStyle(
-                          color: msg.isMe
-                              ? AppColors.bg(context)
-                              : AppColors.textSecondary(context),
-                          fontSize: 15,
-                          fontWeight: msg.isMe
-                              ? FontWeight.w500
-                              : FontWeight.w400,
-                        ),
-                      ),
+                      _buildMessageContent(msg),
                       _buildLinkPreviews(msg.content),
                     ],
                     if (msg.isMe) ...[
@@ -1777,6 +1870,95 @@ class _FriendChatPanelState extends State<FriendChatPanel>
         ),
       ),
     );
+  }
+
+  Widget _buildMessageContent(FriendMessageData msg) {
+    final displayText = _stripReplyFallback(msg.content);
+    final hasFormatting =
+        displayText.contains('**') ||
+        displayText.contains('*') ||
+        displayText.contains('`') ||
+        displayText.contains('```') ||
+        displayText.contains('#') ||
+        displayText.contains('[') ||
+        displayText.contains('>') ||
+        msg.formattedContent != null;
+
+    if (hasFormatting) {
+      return MarkdownBody(
+        data: displayText,
+        selectable: true,
+        styleSheet: MarkdownStyleSheet(
+          p: TextStyle(
+            color: msg.isMe
+                ? AppColors.bg(context)
+                : AppColors.textSecondary(context),
+            fontSize: 15,
+            fontWeight: msg.isMe ? FontWeight.w500 : FontWeight.w400,
+          ),
+          code: TextStyle(
+            color: msg.isMe ? AppColors.bg(context) : AppColors.acc(context),
+            backgroundColor: msg.isMe
+                ? AppColors.bg(context).withValues(alpha: 0.15)
+                : AppColors.sfAlt(context),
+            fontSize: 13,
+          ),
+          codeblockDecoration: BoxDecoration(
+            color: msg.isMe
+                ? AppColors.bg(context).withValues(alpha: 0.1)
+                : AppColors.sfAlt(context),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          blockquote: TextStyle(
+            color: msg.isMe
+                ? AppColors.bg(context).withValues(alpha: 0.7)
+                : AppColors.textTertiary(context),
+            fontSize: 14,
+          ),
+          blockquoteDecoration: BoxDecoration(
+            border: Border(
+              left: BorderSide(color: AppColors.acc(context), width: 3),
+            ),
+          ),
+          listBullet: TextStyle(
+            color: msg.isMe
+                ? AppColors.bg(context)
+                : AppColors.textSecondary(context),
+            fontSize: 15,
+          ),
+        ),
+      );
+    }
+
+    return Text(
+      displayText,
+      style: TextStyle(
+        color: msg.isMe
+            ? AppColors.bg(context)
+            : AppColors.textSecondary(context),
+        fontSize: 15,
+        fontWeight: msg.isMe ? FontWeight.w500 : FontWeight.w400,
+      ),
+    );
+  }
+
+  String _stripReplyFallback(String content) {
+    final lines = content.split('\n');
+    final result = <String>[];
+    var pastFallback = false;
+    for (final line in lines) {
+      if (!pastFallback && line.startsWith('> ')) {
+        continue;
+      }
+      if (!pastFallback && !line.startsWith('> ')) {
+        pastFallback = true;
+      }
+      if (pastFallback && line.isEmpty && result.isEmpty) {
+        continue;
+      }
+      result.add(line);
+    }
+    return result.join('\n').trim();
   }
 
   Widget _buildLinkPreviews(String text) {
