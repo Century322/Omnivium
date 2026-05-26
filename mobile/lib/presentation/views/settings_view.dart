@@ -12,6 +12,7 @@ import '../../main.dart';
 import '../../core/app_provider.dart';
 import '../../core/analytics_service.dart';
 import '../../core/remote_ui_engine.dart';
+import '../../core/remote_config_service.dart';
 import '../../core/auth_service.dart';
 import '../widgets/section_header.dart';
 import '../widgets/setting_item.dart';
@@ -405,6 +406,19 @@ class _SettingsViewState extends State<SettingsView>
                               context,
                               MaterialPageRoute(
                                 builder: (_) => const TermsOfServiceView(),
+                              ),
+                            );
+                          },
+                        ),
+                        SettingItem(
+                          title: t('labs'),
+                          subtitle: t('labs_desc'),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    _LabsView(provider: widget.provider),
                               ),
                             );
                           },
@@ -1108,6 +1122,274 @@ class _SettingsViewState extends State<SettingsView>
               },
             );
           }).toList(),
+        ),
+      ),
+    );
+  }
+}
+
+class _LabsView extends StatefulWidget {
+  final AppProvider provider;
+  const _LabsView({required this.provider});
+
+  @override
+  State<_LabsView> createState() => _LabsViewState();
+}
+
+class _LabsViewState extends State<_LabsView> {
+  Map<String, dynamic> _config = {};
+  Map<String, Map<String, dynamic>> _uiSchemas = {};
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadConfig();
+  }
+
+  Future<void> _loadConfig() async {
+    final svc = RemoteConfigService.instance;
+    await svc.fetch();
+    if (mounted) {
+      setState(() {
+        _config = svc.config;
+        _uiSchemas = svc.uiSchemas;
+        _loading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = localeProvider.t;
+    return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(LucideIcons.arrowLeft, color: AppColors.sec(context)),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          t('labs'),
+          style: TextStyle(
+            color: AppColors.textPrimary(context),
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+      body: _loading
+          ? Center(
+              child: CircularProgressIndicator(color: AppColors.acc(context)),
+            )
+          : RefreshIndicator(
+              onRefresh: _loadConfig,
+              child: ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  SectionHeader(title: t('feature_flags')),
+                  const SizedBox(height: 8),
+                  ..._buildFeatureFlags(),
+                  const SizedBox(height: 24),
+                  SectionHeader(title: t('remote_config')),
+                  const SizedBox(height: 8),
+                  ..._buildConfigValues(),
+                  if (_uiSchemas.isNotEmpty) ...[
+                    const SizedBox(height: 24),
+                    SectionHeader(title: t('ui_schemas')),
+                    const SizedBox(height: 8),
+                    ..._buildUISchemas(),
+                  ],
+                  const SizedBox(height: 40),
+                ],
+              ),
+            ),
+    );
+  }
+
+  List<Widget> _buildFeatureFlags() {
+    final features = _config['features'] as Map<String, dynamic>? ?? {};
+    if (features.isEmpty) {
+      return [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Text(
+            localeProvider.t('no_feature_flags'),
+            style: TextStyle(
+              color: AppColors.textTertiary(context),
+              fontSize: 14,
+            ),
+          ),
+        ),
+      ];
+    }
+    return features.entries.map((entry) {
+      final enabled = entry.value as bool? ?? false;
+      return Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: AppColors.sf(context),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                entry.key,
+                style: TextStyle(
+                  color: AppColors.textPrimary(context),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: enabled
+                    ? AppColors.ok(context).withValues(alpha: 0.15)
+                    : AppColors.textDisabled(context).withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                enabled
+                    ? localeProvider.t('enabled')
+                    : localeProvider.t('disabled'),
+                style: TextStyle(
+                  color: enabled
+                      ? AppColors.ok(context)
+                      : AppColors.textDisabled(context),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }).toList();
+  }
+
+  List<Widget> _buildConfigValues() {
+    final displayConfig = Map<String, dynamic>.from(_config)
+      ..remove('features');
+    if (displayConfig.isEmpty) {
+      return [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Text(
+            localeProvider.t('no_remote_config'),
+            style: TextStyle(
+              color: AppColors.textTertiary(context),
+              fontSize: 14,
+            ),
+          ),
+        ),
+      ];
+    }
+    return displayConfig.entries.map((entry) {
+      return Container(
+        margin: const EdgeInsets.only(bottom: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: AppColors.sf(context),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                entry.key,
+                style: TextStyle(
+                  color: AppColors.textSecondary(context),
+                  fontSize: 13,
+                ),
+              ),
+            ),
+            Text(
+              '${entry.value}',
+              style: TextStyle(
+                color: AppColors.textPrimary(context),
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      );
+    }).toList();
+  }
+
+  List<Widget> _buildUISchemas() {
+    return _uiSchemas.keys.map((screenId) {
+      return Container(
+        margin: const EdgeInsets.only(bottom: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: AppColors.sf(context),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          children: [
+            Icon(LucideIcons.layout, size: 16, color: AppColors.acc(context)),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                screenId,
+                style: TextStyle(
+                  color: AppColors.textPrimary(context),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTap: () => _previewSchema(screenId),
+              child: Icon(
+                LucideIcons.eye,
+                size: 16,
+                color: AppColors.sec(context),
+              ),
+            ),
+          ],
+        ),
+      );
+    }).toList();
+  }
+
+  void _previewSchema(String screenId) {
+    final schema = _uiSchemas[screenId];
+    if (schema == null) return;
+    final engine = RemoteUIEngine(
+      actionHandler: RemoteUIActionHandler()
+        ..register('navigate', (args) {
+          final route = args['route'] as String?;
+          if (route != null) Navigator.pop(context);
+        })
+        ..register('show_snackbar', (args) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('${args['message'] ?? 'OK'}')));
+        }),
+    );
+    final widget = engine.build(schema);
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.bg(context),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => DraggableScrollableSheet(
+        initialChildSize: 0.6,
+        minChildSize: 0.3,
+        maxChildSize: 0.9,
+        expand: false,
+        builder: (_, controller) => SingleChildScrollView(
+          controller: controller,
+          padding: const EdgeInsets.all(16),
+          child: widget,
         ),
       ),
     );

@@ -703,5 +703,12 @@
     "forward_to": "Forward to",
     "forwarded": "Forwarded",
     "replying_to": "Replying to",
-    "no_chats_to_forward": "No chats to forward to"
+    "no_chats_to_forward": "No chats to forward to",
+    "labs": "Labs",
+    "labs_desc": "Remote config & experimental features",
+    "feature_flags": "Feature Flags",
+    "remote_config": "Remote Config",
+    "ui_schemas": "UI Schemas",
+    "no_feature_flags": "No feature flags",
+    "no_remote_config": "No remote config"
 }

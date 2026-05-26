@@ -2130,4 +2130,25 @@ class SZh extends S {
 
   @override
   String get no_chats_to_forward => '没有可转发的聊天';
+
+  @override
+  String get labs => '功能实验';
+
+  @override
+  String get labs_desc => '远程配置与实验性功能';
+
+  @override
+  String get feature_flags => '功能开关';
+
+  @override
+  String get remote_config => '远程配置';
+
+  @override
+  String get ui_schemas => 'UI 模板';
+
+  @override
+  String get no_feature_flags => '暂无功能开关';
+
+  @override
+  String get no_remote_config => '暂无远程配置';
 }

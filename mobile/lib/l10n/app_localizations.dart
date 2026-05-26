@@ -4324,6 +4324,48 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'没有可转发的聊天'**
   String get no_chats_to_forward;
+
+  /// No description provided for @labs.
+  ///
+  /// In zh, this message translates to:
+  /// **'功能实验'**
+  String get labs;
+
+  /// No description provided for @labs_desc.
+  ///
+  /// In zh, this message translates to:
+  /// **'远程配置与实验性功能'**
+  String get labs_desc;
+
+  /// No description provided for @feature_flags.
+  ///
+  /// In zh, this message translates to:
+  /// **'功能开关'**
+  String get feature_flags;
+
+  /// No description provided for @remote_config.
+  ///
+  /// In zh, this message translates to:
+  /// **'远程配置'**
+  String get remote_config;
+
+  /// No description provided for @ui_schemas.
+  ///
+  /// In zh, this message translates to:
+  /// **'UI 模板'**
+  String get ui_schemas;
+
+  /// No description provided for @no_feature_flags.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无功能开关'**
+  String get no_feature_flags;
+
+  /// No description provided for @no_remote_config.
+  ///
+  /// In zh, this message translates to:
+  /// **'暂无远程配置'**
+  String get no_remote_config;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

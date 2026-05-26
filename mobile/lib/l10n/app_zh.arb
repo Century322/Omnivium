@@ -703,5 +703,12 @@
     "forward_to": "转发到",
     "forwarded": "已转发",
     "replying_to": "正在回复",
-    "no_chats_to_forward": "没有可转发的聊天"
+    "no_chats_to_forward": "没有可转发的聊天",
+    "labs": "功能实验",
+    "labs_desc": "远程配置与实验性功能",
+    "feature_flags": "功能开关",
+    "remote_config": "远程配置",
+    "ui_schemas": "UI 模板",
+    "no_feature_flags": "暂无功能开关",
+    "no_remote_config": "暂无远程配置"
 }

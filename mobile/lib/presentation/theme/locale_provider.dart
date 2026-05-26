@@ -781,6 +781,13 @@ class LocaleProvider extends ChangeNotifier {
       'forwarded': s.forwarded,
       'replying_to': s.replying_to,
       'no_chats_to_forward': s.no_chats_to_forward,
+      'labs': s.labs,
+      'labs_desc': s.labs_desc,
+      'feature_flags': s.feature_flags,
+      'remote_config': s.remote_config,
+      'ui_schemas': s.ui_schemas,
+      'no_feature_flags': s.no_feature_flags,
+      'no_remote_config': s.no_remote_config,
     };
   }
 

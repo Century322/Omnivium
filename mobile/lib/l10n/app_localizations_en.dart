@@ -2201,4 +2201,25 @@ class SEn extends S {
 
   @override
   String get no_chats_to_forward => 'No chats to forward to';
+
+  @override
+  String get labs => 'Labs';
+
+  @override
+  String get labs_desc => 'Remote config & experimental features';
+
+  @override
+  String get feature_flags => 'Feature Flags';
+
+  @override
+  String get remote_config => 'Remote Config';
+
+  @override
+  String get ui_schemas => 'UI Schemas';
+
+  @override
+  String get no_feature_flags => 'No feature flags';
+
+  @override
+  String get no_remote_config => 'No remote config';
 }
