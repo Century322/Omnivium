@@ -30,7 +30,7 @@ class ApiProxyService {
 
   String get _effectiveBaseUrl {
     final envUrl = AppConfig.apiBaseUrl;
-    if (envUrl.isNotEmpty && envUrl != 'http://10.0.2.2:8787') return envUrl;
+    if (envUrl.isNotEmpty) return envUrl;
     return _fallbackUrls[_activeUrlIndex];
   }
 

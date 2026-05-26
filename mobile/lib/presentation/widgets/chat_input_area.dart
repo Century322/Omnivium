@@ -69,9 +69,11 @@ class ChatInputArea extends StatelessWidget {
                   final isFocused = focusNode.hasFocus;
                   final borderColor = isFocused
                       ? AppColors.acc(context)
-                      : g > 0.5
-                      ? AppColors.acc(context).withValues(alpha: 0.3)
-                      : AppColors.divider(context);
+                      : Color.lerp(
+                          AppColors.divider(context),
+                          AppColors.acc(context).withValues(alpha: 0.4),
+                          g,
+                        )!;
                   return Container(
                     decoration: BoxDecoration(
                       color: AppColors.sf(context),
@@ -174,7 +176,7 @@ class ChatInputArea extends StatelessWidget {
         BoxShadow(
           color: AppColors.acc(context).withValues(alpha: 0.5 * g),
           blurRadius: 24,
-          offset: const Offset(0, -4),
+          offset: Offset.zero,
         ),
         BoxShadow(
           color: AppColors.acc(context).withValues(alpha: 0.3 * g),

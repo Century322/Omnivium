@@ -788,6 +788,7 @@ class LocaleProvider extends ChangeNotifier {
       'ui_schemas': s.ui_schemas,
       'no_feature_flags': s.no_feature_flags,
       'no_remote_config': s.no_remote_config,
+      'voice_not_available': s.voice_not_available,
     };
   }
 

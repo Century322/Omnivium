@@ -302,12 +302,28 @@ class ModelsContent extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 24),
               child: Center(
-                child: Text(
-                  localeProvider.t('no_models'),
-                  style: TextStyle(
-                    color: AppColors.textDisabled(context),
-                    fontSize: 14,
-                  ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      localeProvider.t('no_models'),
+                      style: TextStyle(
+                        color: AppColors.textDisabled(context),
+                        fontSize: 14,
+                      ),
+                    ),
+                    if (provider.model.lastError != null) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        provider.model.lastError!,
+                        style: TextStyle(
+                          color: AppColors.warn(context),
+                          fontSize: 12,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ],
                 ),
               ),
             ),

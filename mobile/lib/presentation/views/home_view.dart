@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'dart:async';
 import '../theme/app_colors.dart';
 import '../../core/app_provider.dart';
 import '../../core/analytics_service.dart';
 import '../../core/navigation_provider.dart';
 import '../../core/runtime/card_runtime.dart';
+import '../../core/voice_service.dart';
 import '../utils/responsive.dart';
 import '../theme/locale_provider.dart';
 import '../../core/notification_center.dart' as nc;
@@ -40,6 +42,8 @@ class _HomeViewState extends State<HomeView>
         HomeConversationMenuMixin {
   String t(String key) => localeProvider.t(key);
   bool _isListening = false;
+  StreamSubscription? _voiceStateSub;
+  StreamSubscription? _voiceResultSub;
   bool _isLeftDrawerOpen = false;
   bool _hasSentMessage = false;
   int _editingIndex = -1;
@@ -95,9 +99,26 @@ class _HomeViewState extends State<HomeView>
     widget.provider.orchestrator.addListener(_onOrchestratorChanged);
     widget.provider.matrix.addListener(_onMatrixChanged);
     _listeningGlow = AnimationController(
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 1200),
       vsync: this,
     );
+    _voiceStateSub = VoiceService.instance.onListeningStateChanged.listen((
+      isListening,
+    ) {
+      if (!mounted) return;
+      if (!isListening) {
+        _listeningGlow.stop();
+        _listeningGlow.reverse();
+        setState(() => _isListening = false);
+      }
+    });
+    _voiceResultSub = VoiceService.instance.onFinalResult.listen((result) {
+      if (!mounted || result.isEmpty) return;
+      final current = _textController.text;
+      final separator = current.isNotEmpty ? ' ' : '';
+      _textController.text = '$current$separator$result';
+      setState(() {});
+    });
     _headerSwitch = AnimationController(
       duration: const Duration(milliseconds: 250),
       vsync: this,
@@ -114,6 +135,8 @@ class _HomeViewState extends State<HomeView>
 
   @override
   void dispose() {
+    _voiceStateSub?.cancel();
+    _voiceResultSub?.cancel();
     _textController.dispose();
     _focusNode.dispose();
     _listeningGlow.dispose();
@@ -242,12 +265,29 @@ class _HomeViewState extends State<HomeView>
     _closeDrawer();
   }
 
-  void _toggleListening() {
-    setState(() => _isListening = !_isListening);
+  void _toggleListening() async {
+    final voice = VoiceService.instance;
     if (_isListening) {
-      _listeningGlow.forward();
-    } else {
+      await voice.stopListening();
+      _listeningGlow.stop();
       _listeningGlow.reverse();
+      setState(() => _isListening = false);
+    } else {
+      final available = await voice.isAvailable;
+      if (!available) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(localeProvider.t('voice_not_available')),
+              backgroundColor: AppColors.warn(context),
+            ),
+          );
+        }
+        return;
+      }
+      await voice.startListening();
+      setState(() => _isListening = true);
+      _listeningGlow.repeat(reverse: true);
     }
   }
 

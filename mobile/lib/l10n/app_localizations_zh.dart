@@ -1519,7 +1519,7 @@ class SZh extends S {
   String get unmuted => '已取消静音';
 
   @override
-  String get voice_not_available => '语音功能不可用';
+  String get voice_not_available => '语音输入不可用';
 
   @override
   String get voice_start_failed => '语音启动失败';

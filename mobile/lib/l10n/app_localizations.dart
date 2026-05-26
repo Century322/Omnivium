@@ -3104,7 +3104,7 @@ abstract class S {
   /// No description provided for @voice_not_available.
   ///
   /// In zh, this message translates to:
-  /// **'语音功能不可用'**
+  /// **'语音输入不可用'**
   String get voice_not_available;
 
   /// No description provided for @voice_start_failed.

@@ -1560,7 +1560,7 @@ class SEn extends S {
   String get unmuted => 'Unmuted';
 
   @override
-  String get voice_not_available => 'Voice not available';
+  String get voice_not_available => 'Voice input not available';
 
   @override
   String get voice_start_failed => 'Voice start failed';

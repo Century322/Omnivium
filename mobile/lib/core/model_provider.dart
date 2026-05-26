@@ -51,6 +51,8 @@ class ModelProvider extends ChangeNotifier {
   String? get activeModelId => _activeModelId;
   ModelConfig? get activeModel =>
       _models.where((m) => m.id == _activeModelId).firstOrNull;
+  String? _lastError;
+  String? get lastError => _lastError;
 
   AgentOrchestrator get orchestrator => _orchestrator;
 
@@ -84,6 +86,7 @@ class ModelProvider extends ChangeNotifier {
   Future<void> _loadModelsFromBackend() async {
     final proxy = ApiProxyService.instance;
     if (!proxy.isConfigured) return;
+    _lastError = null;
     try {
       final uri = proxy.resolveModelsUrl();
       final response = await proxy.secureClient
@@ -94,7 +97,7 @@ class ModelProvider extends ChangeNotifier {
               ...proxy.buildDeviceHeaders(),
             },
           )
-          .timeout(const Duration(seconds: 5));
+          .timeout(const Duration(seconds: 10));
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body) as Map<String, dynamic>;
         final list = body['models'] as List? ?? [];
@@ -111,8 +114,11 @@ class ModelProvider extends ChangeNotifier {
           );
         }
         await _saveModels();
+      } else {
+        _lastError = 'HTTP ${response.statusCode}';
       }
     } catch (e, stackTrace) {
+      _lastError = e.toString();
       AppLogger.instance.error(
         'Operation failed',
         error: e,
