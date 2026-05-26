@@ -45,6 +45,33 @@ class FriendChatPanel extends StatefulWidget {
 
   @override
   State<FriendChatPanel> createState() => _FriendChatPanelState();
+
+  static Future<void> flushOutbox() async {
+    final db = DatabaseService.instance;
+    final outbox = db.getData('outbox');
+    if (outbox == null) return;
+    final messages = List<Map<String, dynamic>>.from(
+      outbox['messages'] as List? ?? [],
+    );
+    if (messages.isEmpty) return;
+    db.deleteData('outbox');
+    for (final msg in messages) {
+      final roomId = msg['roomId'] as String?;
+      final text = msg['text'] as String?;
+      if (roomId == null || text == null) continue;
+      try {
+        final matrix = MatrixService.instance;
+        if (matrix.isLoggedIn) {
+          final room = matrix.client?.getRoomById(roomId);
+          if (room != null) {
+            await room.sendTextEvent(text);
+          }
+        }
+      } catch (e) {
+        AppLogger.instance.warning('Outbox flush failed', error: e);
+      }
+    }
+  }
 }
 
 class _FriendChatPanelState extends State<FriendChatPanel>
@@ -397,33 +424,6 @@ class _FriendChatPanelState extends State<FriendChatPanel>
         FriendMessageData(isMe: true, content: text, timestamp: DateTime.now()),
       );
     });
-  }
-
-  static Future<void> flushOutbox() async {
-    final db = DatabaseService.instance;
-    final outbox = db.getData('outbox');
-    if (outbox == null) return;
-    final messages = List<Map<String, dynamic>>.from(
-      outbox['messages'] as List? ?? [],
-    );
-    if (messages.isEmpty) return;
-    db.deleteData('outbox');
-    for (final msg in messages) {
-      final roomId = msg['roomId'] as String?;
-      final text = msg['text'] as String?;
-      if (roomId == null || text == null) continue;
-      try {
-        final matrix = MatrixService.instance;
-        if (matrix.isLoggedIn) {
-          final room = matrix.client?.getRoomById(roomId);
-          if (room != null) {
-            await room.sendTextEvent(text);
-          }
-        }
-      } catch (e) {
-        AppLogger.instance.warning('Outbox flush failed', error: e);
-      }
-    }
   }
 
   void _toggleEmojiPicker() {

@@ -559,9 +559,6 @@ class LocaleProvider extends ChangeNotifier {
       'understand': s.understand,
       'unmuted': s.unmuted,
       'voice_not_available': s.voice_not_available,
-      'typing': s.typing,
-      'today': s.today,
-      'yesterday': s.yesterday,
       'voice_start_failed': s.voice_start_failed,
       'voice_tap_to_start': s.voice_tap_to_start,
       'voice_thinking': s.voice_thinking,
@@ -798,7 +795,6 @@ class LocaleProvider extends ChangeNotifier {
       'ui_schemas': s.ui_schemas,
       'no_feature_flags': s.no_feature_flags,
       'no_remote_config': s.no_remote_config,
-      'voice_not_available': s.voice_not_available,
     };
   }
 

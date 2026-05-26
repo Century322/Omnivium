@@ -209,7 +209,7 @@ class _MessageListViewState extends State<MessageListView> {
         ),
         subtitle: Row(
           children: [
-            if (room.isMuted)
+            if (room.pushRuleState == PushRuleState.dontNotify)
               Padding(
                 padding: const EdgeInsets.only(right: 4),
                 child: Icon(
@@ -240,7 +240,7 @@ class _MessageListViewState extends State<MessageListView> {
                       ),
                     ),
             ),
-            if (room.isPinned)
+            if (room.isFavourite)
               Padding(
                 padding: const EdgeInsets.only(left: 4),
                 child: Icon(
