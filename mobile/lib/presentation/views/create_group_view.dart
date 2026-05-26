@@ -415,7 +415,7 @@ class _CreateGroupViewState extends State<CreateGroupView> {
     try {
       final roomId = await matrix.createGroupChat(
         name,
-        invite: _selectedMembers.toList(),
+        userIds: _selectedMembers.toList(),
       );
       if (mounted) {
         Navigator.pop(context, roomId);
