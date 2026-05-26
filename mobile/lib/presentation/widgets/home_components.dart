@@ -40,6 +40,11 @@ class FriendMessageData {
   final String? msgType;
   final String? url;
   final int? audioDuration;
+  final String? replyToId;
+  final String? replyToContent;
+  final String? replyToSender;
+  final String? formattedContent;
+  final String? senderId;
   const FriendMessageData({
     required this.isMe,
     required this.content,
@@ -47,10 +52,16 @@ class FriendMessageData {
     this.msgType,
     this.url,
     this.audioDuration,
+    this.replyToId,
+    this.replyToContent,
+    this.replyToSender,
+    this.formattedContent,
+    this.senderId,
   });
   bool get isVoice => msgType == 'm.audio' || content.startsWith('🎙️');
   bool get isImage => msgType == 'm.image';
   bool get isFile => msgType == 'm.file';
+  bool get hasReply => replyToId != null && replyToContent != null;
 }
 
 class NoScrollbarBehavior extends ScrollBehavior {

@@ -2116,4 +2116,22 @@ class SJa extends S {
 
   @override
   String get search_friends => '搜索好友';
+
+  @override
+  String get reply => '回复';
+
+  @override
+  String get forward_message => '转发';
+
+  @override
+  String get forward_to => '转发到';
+
+  @override
+  String get forwarded => '已转发';
+
+  @override
+  String get replying_to => '正在回复';
+
+  @override
+  String get no_chats_to_forward => '没有可转发的聊天';
 }

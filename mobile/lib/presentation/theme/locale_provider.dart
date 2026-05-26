@@ -775,6 +775,12 @@ class LocaleProvider extends ChangeNotifier {
       'rotate': s.rotate,
       'group_description': s.group_description,
       'search_friends': s.search_friends,
+      'reply': s.reply,
+      'forward_message': s.forward_message,
+      'forward_to': s.forward_to,
+      'forwarded': s.forwarded,
+      'replying_to': s.replying_to,
+      'no_chats_to_forward': s.no_chats_to_forward,
     };
   }
 

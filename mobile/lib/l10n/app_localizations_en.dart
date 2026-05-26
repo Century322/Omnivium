@@ -2183,4 +2183,22 @@ class SEn extends S {
 
   @override
   String get search_friends => 'Search Friends';
+
+  @override
+  String get reply => 'Reply';
+
+  @override
+  String get forward_message => 'Forward';
+
+  @override
+  String get forward_to => 'Forward to';
+
+  @override
+  String get forwarded => 'Forwarded';
+
+  @override
+  String get replying_to => 'Replying to';
+
+  @override
+  String get no_chats_to_forward => 'No chats to forward to';
 }

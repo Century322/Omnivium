@@ -697,5 +697,11 @@
     "rotate_key_desc": "轮换后旧密钥将失效，但 DID 保持不变。确保您已备份当前身份。",
     "rotate": "轮换",
     "group_description": "群简介",
-    "search_friends": "搜索好友"
+    "search_friends": "搜索好友",
+    "reply": "回复",
+    "forward_message": "转发",
+    "forward_to": "转发到",
+    "forwarded": "已转发",
+    "replying_to": "正在回复",
+    "no_chats_to_forward": "没有可转发的聊天"
 }

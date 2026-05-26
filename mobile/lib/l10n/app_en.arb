@@ -697,5 +697,11 @@
     "rotate_key_desc": "After rotation, the old key will be invalidated but your DID remains unchanged. Make sure you have backed up your identity.",
     "rotate": "Rotate",
     "group_description": "Group Description",
-    "search_friends": "Search Friends"
+    "search_friends": "Search Friends",
+    "reply": "Reply",
+    "forward_message": "Forward",
+    "forward_to": "Forward to",
+    "forwarded": "Forwarded",
+    "replying_to": "Replying to",
+    "no_chats_to_forward": "No chats to forward to"
 }

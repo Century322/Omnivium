@@ -4288,6 +4288,42 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'搜索好友'**
   String get search_friends;
+
+  /// No description provided for @reply.
+  ///
+  /// In zh, this message translates to:
+  /// **'回复'**
+  String get reply;
+
+  /// No description provided for @forward_message.
+  ///
+  /// In zh, this message translates to:
+  /// **'转发'**
+  String get forward_message;
+
+  /// No description provided for @forward_to.
+  ///
+  /// In zh, this message translates to:
+  /// **'转发到'**
+  String get forward_to;
+
+  /// No description provided for @forwarded.
+  ///
+  /// In zh, this message translates to:
+  /// **'已转发'**
+  String get forwarded;
+
+  /// No description provided for @replying_to.
+  ///
+  /// In zh, this message translates to:
+  /// **'正在回复'**
+  String get replying_to;
+
+  /// No description provided for @no_chats_to_forward.
+  ///
+  /// In zh, this message translates to:
+  /// **'没有可转发的聊天'**
+  String get no_chats_to_forward;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {

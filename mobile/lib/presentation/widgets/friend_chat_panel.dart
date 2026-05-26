@@ -56,6 +56,10 @@ class _FriendChatPanelState extends State<FriendChatPanel>
   bool _isListening = false;
   Future<CachedPresence?>? _presenceFuture;
   Timer? _presenceTimer;
+  Timeline? _timeline;
+  bool _isLoadingHistory = false;
+  bool _canLoadMore = true;
+  FriendMessageData? _replyingTo;
 
   late AnimationController _listeningGlow;
 
@@ -77,6 +81,16 @@ class _FriendChatPanelState extends State<FriendChatPanel>
     });
     _loadMatrixMessages(widget.chatTargetId);
     _markRoomAsRead(widget.chatTargetId);
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+    if (_scrollController.position.pixels <= 100 &&
+        _canLoadMore &&
+        !_isLoadingHistory) {
+      _loadMoreHistory();
+    }
   }
 
   @override
@@ -171,34 +185,12 @@ class _FriendChatPanelState extends State<FriendChatPanel>
     final room = matrix.client?.getRoomById(roomId);
     if (room == null) return;
     try {
-      final timeline = await room.getTimeline();
+      _timeline = await room.getTimeline();
       if (!mounted) return;
       setState(() {
         _friendMessages.clear();
-        for (final event in timeline.events) {
-          if (event.type == EventTypes.Message && event.body.isNotEmpty) {
-            final isMe = event.senderId == matrix.userId;
-            final msgType = event.content['msgtype'] as String?;
-            final url =
-                event.content['url'] as String? ??
-                (event.content['file'] is Map
-                    ? (event.content['file'] as Map)['url'] as String?
-                    : null);
-            final audioDuration = event.content['info'] is Map
-                ? (event.content['info'] as Map)['duration'] as int?
-                : null;
-            _friendMessages.add(
-              FriendMessageData(
-                isMe: isMe,
-                content: event.body,
-                eventId: event.eventId,
-                msgType: msgType,
-                url: url,
-                audioDuration: audioDuration,
-              ),
-            );
-          }
-        }
+        _friendMessages.addAll(_parseTimelineEvents(_timeline!));
+        _canLoadMore = _timeline!.canRequestHistory;
       });
     } catch (e, stackTrace) {
       AppLogger.instance.error(
@@ -207,6 +199,94 @@ class _FriendChatPanelState extends State<FriendChatPanel>
         stackTrace: stackTrace,
       );
     }
+  }
+
+  Future<void> _loadMoreHistory() async {
+    if (_timeline == null || !_timeline!.canRequestHistory || _isLoadingHistory)
+      return;
+    setState(() => _isLoadingHistory = true);
+    try {
+      await _timeline!.requestHistory(historyCount: 50);
+      if (!mounted) return;
+      final prevCount = _friendMessages.length;
+      setState(() {
+        _friendMessages.clear();
+        _friendMessages.addAll(_parseTimelineEvents(_timeline!));
+        _canLoadMore = _timeline!.canRequestHistory;
+        _isLoadingHistory = false;
+      });
+      final addedCount = _friendMessages.length - prevCount;
+      if (addedCount > 0 && _scrollController.hasClients) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!_scrollController.hasClients) return;
+          final max = _scrollController.position.maxScrollExtent;
+          final approxItemHeight = 60.0;
+          _scrollController.jumpTo(
+            max +
+                addedCount * approxItemHeight -
+                (max - _scrollController.position.pixels),
+          );
+        });
+      }
+    } catch (e) {
+      if (mounted) setState(() => _isLoadingHistory = false);
+    }
+  }
+
+  List<FriendMessageData> _parseTimelineEvents(Timeline timeline) {
+    final matrix = widget.provider.matrix;
+    final messages = <FriendMessageData>[];
+    final eventMap = <String, Event>{};
+    for (final event in timeline.events) {
+      eventMap[event.eventId] = event;
+    }
+    for (final event in timeline.events) {
+      if (event.type == EventTypes.Message && event.body.isNotEmpty) {
+        final isMe = event.senderId == matrix.userId;
+        final msgType = event.content['msgtype'] as String?;
+        final url =
+            event.content['url'] as String? ??
+            (event.content['file'] is Map
+                ? (event.content['file'] as Map)['url'] as String?
+                : null);
+        final audioDuration = event.content['info'] is Map
+            ? (event.content['info'] as Map)['duration'] as int?
+            : null;
+        final replyToId = event.content['m.relates_to'] is Map
+            ? (event.content['m.relates_to'] as Map)['m.in_reply_to'] is Map
+                  ? (event.content['m.relates_to']
+                            as Map)['m.in_reply_to']['event_id']
+                        as String?
+                  : null
+            : null;
+        String? replyToContent;
+        String? replyToSender;
+        if (replyToId != null) {
+          final replyEvent = eventMap[replyToId];
+          if (replyEvent != null) {
+            replyToContent = replyEvent.body;
+            replyToSender = replyEvent.senderId;
+          }
+        }
+        final formattedContent = event.content['formatted_body'] as String?;
+        messages.add(
+          FriendMessageData(
+            isMe: isMe,
+            content: event.body,
+            eventId: event.eventId,
+            msgType: msgType,
+            url: url,
+            audioDuration: audioDuration,
+            replyToId: replyToId,
+            replyToContent: replyToContent,
+            replyToSender: replyToSender,
+            formattedContent: formattedContent,
+            senderId: event.senderId,
+          ),
+        );
+      }
+    }
+    return messages;
   }
 
   void _toggleListening() {
@@ -234,14 +314,23 @@ class _FriendChatPanelState extends State<FriendChatPanel>
     _textController.clear();
     _focusNode.unfocus();
 
-    setState(() {
-      _friendMessages.add(FriendMessageData(isMe: true, content: text));
-    });
-
     final matrix = widget.provider.matrix;
     if (matrix.isLoggedIn && widget.chatTargetId.isNotEmpty) {
-      matrix.sendMessage(widget.chatTargetId, text);
-      AnalyticsService.instance.logSendMessage(type: 'text');
+      final room = matrix.client?.getRoomById(widget.chatTargetId);
+      if (room != null) {
+        final content = <String, dynamic>{'msgtype': 'm.text', 'body': text};
+        if (_replyingTo != null && _replyingTo!.eventId != null) {
+          content['m.relates_to'] = {
+            'm.in_reply_to': {'event_id': _replyingTo!.eventId},
+          };
+          final replyBody = _replyingTo!.content;
+          final replySender = _replyingTo!.senderId ?? '';
+          content['body'] = '> <$replySender> $replyBody\n\n$text';
+        }
+        room.sendEvent(content, type: EventTypes.Message);
+        AnalyticsService.instance.logSendMessage(type: 'text');
+      }
+      setState(() => _replyingTo = null);
     }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -318,6 +407,29 @@ class _FriendChatPanelState extends State<FriendChatPanel>
             ),
             const SizedBox(height: 12),
             ListTile(
+              leading: Icon(LucideIcons.reply, color: AppColors.acc(context)),
+              title: Text(
+                t('reply'),
+                style: TextStyle(color: AppColors.textPrimary(context)),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                setState(() => _replyingTo = msg);
+                _focusNode.requestFocus();
+              },
+            ),
+            ListTile(
+              leading: Icon(LucideIcons.forward, color: AppColors.sec(context)),
+              title: Text(
+                t('forward_message'),
+                style: TextStyle(color: AppColors.textPrimary(context)),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                _forwardMessage(msg);
+              },
+            ),
+            ListTile(
               leading: Icon(LucideIcons.copy, color: AppColors.sec(context)),
               title: Text(
                 t('copy'),
@@ -350,6 +462,120 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                   _recallMessage(index);
                 },
               ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _forwardMessage(FriendMessageData msg) {
+    final matrix = widget.provider.matrix;
+    final client = matrix.client;
+    if (client == null) return;
+    final rooms = client.rooms
+        .where((r) => r.id != widget.chatTargetId)
+        .toList();
+    if (rooms.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(t('no_chats_to_forward'))));
+      return;
+    }
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.sf(context),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 8),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.textDisabled(context),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                t('forward_to'),
+                style: TextStyle(
+                  color: AppColors.textPrimary(context),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.4,
+              ),
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: rooms.length,
+                itemBuilder: (_, i) {
+                  final room = rooms[i];
+                  return ListTile(
+                    leading: Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: AppColors.accBg(context),
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      child: Center(
+                        child: Text(
+                          room.displayName.isNotEmpty
+                              ? room.displayName[0].toUpperCase()
+                              : '?',
+                          style: TextStyle(
+                            color: AppColors.acc(context),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                    title: Text(
+                      room.displayName,
+                      style: TextStyle(color: AppColors.textPrimary(context)),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    onTap: () async {
+                      Navigator.pop(context);
+                      try {
+                        await room.sendTextEvent(msg.content);
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(t('forwarded')),
+                              backgroundColor: AppColors.ok(context),
+                              duration: const Duration(milliseconds: 1500),
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(e.toString()),
+                              backgroundColor: AppColors.dng(context),
+                            ),
+                          );
+                        }
+                      }
+                    },
+                  );
+                },
+              ),
+            ),
             const SizedBox(height: 8),
           ],
         ),
@@ -1282,7 +1508,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
             alignment: msg.isMe ? Alignment.centerRight : Alignment.centerLeft,
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
-              onLongPress: msg.isMe ? () => _showMessageActions(i) : null,
+              onLongPress: () => _showMessageActions(i),
               child: Container(
                 constraints: BoxConstraints(
                   maxWidth: MediaQuery.of(context).size.width * 0.7,
@@ -1308,6 +1534,51 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                     else if (msg.isFile)
                       _buildFileBubble(msg)
                     else ...[
+                      if (msg.hasReply) ...[
+                        Container(
+                          margin: const EdgeInsets.only(bottom: 6),
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: msg.isMe
+                                ? AppColors.bg(context).withValues(alpha: 0.15)
+                                : AppColors.accBg(context),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border(
+                              left: BorderSide(
+                                color: AppColors.acc(context),
+                                width: 3,
+                              ),
+                            ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                msg.replyToSender ?? '',
+                                style: TextStyle(
+                                  color: AppColors.acc(context),
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                msg.replyToContent ?? '',
+                                style: TextStyle(
+                                  color: msg.isMe
+                                      ? AppColors.bg(
+                                          context,
+                                        ).withValues(alpha: 0.7)
+                                      : AppColors.textTertiary(context),
+                                  fontSize: 12,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                       Text(
                         msg.content,
                         style: TextStyle(
@@ -1535,6 +1806,58 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      if (_replyingTo != null)
+                        Container(
+                          margin: const EdgeInsets.fromLTRB(8, 4, 8, 0),
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: AppColors.accBg(context),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border(
+                              left: BorderSide(
+                                color: AppColors.acc(context),
+                                width: 3,
+                              ),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      t('replying_to'),
+                                      style: TextStyle(
+                                        color: AppColors.acc(context),
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      _replyingTo!.content,
+                                      style: TextStyle(
+                                        color: AppColors.textTertiary(context),
+                                        fontSize: 12,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () => setState(() => _replyingTo = null),
+                                child: Icon(
+                                  LucideIcons.x,
+                                  size: 16,
+                                  color: AppColors.iconGray(context),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ConstrainedBox(
                         constraints: const BoxConstraints(maxHeight: 120),
                         child: TextField(
