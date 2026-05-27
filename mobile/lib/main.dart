@@ -682,7 +682,9 @@ class _AppShellState extends State<_AppShell>
             backgroundColor: bgColor,
             body: Center(
               child: Image.asset(
-                'assets/icon/app_icon.png',
+                isDark
+                    ? 'assets/icon/app_icon.png'
+                    : 'assets/icon/app_icon_light_splash.png',
                 width: 120,
                 height: 120,
               ),
