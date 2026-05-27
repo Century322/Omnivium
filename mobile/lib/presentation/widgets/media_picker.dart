@@ -306,8 +306,9 @@ class MediaThumbnail extends StatelessWidget {
                             fit: BoxFit.cover,
                             width: 80,
                             height: 80,
-                      errorBuilder: (_, _, _) => _buildFilePlaceholder(context),
-                    ),
+                            errorBuilder: (_, _, _) =>
+                                _buildFilePlaceholder(context),
+                          ),
                   )
                 : _buildFilePlaceholder(context),
           ),

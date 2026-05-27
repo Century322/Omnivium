@@ -1,4 +1,4 @@
-﻿import '../../core/app_logger.dart';
+import '../../core/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:matrix/matrix.dart';
@@ -398,9 +398,7 @@ class FriendProfileView extends StatelessWidget {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: AppColors.sf(context),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           t('edit_group_name'),
           style: TextStyle(color: AppColors.textPrimary(context)),
@@ -467,9 +465,7 @@ class FriendProfileView extends StatelessWidget {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: AppColors.sf(context),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           t('invite_member'),
           style: TextStyle(color: AppColors.textPrimary(context)),
@@ -477,10 +473,7 @@ class FriendProfileView extends StatelessWidget {
         content: TextField(
           controller: ctrl,
           maxLength: 512,
-          style: TextStyle(
-            color: AppColors.textPrimary(context),
-            fontSize: 14,
-          ),
+          style: TextStyle(color: AppColors.textPrimary(context), fontSize: 14),
           decoration: InputDecoration(
             labelText: t('enter_matrix_id'),
             hintStyle: TextStyle(
@@ -604,11 +597,7 @@ class FriendProfileView extends StatelessWidget {
         );
       }
     } catch (e, stackTrace) {
-      AppLogger.instance.error(
-        'App error',
-        error: e,
-        stackTrace: stackTrace,
-      );
+      AppLogger.instance.error('App error', error: e, stackTrace: stackTrace);
     }
   }
 
@@ -703,10 +692,7 @@ class FriendProfileView extends StatelessWidget {
             onPressed: () async {
               Navigator.pop(context);
               try {
-                await room.client.reportRoom(
-                  room.id,
-                  t('report'),
-                );
+                await room.client.reportRoom(room.id, t('report'));
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(

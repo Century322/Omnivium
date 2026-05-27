@@ -117,9 +117,7 @@ class ConversationContent extends StatelessWidget {
           ListItemData(
             UserBubble(
               content: msg.content,
-              onLongPress: longPress != null
-                  ? () => longPress(i)
-                  : null,
+              onLongPress: longPress != null ? () => longPress(i) : null,
             ),
             12,
           ),
@@ -142,9 +140,7 @@ class ConversationContent extends StatelessWidget {
             AiTextBubble(
               content: msg.content,
               isStreaming: msg.isStreaming,
-              onLongPress: longPress != null
-                  ? () => longPress(i)
-                  : null,
+              onLongPress: longPress != null ? () => longPress(i) : null,
             ),
             12,
           ),

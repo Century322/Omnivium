@@ -658,8 +658,7 @@ class AutonomousLegislature {
     );
     final currentId = activeProposal?.proposalId;
     for (final p in existingProposals) {
-      if (p.proposedChange == proposedChange &&
-          p.proposalId != currentId) {
+      if (p.proposedChange == proposedChange && p.proposalId != currentId) {
         return true;
       }
     }
@@ -673,9 +672,7 @@ class AutonomousLegislature {
     final review = proposal.judiciaryReview;
     final recommendation = review['recommendation'];
     if (recommendation == 'reject') {
-      final rejected = proposal.copyWith(
-        stage: LegislativeStage.rejected,
-      );
+      final rejected = proposal.copyWith(stage: LegislativeStage.rejected);
       _updateProposal(rejected);
       return rejected;
     }
@@ -687,9 +684,7 @@ class AutonomousLegislature {
       return updated;
     }
 
-    final updated = proposal.copyWith(
-      stage: LegislativeStage.consensusVoting,
-    );
+    final updated = proposal.copyWith(stage: LegislativeStage.consensusVoting);
     _updateProposal(updated);
     return updated;
   }

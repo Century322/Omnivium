@@ -45,7 +45,9 @@ class FileLog {
     try {
       final timestamp = DateTime.now().toIso8601String();
       sink.writeln('[$timestamp] $message');
-      if (logFile != null && logFile.existsSync() && logFile.lengthSync() > _maxFileSize) {
+      if (logFile != null &&
+          logFile.existsSync() &&
+          logFile.lengthSync() > _maxFileSize) {
         _rotateLogs(Directory(logFile.parent.path));
       }
     } catch (e) {

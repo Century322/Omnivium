@@ -289,8 +289,7 @@ class ReminderService {
       if (reminder.type == ReminderType.messageNotification) continue;
 
       final triggerAt = reminder.nextTriggerAt;
-      if (triggerAt != null &&
-          now.isAfter(triggerAt)) {
+      if (triggerAt != null && now.isAfter(triggerAt)) {
         try {
           await _fireReminder(reminder);
           _consecutiveFailures[reminder.id] = 0;
@@ -332,10 +331,10 @@ class ReminderService {
         final aiResponse = await aiTrigger(
           reminder.aiPrompt ?? reminder.description,
         );
-      if (aiResponse != null && aiResponse.isNotEmpty) {
-        body = aiResponse.length > 200
-            ? '${aiResponse.substring(0, 200)}...'
-            : aiResponse;
+        if (aiResponse != null && aiResponse.isNotEmpty) {
+          body = aiResponse.length > 200
+              ? '${aiResponse.substring(0, 200)}...'
+              : aiResponse;
         }
       }
     }

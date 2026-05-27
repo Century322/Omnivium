@@ -1,4 +1,4 @@
-﻿import 'app_logger.dart';
+import 'app_logger.dart';
 import 'dart:convert';
 import 'dart:async';
 import 'package:flutter/material.dart';
@@ -305,11 +305,7 @@ class SessionProvider extends ChangeNotifier {
         await db.deleteCache(_activeSessionKey);
       }
     } catch (e, stackTrace) {
-      AppLogger.instance.error(
-        'App error',
-        error: e,
-        stackTrace: stackTrace,
-      );
+      AppLogger.instance.error('App error', error: e, stackTrace: stackTrace);
     }
   }
 

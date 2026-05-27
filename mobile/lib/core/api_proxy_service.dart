@@ -1,4 +1,4 @@
-﻿import 'app_logger.dart';
+import 'app_logger.dart';
 import 'app_config.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -162,11 +162,7 @@ class ApiProxyService {
       }
       return false;
     } catch (e, stackTrace) {
-      AppLogger.instance.warning(
-        'App error',
-        error: e,
-        stackTrace: stackTrace,
-      );
+      AppLogger.instance.warning('App error', error: e, stackTrace: stackTrace);
       return false;
     }
   }
@@ -302,8 +298,7 @@ class ApiProxyService {
 
     try {
       final resetTime = _rateLimitResetTime;
-      if (resetTime != null &&
-          DateTime.now().isBefore(resetTime)) {
+      if (resetTime != null && DateTime.now().isBefore(resetTime)) {
         throw ApiProxyException.rateLimited(
           retryAfter: resetTime.difference(DateTime.now()),
         );

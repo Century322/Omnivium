@@ -54,7 +54,12 @@ class ChatInputArea extends StatelessWidget {
     final viewBottom = MediaQuery.of(context).viewInsets.bottom;
     final safeBottom = MediaQuery.of(context).padding.bottom;
     return Padding(
-      padding: EdgeInsets.fromLTRB(16, 0, 16, viewBottom > 0 ? viewBottom : max(24, safeBottom)),
+      padding: EdgeInsets.fromLTRB(
+        16,
+        0,
+        16,
+        viewBottom > 0 ? viewBottom : max(24, safeBottom),
+      ),
       child: Center(
         child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: maxWidth - 32),

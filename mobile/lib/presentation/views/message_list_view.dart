@@ -254,7 +254,10 @@ class _MessageListViewState extends State<MessageListView> {
             if (unreadCount > 0)
               Flexible(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.acc(context),
                     borderRadius: BorderRadius.circular(10),

@@ -41,9 +41,7 @@ class ImageViewer extends StatelessWidget {
             imageUrl: imageUrl,
             fit: BoxFit.contain,
             placeholder: (_, __) => Center(
-              child: CircularProgressIndicator(
-                color: AppColors.acc(context),
-              ),
+              child: CircularProgressIndicator(color: AppColors.acc(context)),
             ),
             errorWidget: (_, url, error) => Center(
               child: Column(
@@ -67,7 +65,11 @@ class ImageViewer extends StatelessWidget {
                     onPressed: () {
                       CachedNetworkImage.evictFromCache(url);
                     },
-                    icon: Icon(LucideIcons.refreshCw, size: 16, color: AppColors.acc(context)),
+                    icon: Icon(
+                      LucideIcons.refreshCw,
+                      size: 16,
+                      color: AppColors.acc(context),
+                    ),
                     label: Text(
                       localeProvider.t('retry'),
                       style: TextStyle(color: AppColors.acc(context)),

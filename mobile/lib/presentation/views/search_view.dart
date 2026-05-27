@@ -1,4 +1,4 @@
-﻿import '../../core/app_logger.dart';
+import '../../core/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:matrix/matrix.dart';
@@ -97,11 +97,7 @@ class _SearchViewState extends State<SearchView> {
         }
       } catch (e, stackTrace) {
         messageSearchFailed = true;
-        AppLogger.instance.error(
-          'App error',
-          error: e,
-          stackTrace: stackTrace,
-        );
+        AppLogger.instance.error('App error', error: e, stackTrace: stackTrace);
       }
       try {
         final users = await matrix.searchUsers(query);
@@ -119,11 +115,7 @@ class _SearchViewState extends State<SearchView> {
         }
       } catch (e, stackTrace) {
         userSearchFailed = true;
-        AppLogger.instance.error(
-          'App error',
-          error: e,
-          stackTrace: stackTrace,
-        );
+        AppLogger.instance.error('App error', error: e, stackTrace: stackTrace);
       }
     }
 
@@ -552,9 +544,7 @@ class _SearchViewState extends State<SearchView> {
       case _SearchResultType.user:
         final userId = result.userId;
         if (userId != null) {
-          widget.provider.matrix.createDirectChat(userId).then((
-            roomId,
-          ) {
+          widget.provider.matrix.createDirectChat(userId).then((roomId) {
             widget.provider.matrix.setActiveRoom(roomId);
             widget.provider.navigation.setCurrentView(ViewState.home);
           });

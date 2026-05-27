@@ -2,10 +2,12 @@ import 'package:flutter/foundation.dart';
 
 bool get isWeb => kIsWeb;
 
-bool get isMobile => !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS ||
+bool get isMobile =>
+    !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS ||
     defaultTargetPlatform == TargetPlatform.android;
 
-bool get isDesktop => !kIsWeb &&
+bool get isDesktop =>
+    !kIsWeb &&
     (defaultTargetPlatform == TargetPlatform.macOS ||
         defaultTargetPlatform == TargetPlatform.windows ||
         defaultTargetPlatform == TargetPlatform.linux);

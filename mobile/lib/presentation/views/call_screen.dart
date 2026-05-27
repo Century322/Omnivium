@@ -147,42 +147,47 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
         if (!didPop) CallService.instance.hangup();
       },
       child: Scaffold(
-      backgroundColor: AppColors.bg(context),
-      body: SafeArea(
-        child: call.isVideo && _renderersInitialized && isConnected
-            ? _buildVideoLayout(context, call)
-            : Column(
-                children: [
-                  const Spacer(flex: 2),
-                  _buildAvatar(isConnected),
-                  const SizedBox(height: 24),
-                  Text(
-                    call.remoteUserId.replaceAll('@', '').split(':').first,
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary(context),
+        backgroundColor: AppColors.bg(context),
+        body: SafeArea(
+          child: call.isVideo && _renderersInitialized && isConnected
+              ? _buildVideoLayout(context, call)
+              : Column(
+                  children: [
+                    const Spacer(flex: 2),
+                    _buildAvatar(isConnected),
+                    const SizedBox(height: 24),
+                    Text(
+                      call.remoteUserId.replaceAll('@', '').split(':').first,
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary(context),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    _getStateText(call.state),
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: isConnected
-                          ? AppColors.ok(context)
-                          : AppColors.textSecondary(context),
+                    const SizedBox(height: 8),
+                    Text(
+                      _getStateText(call.state),
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: isConnected
+                            ? AppColors.ok(context)
+                            : AppColors.textSecondary(context),
+                      ),
                     ),
-                  ),
-                  const Spacer(flex: 3),
-                  if (isConnected) _buildInCallControls(context),
-                  if (isRinging) _buildIncomingCallControls(),
-                  if (isConnecting) _buildConnectingControls(),
-                  SizedBox(height: max(48, MediaQuery.of(context).padding.bottom + 16)),
-                ],
-              ),
+                    const Spacer(flex: 3),
+                    if (isConnected) _buildInCallControls(context),
+                    if (isRinging) _buildIncomingCallControls(),
+                    if (isConnecting) _buildConnectingControls(),
+                    SizedBox(
+                      height: max(
+                        48,
+                        MediaQuery.of(context).padding.bottom + 16,
+                      ),
+                    ),
+                  ],
+                ),
+        ),
       ),
-    ),
     );
   }
 
@@ -340,7 +345,9 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                   _formatDuration(_callDuration),
                   style: TextStyle(
                     fontSize: 14,
-                    color: AppColors.textOnAccent(context).withValues(alpha: 0.8),
+                    color: AppColors.textOnAccent(
+                      context,
+                    ).withValues(alpha: 0.8),
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -352,7 +359,9 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                       label: _isMuted
                           ? localeProvider.t('unmute')
                           : localeProvider.t('mute'),
-                      color: _isMuted ? AppColors.dng(context) : AppColors.textOnAccent(context),
+                      color: _isMuted
+                          ? AppColors.dng(context)
+                          : AppColors.textOnAccent(context),
                       onTap: () {
                         setState(() => _isMuted = !_isMuted);
                         _toggleMute(_isMuted);

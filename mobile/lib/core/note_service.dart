@@ -147,7 +147,10 @@ class NoteService {
             try {
               _items[localIdx] = NoteItem.fromJson(cloud);
             } catch (e) {
-              AppLogger.instance.warning('Update note from cloud failed', error: e);
+              AppLogger.instance.warning(
+                'Update note from cloud failed',
+                error: e,
+              );
             }
           }
         }
@@ -221,18 +224,14 @@ class NoteService {
       _items.where((n) => n.type == NoteType.schedule).toList();
   List<NoteItem> getTodaySchedules() {
     final now = DateTime.now();
-    return _items
-        .where(
-          (n) {
-            final due = n.dueDate;
-            return n.type == NoteType.schedule &&
-              due != null &&
-              due.year == now.year &&
-              due.month == now.month &&
-              due.day == now.day;
-          },
-        )
-        .toList();
+    return _items.where((n) {
+      final due = n.dueDate;
+      return n.type == NoteType.schedule &&
+          due != null &&
+          due.year == now.year &&
+          due.month == now.month &&
+          due.day == now.day;
+    }).toList();
   }
 
   List<NoteItem> getPendingTodos() =>

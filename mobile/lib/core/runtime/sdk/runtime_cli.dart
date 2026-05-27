@@ -45,7 +45,11 @@ class RuntimeCLI {
           return 'Unknown command: $command\n${cmdHelp()}';
       }
     } catch (e, stackTrace) {
-      AppLogger.instance.warning('CLI command failed: $command', error: e, stackTrace: stackTrace);
+      AppLogger.instance.warning(
+        'CLI command failed: $command',
+        error: e,
+        stackTrace: stackTrace,
+      );
       return 'Error: $e';
     }
   }

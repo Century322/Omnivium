@@ -98,13 +98,16 @@ class AgentOrchestrator extends ChangeNotifier {
     } else if (!_hasPendingNotify) {
       _hasPendingNotify = true;
       _throttleTimer?.cancel();
-      _throttleTimer = Timer(Duration(milliseconds: _notifyThrottleMs - elapsed), () {
-        if (_hasPendingNotify && !_disposed) {
-          _hasPendingNotify = false;
-          _lastNotifyTime = DateTime.now();
-          notifyListeners();
-        }
-      });
+      _throttleTimer = Timer(
+        Duration(milliseconds: _notifyThrottleMs - elapsed),
+        () {
+          if (_hasPendingNotify && !_disposed) {
+            _hasPendingNotify = false;
+            _lastNotifyTime = DateTime.now();
+            notifyListeners();
+          }
+        },
+      );
     }
   }
 
@@ -137,6 +140,7 @@ class AgentOrchestrator extends ChangeNotifier {
     final completer = _permissionCompleter;
     return completer != null && !completer.isCompleted;
   }
+
   String? get pendingSkillName => _pendingSkillName;
 
   void stopStreaming() {
@@ -191,7 +195,10 @@ class AgentOrchestrator extends ChangeNotifier {
           ),
         ],
       );
-      final registered = await sdk.container.registerPlugin(descriptor, _SkillPluginHandler(skill));
+      final registered = await sdk.container.registerPlugin(
+        descriptor,
+        _SkillPluginHandler(skill),
+      );
       if (registered) {
         await sdk.container.activatePlugin(descriptor.id);
       } else {
@@ -307,19 +314,19 @@ class AgentOrchestrator extends ChangeNotifier {
       if (capResult.status == CapabilityStatus.success) {
         final data = capResult.data;
         if (data != null) {
-        if (data.containsKey('stream')) {
-          final agentStream = data['stream'] as AgentStream;
-          await for (final event in agentStream.events) {
-            final result = _eventHandler.handleEvent(event, msgIndex);
-            if (result.shouldNotify) _throttledNotify();
-            if (result.isComplete) break;
+          if (data.containsKey('stream')) {
+            final agentStream = data['stream'] as AgentStream;
+            await for (final event in agentStream.events) {
+              final result = _eventHandler.handleEvent(event, msgIndex);
+              if (result.shouldNotify) _throttledNotify();
+              if (result.isComplete) break;
+            }
+          } else if (data.containsKey('content')) {
+            _conversation.updateStreamingContent(
+              msgIndex,
+              data['content'] as String,
+            );
           }
-        } else if (data.containsKey('content')) {
-          _conversation.updateStreamingContent(
-            msgIndex,
-            data['content'] as String,
-          );
-        }
         }
       } else {
         await _streamAIDirect(contextMessages, skillsList, msgIndex);

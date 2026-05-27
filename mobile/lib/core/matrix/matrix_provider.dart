@@ -1,4 +1,4 @@
-﻿import '../app_logger.dart';
+import '../app_logger.dart';
 import '../call_service.dart';
 import 'dart:async';
 import 'dart:io' if (dart.library.html) '';
@@ -34,11 +34,7 @@ class MatrixProvider extends ChangeNotifier {
       if (parts.length < 2) return null;
       return '${c.homeserver}/_matrix/media/v3/download/${parts[0]}/${parts[1]}';
     } catch (e, stackTrace) {
-      AppLogger.instance.warning(
-        'App error',
-        error: e,
-        stackTrace: stackTrace,
-      );
+      AppLogger.instance.warning('App error', error: e, stackTrace: stackTrace);
       return null;
     }
   }
@@ -164,8 +160,16 @@ class MatrixProvider extends ChangeNotifier {
     return roomId;
   }
 
-  Future<String> createGroupChat(String name, {List<String>? userIds, String? topic}) async {
-    final roomId = await _service.createGroupChat(name, invite: userIds, topic: topic);
+  Future<String> createGroupChat(
+    String name, {
+    List<String>? userIds,
+    String? topic,
+  }) async {
+    final roomId = await _service.createGroupChat(
+      name,
+      invite: userIds,
+      topic: topic,
+    );
     if (!_disposed) notifyListeners();
     return roomId;
   }
@@ -193,11 +197,7 @@ class MatrixProvider extends ChangeNotifier {
     try {
       await room.setTyping(isTyping, timeout: isTyping ? 5000 : 0);
     } catch (e, stackTrace) {
-      AppLogger.instance.error(
-        'App error',
-        error: e,
-        stackTrace: stackTrace,
-      );
+      AppLogger.instance.error('App error', error: e, stackTrace: stackTrace);
     }
   }
 
@@ -214,8 +214,16 @@ class MatrixProvider extends ChangeNotifier {
       if (bytes.length > 20 * 1024 * 1024) {
         throw Exception('Image size exceeds 20MB limit');
       }
-      final ext = fileName.contains('.') ? fileName.split('.').last.toLowerCase() : 'jpg';
-      final mimeMap = {'jpg': 'jpeg', 'jpeg': 'jpeg', 'png': 'png', 'gif': 'gif', 'webp': 'webp'};
+      final ext = fileName.contains('.')
+          ? fileName.split('.').last.toLowerCase()
+          : 'jpg';
+      final mimeMap = {
+        'jpg': 'jpeg',
+        'jpeg': 'jpeg',
+        'png': 'png',
+        'gif': 'gif',
+        'webp': 'webp',
+      };
       final mimeType = 'image/${mimeMap[ext] ?? ext}';
       final file = MatrixFile.fromMimeType(
         bytes: bytes,

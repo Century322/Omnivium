@@ -1,4 +1,4 @@
-﻿import '../governance/resource_controller.dart';
+import '../governance/resource_controller.dart';
 import '../governance/policy_engine.dart';
 import '../distributed/hybrid_logical_clock.dart';
 import '../stability/security.dart';
@@ -359,8 +359,7 @@ class SandboxIsolate {
 
   void _checkGuardTermination() {
     final guard = constitutionalGuard;
-    if (guard != null &&
-        guard.shouldTerminate(identity.sandboxId)) {
+    if (guard != null && guard.shouldTerminate(identity.sandboxId)) {
       terminate('constitutional_violation_escalation');
     }
   }

@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -162,11 +162,7 @@ class ModelProvider extends ChangeNotifier {
           _models.add(ModelConfig.fromJson(item as Map<String, dynamic>));
         }
       } catch (e, stackTrace) {
-        AppLogger.instance.error(
-          'App error',
-          error: e,
-          stackTrace: stackTrace,
-        );
+        AppLogger.instance.error('App error', error: e, stackTrace: stackTrace);
       }
     }
     _activeModelId = prefs.getString(_activeModelKey);
@@ -184,11 +180,7 @@ class ModelProvider extends ChangeNotifier {
         await prefs.remove(_activeModelKey);
       }
     } catch (e, stackTrace) {
-      AppLogger.instance.error(
-        'App error',
-        error: e,
-        stackTrace: stackTrace,
-      );
+      AppLogger.instance.error('App error', error: e, stackTrace: stackTrace);
     }
   }
 

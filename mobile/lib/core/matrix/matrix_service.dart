@@ -28,6 +28,7 @@ class MatrixService {
     if (c == null) throw StateError('Matrix client not initialized');
     return c;
   }
+
   String? get userId => _client?.userID;
   String? get homeserver => _client?.homeserver?.toString();
 
@@ -291,7 +292,10 @@ class MatrixService {
         await room.enableEncryption();
       }
     } catch (e) {
-      AppLogger.instance.warning('Failed to enable encryption for group', error: e);
+      AppLogger.instance.warning(
+        'Failed to enable encryption for group',
+        error: e,
+      );
     }
     return roomId;
   }
@@ -333,12 +337,16 @@ class MatrixService {
 
   List<Room> get directChats {
     if (_client == null) return [];
-    return requireClient.rooms.where((r) => r.isDirectChat && !r.isSpace).toList();
+    return requireClient.rooms
+        .where((r) => r.isDirectChat && !r.isSpace)
+        .toList();
   }
 
   List<Room> get groupChats {
     if (_client == null) return [];
-    return requireClient.rooms.where((r) => !r.isDirectChat && !r.isSpace).toList();
+    return requireClient.rooms
+        .where((r) => !r.isDirectChat && !r.isSpace)
+        .toList();
   }
 
   Stream<SyncUpdate>? get onSync {

@@ -233,10 +233,7 @@ class RemoteUIEngine {
         itemCount: items.length,
         itemBuilder: (context, index) {
           final item = items[index] as Map<String, dynamic>;
-          final resolved = _resolveTemplate(
-            itemTemplate,
-            item,
-          );
+          final resolved = _resolveTemplate(itemTemplate, item);
           return render(resolved, context, depth + 1);
         },
       ),

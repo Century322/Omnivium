@@ -153,8 +153,7 @@ class ConstitutionalTraceGraph {
       } else {
         totalViolations++;
         if (d.violatedLaw case final law?) {
-          violationCounts[law] =
-              (violationCounts[law] ?? 0) + 1;
+          violationCounts[law] = (violationCounts[law] ?? 0) + 1;
         }
         sandboxViolationCounts[d.sandboxId] =
             (sandboxViolationCounts[d.sandboxId] ?? 0) + 1;

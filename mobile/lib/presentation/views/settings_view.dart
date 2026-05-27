@@ -1,4 +1,4 @@
-﻿import '../../core/app_logger.dart';
+import '../../core/app_logger.dart';
 import '../../core/app_navigator.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
@@ -253,7 +253,10 @@ class _SettingsViewState extends State<SettingsView>
                                 PushNotificationService.instance
                                     .requestPermissions();
                               } catch (e) {
-                                AppLogger.instance.warning('Push permission failed', error: e);
+                                AppLogger.instance.warning(
+                                  'Push permission failed',
+                                  error: e,
+                                );
                               }
                             },
                           ),
@@ -1006,7 +1009,8 @@ class _SettingsViewState extends State<SettingsView>
         );
       } catch (e) {
         AppLogger.instance.warning('Set TTS voice failed', error: e);
-      }    });
+      }
+    });
   }
 
   void _showVoiceModeDialog() {

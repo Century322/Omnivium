@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:math';
 import 'dart:io' if (dart.library.html) '';
@@ -291,11 +291,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
         _canLoadMore = timeline.canRequestHistory;
       });
     } catch (e, stackTrace) {
-      AppLogger.instance.error(
-        'App error',
-        error: e,
-        stackTrace: stackTrace,
-      );
+      AppLogger.instance.error('App error', error: e, stackTrace: stackTrace);
     }
   }
 
@@ -419,8 +415,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
     if (widget.chatTargetId.isEmpty) return;
     final now = DateTime.now();
     final lastNotice = _lastTypingNotice;
-    if (lastNotice != null &&
-        now.difference(lastNotice).inSeconds < 3) {
+    if (lastNotice != null && now.difference(lastNotice).inSeconds < 3) {
       return;
     }
     _lastTypingNotice = now;
@@ -521,11 +516,56 @@ class _FriendChatPanelState extends State<FriendChatPanel>
   Widget _buildEmojiPicker() {
     if (!_showEmojiPicker) return const SizedBox.shrink();
     const allEmojis = [
-      '😀', '😂', '🥹', '😊', '😍', '🥰', '😘', '😜', '🤪', '😎',
-      '🤔', '🤗', '😏', '😌', '🥳', '😇', '🤩', '😋', '🤭', '🫠',
-      '👍', '👎', '❤️', '🔥', '💯', '✨', '🎉', '💪', '🙏', '👋',
-      '😢', '😭', '😤', '🤬', '😱', '🫣', '🥺', '😓', '🙄', '💀',
-      '⭐', '🌟', '💫', '🌈', '☀️', '🌙', '⚡', '💎', '🎵', '🎶',
+      '😀',
+      '😂',
+      '🥹',
+      '😊',
+      '😍',
+      '🥰',
+      '😘',
+      '😜',
+      '🤪',
+      '😎',
+      '🤔',
+      '🤗',
+      '😏',
+      '😌',
+      '🥳',
+      '😇',
+      '🤩',
+      '😋',
+      '🤭',
+      '🫠',
+      '👍',
+      '👎',
+      '❤️',
+      '🔥',
+      '💯',
+      '✨',
+      '🎉',
+      '💪',
+      '🙏',
+      '👋',
+      '😢',
+      '😭',
+      '😤',
+      '🤬',
+      '😱',
+      '🫣',
+      '🥺',
+      '😓',
+      '🙄',
+      '💀',
+      '⭐',
+      '🌟',
+      '💫',
+      '🌈',
+      '☀️',
+      '🌙',
+      '⚡',
+      '💎',
+      '🎵',
+      '🎶',
     ];
     return Container(
       height: 220,
@@ -1322,7 +1362,9 @@ class _FriendChatPanelState extends State<FriendChatPanel>
       final room = client.getRoomById(widget.chatTargetId);
       if (room == null) return;
       final members = room.getParticipants();
-      final otherMember = members.where((u) => u.id != client.userID).firstOrNull;
+      final otherMember = members
+          .where((u) => u.id != client.userID)
+          .firstOrNull;
       if (otherMember == null) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -1406,11 +1448,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
       }
       return parts.join('\n');
     } catch (e, stackTrace) {
-      AppLogger.instance.warning(
-        'App error',
-        error: e,
-        stackTrace: stackTrace,
-      );
+      AppLogger.instance.warning('App error', error: e, stackTrace: stackTrace);
       return null;
     }
   }
@@ -1430,11 +1468,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
         fetchOnlyFromCached: true,
       );
     } catch (e, stackTrace) {
-      AppLogger.instance.warning(
-        'App error',
-        error: e,
-        stackTrace: stackTrace,
-      );
+      AppLogger.instance.warning('App error', error: e, stackTrace: stackTrace);
       return null;
     }
   }
@@ -2040,7 +2074,10 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                             : CrossAxisAlignment.start,
                         children: [
                           if (msg.isVoice && msg.url != null)
-                            VoiceMessagePlayer(url: msg.url ?? '', isMe: msg.isMe)
+                            VoiceMessagePlayer(
+                              url: msg.url ?? '',
+                              isMe: msg.isMe,
+                            )
                           else if (msg.isImage && msg.url != null)
                             _buildImageBubble(msg)
                           else if (msg.isFile)
@@ -2135,7 +2172,9 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Text(
-                                    _formatMessageTime(msg.timestamp ?? DateTime.now()),
+                                    _formatMessageTime(
+                                      msg.timestamp ?? DateTime.now(),
+                                    ),
                                     style: TextStyle(
                                       color: msg.isMe
                                           ? AppColors.bg(
@@ -2507,7 +2546,12 @@ class _FriendChatPanelState extends State<FriendChatPanel>
     final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
     final safeBottom = MediaQuery.of(context).padding.bottom;
     return Padding(
-      padding: EdgeInsets.fromLTRB(16, 0, 16, bottomPadding > 0 ? bottomPadding : max(24, safeBottom)),
+      padding: EdgeInsets.fromLTRB(
+        16,
+        0,
+        16,
+        bottomPadding > 0 ? bottomPadding : max(24, safeBottom),
+      ),
       child: Center(
         child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: widget.maxWidth - 32),

@@ -1,4 +1,4 @@
-﻿import 'app_logger.dart';
+import 'app_logger.dart';
 import 'dart:convert';
 import 'api_proxy_service.dart';
 import 'database_service.dart';
@@ -21,7 +21,8 @@ class RemoteConfigService {
 
   bool get _isCacheStale {
     final lastFetch = _lastFetch;
-    return lastFetch == null || DateTime.now().difference(lastFetch) > _cacheTtl;
+    return lastFetch == null ||
+        DateTime.now().difference(lastFetch) > _cacheTtl;
   }
 
   bool getFeatureFlag(String key, {bool defaultValue = false}) {
@@ -86,11 +87,7 @@ class RemoteConfigService {
         await _saveToCache();
       }
     } catch (e, stackTrace) {
-      AppLogger.instance.error(
-        'App error',
-        error: e,
-        stackTrace: stackTrace,
-      );
+      AppLogger.instance.error('App error', error: e, stackTrace: stackTrace);
     }
 
     try {
@@ -114,11 +111,7 @@ class RemoteConfigService {
         await _saveSchemasToCache();
       }
     } catch (e, stackTrace) {
-      AppLogger.instance.error(
-        'App error',
-        error: e,
-        stackTrace: stackTrace,
-      );
+      AppLogger.instance.error('App error', error: e, stackTrace: stackTrace);
     }
   }
 
@@ -136,11 +129,7 @@ class RemoteConfigService {
           );
         }
       } catch (e, stackTrace) {
-        AppLogger.instance.error(
-          'App error',
-          error: e,
-          stackTrace: stackTrace,
-        );
+        AppLogger.instance.error('App error', error: e, stackTrace: stackTrace);
       }
     }
 
@@ -150,11 +139,7 @@ class RemoteConfigService {
         final data = jsonDecode(schemaRaw) as Map<String, dynamic>;
         _uiSchemas = data.map((k, v) => MapEntry(k, v as Map<String, dynamic>));
       } catch (e, stackTrace) {
-        AppLogger.instance.error(
-          'App error',
-          error: e,
-          stackTrace: stackTrace,
-        );
+        AppLogger.instance.error('App error', error: e, stackTrace: stackTrace);
       }
     }
   }

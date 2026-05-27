@@ -1,4 +1,4 @@
-﻿import '../../core/app_logger.dart';
+import '../../core/app_logger.dart';
 import '../../core/app_provider.dart';
 import 'dart:async';
 import 'dart:io' if (dart.library.html) '';
@@ -54,11 +54,7 @@ class _VoiceRecorderButtonState extends State<VoiceRecorderButton> {
         if (mounted) setState(() => _duration += const Duration(seconds: 1));
       });
     } catch (e, stackTrace) {
-      AppLogger.instance.error(
-        'App error',
-        error: e,
-        stackTrace: stackTrace,
-      );
+      AppLogger.instance.error('App error', error: e, stackTrace: stackTrace);
     }
   }
 
@@ -72,11 +68,7 @@ class _VoiceRecorderButtonState extends State<VoiceRecorderButton> {
         File(path).deleteSync();
       }
     } catch (e, stackTrace) {
-      AppLogger.instance.error(
-        'App error',
-        error: e,
-        stackTrace: stackTrace,
-      );
+      AppLogger.instance.error('App error', error: e, stackTrace: stackTrace);
     }
     if (mounted) {
       setState(() {
@@ -267,9 +259,7 @@ class _VoiceMessagePlayerState extends State<VoiceMessagePlayer> {
       if (_position > Duration.zero && _position < _duration) {
         await _player.resume();
       } else {
-        await _player.play(
-          UrlSource(playUrl),
-        );
+        await _player.play(UrlSource(playUrl));
       }
     }
   }

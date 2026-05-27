@@ -29,9 +29,7 @@ class ConnectivityService {
   DateTime? get lastOfflineTime => _lastOfflineTime;
   Duration? get offlineDuration {
     final lastOffline = _lastOfflineTime;
-    return lastOffline != null
-        ? DateTime.now().difference(lastOffline)
-        : null;
+    return lastOffline != null ? DateTime.now().difference(lastOffline) : null;
   }
 
   Stream<bool> get onConnectivityChanged => _controller.stream;

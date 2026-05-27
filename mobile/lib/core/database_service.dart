@@ -1,4 +1,4 @@
-﻿import 'app_logger.dart';
+import 'app_logger.dart';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -75,16 +75,16 @@ class DatabaseService {
         error: e,
         stackTrace: stackTrace,
       );
-      throw StateError('Encryption failed. Data will not be stored in plaintext.');
+      throw StateError(
+        'Encryption failed. Data will not be stored in plaintext.',
+      );
     }
   }
 
   String? _decrypt(String cipherText) {
     final key = _aesKey;
     if (key == null) {
-      throw StateError(
-        'Encryption key not set. Cannot decrypt data.',
-      );
+      throw StateError('Encryption key not set. Cannot decrypt data.');
     }
     try {
       final combined = base64.decode(cipherText);
@@ -142,11 +142,7 @@ class DatabaseService {
     try {
       return jsonDecode(raw) as Map<String, dynamic>;
     } catch (e, stackTrace) {
-      AppLogger.instance.warning(
-        'App error',
-        error: e,
-        stackTrace: stackTrace,
-      );
+      AppLogger.instance.warning('App error', error: e, stackTrace: stackTrace);
       return null;
     }
   }
@@ -183,11 +179,7 @@ class DatabaseService {
     try {
       return jsonDecode(raw) as Map<String, dynamic>;
     } catch (e, stackTrace) {
-      AppLogger.instance.warning(
-        'App error',
-        error: e,
-        stackTrace: stackTrace,
-      );
+      AppLogger.instance.warning('App error', error: e, stackTrace: stackTrace);
       return null;
     }
   }
@@ -244,11 +236,7 @@ class DatabaseService {
     try {
       return jsonDecode(raw) as Map<String, dynamic>;
     } catch (e, stackTrace) {
-      AppLogger.instance.warning(
-        'App error',
-        error: e,
-        stackTrace: stackTrace,
-      );
+      AppLogger.instance.warning('App error', error: e, stackTrace: stackTrace);
       return null;
     }
   }
@@ -288,11 +276,7 @@ class DatabaseService {
         }
         await prefs.remove('omnivium_sessions');
       } catch (e, stackTrace) {
-        AppLogger.instance.error(
-          'App error',
-          error: e,
-          stackTrace: stackTrace,
-        );
+        AppLogger.instance.error('App error', error: e, stackTrace: stackTrace);
       }
     }
     final memRaw = prefs.getString('omnivium_memories');
@@ -308,11 +292,7 @@ class DatabaseService {
         }
         await prefs.remove('omnivium_memories');
       } catch (e, stackTrace) {
-        AppLogger.instance.error(
-          'App error',
-          error: e,
-          stackTrace: stackTrace,
-        );
+        AppLogger.instance.error('App error', error: e, stackTrace: stackTrace);
       }
     }
   }

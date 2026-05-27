@@ -660,15 +660,20 @@ class _AppShellState extends State<_AppShell>
   @override
   Widget build(BuildContext context) {
     if (!_initialized) {
-      final isDark = MediaQuery.of(context).platformBrightness == Brightness.dark;
-      final bgColor = isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F7);
+      final isDark =
+          MediaQuery.of(context).platformBrightness == Brightness.dark;
+      final bgColor = isDark
+          ? const Color(0xFF1C1C1E)
+          : const Color(0xFFF5F5F7);
       return AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle(
           statusBarColor: bgColor,
           statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
           statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
           systemNavigationBarColor: bgColor,
-          systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+          systemNavigationBarIconBrightness: isDark
+              ? Brightness.light
+              : Brightness.dark,
         ),
         child: MaterialApp(
           debugShowCheckedModeBanner: false,

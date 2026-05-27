@@ -69,9 +69,7 @@ class RuntimeTrace {
 
   int get totalDurationMs {
     if (spans.isEmpty) return 0;
-    final endTimes = spans
-        .map((s) => s.endTimeMs)
-        .whereType<int>();
+    final endTimes = spans.map((s) => s.endTimeMs).whereType<int>();
     if (endTimes.isEmpty) return 0;
     return endTimes.reduce((a, b) => a > b ? a : b) - spans.first.startTimeMs;
   }

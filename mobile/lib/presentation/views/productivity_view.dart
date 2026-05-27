@@ -329,8 +329,7 @@ class _ProductivityViewState extends State<ProductivityView>
 
   Widget _buildScheduleCard(NoteItem schedule) {
     final dueDate = schedule.dueDate;
-    final isOverdue =
-        dueDate != null && dueDate.isBefore(DateTime.now());
+    final isOverdue = dueDate != null && dueDate.isBefore(DateTime.now());
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 3),
       decoration: BoxDecoration(
@@ -367,9 +366,7 @@ class _ProductivityViewState extends State<ProductivityView>
                 ),
               ),
               Text(
-                dueDate != null
-                    ? _monthShort(dueDate.month)
-                    : '',
+                dueDate != null ? _monthShort(dueDate.month) : '',
                 style: TextStyle(
                   color: isOverdue
                       ? AppColors.dng(context).withValues(alpha: 0.7)

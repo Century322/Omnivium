@@ -1,4 +1,4 @@
-﻿import '../../core/app_logger.dart';
+import '../../core/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -197,11 +197,7 @@ class LinkPreviewCard extends StatelessWidget {
       final uri = Uri.parse(url);
       return uri.host.replaceAll('www.', '');
     } catch (e, stackTrace) {
-      AppLogger.instance.warning(
-        'App error',
-        error: e,
-        stackTrace: stackTrace,
-      );
+      AppLogger.instance.warning('App error', error: e, stackTrace: stackTrace);
       return url.length > 40 ? '${url.substring(0, 40)}...' : url;
     }
   }

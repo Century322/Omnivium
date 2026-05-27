@@ -153,11 +153,7 @@ class ChatService {
       'stream': false,
     });
     final response = await proxy.secureClient
-        .post(
-          uri,
-          headers: _headersWithBody(syncBody),
-          body: syncBody,
-        )
+        .post(uri, headers: _headersWithBody(syncBody), body: syncBody)
         .timeout(const Duration(seconds: 30));
 
     if (response.statusCode == 401) {

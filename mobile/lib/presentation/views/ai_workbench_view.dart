@@ -488,10 +488,7 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView>
             if (_selectedTemplate case final selTemplate?) ...[
               Row(
                 children: [
-                  Text(
-                    selTemplate.emoji,
-                    style: const TextStyle(fontSize: 16),
-                  ),
+                  Text(selTemplate.emoji, style: const TextStyle(fontSize: 16)),
                   const SizedBox(width: 6),
                   Text(
                     t(selTemplate.nameKey),

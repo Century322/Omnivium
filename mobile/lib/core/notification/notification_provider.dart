@@ -1,4 +1,4 @@
-﻿import '../app_logger.dart';
+import '../app_logger.dart';
 import '../notification_center.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -35,11 +35,7 @@ class NotificationProvider extends ChangeNotifier {
         }
         if (!_disposed) notifyListeners();
       } catch (e, stackTrace) {
-        AppLogger.instance.error(
-          'App error',
-          error: e,
-          stackTrace: stackTrace,
-        );
+        AppLogger.instance.error('App error', error: e, stackTrace: stackTrace);
       }
     }
     NotificationCenter.observe(Event.pushNotification, _onPushNotification);
