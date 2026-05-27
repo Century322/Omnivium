@@ -301,6 +301,7 @@ class _AppLockDialogState extends State<_AppLockDialog> {
   void _submit() async {
     final input = _controller.text;
     final ok = await widget.lock.verify(input);
+    if (!mounted) return;
     if (ok) {
       widget.lock.recordUnlock();
       widget.onUnlocked();
@@ -457,8 +458,9 @@ class _AppShellState extends State<_AppShell>
           ),
         );
       }
-    } catch (_) {}
-  }
+    } catch (e) {
+      AppLogger.instance.warning('Auth event handling failed', error: e);
+    }
 
   @override
   void dispose() {
@@ -466,6 +468,7 @@ class _AppShellState extends State<_AppShell>
     _provider.session.saveCurrentSession();
     _provider.dispose();
     ConnectivityService.instance.dispose();
+    DeepLinkService.instance.dispose();
     PushNotificationService.instance.dispose();
     VoiceService.instance.dispose();
     disposeFirebaseMessaging();
@@ -643,6 +646,7 @@ class _AppShellState extends State<_AppShell>
   void _onLoginSuccess() {
     AuthService.instance.onMatrixLogin();
     setState(() => _showLogin = false);
+    _provider.model.refreshModels();
   }
 
   void _onPrivacyConsentResult(bool agreed) async {
@@ -655,19 +659,22 @@ class _AppShellState extends State<_AppShell>
   @override
   Widget build(BuildContext context) {
     if (!_initialized) {
+      final isDark = MediaQuery.platformBrightness == Brightness.dark;
+      final bgColor = isDark ? const Color(0xFF1C1C1E) : Colors.white;
+      final fgColor = isDark ? Colors.white : Colors.black;
       return AnnotatedRegion<SystemUiOverlayStyle>(
-        value: const SystemUiOverlayStyle(
-          statusBarColor: Color(0xFFFFFFFF),
-          statusBarIconBrightness: Brightness.dark,
-          statusBarBrightness: Brightness.light,
-          systemNavigationBarColor: Color(0xFFFFFFFF),
-          systemNavigationBarIconBrightness: Brightness.dark,
+        value: SystemUiOverlayStyle(
+          statusBarColor: bgColor,
+          statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+          statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+          systemNavigationBarColor: bgColor,
+          systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
         ),
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
-          theme: ThemeData(scaffoldBackgroundColor: const Color(0xFFFFFFFF)),
+          theme: ThemeData(scaffoldBackgroundColor: bgColor),
           home: Scaffold(
-            backgroundColor: const Color(0xFFFFFFFF),
+            backgroundColor: bgColor,
             body: Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,

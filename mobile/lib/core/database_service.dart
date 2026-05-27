@@ -53,11 +53,16 @@ class DatabaseService {
   }
 
   String _encrypt(String plainText) {
-    if (_aesKey == null) return plainText;
+    final key = _aesKey;
+    if (key == null) {
+      throw StateError(
+        'Encryption key not set. Call setEncryptionKey() before storing encrypted data.',
+      );
+    }
     try {
       final iv = encrypt.IV.fromSecureRandom(16);
       final encrypter = encrypt.Encrypter(
-        encrypt.AES(_aesKey!, mode: encrypt.AESMode.cbc),
+        encrypt.AES(key, mode: encrypt.AESMode.cbc),
       );
       final encrypted = encrypter.encrypt(plainText, iv: iv);
       final combined = Uint8List(iv.bytes.length + encrypted.bytes.length);
@@ -66,18 +71,21 @@ class DatabaseService {
       return base64.encode(combined);
     } catch (e, stackTrace) {
       AppLogger.instance.error(
-        'AES encryption failed - data will NOT be stored unencrypted',
+        'AES encryption failed',
         error: e,
         stackTrace: stackTrace,
       );
-      throw StateError(
-        'Encryption failed. Data will not be stored in plaintext.',
-      );
+      throw StateError('Encryption failed. Data will not be stored in plaintext.');
     }
   }
 
   String? _decrypt(String cipherText) {
-    if (_aesKey == null) return cipherText;
+    final key = _aesKey;
+    if (key == null) {
+      throw StateError(
+        'Encryption key not set. Cannot decrypt data.',
+      );
+    }
     try {
       final combined = base64.decode(cipherText);
       if (combined.length < 16) return null;
@@ -85,7 +93,7 @@ class DatabaseService {
       final encryptedBytes = combined.sublist(16);
       final iv = encrypt.IV(Uint8List.fromList(ivBytes));
       final encrypter = encrypt.Encrypter(
-        encrypt.AES(_aesKey!, mode: encrypt.AESMode.cbc),
+        encrypt.AES(key, mode: encrypt.AESMode.cbc),
       );
       final decrypted = encrypter.decrypt(
         encrypt.Encrypted(Uint8List.fromList(encryptedBytes)),
@@ -208,6 +216,12 @@ class DatabaseService {
 
   Future<void> putCache(String key, String value) async {
     await _cache.put(key, value);
+    if (_cache.length > 200) {
+      final keys = _cache.keys.take(_cache.length - 150).toList();
+      for (final k in keys) {
+        await _cache.delete(k);
+      }
+    }
   }
 
   String? getCache(String key) => _cache.get(key);
@@ -246,7 +260,8 @@ class DatabaseService {
         .map((raw) {
           try {
             return jsonDecode(raw) as Map<String, dynamic>;
-          } catch (_) {
+          } catch (e) {
+            AppLogger.instance.debug('Cache JSON decode failed', error: e);
             return <String, dynamic>{};
           }
         })

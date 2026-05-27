@@ -43,11 +43,11 @@ class SettingItem extends StatelessWidget {
                           color: effectiveTextColor,
                         ),
                       ),
-                      if (subtitle != null)
+                      if (subtitle case final sub?)
                         Padding(
                           padding: const EdgeInsets.only(top: 4),
                           child: Text(
-                            subtitle!,
+                            sub,
                             style: TextStyle(
                               fontSize: 13,
                               color: AppColors.mut(context),

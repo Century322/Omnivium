@@ -2,11 +2,15 @@ import '../../core/app_logger.dart';
 import '../../core/app_navigator.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
+import 'dart:io' if (dart.library.html) '';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../theme/app_colors.dart';
+import '../theme/wallpaper_presets.dart';
 import '../theme/locale_provider.dart';
 import '../../main.dart';
 import '../../core/app_provider.dart';
@@ -16,6 +20,7 @@ import '../../core/remote_config_service.dart';
 import '../../core/database_service.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../core/auth_service.dart';
+import '../../core/app_lock_service.dart';
 import '../widgets/section_header.dart';
 import '../widgets/setting_item.dart';
 import '../widgets/animated_toggle.dart';
@@ -71,11 +76,17 @@ class _SettingsViewState extends State<SettingsView>
   Future<void> _loadPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     if (!mounted) return;
+    final lockEnabled = prefs.getBool('lock_enabled') ?? false;
+    final hasPinHash = await _secure.read('omnivium_lock_pin_hash');
+    if (lockEnabled && (hasPinHash == null || hasPinHash.isEmpty)) {
+      await prefs.setBool('lock_enabled', false);
+    }
+    if (!mounted) return;
     setState(() {
       _notifications = prefs.getBool('omnivium_notifications') ?? true;
       _dataRetention = prefs.getBool('omnivium_data_retention') ?? true;
       _agentEnabled = prefs.getBool('omnivium_agent_enabled') ?? true;
-      _lockEnabled = prefs.getBool('lock_enabled') ?? false;
+      _lockEnabled = lockEnabled && hasPinHash != null && hasPinHash.isNotEmpty;
       _assistantLang = prefs.getString('omnivium_assistant_lang') ?? 'auto';
       _imageModel = prefs.getString('omnivium_image_model') ?? 'default_model';
       _sttEngine = prefs.getString('omnivium_stt_engine') ?? 'system';
@@ -116,8 +127,8 @@ class _SettingsViewState extends State<SettingsView>
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onHorizontalDragEnd: (details) {
-              if (details.primaryVelocity != null &&
-                  details.primaryVelocity! > 500) {
+              final velocity = details.primaryVelocity;
+              if (velocity != null && velocity > 500) {
                 widget.provider.navigation.closeSettingsAndReturnToDrawer();
               }
             },
@@ -241,7 +252,9 @@ class _SettingsViewState extends State<SettingsView>
                               try {
                                 PushNotificationService.instance
                                     .requestPermissions();
-                              } catch (_) {}
+                              } catch (e) {
+                                AppLogger.instance.warning('Push permission failed', error: e);
+                              }
                             },
                           ),
                         ),
@@ -781,120 +794,119 @@ class _SettingsViewState extends State<SettingsView>
   void _showLockScreenDialog() {
     final pinCtrl = TextEditingController();
     bool isSetting = !_lockEnabled;
-    try {
-      showDialog(
-        context: context,
-        builder: (ctx) => StatefulBuilder(
-          builder: (ctx, setDialogState) => AlertDialog(
-            backgroundColor: AppColors.sf(context),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            title: Text(
-              t('lock_screen'),
-              style: TextStyle(color: AppColors.textPrimary(context)),
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (isSetting) ...[
-                  Text(
-                    t('set_pin_desc'),
-                    style: TextStyle(
-                      color: AppColors.textSecondary(context),
-                      fontSize: 14,
-                    ),
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          backgroundColor: AppColors.sf(context),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Text(
+            t('lock_screen'),
+            style: TextStyle(color: AppColors.textPrimary(context)),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (isSetting) ...[
+                Text(
+                  t('set_pin_desc'),
+                  style: TextStyle(
+                    color: AppColors.textSecondary(context),
+                    fontSize: 14,
                   ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: pinCtrl,
-                    obscureText: true,
-                    keyboardType: TextInputType.number,
-                    maxLength: 6,
-                    style: TextStyle(
-                      color: AppColors.textPrimary(context),
-                      fontSize: 18,
-                      letterSpacing: 8,
-                    ),
-                    decoration: InputDecoration(
-                      labelText: t('enter_pin'),
-                      hintStyle: TextStyle(
-                        color: AppColors.textDisabled(context),
-                      ),
-                      counterText: '',
-                      filled: true,
-                      fillColor: AppColors.sfAlt(context),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                  ),
-                ] else ...[
-                  Text(
-                    t('lock_screen_desc'),
-                    style: TextStyle(
-                      color: AppColors.textSecondary(context),
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  SwitchListTile(
-                    value: _lockEnabled,
-                    onChanged: (v) {
-                      setDialogState(() {
-                        _lockEnabled = v;
-                      });
-                      _savePref('lock_enabled', v);
-                    },
-                    title: Text(
-                      t('enable_lock'),
-                      style: TextStyle(color: AppColors.textPrimary(context)),
-                    ),
-                    activeThumbColor: AppColors.acc(context),
-                  ),
-                ],
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: Text(
-                  t('cancel'),
-                  style: TextStyle(color: AppColors.sec(context)),
                 ),
-              ),
-              if (isSetting)
-                TextButton(
-                  onPressed: () async {
-                    if (pinCtrl.text.length < 4) return;
-                    final salt = DateTime.now().millisecondsSinceEpoch
-                        .toString();
-                    final pinHash = sha256
-                        .convert(utf8.encode('$salt${pinCtrl.text}'))
-                        .toString();
-                    await _secure.write('omnivium_lock_pin_hash', pinHash);
-                    await _secure.write('omnivium_lock_pin_salt', salt);
-                    await _secure.delete('omnivium_lock_pin');
-                    if (!mounted) return;
-                    setState(() {
-                      _lockEnabled = true;
+                const SizedBox(height: 12),
+                TextField(
+                  controller: pinCtrl,
+                  obscureText: true,
+                  keyboardType: TextInputType.number,
+                  maxLength: 6,
+                  style: TextStyle(
+                    color: AppColors.textPrimary(context),
+                    fontSize: 18,
+                    letterSpacing: 8,
+                  ),
+                  decoration: InputDecoration(
+                    labelText: t('enter_pin'),
+                    hintStyle: TextStyle(
+                      color: AppColors.textDisabled(context),
+                    ),
+                    counterText: '',
+                    filled: true,
+                    fillColor: AppColors.sfAlt(context),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                ),
+              ] else ...[
+                Text(
+                  t('lock_screen_desc'),
+                  style: TextStyle(
+                    color: AppColors.textSecondary(context),
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SwitchListTile(
+                  value: _lockEnabled,
+                  onChanged: (v) async {
+                    if (!v) {
+                      await AppLockService.instance.removePasscode();
+                    }
+                    setDialogState(() {
+                      _lockEnabled = v;
                     });
-                    _savePref('lock_enabled', true);
-                    if (ctx.mounted) Navigator.pop(ctx);
+                    _savePref('lock_enabled', v);
                   },
-                  child: Text(
-                    t('confirm'),
-                    style: TextStyle(color: AppColors.acc(context)),
+                  title: Text(
+                    t('enable_lock'),
+                    style: TextStyle(color: AppColors.textPrimary(context)),
                   ),
+                  activeThumbColor: AppColors.acc(context),
                 ),
+              ],
             ],
           ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                pinCtrl.dispose();
+              },
+              child: Text(
+                t('cancel'),
+                style: TextStyle(color: AppColors.sec(context)),
+              ),
+            ),
+            if (isSetting)
+              TextButton(
+                onPressed: () async {
+                  if (pinCtrl.text.length < 4) return;
+                  await AppLockService.instance.setPasscode(
+                    pinCtrl.text,
+                    PasscodeType.pin,
+                  );
+                  if (!mounted) return;
+                  setState(() {
+                    _lockEnabled = true;
+                  });
+                  _savePref('lock_enabled', true);
+                  pinCtrl.dispose();
+                  if (ctx.mounted) Navigator.pop(ctx);
+                },
+                child: Text(
+                  t('confirm'),
+                  style: TextStyle(color: AppColors.acc(context)),
+                ),
+              ),
+          ],
         ),
-      );
-    } finally {
-      pinCtrl.dispose();
-    }
+      ),
+    );
   }
 
   void _showImageModelDialog() {
@@ -914,6 +926,7 @@ class _SettingsViewState extends State<SettingsView>
       (v) {
         final key = modelKeys[modelLabels.indexOf(v)];
         setState(() => _imageModel = key);
+        _savePref('omnivium_image_model', key);
       },
     );
   }
@@ -959,7 +972,9 @@ class _SettingsViewState extends State<SettingsView>
                 _savePref('omnivium_stt_engine', key);
                 try {
                   VoiceService.instance.setSttEngine(key);
-                } catch (_) {}
+                } catch (e) {
+                  AppLogger.instance.warning('Set STT engine failed', error: e);
+                }
                 Navigator.pop(context);
               },
             );
@@ -989,8 +1004,9 @@ class _SettingsViewState extends State<SettingsView>
             orElse: () => TTSVoice.alloy,
           ),
         );
-      } catch (_) {}
-    });
+      } catch (e) {
+        AppLogger.instance.warning('Set TTS voice failed', error: e);
+      }    });
   }
 
   void _showVoiceModeDialog() {
@@ -1034,7 +1050,9 @@ class _SettingsViewState extends State<SettingsView>
                 _savePref('omnivium_voice_mode', key);
                 try {
                   VoiceService.instance.setVoiceModeByName(key);
-                } catch (_) {}
+                } catch (e) {
+                  AppLogger.instance.warning('Set voice mode failed', error: e);
+                }
                 Navigator.pop(context);
               },
             );
@@ -1198,57 +1216,78 @@ class _WallpaperViewState extends State<_WallpaperView> {
       imageQuality: 80,
     );
     if (xfile == null) return;
-    final db = DatabaseService.instance;
-    db.putData('chat_wallpaper', {'id': 'custom', 'path': xfile.path});
-    setState(() => _currentWallpaper = 'custom');
+    try {
+      final appDir = await getApplicationDocumentsDirectory();
+      final wallpaperDir = Directory('${appDir.path}/wallpapers');
+      if (!await wallpaperDir.exists()) {
+        await wallpaperDir.create(recursive: true);
+      }
+      final ext = xfile.path.split('.').lastOrNull ?? 'jpg';
+      final savedPath = '${wallpaperDir.path}/custom_wallpaper.$ext';
+      await File(xfile.path).copy(savedPath);
+      final db = DatabaseService.instance;
+      db.putData('chat_wallpaper', {'id': 'custom', 'path': savedPath});
+      if (!mounted) return;
+      setState(() => _currentWallpaper = 'custom');
+    } catch (e, stackTrace) {
+      AppLogger.instance.error(
+        'Save wallpaper failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      final db = DatabaseService.instance;
+      db.putData('chat_wallpaper', {'id': 'custom', 'path': xfile.path});
+      if (!mounted) return;
+      setState(() => _currentWallpaper = 'custom');
+    }
   }
 
   BoxDecoration _buildPresetDecoration(String id) {
     switch (id) {
       case 'gradient_sunset':
-        return const BoxDecoration(
+        return BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFFFF6B35), Color(0xFFF7931E), Color(0xFFFFD700)],
+            colors: WallpaperPresets.warm,
           ),
         );
       case 'gradient_ocean':
-        return const BoxDecoration(
+        return BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF0077B6), Color(0xFF00B4D8), Color(0xFF90E0EF)],
+            colors: WallpaperPresets.ocean,
           ),
         );
       case 'gradient_forest':
-        return const BoxDecoration(
+        return BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF2D6A4F), Color(0xFF40916C), Color(0xFF95D5B2)],
+            colors: WallpaperPresets.forest,
           ),
         );
       case 'gradient_night':
-        return const BoxDecoration(
+        return BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF0D1B2A), Color(0xFF1B2838), Color(0xFF2C3E50)],
+            colors: WallpaperPresets.dark,
           ),
         );
       case 'gradient_rose':
-        return const BoxDecoration(
+        return BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFFE91E63), Color(0xFFF06292), Color(0xFFF8BBD0)],
+            colors: WallpaperPresets.pink,
           ),
         );
       case 'solid_dark':
-        return const BoxDecoration(color: Color(0xFF1A1A2E));
+        return const BoxDecoration(color: WallpaperPresets.darkBg);
       case 'solid_midnight':
-        return const BoxDecoration(color: Color(0xFF16213E));
+        return const BoxDecoration(color: WallpaperPresets.darkBlueBg);
       default:
         return const BoxDecoration(color: Colors.transparent);
     }

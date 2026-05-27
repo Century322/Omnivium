@@ -123,15 +123,16 @@ class AuthService {
   }
 
   void _setupAuthListener() {
-    if (_client == null) return;
+    final client = _client;
+    if (client == null) return;
     _authSubscription?.cancel();
-    _authSubscription = _client!.auth.onAuthStateChange.listen((event) {
+    _authSubscription = client.auth.onAuthStateChange.listen((event) {
       _currentUser = event.session?.user;
       _jwtToken = event.session?.accessToken;
       _authStateController.add(event);
     });
 
-    final session = _client!.auth.currentSession;
+    final session = client.auth.currentSession;
     if (session != null) {
       _currentUser = session.user;
       _jwtToken = session.accessToken;
@@ -159,21 +160,23 @@ class AuthService {
   }
 
   Future<void> _linkMatrixAccount(String matrixUserId) async {
-    if (_client == null || !_supabaseInitialized) return;
+    final client = _client;
+    if (client == null || !_supabaseInitialized) return;
     try {
       if (isAuthenticated) {
         final currentMeta = _currentUser?.userMetadata;
         if (currentMeta?['matrix_user_id'] == matrixUserId) return;
       }
-      final response = await _client!.auth.signInAnonymously();
+      final response = await client.auth.signInAnonymously();
       _currentUser = response.user;
       _jwtToken = response.session?.accessToken;
-      await _client!.auth.updateUser(
+      await client.auth.updateUser(
         UserAttributes(data: {'matrix_user_id': matrixUserId}),
       );
-      if (_currentUser != null) {
+      final user = _currentUser;
+      if (user != null) {
         await IdentityBridge.instance.onUserAuthenticated(
-          _currentUser!.id,
+          user.id,
           matrixId: matrixUserId,
         );
       }
@@ -197,16 +200,18 @@ class AuthService {
   }
 
   Future<bool> signIn({required String email, required String password}) async {
-    if (_client == null || !_supabaseInitialized) return false;
+    final client = _client;
+    if (client == null || !_supabaseInitialized) return false;
     try {
-      final response = await _client!.auth.signInWithPassword(
+      final response = await client.auth.signInWithPassword(
         email: email,
         password: password,
       );
       _currentUser = response.user;
       _jwtToken = response.session?.accessToken;
-      if (_currentUser != null) {
-        await IdentityBridge.instance.onUserAuthenticated(_currentUser!.id);
+      final user = _currentUser;
+      if (user != null) {
+        await IdentityBridge.instance.onUserAuthenticated(user.id);
       }
       return _currentUser != null;
     } catch (e) {
@@ -216,13 +221,14 @@ class AuthService {
   }
 
   Future<void> signOut() async {
-    if (_client == null) return;
+    final client = _client;
+    if (client == null) return;
     _refreshTimer?.cancel();
     _refreshTimer = null;
     await _authSubscription?.cancel();
     _authSubscription = null;
     try {
-      await _client!.auth.signOut();
+      await client.auth.signOut();
     } catch (e) {
       AppLogger.instance.warning('Sign out failed', error: e);
     }
@@ -232,9 +238,10 @@ class AuthService {
   }
 
   Future<bool> refreshSession() async {
-    if (_client == null || !_supabaseInitialized) return false;
+    final client = _client;
+    if (client == null || !_supabaseInitialized) return false;
     try {
-      final response = await _client!.auth.refreshSession();
+      final response = await client.auth.refreshSession();
       _currentUser = response.user;
       _jwtToken = response.session?.accessToken;
       return _currentUser != null;

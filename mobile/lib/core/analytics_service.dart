@@ -16,8 +16,9 @@ class AnalyticsService {
   Future<void> init() async {
     try {
       if (Firebase.apps.isEmpty) return;
-      _analytics = FirebaseAnalytics.instance;
-      await _analytics!.setAnalyticsCollectionEnabled(!kDebugMode);
+      final analytics = FirebaseAnalytics.instance;
+      _analytics = analytics;
+      await analytics.setAnalyticsCollectionEnabled(!kDebugMode);
       AppLogger.instance.info('Analytics initialized');
     } catch (e) {
       AppLogger.instance.warning('Analytics init failed', error: e);
@@ -33,9 +34,11 @@ class AnalyticsService {
     required String name,
     Map<String, Object>? parameters,
   }) async {
-    if (!_enabled || _analytics == null) return;
+    if (!_enabled) return;
+    final analytics = _analytics;
+    if (analytics == null) return;
     try {
-      await _analytics!.logEvent(name: name, parameters: parameters);
+      await analytics.logEvent(name: name, parameters: parameters);
     } catch (e) {
       AppLogger.instance.warning('Analytics logEvent failed', error: e);
     }
@@ -45,9 +48,11 @@ class AnalyticsService {
     required String name,
     required String? value,
   }) async {
-    if (!_enabled || _analytics == null) return;
+    if (!_enabled) return;
+    final analytics = _analytics;
+    if (analytics == null) return;
     try {
-      await _analytics!.setUserProperty(name: name, value: value);
+      await analytics.setUserProperty(name: name, value: value);
     } catch (e) {
       AppLogger.instance.warning('Analytics setUserProperty failed', error: e);
     }

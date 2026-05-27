@@ -55,16 +55,21 @@ class WebSearchSkill extends Skill {
       }
 
       final json = jsonDecode(response.body);
+      if (json is! Map<String, dynamic>) {
+        return SkillResult.fail('Invalid search response format');
+      }
       final results = <Map<String, String>>[];
 
       final organic = json['organic'] as List?;
       if (organic != null) {
         for (final item in organic.take(5)) {
-          results.add({
-            'title': item['title'] ?? '',
-            'link': item['link'] ?? '',
-            'snippet': item['snippet'] ?? '',
-          });
+          if (item is Map<String, dynamic>) {
+            results.add({
+              'title': item['title']?.toString() ?? '',
+              'link': item['link']?.toString() ?? '',
+              'snippet': item['snippet']?.toString() ?? '',
+            });
+          }
         }
       }
 

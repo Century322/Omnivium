@@ -184,7 +184,8 @@ class UnifiedLeaseManager {
   }) {
     try {
       return acquire(type, targetId, constraints: constraints);
-    } catch (_) {
+    } catch (e) {
+      AppLogger.instance.debug('Unified lease acquire failed', error: e);
       return null;
     }
   }

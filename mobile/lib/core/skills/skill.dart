@@ -110,15 +110,17 @@ class RemoteSkill extends Skill {
       if (!proxy.isConfigured)
         return SkillResult.fail('API proxy not configured');
       final uri = Uri.parse('${proxy.backendUrl}$endpoint');
-      final response = await proxy.secureClient.post(
-        uri,
-        headers: {
-          ...proxy.buildAuthHeaders(),
-          ...proxy.buildDeviceHeaders(),
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode(params),
-      );
+      final response = await proxy.secureClient
+          .post(
+            uri,
+            headers: {
+              ...proxy.buildAuthHeaders(),
+              ...proxy.buildDeviceHeaders(),
+              'Content-Type': 'application/json',
+            },
+            body: jsonEncode(params),
+          )
+          .timeout(Duration(milliseconds: timeoutMs));
       if (response.statusCode == 200) {
         return SkillResult.ok(response.body);
       }

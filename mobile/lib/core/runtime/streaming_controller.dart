@@ -22,33 +22,40 @@ class StreamingController {
   bool get isDisposed => _disposed;
 
   void addChunk(String content) {
-    if (_disposed || _controller == null || _controller!.isClosed) return;
+    if (_disposed) return;
+    final ctrl = _controller;
+    if (ctrl == null || ctrl.isClosed) return;
     if (_buffer.length + content.length > _maxBufferSize) {
       addError('Response buffer overflow');
       return;
     }
     _isStreaming = true;
     _buffer += content;
-    _controller!.add(StreamChunk(content: content));
+    ctrl.add(StreamChunk(content: content));
   }
 
   void complete() {
-    if (_disposed || _controller == null || _controller!.isClosed) return;
+    if (_disposed) return;
+    final ctrl = _controller;
+    if (ctrl == null || ctrl.isClosed) return;
     _isStreaming = false;
-    _controller!.add(const StreamChunk(isDone: true));
+    ctrl.add(const StreamChunk(isDone: true));
   }
 
   void addError(String error) {
-    if (_disposed || _controller == null || _controller!.isClosed) return;
+    if (_disposed) return;
+    final ctrl = _controller;
+    if (ctrl == null || ctrl.isClosed) return;
     _isStreaming = false;
-    _controller!.add(StreamChunk(error: error, isDone: true));
+    ctrl.add(StreamChunk(error: error, isDone: true));
   }
 
   void reset() {
     _buffer = '';
     _isStreaming = false;
     if (_disposed) return;
-    if (_controller != null && _controller!.isClosed) {
+    final ctrl = _controller;
+    if (ctrl != null && ctrl.isClosed) {
       _controller = StreamController<StreamChunk>.broadcast();
     }
   }

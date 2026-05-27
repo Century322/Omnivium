@@ -31,8 +31,9 @@ class _AiOperationLogViewState extends State<AiOperationLogView>
 
   @override
   void dispose() {
-    if (_eventSub != null) {
-      OmniviumSDK.instance.container.eventBus.unsubscribe(_eventSub!.id);
+    final eventSub = _eventSub;
+    if (eventSub != null) {
+      OmniviumSDK.instance.container.eventBus.unsubscribe(eventSub.id);
     }
     _tabController.dispose();
     super.dispose();

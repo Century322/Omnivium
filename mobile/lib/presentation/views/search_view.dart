@@ -68,24 +68,30 @@ class _SearchViewState extends State<SearchView> {
     bool userSearchFailed = false;
     if (matrix.isLoggedIn && matrix.client != null) {
       try {
-        for (final room in matrix.rooms) {
-          final timeline = await room.getTimeline();
-          var events = timeline.events;
-          var count = 0;
-          for (final event in events) {
-            if (count >= 50) break;
-            if (event.body.toLowerCase().contains(query.toLowerCase())) {
-              results.add(
-                _SearchResult(
-                  type: _SearchResultType.message,
-                  title: room.getLocalizedDisplayname(),
-                  subtitle: event.body,
-                  roomId: room.id,
-                  eventId: event.eventId,
-                ),
-              );
-              count++;
+        final rooms = matrix.rooms;
+        final roomsToSearch = rooms.length > 10 ? rooms.sublist(0, 10) : rooms;
+        for (final room in roomsToSearch) {
+          Timeline? timeline;
+          try {
+            timeline = await room.getTimeline();
+            var count = 0;
+            for (final event in timeline.events) {
+              if (count >= 20) break;
+              if (event.body.toLowerCase().contains(query.toLowerCase())) {
+                results.add(
+                  _SearchResult(
+                    type: _SearchResultType.message,
+                    title: room.getLocalizedDisplayname(),
+                    subtitle: event.body,
+                    roomId: room.id,
+                    eventId: event.eventId,
+                  ),
+                );
+                count++;
+              }
             }
+          } finally {
+            timeline?.dispose();
           }
         }
       } catch (e, stackTrace) {
@@ -247,6 +253,7 @@ class _SearchViewState extends State<SearchView> {
                   Expanded(
                     child: TextField(
                       controller: _searchController,
+                      maxLength: 256,
                       autofocus: true,
                       style: TextStyle(
                         color: AppColors.textPrimary(context),
@@ -450,24 +457,30 @@ class _SearchViewState extends State<SearchView> {
       itemBuilder: (context, index) {
         final item = items[index];
         if (item == '_header_conv') {
-          return _buildSectionHeader(
-            context,
-            localeProvider.t('conversations'),
-            conversations.length,
+          return RepaintBoundary(
+            child: _buildSectionHeader(
+              context,
+              localeProvider.t('conversations'),
+              conversations.length,
+            ),
           );
         }
         if (item == '_header_msg') {
-          return _buildSectionHeader(
-            context,
-            localeProvider.t('messages'),
-            messages.length,
+          return RepaintBoundary(
+            child: _buildSectionHeader(
+              context,
+              localeProvider.t('messages'),
+              messages.length,
+            ),
           );
         }
         if (item == '_header_user') {
-          return _buildSectionHeader(
-            context,
-            localeProvider.t('contacts'),
-            users.length,
+          return RepaintBoundary(
+            child: _buildSectionHeader(
+              context,
+              localeProvider.t('contacts'),
+              users.length,
+            ),
           );
         }
         return _buildResultTile(context, item as _SearchResult);
@@ -529,14 +542,16 @@ class _SearchViewState extends State<SearchView> {
   void _handleResultTap(_SearchResult result) {
     switch (result.type) {
       case _SearchResultType.message:
-        if (result.roomId != null) {
-          widget.provider.matrix.setActiveRoom(result.roomId!);
+        final roomId = result.roomId;
+        if (roomId != null) {
+          widget.provider.matrix.setActiveRoom(roomId);
           widget.provider.navigation.setCurrentView(ViewState.home);
         }
         break;
       case _SearchResultType.user:
-        if (result.userId != null) {
-          widget.provider.matrix.createDirectChat(result.userId!).then((
+        final userId = result.userId;
+        if (userId != null) {
+          widget.provider.matrix.createDirectChat(userId).then((
             roomId,
           ) {
             widget.provider.matrix.setActiveRoom(roomId);
@@ -545,8 +560,9 @@ class _SearchViewState extends State<SearchView> {
         }
         break;
       case _SearchResultType.conversation:
-        if (result.sessionId != null) {
-          widget.provider.session.switchSession(result.sessionId!);
+        final sessionId = result.sessionId;
+        if (sessionId != null) {
+          widget.provider.session.switchSession(sessionId);
           widget.provider.navigation.setCurrentView(ViewState.home);
         }
         break;

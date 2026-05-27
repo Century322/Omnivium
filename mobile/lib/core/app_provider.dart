@@ -166,6 +166,8 @@ class AppProvider {
     _notification.dispose();
     _quickCommands.dispose();
     _notes.dispose();
+    _theme.dispose();
+    _locale.dispose();
     VoiceService.instance.dispose();
   }
 }

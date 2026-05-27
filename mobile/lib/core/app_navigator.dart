@@ -22,7 +22,11 @@ import '../presentation/views/create_group_view.dart';
 
 class AppNavigator {
   static AppProvider? _provider;
-  static AppProvider get provider => _provider!;
+  static AppProvider get provider {
+    final p = _provider;
+    if (p == null) throw StateError('AppNavigator not initialized');
+    return p;
+  }
 
   static void init(AppProvider p) {
     _provider = p;

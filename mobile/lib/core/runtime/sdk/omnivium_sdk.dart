@@ -24,15 +24,20 @@ class OmniviumSDK {
   OmniviumSDK._();
 
   static OmniviumSDK get instance {
-    _instance ??= OmniviumSDK._();
-    return _instance!;
+    var inst = _instance;
+    if (inst == null) {
+      inst = OmniviumSDK._();
+      _instance = inst;
+    }
+    return inst;
   }
 
   bool get isInitialized => _container != null && RuntimeContainer.isBooted;
   RuntimeContainer get container {
-    if (_container == null)
+    final c = _container;
+    if (c == null)
       throw StateError('OmniviumSDK not initialized. Call init() first.');
-    return _container!;
+    return c;
   }
 
   DistributedRuntime? get distributed => _distributed;
@@ -48,6 +53,8 @@ class OmniviumSDK {
   }
 
   Future<void> _registerBuiltinPlugins(PersistenceBackend persistence) async {
+    final container = _container;
+    if (container == null) return;
     final plugins = <(PluginDescriptor, PluginHandler)>[
       (LoggerPlugin.descriptor(), LoggerPlugin()),
       (StoragePlugin.descriptor(), StoragePlugin(persistence: persistence)),
@@ -57,8 +64,8 @@ class OmniviumSDK {
       (MemoryPlugin.descriptor(), MemoryPlugin(persistence: persistence)),
     ];
     for (final (descriptor, handler) in plugins) {
-      await _container!.registerPlugin(descriptor, handler);
-      await _container!.activatePlugin(descriptor.id);
+      await container.registerPlugin(descriptor, handler);
+      await container.activatePlugin(descriptor.id);
     }
   }
 
@@ -67,16 +74,18 @@ class OmniviumSDK {
   ) async {
     final sdk = OmniviumSDK.instance;
     sdk._container = await RuntimeContainer.boot();
-    sdk._distributed = DistributedRuntime(config);
-    await sdk._distributed!.start();
+    final distributed = DistributedRuntime(config);
+    sdk._distributed = distributed;
+    await distributed.start();
     return sdk;
   }
 
   static Future<void> shutdown() async {
     final sdk = OmniviumSDK.instance;
-    if (sdk._distributed != null) {
-      await sdk._distributed!.stop();
-      sdk._distributed!.dispose();
+    final distributed = sdk._distributed;
+    if (distributed != null) {
+      await distributed.stop();
+      distributed.dispose();
       sdk._distributed = null;
     }
     await RuntimeContainer.shutdown();

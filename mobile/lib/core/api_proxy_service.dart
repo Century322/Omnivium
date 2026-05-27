@@ -43,12 +43,14 @@ class ApiProxyService {
     try {
       final prefs = await SharedPreferences.getInstance();
       _userConfiguredUrl = prefs.getString('omnivium_api_base_url');
-    } catch (_) {}
-  }
+    } catch (e) {
+      AppLogger.instance.debug('Load API URL failed', error: e);
+    }
 
   String get backendUrl {
-    if (_userConfiguredUrl != null && _userConfiguredUrl!.isNotEmpty) {
-      return _userConfiguredUrl!;
+    final configured = _userConfiguredUrl;
+    if (configured != null && configured.isNotEmpty) {
+      return configured;
     }
     final remote = _remoteConfig?['backend_url'] as String?;
     if (remote != null && remote.isNotEmpty) return remote;
@@ -152,7 +154,10 @@ class ApiProxyService {
       final response = await secureClient.get(uri).timeout(_shortTimeout);
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
-        return body['status'] == 'ok';
+        if (body is Map<String, dynamic>) {
+          return body['status'] == 'ok';
+        }
+        return false;
       }
       return false;
     } catch (e, stackTrace) {
@@ -295,10 +300,11 @@ class ApiProxyService {
     _inFlightRequests[dedupeKey] = completer;
 
     try {
-      if (_rateLimitResetTime != null &&
-          DateTime.now().isBefore(_rateLimitResetTime!)) {
+      final resetTime = _rateLimitResetTime;
+      if (resetTime != null &&
+          DateTime.now().isBefore(resetTime)) {
         throw ApiProxyException.rateLimited(
-          retryAfter: _rateLimitResetTime!.difference(DateTime.now()),
+          retryAfter: resetTime.difference(DateTime.now()),
         );
       }
 
@@ -415,8 +421,9 @@ class _CircuitBreaker {
       case _CircuitState.closed:
         return true;
       case _CircuitState.open:
-        if (_lastFailureTime != null &&
-            DateTime.now().difference(_lastFailureTime!) > recoveryTimeout) {
+        final lastFailure = _lastFailureTime;
+        if (lastFailure != null &&
+            DateTime.now().difference(lastFailure) > recoveryTimeout) {
           _state = _CircuitState.halfOpen;
           _halfOpenSuccessCount = 0;
           return true;

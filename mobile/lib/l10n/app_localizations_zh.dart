@@ -2175,4 +2175,7 @@ class SZh extends S {
 
   @override
   String get choose_from_gallery => '从相册选择';
+
+  @override
+  String get send_failed => '发送失败';
 }

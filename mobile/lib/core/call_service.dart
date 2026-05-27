@@ -44,13 +44,14 @@ class VoIPCall {
       ],
     };
 
-    _peerConnection = await createPeerConnection(config);
+    final pc = await createPeerConnection(config);
+    _peerConnection = pc;
 
-    _peerConnection!.onIceCandidate = (candidate) {
+    pc.onIceCandidate = (candidate) {
       onIceCandidate?.call(this, candidate);
     };
 
-    _peerConnection!.onIceConnectionState = (iceState) {
+    pc.onIceConnectionState = (iceState) {
       AppLogger.instance.info('ICE state: $iceState');
       if (iceState == RTCIceConnectionState.RTCIceConnectionStateConnected) {
         state = CallState.connected;
@@ -63,14 +64,15 @@ class VoIPCall {
       }
     };
 
-    _peerConnection!.onTrack = (event) {
+    pc.onTrack = (event) {
       if (event.streams.isNotEmpty) {
-        _remoteStream = event.streams[0];
-        onRemoteStream?.call(this, _remoteStream!);
+        final remote = event.streams[0];
+        _remoteStream = remote;
+        onRemoteStream?.call(this, remote);
       }
     };
 
-    _localStream = await navigator.mediaDevices.getUserMedia({
+    final local = await navigator.mediaDevices.getUserMedia({
       'audio': true,
       'video': isVideo
           ? {
@@ -80,44 +82,59 @@ class VoIPCall {
             }
           : false,
     });
+    _localStream = local;
 
-    for (final track in _localStream!.getTracks()) {
-      _peerConnection!.addTrack(track, _localStream!);
+    for (final track in local.getTracks()) {
+      pc.addTrack(track, local);
     }
   }
 
   Future<String?> createOffer() async {
     await _setupPeerConnection();
-    final offer = await _peerConnection!.createOffer({
+    final pc = _peerConnection;
+    if (pc == null) return null;
+    final offer = await pc.createOffer({
       'offerToReceiveAudio': true,
       'offerToReceiveVideo': isVideo,
     });
-    await _peerConnection!.setLocalDescription(offer);
+    await pc.setLocalDescription(offer);
     state = CallState.inviting;
     return offer.sdp;
   }
 
   Future<void> handleAnswer(String sdp) async {
+    final pc = _peerConnection;
+    if (pc == null) return;
     final answer = RTCSessionDescription(sdp, 'answer');
-    await _peerConnection!.setRemoteDescription(answer);
+    await pc.setRemoteDescription(answer);
+    for (final candidate in _pendingCandidates) {
+      try {
+        await pc.addCandidate(candidate);
+      } catch (e) {
+        AppLogger.instance.debug('Add ICE candidate failed', error: e);
+      }
+    }
+    _pendingCandidates.clear();
     state = CallState.connecting;
   }
 
   Future<String?> createAnswer(String offerSdp) async {
     await _setupPeerConnection();
+    final pc = _peerConnection;
+    if (pc == null) return null;
     final offer = RTCSessionDescription(offerSdp, 'offer');
-    await _peerConnection!.setRemoteDescription(offer);
+    await pc.setRemoteDescription(offer);
 
     for (final candidate in _pendingCandidates) {
-      _peerConnection!.addCandidate(candidate);
+      pc.addCandidate(candidate);
     }
     _pendingCandidates.clear();
 
-    final answer = await _peerConnection!.createAnswer({
+    final answer = await pc.createAnswer({
       'offerToReceiveAudio': true,
       'offerToReceiveVideo': isVideo,
     });
-    await _peerConnection!.setLocalDescription(answer);
+    await pc.setLocalDescription(answer);
     state = CallState.connecting;
     return answer.sdp;
   }
@@ -128,10 +145,12 @@ class VoIPCall {
     int? sdpMLineIndex,
   ) async {
     final rtcCandidate = RTCIceCandidate(candidate, sdpMid, sdpMLineIndex);
-    if (_peerConnection != null) {
+    final pc = _peerConnection;
+    if (pc != null) {
       try {
-        await _peerConnection!.addCandidate(rtcCandidate);
-      } catch (_) {
+        await pc.addCandidate(rtcCandidate);
+      } catch (e) {
+        AppLogger.instance.debug('ICE candidate add failed, queuing', error: e);
         _pendingCandidates.add(rtcCandidate);
       }
     } else {
@@ -164,12 +183,20 @@ class CallService {
   VoIPCall? _currentCall;
   StreamSubscription? _eventSubscription;
   final _callStateController = StreamController<VoIPCall>.broadcast();
+  Timer? _callTimeoutTimer;
 
   Stream<VoIPCall> get callStateStream => _callStateController.stream;
   VoIPCall? get currentCall => _currentCall;
   bool get isInCall => _currentCall?.isActive ?? false;
 
+  VoIPCall get requireCurrentCall {
+    final call = _currentCall;
+    if (call == null) throw StateError('No active call');
+    return call;
+  }
+
   void init(matrix.Client client) {
+    _eventSubscription?.cancel();
     _matrixClient = client;
     _eventSubscription = client.onTimelineEvent.stream.listen(
       _handleTimelineEvent,
@@ -191,7 +218,7 @@ class CallService {
 
       switch (type) {
         case 'm.call.invite':
-          _handleIncomingCall(callId, roomId, callContent);
+          _handleIncomingCall(callId, roomId, callContent, event.senderId);
         case 'm.call.candidates':
           _handleCandidates(callContent);
         case 'm.call.answer':
@@ -213,7 +240,8 @@ class CallService {
     String remoteUserId, {
     bool isVideo = false,
   }) async {
-    if (_currentCall != null && _currentCall!.isActive) {
+    final current = _currentCall;
+    if (current != null && current.isActive) {
       AppLogger.instance.warning('Already in a call');
       return;
     }
@@ -261,6 +289,13 @@ class CallService {
       'offer': {'type': 'offer', 'sdp': offerSdp},
     });
 
+    _callTimeoutTimer?.cancel();
+    _callTimeoutTimer = Timer(const Duration(seconds: 60), () {
+      if (_currentCall == call && call.state == CallState.inviting) {
+        hangup();
+      }
+    });
+
     AppLogger.instance.info('Outgoing call initiated: $callId');
   }
 
@@ -268,8 +303,10 @@ class CallService {
     String callId,
     String roomId,
     Map<String, dynamic> content,
+    String senderId,
   ) {
-    if (_currentCall != null && _currentCall!.isActive) {
+    final current = _currentCall;
+    if (current != null && current.isActive) {
       _sendCallEvent(roomId, 'm.call.hangup', {
         'call_id': callId,
         'version': 1,
@@ -281,9 +318,7 @@ class CallService {
     final offer = content['offer'] as Map<String, dynamic>?;
     if (offer == null) return;
 
-    final senderId = content['sender_id'] as String? ?? '';
-
-    _currentCall = VoIPCall(
+    final call = VoIPCall(
       callId: callId,
       roomId: roomId,
       remoteUserId: senderId,
@@ -291,7 +326,7 @@ class CallService {
       state: CallState.ringing,
     );
 
-    _currentCall!.onIceCandidate = (c, candidate) {
+    call.onIceCandidate = (c, candidate) {
       _sendCallEvent(roomId, 'm.call.candidates', {
         'call_id': callId,
         'version': 1,
@@ -305,20 +340,21 @@ class CallService {
       });
     };
 
-    _currentCall!.onStateChanged = (c) {
+    call.onStateChanged = (c) {
       _notifyState();
     };
 
+    _currentCall = call;
     _notifyState();
     AppLogger.instance.info('Incoming call: $callId from $senderId');
   }
 
   Future<void> answerCall() async {
-    if (_currentCall == null || _currentCall!.state != CallState.ringing) {
+    final call = _currentCall;
+    if (call == null || call.state != CallState.ringing) {
       return;
     }
 
-    final call = _currentCall!;
     final client = _matrixClient;
     if (client == null) return;
 
@@ -368,11 +404,12 @@ class CallService {
 
   void _handleCandidates(Map<String, dynamic> content) {
     final candidates = content['candidates'] as List<dynamic>?;
-    if (candidates == null || _currentCall == null) return;
+    final call = _currentCall;
+    if (candidates == null || call == null) return;
 
     for (final c in candidates) {
       final candidate = c as Map<String, dynamic>;
-      _currentCall!.addIceCandidate(
+      call.addIceCandidate(
         candidate['candidate'] as String? ?? '',
         candidate['sdpMid'] as String?,
         candidate['sdpMLineIndex'] as int?,
@@ -380,18 +417,18 @@ class CallService {
     }
   }
 
-  void _handleCallAnswer(Map<String, dynamic> content) {
-    if (_currentCall == null || !_currentCall!.isOutgoing) return;
+  void _handleCallAnswer(Map<String, dynamic> content) async {
+    final call = _currentCall;
+    if (call == null || !call.isOutgoing) return;
     final callId = content['call_id'] as String?;
-    if (callId != _currentCall!.callId) return;
+    if (callId != call.callId) return;
 
     final answer = content['answer'] as Map<String, dynamic>?;
     if (answer == null) return;
 
     final sdp = answer['sdp'] as String?;
     if (sdp != null) {
-      _currentCall!.handleAnswer(sdp);
-      _currentCall!.state = CallState.connected;
+      await call.handleAnswer(sdp);
       _notifyState();
     }
   }
@@ -407,25 +444,28 @@ class CallService {
   }
 
   Future<void> rejectCall() async {
-    if (_currentCall == null) return;
-    await _sendCallEvent(_currentCall!.roomId, 'm.call.hangup', {
-      'call_id': _currentCall!.callId,
+    final call = _currentCall;
+    if (call == null) return;
+    await _sendCallEvent(call.roomId, 'm.call.hangup', {
+      'call_id': call.callId,
       'version': 1,
       'reason': 'user_hangup',
     });
-    _currentCall?.end();
+    call.end();
     _currentCall = null;
     _notifyState();
   }
 
   Future<void> hangup() async {
-    if (_currentCall == null) return;
-    await _sendCallEvent(_currentCall!.roomId, 'm.call.hangup', {
-      'call_id': _currentCall!.callId,
+    _callTimeoutTimer?.cancel();
+    final call = _currentCall;
+    if (call == null) return;
+    await _sendCallEvent(call.roomId, 'm.call.hangup', {
+      'call_id': call.callId,
       'version': 1,
       'reason': 'user_hangup',
     });
-    _currentCall?.end();
+    call.end();
     _currentCall = null;
     _notifyState();
   }
@@ -448,8 +488,9 @@ class CallService {
   }
 
   void _notifyState() {
-    if (_currentCall != null) {
-      _callStateController.add(_currentCall!);
+    final call = _currentCall;
+    if (call != null) {
+      _callStateController.add(call);
     }
   }
 

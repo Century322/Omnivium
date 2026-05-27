@@ -312,10 +312,10 @@ class ModelsContent extends StatelessWidget {
                         fontSize: 14,
                       ),
                     ),
-                    if (provider.model.lastError != null) ...[
+                    if (provider.model.lastError case final lastError?) ...[
                       const SizedBox(height: 8),
                       Text(
-                        provider.model.lastError!,
+                        lastError,
                         style: TextStyle(
                           color: AppColors.warn(context),
                           fontSize: 12,

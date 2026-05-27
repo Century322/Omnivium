@@ -82,9 +82,10 @@ class RuntimeObservatory {
 
   void _checkRuntimeStatus() {
     final snap = _container.stateSnapshot;
-    if (_lastStatus != null && snap.status != _lastStatus) {
+    final last = _lastStatus;
+    if (last != null && snap.status != last) {
       _emit(ObservatoryEventType.runtimeStatus, {
-        'from': _lastStatus!.name,
+        'from': last.name,
         'to': snap.status.name,
         'activePlugins': snap.activePluginCount,
         'activeTasks': snap.activeTaskCount,

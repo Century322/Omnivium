@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'dart:io';
+import 'dart:math';
+import 'dart:io' if (dart.library.html) '';
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:share_plus/share_plus.dart';
@@ -11,6 +13,7 @@ import 'package:matrix/matrix.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import '../theme/app_colors.dart';
 import '../theme/locale_provider.dart';
+import '../theme/wallpaper_presets.dart';
 import '../../core/app_provider.dart';
 import '../../core/analytics_service.dart';
 import '../../core/app_logger.dart';
@@ -55,7 +58,7 @@ class FriendChatPanel extends StatefulWidget {
       outbox['messages'] as List? ?? [],
     );
     if (messages.isEmpty) return;
-    db.deleteData('outbox');
+    final remaining = <Map<String, dynamic>>[];
     for (final msg in messages) {
       final roomId = msg['roomId'] as String?;
       final text = msg['text'] as String?;
@@ -66,11 +69,19 @@ class FriendChatPanel extends StatefulWidget {
           final room = matrix.client?.getRoomById(roomId);
           if (room != null) {
             await room.sendTextEvent(text);
+            continue;
           }
         }
+        remaining.add(msg);
       } catch (e) {
         AppLogger.instance.warning('Outbox flush failed', error: e);
+        remaining.add(msg);
       }
+    }
+    if (remaining.isEmpty) {
+      db.deleteData('outbox');
+    } else {
+      db.putData('outbox', {'messages': remaining});
     }
   }
 }
@@ -92,6 +103,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
   bool _canLoadMore = true;
   FriendMessageData? _replyingTo;
   bool _showEmojiPicker = false;
+  StreamSubscription? _voiceResultSub;
 
   late AnimationController _listeningGlow;
 
@@ -105,17 +117,18 @@ class _FriendChatPanelState extends State<FriendChatPanel>
     widget.provider.matrix.addListener(_onMatrixChanged);
     _presenceFuture = _getPresence();
     _presenceTimer = Timer.periodic(const Duration(seconds: 30), (_) {
-      if (mounted) {
-        setState(() {
-          _presenceFuture = _getPresence();
-        });
-      }
+      if (!mounted) return;
+      final lifecycle = WidgetsBinding.instance.lifecycleState;
+      if (lifecycle == AppLifecycleState.paused) return;
+      setState(() {
+        _presenceFuture = _getPresence();
+      });
     });
     _loadMatrixMessages(widget.chatTargetId);
     _markRoomAsRead(widget.chatTargetId);
     _scrollController.addListener(_onScroll);
     _restoreDraft();
-    VoiceService.instance.onFinalResult.listen((text) {
+    _voiceResultSub = VoiceService.instance.onFinalResult.listen((text) {
       if (!mounted || text.isEmpty) return;
       final current = _textController.text;
       _textController.text = current.isEmpty ? text : '$current $text';
@@ -124,6 +137,24 @@ class _FriendChatPanelState extends State<FriendChatPanel>
       );
       setState(() {});
     });
+  }
+
+  @override
+  void didUpdateWidget(covariant FriendChatPanel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.provider.matrix != widget.provider.matrix) {
+      oldWidget.provider.matrix.removeListener(_onMatrixChanged);
+      widget.provider.matrix.addListener(_onMatrixChanged);
+    }
+    if (oldWidget.chatTargetId != widget.chatTargetId) {
+      _saveDraft();
+      _timeline?.dispose();
+      _timeline = null;
+      _loadMatrixMessages(widget.chatTargetId);
+      _markRoomAsRead(widget.chatTargetId);
+      _restoreDraft();
+      _presenceFuture = _getPresence();
+    }
   }
 
   void _restoreDraft() {
@@ -159,7 +190,9 @@ class _FriendChatPanelState extends State<FriendChatPanel>
   @override
   void dispose() {
     _saveDraft();
+    _voiceResultSub?.cancel();
     _presenceTimer?.cancel();
+    _timeline?.dispose();
     _textController.dispose();
     _focusNode.dispose();
     _scrollController.dispose();
@@ -170,10 +203,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
 
   void _onMatrixChanged() {
     if (!mounted) return;
-    if (widget.chatTargetId.isEmpty) {
-      setState(() {});
-      return;
-    }
+    if (widget.chatTargetId.isEmpty) return;
     final matrix = widget.provider.matrix;
     final room = matrix.client?.getRoomById(widget.chatTargetId);
     if (room != null) {
@@ -192,6 +222,8 @@ class _FriendChatPanelState extends State<FriendChatPanel>
     if (relevantEvents.isNotEmpty) {
       for (final event in relevantEvents) {
         if (event.type == EventTypes.Message && event.body.isNotEmpty) {
+          final eventId = event.eventId;
+          if (_friendMessages.any((m) => m.eventId == eventId)) continue;
           final isMe = event.senderId == matrix.userId;
           final msgType = event.content['msgtype'] as String?;
           final url =
@@ -210,6 +242,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                 msgType: msgType,
                 url: url,
                 audioDuration: audioDuration,
+                eventId: eventId,
               ),
             );
           });
@@ -251,10 +284,12 @@ class _FriendChatPanelState extends State<FriendChatPanel>
     try {
       _timeline = await room.getTimeline();
       if (!mounted) return;
+      final timeline = _timeline;
+      if (timeline == null) return;
       setState(() {
         _friendMessages.clear();
-        _friendMessages.addAll(_parseTimelineEvents(_timeline!));
-        _canLoadMore = _timeline!.canRequestHistory;
+        _friendMessages.addAll(_parseTimelineEvents(timeline));
+        _canLoadMore = timeline.canRequestHistory;
       });
     } catch (e, stackTrace) {
       AppLogger.instance.error(
@@ -266,17 +301,17 @@ class _FriendChatPanelState extends State<FriendChatPanel>
   }
 
   Future<void> _loadMoreHistory() async {
-    if (_timeline == null || !_timeline!.canRequestHistory || _isLoadingHistory)
+    final timeline = _timeline;
+    if (timeline == null || !timeline.canRequestHistory || _isLoadingHistory)
       return;
     setState(() => _isLoadingHistory = true);
     try {
-      await _timeline!.requestHistory(historyCount: 50);
+      await timeline.requestHistory(historyCount: 50);
       if (!mounted) return;
       final prevCount = _friendMessages.length;
       setState(() {
-        _friendMessages.clear();
-        _friendMessages.addAll(_parseTimelineEvents(_timeline!));
-        _canLoadMore = _timeline!.canRequestHistory;
+        _friendMessages.addAll(_parseTimelineEvents(timeline));
+        _canLoadMore = timeline.canRequestHistory;
         _isLoadingHistory = false;
       });
       final addedCount = _friendMessages.length - prevCount;
@@ -368,19 +403,28 @@ class _FriendChatPanelState extends State<FriendChatPanel>
     final voice = VoiceService.instance;
     if (_isListening) {
       await voice.stopListening();
+      if (!mounted) return;
       setState(() => _isListening = false);
       _listeningGlow.reverse();
     } else {
       final ok = await voice.startListening();
-      if (ok) {
-        setState(() => _isListening = true);
-        _listeningGlow.forward();
-      }
+      if (!ok || !mounted) return;
+      setState(() => _isListening = true);
+      _listeningGlow.forward();
     }
   }
 
+  DateTime? _lastTypingNotice;
+
   void _sendTypingNotice() {
     if (widget.chatTargetId.isEmpty) return;
+    final now = DateTime.now();
+    final lastNotice = _lastTypingNotice;
+    if (lastNotice != null &&
+        now.difference(lastNotice).inSeconds < 3) {
+      return;
+    }
+    _lastTypingNotice = now;
     final room = widget.provider.matrix.client?.getRoomById(
       widget.chatTargetId,
     );
@@ -401,16 +445,29 @@ class _FriendChatPanelState extends State<FriendChatPanel>
       final room = matrix.client?.getRoomById(widget.chatTargetId);
       if (room != null) {
         final content = <String, dynamic>{'msgtype': 'm.text', 'body': text};
-        if (_replyingTo != null && _replyingTo!.eventId != null) {
+        final replyingTo = _replyingTo;
+        if (replyingTo != null && replyingTo.eventId != null) {
           content['m.relates_to'] = {
-            'm.in_reply_to': {'event_id': _replyingTo!.eventId},
+            'm.in_reply_to': {'event_id': replyingTo.eventId},
           };
-          final replyBody = _replyingTo!.content;
-          final replySender = _replyingTo!.senderId ?? '';
+          final replyBody = replyingTo.content;
+          final replySender = replyingTo.senderId ?? '';
           content['body'] = '> <$replySender> $replyBody\n\n$text';
         }
-        room.sendEvent(content, type: EventTypes.Message);
+        room.sendEvent(content, type: EventTypes.Message).catchError((e) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(localeProvider.t('send_failed')),
+                backgroundColor: AppColors.dng(context),
+                duration: const Duration(seconds: 2),
+              ),
+            );
+          }
+        });
         AnalyticsService.instance.logSendMessage(type: 'text');
+      } else {
+        _enqueueOutbox(text);
       }
       setState(() => _replyingTo = null);
     } else {
@@ -464,12 +521,12 @@ class _FriendChatPanelState extends State<FriendChatPanel>
 
   Widget _buildEmojiPicker() {
     if (!_showEmojiPicker) return const SizedBox.shrink();
-    const emojiRows = [
-      ['😀', '😂', '🥹', '😊', '😍', '🥰', '😘', '😜', '🤪', '😎'],
-      ['🤔', '🤗', '😏', '😌', '🥳', '😇', '🤩', '😋', '🤭', '🫠'],
-      ['👍', '👎', '❤️', '🔥', '💯', '✨', '🎉', '💪', '🙏', '👋'],
-      ['😢', '😭', '😤', '🤬', '😱', '🫣', '🥺', '😓', '🙄', '💀'],
-      ['⭐', '🌟', '💫', '🌈', '☀️', '🌙', '⚡', '💎', '🎵', '🎶'],
+    const allEmojis = [
+      '😀', '😂', '🥹', '😊', '😍', '🥰', '😘', '😜', '🤪', '😎',
+      '🤔', '🤗', '😏', '😌', '🥳', '😇', '🤩', '😋', '🤭', '🫠',
+      '👍', '👎', '❤️', '🔥', '💯', '✨', '🎉', '💪', '🙏', '👋',
+      '😢', '😭', '😤', '🤬', '😱', '🫣', '🥺', '😓', '🙄', '💀',
+      '⭐', '🌟', '💫', '🌈', '☀️', '🌙', '⚡', '💎', '🎵', '🎶',
     ];
     return Container(
       height: 220,
@@ -480,23 +537,18 @@ class _FriendChatPanelState extends State<FriendChatPanel>
           top: BorderSide(color: AppColors.divider(context), width: 0.5),
         ),
       ),
-      child: Column(
-        children: emojiRows.map((row) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 2),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: row.map((emoji) {
-                return GestureDetector(
-                  onTap: () => _insertEmoji(emoji),
-                  child: Container(
-                    width: 36,
-                    height: 36,
-                    alignment: Alignment.center,
-                    child: Text(emoji, style: const TextStyle(fontSize: 24)),
-                  ),
-                );
-              }).toList(),
+      child: Wrap(
+        alignment: WrapAlignment.center,
+        spacing: 2,
+        runSpacing: 2,
+        children: allEmojis.map((emoji) {
+          return GestureDetector(
+            onTap: () => _insertEmoji(emoji),
+            child: Container(
+              width: 36,
+              height: 36,
+              alignment: Alignment.center,
+              child: Text(emoji, style: const TextStyle(fontSize: 24)),
             ),
           );
         }).toList(),
@@ -506,6 +558,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
 
   void _sendVoiceMessage(String path, Duration duration) async {
     try {
+      if (kIsWeb) return;
       final client = widget.provider.matrix.client;
       if (client == null) return;
       final room = client.getRoomById(widget.chatTargetId);
@@ -763,16 +816,32 @@ class _FriendChatPanelState extends State<FriendChatPanel>
     );
   }
 
-  void _recallMessage(int index) {
+  void _recallMessage(int index) async {
     final msg = _friendMessages[index];
     if (msg.eventId != null && widget.chatTargetId.isNotEmpty) {
       final room = widget.provider.matrix.client?.getRoomById(
         widget.chatTargetId,
       );
       if (room != null) {
-        room.redactEvent(msg.eventId!);
+        try {
+          final eventId = msg.eventId;
+          if (eventId != null) {
+            await room.redactEvent(eventId);
+          }
+        } catch (e) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(localeProvider.t('send_failed')),
+                backgroundColor: AppColors.dng(context),
+              ),
+            );
+          }
+          return;
+        }
       }
     }
+    if (!mounted) return;
     setState(() {
       _friendMessages[index] = FriendMessageData(
         isMe: msg.isMe,
@@ -799,6 +868,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
           autofocus: true,
           maxLines: 5,
           minLines: 1,
+          maxLength: 4096,
           decoration: InputDecoration(
             filled: true,
             fillColor: AppColors.bg(context),
@@ -836,6 +906,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                   },
                 };
                 await room.sendEvent(content, type: EventTypes.Message);
+                if (!mounted) return;
                 setState(() {
                   final idx = _friendMessages.indexWhere(
                     (m) => m.eventId == msg.eventId,
@@ -943,7 +1014,9 @@ class _FriendChatPanelState extends State<FriendChatPanel>
     final result = await FilePicker.platform.pickFiles(allowMultiple: true);
     if (result == null || result.files.isEmpty) return;
     for (final file in result.files) {
-      _sendFileMessage(localeProvider.t('file_msg'), file.name, file.path);
+      if (file.path != null) {
+        _sendFileMessage(localeProvider.t('file_msg'), file.name, file.path);
+      }
     }
   }
 
@@ -1112,14 +1185,15 @@ class _FriendChatPanelState extends State<FriendChatPanel>
               size: 20,
             ),
             const SizedBox(width: 8),
-            Text(
-              isEncrypted
-                  ? localeProvider.t('e2e_encrypted_short')
-                  : localeProvider.t('not_encrypted_short'),
-              style: TextStyle(
-                color: AppColors.textPrimary(context),
-                fontSize: 18,
-              ),
+            Flexible(
+              child: Text(
+                isEncrypted
+                    ? localeProvider.t('e2e_encrypted_short')
+                    : localeProvider.t('not_encrypted_short'),
+                style: TextStyle(
+                  color: AppColors.textPrimary(context),
+                  fontSize: 18,
+                ),
             ),
           ],
         ),
@@ -1155,6 +1229,15 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                         width: 20,
                         height: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    );
+                  }
+                  if (snap.hasError) {
+                    return Text(
+                      t('verify_unavailable'),
+                      style: TextStyle(
+                        color: AppColors.textHint(context),
+                        fontSize: 13,
                       ),
                     );
                   }
@@ -1236,7 +1319,22 @@ class _FriendChatPanelState extends State<FriendChatPanel>
     try {
       final client = widget.provider.matrix.client;
       if (client == null || widget.chatTargetId.isEmpty) return;
-      final deviceKeysList = client.userDeviceKeys[widget.chatTargetId];
+      final room = client.getRoomById(widget.chatTargetId);
+      if (room == null) return;
+      final members = room.getParticipants();
+      final otherMember = members.where((u) => u.id != client.userID).firstOrNull;
+      if (otherMember == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(localeProvider.t('verify_unavailable')),
+              backgroundColor: AppColors.sf(context),
+            ),
+          );
+        }
+        return;
+      }
+      final deviceKeysList = client.userDeviceKeys[otherMember.id];
       if (deviceKeysList == null || deviceKeysList.deviceKeys.isEmpty) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -1432,6 +1530,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                             Expanded(
                               child: TextField(
                                 controller: searchCtrl,
+                                maxLength: 256,
                                 autofocus: true,
                                 style: TextStyle(
                                   color: AppColors.textPrimary(context),
@@ -1666,6 +1765,8 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                   children: [
                     Text(
                       widget.chatTargetName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: AppColors.textPrimary(context),
                         fontSize: 16,
@@ -1684,16 +1785,29 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                       FutureBuilder<CachedPresence?>(
                         future: _presenceFuture,
                         builder: (context, snap) {
-                          final presence = snap.data;
-                          if (presence == null) {
+                          if (snap.connectionState == ConnectionState.waiting) {
+                            return SizedBox(
+                              width: 60,
+                              height: 14,
+                              child: LinearProgressIndicator(
+                                borderRadius: BorderRadius.circular(2),
+                                backgroundColor: AppColors.sfActive(context),
+                              ),
+                            );
+                          }
+                          if (snap.hasError || !snap.hasData) {
                             return Text(
                               '@${widget.chatTargetId}',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 color: AppColors.textTertiary(context),
                                 fontSize: 11,
                               ),
                             );
                           }
+                          final presence = snap.data;
+                          if (presence == null) return const SizedBox.shrink();
                           final isOnline = presence.currentlyActive == true;
                           final status = isOnline
                               ? localeProvider.t('online')
@@ -1784,49 +1898,49 @@ class _FriendChatPanelState extends State<FriendChatPanel>
     if (id == null || id == 'none') return null;
     switch (id) {
       case 'gradient_sunset':
-        return const BoxDecoration(
+        return BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFFFF6B35), Color(0xFFF7931E), Color(0xFFFFD700)],
+            colors: WallpaperPresets.warm,
           ),
         );
       case 'gradient_ocean':
-        return const BoxDecoration(
+        return BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF0077B6), Color(0xFF00B4D8), Color(0xFF90E0EF)],
+            colors: WallpaperPresets.ocean,
           ),
         );
       case 'gradient_forest':
-        return const BoxDecoration(
+        return BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF2D6A4F), Color(0xFF40916C), Color(0xFF95D5B2)],
+            colors: WallpaperPresets.forest,
           ),
         );
       case 'gradient_night':
-        return const BoxDecoration(
+        return BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF0D1B2A), Color(0xFF1B2838), Color(0xFF2C3E50)],
+            colors: WallpaperPresets.dark,
           ),
         );
       case 'gradient_rose':
-        return const BoxDecoration(
+        return BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFFE91E63), Color(0xFFF06292), Color(0xFFF8BBD0)],
+            colors: WallpaperPresets.pink,
           ),
         );
       case 'solid_dark':
-        return const BoxDecoration(color: Color(0xFF1A1A2E));
+        return const BoxDecoration(color: WallpaperPresets.darkBg);
       case 'solid_midnight':
-        return const BoxDecoration(color: Color(0xFF16213E));
+        return const BoxDecoration(color: WallpaperPresets.darkBlueBg);
       default:
         return null;
     }
@@ -1834,6 +1948,31 @@ class _FriendChatPanelState extends State<FriendChatPanel>
 
   Widget _buildChatContent() {
     final wallpaper = _getWallpaperDecoration();
+    if (_friendMessages.isEmpty) {
+      return Container(
+        decoration: wallpaper,
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                LucideIcons.messageCircle,
+                size: 48,
+                color: AppColors.mut(context),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                localeProvider.t('no_messages_yet'),
+                style: TextStyle(
+                  color: AppColors.textTertiary(context),
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
     return Container(
       decoration: wallpaper,
       child: ListView.builder(
@@ -1901,7 +2040,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                             : CrossAxisAlignment.start,
                         children: [
                           if (msg.isVoice && msg.url != null)
-                            VoiceMessagePlayer(url: msg.url!, isMe: msg.isMe)
+                            VoiceMessagePlayer(url: msg.url ?? '', isMe: msg.isMe)
                           else if (msg.isImage && msg.url != null)
                             _buildImageBubble(msg)
                           else if (msg.isFile)
@@ -1996,7 +2135,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Text(
-                                    _formatMessageTime(msg.timestamp!),
+                                    _formatMessageTime(msg.timestamp ?? DateTime.now()),
                                     style: TextStyle(
                                       color: msg.isMe
                                           ? AppColors.bg(
@@ -2110,6 +2249,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
             ? CachedNetworkImage(
                 imageUrl: httpUrl,
                 width: 200,
+                memCacheWidth: 400,
                 fit: BoxFit.cover,
                 placeholder: (_, _) => Container(
                   width: 200,
@@ -2211,8 +2351,10 @@ class _FriendChatPanelState extends State<FriendChatPanel>
     FriendMessageData prev,
     FriendMessageData curr,
   ) {
-    if (prev.timestamp == null || curr.timestamp == null) return false;
-    return _dateOnly(prev.timestamp!) != _dateOnly(curr.timestamp!);
+    final prevTs = prev.timestamp;
+    final currTs = curr.timestamp;
+    if (prevTs == null || currTs == null) return false;
+    return _dateOnly(prevTs) != _dateOnly(currTs);
   }
 
   String _dateOnly(DateTime dt) =>
@@ -2326,10 +2468,22 @@ class _FriendChatPanelState extends State<FriendChatPanel>
 
   bool _isMessageRead(Room room, FriendMessageData msg) {
     if (msg.eventId == null) return false;
+    if (!msg.isMe) return false;
     try {
-      return room.notificationCount == 0;
-    } catch (_) {
-      return room.notificationCount == 0;
+      final readMarkers = room.readMarkers;
+      final mRead = readMarkers['m.read'];
+      if (mRead == null) return false;
+      final timeline = room.timeline;
+      if (timeline == null) return false;
+      final events = timeline.events;
+      if (events.isEmpty) return false;
+      final msgIndex = events.indexWhere((e) => e.eventId == msg.eventId);
+      final readIndex = events.indexWhere((e) => e.eventId == mRead);
+      if (msgIndex == -1 || readIndex == -1) return false;
+      return readIndex >= msgIndex;
+    } catch (e) {
+      AppLogger.instance.debug('Read receipt check failed', error: e);
+      return false;
     }
   }
 
@@ -2351,8 +2505,10 @@ class _FriendChatPanelState extends State<FriendChatPanel>
 
   Widget _buildInputArea() {
     final hasText = _textController.text.trim().isNotEmpty;
+    final bottomPadding = MediaQuery.of(context).viewInsets.bottom;
+    final safeBottom = MediaQuery.of(context).padding.bottom;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+      padding: EdgeInsets.fromLTRB(16, 0, 16, bottomPadding > 0 ? bottomPadding : max(24, safeBottom)),
       child: Center(
         child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: widget.maxWidth - 32),
@@ -2412,7 +2568,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                                     ),
                                     const SizedBox(height: 2),
                                     Text(
-                                      _replyingTo!.content,
+                                      _replyingTo?.content ?? '',
                                       style: TextStyle(
                                         color: AppColors.textTertiary(context),
                                         fontSize: 12,
@@ -2439,6 +2595,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                         child: TextField(
                           controller: _textController,
                           focusNode: _focusNode,
+                          maxLength: 4096,
                           style: TextStyle(
                             color: AppColors.textPrimary(context),
                             fontSize: 16,

@@ -152,11 +152,13 @@ class ChatService {
       'max_tokens': maxTokens,
       'stream': false,
     });
-    final response = await proxy.secureClient.post(
-      uri,
-      headers: _headersWithBody(syncBody),
-      body: syncBody,
-    );
+    final response = await proxy.secureClient
+        .post(
+          uri,
+          headers: _headersWithBody(syncBody),
+          body: syncBody,
+        )
+        .timeout(const Duration(seconds: 30));
 
     if (response.statusCode == 401) {
       _handleAuthFailure();

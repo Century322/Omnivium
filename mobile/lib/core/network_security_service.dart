@@ -44,7 +44,8 @@ class NetworkSecurityService {
         }
       }
       return result;
-    } catch (_) {
+    } catch (e) {
+      AppLogger.instance.debug('Certificate pinning check failed', error: e);
       return {};
     }
   }
@@ -161,7 +162,8 @@ class NetworkSecurityService {
         }
       }
       return result;
-    } catch (_) {
+    } catch (e) {
+      AppLogger.instance.debug('SSL check failed', error: e);
       return null;
     }
   }
@@ -188,11 +190,16 @@ class NetworkSecurityService {
   http.Client? _fallbackClient;
 
   http.Client get client {
-    if (_pinningEnabled && _pinnedClient != null) {
-      return _pinnedClient!;
+    if (_pinningEnabled) {
+      final pinned = _pinnedClient;
+      if (pinned != null) return pinned;
     }
-    _fallbackClient ??= http.Client();
-    return _fallbackClient!;
+    var fallback = _fallbackClient;
+    if (fallback == null) {
+      fallback = http.Client();
+      _fallbackClient = fallback;
+    }
+    return fallback;
   }
 
   Future<bool> verifyPinning(String domain) async {
@@ -208,7 +215,8 @@ class NetworkSecurityService {
       final request = http.Request('HEAD', uri);
       await pinnedClient.send(request).timeout(const Duration(seconds: 5));
       return true;
-    } catch (_) {
+    } catch (e) {
+      AppLogger.instance.debug('Remote pin fetch failed', error: e);
       return false;
     }
   }

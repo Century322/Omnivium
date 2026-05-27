@@ -2,7 +2,7 @@ import 'app_logger.dart';
 import 'notification_center.dart';
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
+import 'dart:io' if (dart.library.html) '';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'api_proxy_service.dart';
@@ -101,13 +101,14 @@ class PushNotificationService {
   }
 
   Future<void> _registerTokenWithBackend() async {
-    if (_fcmToken == null) return;
+    final token = _fcmToken;
+    if (token == null) return;
     final proxy = ApiProxyService.instance;
     if (!proxy.isConfigured) return;
     try {
       await proxy.registerDevice(
         deviceId: proxy.buildDeviceHeaders()['X-Device-Id'] ?? 'unknown',
-        fcmToken: _fcmToken!,
+        fcmToken: token,
         platform: defaultTargetPlatform.name,
         appVersion: proxy.buildDeviceHeaders()['X-App-Version'] ?? '1.0.0',
       );
@@ -239,7 +240,8 @@ class PushNotificationService {
   Map<String, dynamic> _parsePayload(String payload) {
     try {
       return jsonDecode(payload) as Map<String, dynamic>;
-    } catch (_) {
+    } catch (e) {
+      AppLogger.instance.debug('Push payload decode failed', error: e);
       return {'payload': payload};
     }
   }

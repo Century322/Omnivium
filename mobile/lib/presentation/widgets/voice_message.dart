@@ -1,6 +1,7 @@
 import '../../core/app_logger.dart';
 import 'dart:async';
-import 'dart:io';
+import 'dart:io' if (dart.library.html) '';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:record/record.dart';
@@ -8,6 +9,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:path_provider/path_provider.dart';
 import '../theme/app_colors.dart';
 import '../theme/locale_provider.dart';
+import '../../core/matrix/matrix_provider.dart';
 
 class VoiceRecorderButton extends StatefulWidget {
   final void Function(String path, Duration duration) onSend;
@@ -35,11 +37,12 @@ class _VoiceRecorderButtonState extends State<VoiceRecorderButton> {
     try {
       if (!await _recorder.hasPermission()) return;
       final dir = await getTemporaryDirectory();
-      _recordPath =
+      final recordPath =
           '${dir.path}/voice_${DateTime.now().millisecondsSinceEpoch}.m4a';
+      _recordPath = recordPath;
       await _recorder.start(
         const RecordConfig(encoder: AudioEncoder.aacLc),
-        path: _recordPath!,
+        path: recordPath,
       );
       if (!mounted) return;
       setState(() {
@@ -249,10 +252,22 @@ class _VoiceMessagePlayerState extends State<VoiceMessagePlayer> {
     if (_isPlaying) {
       await _player.pause();
     } else {
+      String playUrl = widget.url;
+      if (playUrl.startsWith('mxc://')) {
+        final converted = MatrixProvider.instance.getMediaUrl(playUrl);
+        if (converted != null) {
+          playUrl = converted;
+        } else {
+          return;
+        }
+      }
+      final headers = MatrixProvider.instance.getMediaHeaders();
       if (_position > Duration.zero && _position < _duration) {
         await _player.resume();
       } else {
-        await _player.play(UrlSource(widget.url));
+        await _player.play(
+          UrlSource(playUrl, headers: headers ?? const {}),
+        );
       }
     }
   }

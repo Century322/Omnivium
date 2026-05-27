@@ -7,6 +7,7 @@ import 'locale_provider.dart';
 class ThemeProvider extends ChangeNotifier {
   ThemeMode _mode = ThemeMode.dark;
   String _accentKey = 'teal';
+  bool _disposed = false;
 
   ThemeMode get mode => _mode;
   AccentPreset get accentPreset => AccentPreset.fromKey(_accentKey);
@@ -15,26 +16,36 @@ class ThemeProvider extends ChangeNotifier {
     _load();
   }
 
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
+
+  void _notify() {
+    if (!_disposed) notifyListeners();
+  }
+
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
     final savedMode = prefs.getString('omnivium_theme_mode') ?? 'dark';
     _mode = _fromString(savedMode);
     _accentKey = prefs.getString('omnivium_accent') ?? 'teal';
-    notifyListeners();
+    _notify();
   }
 
   Future<void> setMode(ThemeMode mode) async {
     _mode = mode;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('omnivium_theme_mode', _toString(mode));
-    notifyListeners();
+    _notify();
   }
 
   Future<void> setAccent(String key) async {
     _accentKey = key;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('omnivium_accent', key);
-    notifyListeners();
+    _notify();
   }
 
   ThemeMode _fromString(String s) {

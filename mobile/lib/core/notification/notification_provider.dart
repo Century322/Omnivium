@@ -45,12 +45,15 @@ class NotificationProvider extends ChangeNotifier {
     NotificationCenter.observe(Event.pushNotification, _onPushNotification);
   }
 
+  static int _pushCounter = 0;
+
   void _onPushNotification(Map<String, dynamic>? data) {
     if (data == null) return;
+    _pushCounter++;
     _notifications.insert(
       0,
       AppNotification(
-        id: 'push_${DateTime.now().millisecondsSinceEpoch}',
+        id: 'push_${DateTime.now().millisecondsSinceEpoch}_${_pushCounter}',
         title: data['title'] as String? ?? '',
         body: data['body'] as String? ?? '',
         type: NotificationType.system,

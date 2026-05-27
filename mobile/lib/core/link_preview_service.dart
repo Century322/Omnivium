@@ -56,7 +56,8 @@ class LinkPreviewService {
         if (second >= 16 && second <= 31) return false;
       }
       return true;
-    } catch (_) {
+    } catch (e) {
+      AppLogger.instance.debug('Link preview fetch failed', error: e);
       return false;
     }
   }

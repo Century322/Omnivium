@@ -180,6 +180,8 @@ class AppColors {
       of(context, Colors.white38, const Color(0xFF888888));
   static Color textDisabled(BuildContext context) =>
       of(context, Colors.white24, const Color(0xFFAAAAAA));
+  static Color textOnAccent(BuildContext context) =>
+      of(context, Colors.white, Colors.white);
   static Color iconGray(BuildContext context) =>
       of(context, const Color(0xFF555555), const Color(0xFF999999));
   static Color divider(BuildContext context) =>

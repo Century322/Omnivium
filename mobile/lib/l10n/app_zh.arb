@@ -721,5 +721,6 @@
     "chat_wallpaper_desc": "自定义聊天背景",
     "preset_wallpapers": "预设壁纸",
     "custom_wallpaper": "自定义壁纸",
-    "choose_from_gallery": "从相册选择"
+    "choose_from_gallery": "从相册选择",
+    "send_failed": "发送失败"
 }

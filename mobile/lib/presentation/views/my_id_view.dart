@@ -111,11 +111,11 @@ class _MyIdViewState extends State<MyIdView> {
             const SizedBox(height: 32),
             _buildMatrixIdCard(context, userId, notLoggedIn),
             const SizedBox(height: 16),
-            if (bridge.supabaseUserId != null)
-              _buildSupabaseIdCard(context, bridge.supabaseUserId!),
+            if (bridge.supabaseUserId case final supabaseId?)
+              _buildSupabaseIdCard(context, supabaseId),
             if (bridge.supabaseUserId != null) const SizedBox(height: 16),
-            if (bridge.omniviumId != null)
-              _buildOmniviumIdCard(context, bridge.omniviumId!),
+            if (bridge.omniviumId case final omniviumId?)
+              _buildOmniviumIdCard(context, omniviumId),
             if (bridge.omniviumId != null) const SizedBox(height: 16),
             if (identity != null) ...[
               _buildSovereignIdCard(context, activeIdentity, isShadow),
@@ -928,6 +928,7 @@ class _MyIdViewState extends State<MyIdView> {
             const SizedBox(height: 12),
             TextField(
               controller: controller,
+              maxLength: 256,
               style: TextStyle(
                 color: AppColors.textPrimary(context),
                 fontSize: 14,
@@ -1296,7 +1297,7 @@ class _MyIdViewState extends State<MyIdView> {
               data: 'omnivium://add?id=$shareId',
               version: QrVersions.auto,
               size: 200,
-              backgroundColor: Colors.white,
+              backgroundColor: AppColors.textOnAccent(context),
             ),
             const SizedBox(height: 12),
             Text(

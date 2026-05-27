@@ -172,6 +172,7 @@ class HomeDialogs {
             children: [
               TextField(
                 controller: nameCtrl,
+                maxLength: 100,
                 style: TextStyle(color: AppColors.textPrimary(context)),
                 decoration: InputDecoration(
                   labelText: t('enter_new_name'),
@@ -187,6 +188,7 @@ class HomeDialogs {
               const SizedBox(height: 12),
               TextField(
                 controller: membersCtrl,
+                maxLength: 512,
                 style: TextStyle(
                   color: AppColors.textPrimary(context),
                   fontSize: 14,

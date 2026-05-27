@@ -720,7 +720,8 @@ class CivilizationNetwork {
   List<WireMessage> drainSendQueue() {
     final messages = List<WireMessage>.from(_sendQueue);
     _sendQueue.clear();
-    if (_transport != null && _transport!.state == TransportState.connected) {
+    final transport = _transport;
+    if (transport != null && transport.state == TransportState.connected) {
       for (final msg in messages) {
         try {
           final transportMsg = TransportMessage(
@@ -734,8 +735,10 @@ class CivilizationNetwork {
               nodeId: msg.senderId,
             ),
           );
-          _transport!.send(transportMsg);
-        } catch (_) {}
+          transport.send(transportMsg);
+        } catch (e) {
+          AppLogger.instance.debug('Broadcast message send failed', error: e);
+        }
       }
     }
     return messages;

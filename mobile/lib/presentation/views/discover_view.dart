@@ -150,7 +150,8 @@ class _DiscoverViewState extends State<DiscoverView> {
               .toList();
           _isLoading = false;
         });
-      } catch (_) {
+      } catch (e) {
+        AppLogger.instance.debug('Load content failed', error: e);
         if (mounted) {
           setState(() {
             _isLoading = false;
@@ -183,7 +184,8 @@ class _DiscoverViewState extends State<DiscoverView> {
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onHorizontalDragEnd: (d) {
-            if (d.primaryVelocity != null && d.primaryVelocity! > 500) {
+            final velocity = d.primaryVelocity;
+            if (velocity != null && velocity > 500) {
               widget.provider.navigation.setCurrentView(ViewState.home);
             }
           },
@@ -616,12 +618,15 @@ class _DiscoverViewState extends State<DiscoverView> {
                           child: ClipOval(
                             child: item.imgSrc.isNotEmpty
                                 ? CachedNetworkImage(
-                                    imageUrl:
-                                        'https://picsum.photos/seed/${item.author}/100/100',
+                                    imageUrl: item.imgSrc,
                                     width: 24,
                                     height: 24,
                                     fit: BoxFit.cover,
-                                    errorWidget: (_, _, _) => const SizedBox(),
+                                    errorWidget: (_, _, _) => Icon(
+                                      LucideIcons.user,
+                                      size: 14,
+                                      color: AppColors.textPrimary(context),
+                                    ),
                                   )
                                 : Icon(
                                     LucideIcons.user,
@@ -631,8 +636,11 @@ class _DiscoverViewState extends State<DiscoverView> {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        Text(
-                          item.author,
+                        Flexible(
+                          child: Text(
+                            item.author,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 13,
                             color: AppColors.textTertiary(context),

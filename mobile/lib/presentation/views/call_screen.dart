@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import '../../core/call_service.dart';
@@ -23,6 +24,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
   RTCVideoRenderer? _remoteRenderer;
   bool _renderersInitialized = false;
   StreamSubscription? _callStateSubscription;
+  Timer? _callTimer;
 
   @override
   void initState() {
@@ -42,8 +44,10 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
       setState(() {});
       if (call.state == CallState.connected) {
         _startTimer();
+        _pulseController.stop();
         if (call.isVideo) _initRenderers();
       } else if (call.state == CallState.ended) {
+        _callTimer?.cancel();
         _disposeRenderers();
         if (context.mounted) Navigator.of(context).pop();
       }
@@ -51,16 +55,19 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
   }
 
   void _startTimer() {
-    Future.delayed(const Duration(seconds: 1), () {
+    _callTimer?.cancel();
+    _callTimer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (mounted && CallService.instance.isInCall) {
         setState(() => _callDuration += const Duration(seconds: 1));
-        _startTimer();
+      } else {
+        _callTimer?.cancel();
       }
     });
   }
 
   @override
   void dispose() {
+    _callTimer?.cancel();
     _callStateSubscription?.cancel();
     _disposeRenderers();
     _pulseController.dispose();
@@ -74,16 +81,18 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
 
     _localRenderer = RTCVideoRenderer();
     _remoteRenderer = RTCVideoRenderer();
-    await _localRenderer!.initialize();
+    final localRenderer = _localRenderer;
+    final remoteRenderer = _remoteRenderer;
+    await localRenderer.initialize();
     if (!mounted) return;
-    await _remoteRenderer!.initialize();
+    await remoteRenderer.initialize();
     if (!mounted) return;
 
-    if (call.localStream != null && _localRenderer != null) {
-      _localRenderer!.srcObject = call.localStream;
+    if (call.localStream != null) {
+      localRenderer.srcObject = call.localStream;
     }
-    if (call.remoteStream != null && _remoteRenderer != null) {
-      _remoteRenderer!.srcObject = call.remoteStream;
+    if (call.remoteStream != null) {
+      remoteRenderer.srcObject = call.remoteStream;
     }
     _renderersInitialized = true;
     if (mounted) setState(() {});
@@ -133,7 +142,12 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     final isConnecting =
         call.state == CallState.connecting || call.state == CallState.inviting;
 
-    return Scaffold(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) CallService.instance.hangup();
+      },
+      child: Scaffold(
       backgroundColor: AppColors.bg(context),
       body: SafeArea(
         child: call.isVideo && _renderersInitialized && isConnected
@@ -165,10 +179,11 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                   if (isConnected) _buildInCallControls(context),
                   if (isRinging) _buildIncomingCallControls(),
                   if (isConnecting) _buildConnectingControls(),
-                  const SizedBox(height: 48),
+                  SizedBox(height: max(48, MediaQuery.of(context).padding.bottom + 16)),
                 ],
               ),
       ),
+    ),
     );
   }
 
@@ -235,7 +250,9 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     for (final track in localStream.getAudioTracks()) {
       try {
         track.enableSpeakerphone(speakerOn);
-      } catch (_) {}
+      } catch (e) {
+        AppLogger.instance.debug('Speakerphone toggle failed', error: e);
+      }
     }
   }
 
@@ -258,21 +275,23 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     for (final track in localStream.getVideoTracks()) {
       try {
         Helper.switchCamera(track);
-      } catch (_) {}
+      } catch (e) {
+        AppLogger.instance.debug('Camera switch failed', error: e);
+      }
     }
   }
 
   Widget _buildVideoLayout(BuildContext context, VoIPCall call) {
     return Stack(
       children: [
-        if (_remoteRenderer != null && call.remoteStream != null)
+        if (_remoteRenderer case final remote? && call.remoteStream != null)
           Positioned.fill(
             child: RTCVideoView(
-              _remoteRenderer!,
+              remote,
               objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
             ),
           ),
-        if (_localRenderer != null && call.localStream != null && !_isCameraOff)
+        if (_localRenderer case final local? && call.localStream != null && !_isCameraOff)
           Positioned(
             top: 60,
             right: 16,
@@ -285,7 +304,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
               ),
               clipBehavior: Clip.antiAlias,
               child: RTCVideoView(
-                _localRenderer!,
+                local,
                 mirror: true,
                 objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
               ),
@@ -302,7 +321,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                 end: Alignment.bottomCenter,
                 colors: [
                   Colors.transparent,
-                  Colors.black.withValues(alpha: 0.7),
+                  AppColors.bg(context).withValues(alpha: 0.7),
                 ],
               ),
             ),
@@ -311,10 +330,10 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
               children: [
                 Text(
                   call.remoteUserId.replaceAll('@', '').split(':').first,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                    color: AppColors.textOnAccent(context),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -322,7 +341,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                   _formatDuration(_callDuration),
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.white.withValues(alpha: 0.8),
+                    color: AppColors.textOnAccent(context).withValues(alpha: 0.8),
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -334,7 +353,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                       label: _isMuted
                           ? localeProvider.t('unmute')
                           : localeProvider.t('mute'),
-                      color: _isMuted ? AppColors.dng(context) : Colors.white,
+                      color: _isMuted ? AppColors.dng(context) : AppColors.textOnAccent(context),
                       onTap: () {
                         setState(() => _isMuted = !_isMuted);
                         _toggleMute(_isMuted);
@@ -347,7 +366,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                           : localeProvider.t('close_camera'),
                       color: _isCameraOff
                           ? AppColors.dng(context)
-                          : Colors.white,
+                          : AppColors.textOnAccent(context),
                       onTap: () {
                         setState(() => _isCameraOff = !_isCameraOff);
                         _toggleCamera();
@@ -356,7 +375,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                     _buildControlButton(
                       icon: Icons.flip_camera_ios,
                       label: localeProvider.t('flip_camera'),
-                      color: Colors.white,
+                      color: AppColors.textOnAccent(context),
                       onTap: _switchCamera,
                     ),
                     _buildControlButton(

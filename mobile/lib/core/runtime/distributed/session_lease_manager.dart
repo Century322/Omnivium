@@ -62,7 +62,8 @@ class SessionLeaseManager {
   DistributedSessionLease? tryAcquire(String sessionId) {
     try {
       return acquire(sessionId);
-    } catch (_) {
+    } catch (e) {
+      AppLogger.instance.debug('Lease acquire failed', error: e);
       return null;
     }
   }

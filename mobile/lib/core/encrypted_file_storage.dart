@@ -1,8 +1,10 @@
 import 'dart:convert';
-import 'dart:io';
+import 'dart:io' if (dart.library.html) '';
 import 'dart:math';
 import 'dart:typed_data';
+import 'package:collection/collection.dart';
 import 'package:encrypt/encrypt.dart';
+import 'package:crypto/crypto.dart';
 import 'package:path_provider/path_provider.dart';
 import 'secure_storage_service.dart';
 import 'app_logger.dart';
@@ -15,6 +17,12 @@ class EncryptedFileStorage {
   static const _masterKeyStorageKey = 'omnivium_file_encryption_key';
 
   Key? _masterKey;
+
+  Key get requireKey {
+    final k = _masterKey;
+    if (k == null) throw StateError('EncryptedFileStorage not initialized');
+    return k;
+  }
 
   Future<void> init() async {
     final storage = SecureStorageService.instance;
@@ -30,6 +38,7 @@ class EncryptedFileStorage {
 
   Future<String> encryptFile(String sourcePath, {String? destPath}) async {
     if (_masterKey == null) await init();
+    final key = requireKey;
 
     final sourceFile = File(sourcePath);
     if (!await sourceFile.exists())
@@ -37,12 +46,16 @@ class EncryptedFileStorage {
 
     final bytes = await sourceFile.readAsBytes();
     final iv = IV.fromSecureRandom(16);
-    final encrypter = Encrypter(AES(_masterKey!, mode: AESMode.ctr));
+    final encrypter = Encrypter(AES(key, mode: AESMode.cbc));
     final encrypted = encrypter.encryptBytes(bytes, iv: iv);
+
+    final hmacKey = Hmac(sha256, key.bytes);
+    final mac = hmacKey.convert([...iv.bytes, ...encrypted.bytes]);
 
     final output = BytesBuilder();
     output.add(iv.bytes);
     output.add(encrypted.bytes);
+    output.add(mac.bytes);
 
     final targetPath = destPath ?? _getEncryptedPath(sourcePath);
     final targetFile = File(targetPath);
@@ -54,18 +67,29 @@ class EncryptedFileStorage {
 
   Future<Uint8List> decryptFile(String encryptedPath) async {
     if (_masterKey == null) await init();
+    final key = requireKey;
 
     final file = File(encryptedPath);
     if (!await file.exists())
       throw Exception('Encrypted file not found: $encryptedPath');
 
     final raw = await file.readAsBytes();
-    if (raw.length < 17) throw Exception('Invalid encrypted file: too short');
+    const hmacLen = 32;
+    if (raw.length < 16 + hmacLen)
+      throw Exception('Invalid encrypted file: too short');
 
     final ivBytes = raw.sublist(0, 16);
-    final data = raw.sublist(16);
+    final macBytes = raw.sublist(raw.length - hmacLen);
+    final data = raw.sublist(16, raw.length - hmacLen);
+
+    final hmacKey = Hmac(sha256, key.bytes);
+    final computedMac = hmacKey.convert([...ivBytes, ...data]);
+    if (!ListEquality().equals(macBytes, computedMac.bytes)) {
+      throw Exception('HMAC verification failed: data may be tampered');
+    }
+
     final iv = IV(ivBytes);
-    final encrypter = Encrypter(AES(_masterKey!, mode: AESMode.ctr));
+    final encrypter = Encrypter(AES(key, mode: AESMode.cbc));
     final decrypted = encrypter.decryptBytes(
       Encrypted(Uint8List.fromList(data)),
       iv: iv,
@@ -77,46 +101,41 @@ class EncryptedFileStorage {
     String encryptedPath, {
     int chunkSize = 65536,
   }) async {
-    if (_masterKey == null) await init();
-
-    final file = File(encryptedPath);
-    if (!await file.exists())
-      throw Exception('Encrypted file not found: $encryptedPath');
-
-    final raw = await file.readAsBytes();
-    if (raw.length < 17) throw Exception('Invalid encrypted file: too short');
-
-    final ivBytes = raw.sublist(0, 16);
-    final data = raw.sublist(16);
-    final iv = IV(ivBytes);
-    final encrypter = Encrypter(AES(_masterKey!, mode: AESMode.ctr));
-    final decrypted = encrypter.decryptBytes(
-      Encrypted(Uint8List.fromList(data)),
-      iv: iv,
-    );
-
-    return Stream.fromIterable([Uint8List.fromList(decrypted)]);
+    final decrypted = await decryptFile(encryptedPath);
+    return Stream.fromIterable([decrypted]);
   }
 
   Future<String> encryptString(String plaintext) async {
     if (_masterKey == null) await init();
+    final key = requireKey;
     final iv = IV.fromSecureRandom(16);
-    final encrypter = Encrypter(AES(_masterKey!, mode: AESMode.ctr));
+    final encrypter = Encrypter(AES(key, mode: AESMode.cbc));
     final encrypted = encrypter.encrypt(plaintext, iv: iv);
+    final hmacKey = Hmac(sha256, key.bytes);
+    final mac = hmacKey.convert([...iv.bytes, ...encrypted.bytes]);
     final output = BytesBuilder();
     output.add(iv.bytes);
     output.add(encrypted.bytes);
+    output.add(mac.bytes);
     return base64Encode(output.takeBytes());
   }
 
   Future<String> decryptString(String ciphertext) async {
     if (_masterKey == null) await init();
+    final key = requireKey;
     final raw = base64Decode(ciphertext);
-    if (raw.length < 17) throw Exception('Invalid encrypted data');
+    const hmacLen = 32;
+    if (raw.length < 16 + hmacLen) throw Exception('Invalid encrypted data');
     final ivBytes = raw.sublist(0, 16);
-    final data = raw.sublist(16);
+    final macBytes = raw.sublist(raw.length - hmacLen);
+    final data = raw.sublist(16, raw.length - hmacLen);
+    final hmacKey = Hmac(sha256, key.bytes);
+    final computedMac = hmacKey.convert([...ivBytes, ...data]);
+    if (!ListEquality().equals(macBytes, computedMac.bytes)) {
+      throw Exception('HMAC verification failed: data may be tampered');
+    }
     final iv = IV(ivBytes);
-    final encrypter = Encrypter(AES(_masterKey!, mode: AESMode.ctr));
+    final encrypter = Encrypter(AES(key, mode: AESMode.cbc));
     return encrypter.decrypt64(base64Encode(data), iv: iv);
   }
 

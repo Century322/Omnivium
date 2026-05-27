@@ -6,6 +6,8 @@ import 'package:sqflite/sqflite.dart';
 import '../auth_service.dart';
 import '../vodozemac_init.dart';
 import '../secure_storage_service.dart';
+import '../note_service.dart';
+import '../encryption_service.dart';
 
 import '../identity_bridge.dart';
 
@@ -20,7 +22,12 @@ class MatrixService {
   final _lock = _AsyncLock();
 
   Client? get client => _client;
-  bool get isLoggedIn => _client != null && _client!.isLogged();
+  bool get isLoggedIn => _client != null && requireClient.isLogged();
+  Client get requireClient {
+    final c = _client;
+    if (c == null) throw StateError('Matrix client not initialized');
+    return c;
+  }
   String? get userId => _client?.userID;
   String? get homeserver => _client?.homeserver?.toString();
 
@@ -40,17 +47,19 @@ class MatrixService {
   }
 
   Future<void> _closeDatabase() async {
-    if (_database != null) {
+    final db = _database;
+    if (db != null) {
       try {
-        await _database!.close();
+        await db.close();
       } catch (e) {
         AppLogger.instance.warning('Failed to close Matrix database', error: e);
       }
       _database = null;
     }
-    if (_rawDb != null && _rawDb!.isOpen) {
+    final rawDb = _rawDb;
+    if (rawDb != null && rawDb.isOpen) {
       try {
-        await _rawDb!.close();
+        await rawDb.close();
       } catch (e) {
         AppLogger.instance.warning('Failed to close raw database', error: e);
       }
@@ -61,10 +70,10 @@ class MatrixService {
   Future<Client> _createClient(String homeserverUrl) async {
     return await _lock.synchronized(() async {
       if (_client != null) {
-        final currentHomeserver = _client!.homeserver?.toString();
+        final currentHomeserver = requireClient.homeserver?.toString();
         if (currentHomeserver == homeserverUrl ||
             currentHomeserver == '$homeserverUrl/') {
-          return _client!;
+          return requireClient;
         }
       }
       await _closeDatabase();
@@ -131,7 +140,7 @@ class MatrixService {
 
     return await _lock.synchronized(() async {
       try {
-        if (_client != null && _client!.isLogged()) {
+        if (_client != null && requireClient.isLogged()) {
           return true;
         }
 
@@ -195,6 +204,8 @@ class MatrixService {
 
   Future<void> logout() async {
     AuthService.instance.onMatrixLogout();
+    NoteService.instance.reset();
+    EncryptionService.instance.reset();
     try {
       await _client?.logout();
     } catch (e, stackTrace) {
@@ -215,27 +226,30 @@ class MatrixService {
   }
 
   Future<void> _saveCredentials(Client client) async {
-    if (client.accessToken != null)
-      await _secure.write(_tokenKey, client.accessToken!);
-    if (client.userID != null) await _secure.write(_userIdKey, client.userID!);
-    if (client.homeserver != null)
-      await _secure.write(_homeserverKey, client.homeserver!.toString());
-    if (client.deviceID != null)
-      await _secure.write(_deviceIdKey, client.deviceID!);
+    final token = client.accessToken;
+    if (token != null) await _secure.write(_tokenKey, token);
+    final uid = client.userID;
+    if (uid != null) await _secure.write(_userIdKey, uid);
+    final hs = client.homeserver;
+    if (hs != null) await _secure.write(_homeserverKey, hs.toString());
+    final did = client.deviceID;
+    if (did != null) await _secure.write(_deviceIdKey, did);
     await _secure.write(_deviceNameKey, client.clientName);
   }
 
   Future<DatabaseApi> _getDatabase() async {
     final dbPath = await getDatabasesPath();
     final path = '$dbPath/omnivium.db';
-    _rawDb = await openDatabase(path);
-    _database = await MatrixSdkDatabase.init('Omnivium', database: _rawDb!);
-    return _database!;
+    final rawDb = await openDatabase(path);
+    _rawDb = rawDb;
+    final database = await MatrixSdkDatabase.init('Omnivium', database: rawDb);
+    _database = database;
+    return database;
   }
 
   List<Room> get rooms {
     if (_client == null) return [];
-    return _client!.rooms.where((r) => !r.isSpace).toList()..sort((a, b) {
+    return requireClient.rooms.where((r) => !r.isSpace).toList()..sort((a, b) {
       final aTime =
           a.lastEvent?.originServerTs ?? DateTime.fromMillisecondsSinceEpoch(0);
       final bTime =
@@ -248,19 +262,21 @@ class MatrixService {
 
   Future<String> createDirectChat(String userId) async {
     if (_client == null) throw StateError('Not logged in');
-    return await _client!.startDirectChat(userId, enableEncryption: true);
+    return await requireClient.startDirectChat(userId, enableEncryption: true);
   }
 
   Future<String> createGroupChat(
     String name, {
     List<String>? invite,
     List<String>? userIds,
+    String? topic,
   }) async {
     if (_client == null) throw StateError('Not logged in');
-    return await _client!.createRoom(
+    final roomId = await requireClient.createRoom(
       preset: CreateRoomPreset.privateChat,
       name: name,
       invite: invite ?? userIds,
+      topic: topic,
       initialState: [
         StateEvent(
           type: 'm.room.encryption',
@@ -269,6 +285,15 @@ class MatrixService {
         ),
       ],
     );
+    try {
+      final room = requireClient.getRoomById(roomId);
+      if (room != null && !room.encrypted) {
+        await room.enableEncryption();
+      }
+    } catch (e) {
+      AppLogger.instance.warning('Failed to enable encryption for group', error: e);
+    }
+    return roomId;
   }
 
   Future<void> sendMessage(String roomId, String text) async {
@@ -280,7 +305,7 @@ class MatrixService {
   Future<List<Profile>> searchUsers(String query) async {
     if (_client == null || query.isEmpty) return [];
     try {
-      final result = await _client!.searchUserDirectory(query, limit: 20);
+      final result = await requireClient.searchUserDirectory(query, limit: 20);
       return result.results;
     } catch (e, stackTrace) {
       AppLogger.instance.warning(
@@ -295,7 +320,7 @@ class MatrixService {
   Future<Profile?> getUserProfile(String userId) async {
     if (_client == null) return null;
     try {
-      return await _client!.getProfileFromUserId(userId);
+      return await requireClient.getProfileFromUserId(userId);
     } catch (e, stackTrace) {
       AppLogger.instance.warning(
         'Get user profile failed',
@@ -308,12 +333,12 @@ class MatrixService {
 
   List<Room> get directChats {
     if (_client == null) return [];
-    return _client!.rooms.where((r) => r.isDirectChat && !r.isSpace).toList();
+    return requireClient.rooms.where((r) => r.isDirectChat && !r.isSpace).toList();
   }
 
   List<Room> get groupChats {
     if (_client == null) return [];
-    return _client!.rooms.where((r) => !r.isDirectChat && !r.isSpace).toList();
+    return requireClient.rooms.where((r) => !r.isDirectChat && !r.isSpace).toList();
   }
 
   Stream<SyncUpdate>? get onSync {
@@ -322,24 +347,20 @@ class MatrixService {
 }
 
 class _AsyncLock {
-  final _queue = <Completer<void>>[];
-  bool _locked = false;
+  Completer<void>? _completer;
 
   Future<T> synchronized<T>(Future<T> Function() action) async {
-    final completer = Completer<void>();
-    _queue.add(completer);
-    if (_locked) {
-      await completer.future;
+    while (_completer != null) {
+      final c = _completer;
+      if (c != null) await c.future;
     }
-    _locked = true;
+    _completer = Completer<void>();
     try {
       return await action();
     } finally {
-      _locked = false;
-      _queue.remove(completer);
-      if (_queue.isNotEmpty) {
-        _queue.first.complete();
-      }
+      final c = _completer;
+      _completer = null;
+      c?.complete();
     }
   }
 }

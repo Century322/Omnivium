@@ -2246,4 +2246,7 @@ class SEn extends S {
 
   @override
   String get choose_from_gallery => 'Choose from Gallery';
+
+  @override
+  String get send_failed => 'Failed to send message';
 }

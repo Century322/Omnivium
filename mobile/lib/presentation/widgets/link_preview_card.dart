@@ -14,7 +14,8 @@ class LinkPreviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (preview == null) {
+    final p = preview;
+    if (p == null) {
       return _buildFallback(context);
     }
     return Semantics(
@@ -33,11 +34,11 @@ class LinkPreviewCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (preview!.imageUrl != null)
+              if (p.imageUrl case final imgUrl?)
                 ConstrainedBox(
                   constraints: const BoxConstraints(maxHeight: 200),
                   child: CachedNetworkImage(
-                    imageUrl: preview!.imageUrl!,
+                    imageUrl: imgUrl,
                     width: double.infinity,
                     fit: BoxFit.cover,
                     placeholder: (_, _) => Container(
@@ -52,9 +53,9 @@ class LinkPreviewCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (preview!.siteName != null)
+                    if (p.siteName case final siteName?)
                       Text(
-                        preview!.siteName!,
+                        siteName,
                         style: TextStyle(
                           color: AppColors.acc(context),
                           fontSize: 11,
@@ -62,9 +63,9 @@ class LinkPreviewCard extends StatelessWidget {
                         ),
                       ),
                     const SizedBox(height: 2),
-                    if (preview!.title != null)
+                    if (p.title case final pTitle?)
                       Text(
-                        preview!.title!,
+                        pTitle,
                         style: TextStyle(
                           color: AppColors.textPrimary(context),
                           fontSize: 14,
@@ -73,10 +74,10 @@ class LinkPreviewCard extends StatelessWidget {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
-                    if (preview!.description != null) ...[
+                    if (p.description case final pDesc?) ...[
                       const SizedBox(height: 4),
                       Text(
-                        preview!.description!,
+                        pDesc,
                         style: TextStyle(
                           color: AppColors.mut(context),
                           fontSize: 12,

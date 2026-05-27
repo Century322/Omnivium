@@ -27,10 +27,11 @@ class TotpService {
   Future<String> generateSecret() async {
     final random = Random.secure();
     final keyBytes = List<int>.generate(20, (_) => random.nextInt(256));
-    _secret = base64Encode(keyBytes);
+    final secret = base64Encode(keyBytes);
+    _secret = secret;
     final storage = SecureStorageService.instance;
-    await storage.write(_secretKey, _secret!);
-    return _secret!;
+    await storage.write(_secretKey, secret);
+    return secret;
   }
 
   Future<void> enable() async {
@@ -48,17 +49,19 @@ class TotpService {
 
   bool verify(String code) {
     if (!_enabled || _secret == null) return true;
+    final secret = _secret;
+    if (secret == null) return true;
     final now = DateTime.now().toUtc();
     final timeStep = now.millisecondsSinceEpoch ~/ 30000;
     for (var offset = -1; offset <= 1; offset++) {
-      final expected = _generateCode(timeStep + offset);
+      final expected = _generateCode(timeStep + offset, secret);
       if (expected == code) return true;
     }
     return false;
   }
 
-  String _generateCode(int timeStep) {
-    final key = base64Decode(_secret!);
+  String _generateCode(int timeStep, String secret) {
+    final key = base64Decode(secret);
     final timeBytes = ByteData(8);
     timeBytes.setInt64(0, timeStep);
     final hmacBytes = Hmac(
@@ -76,8 +79,9 @@ class TotpService {
   }
 
   String getOtpAuthUri(String username) {
-    final encodedSecret = _secret != null
-        ? base64Encode(base64Decode(_secret!))
+    final secret = _secret;
+    final encodedSecret = secret != null
+        ? base64Encode(base64Decode(secret))
         : '';
     return 'otpauth://totp/Omnivium:$username?secret=$encodedSecret&issuer=Omnivium&algorithm=SHA1&digits=6&period=30';
   }

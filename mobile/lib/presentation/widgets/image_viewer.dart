@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../theme/app_colors.dart';
 import '../theme/locale_provider.dart';
 
@@ -20,9 +21,11 @@ class ImageViewer extends StatelessWidget {
           icon: Icon(LucideIcons.x, color: AppColors.textPrimary(context)),
           onPressed: () => Navigator.pop(context),
         ),
-        title: title != null
+        title: title case final t?
             ? Text(
-                title!,
+                t,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   color: AppColors.textPrimary(context),
                   fontSize: 16,
@@ -34,23 +37,16 @@ class ImageViewer extends StatelessWidget {
         child: InteractiveViewer(
           minScale: 0.5,
           maxScale: 4.0,
-          child: Image.network(
-            imageUrl,
+          child: CachedNetworkImage(
+            imageUrl: imageUrl,
             semanticLabel: title ?? localeProvider.t('full_size_image'),
             fit: BoxFit.contain,
-            loadingBuilder: (_, child, progress) {
-              if (progress == null) return child;
-              return Center(
-                child: CircularProgressIndicator(
-                  value: progress.expectedTotalBytes != null
-                      ? progress.cumulativeBytesLoaded /
-                            progress.expectedTotalBytes!
-                      : null,
-                  color: AppColors.acc(context),
-                ),
-              );
-            },
-            errorBuilder: (_, _, _) => Center(
+            placeholder: (_, __) => Center(
+              child: CircularProgressIndicator(
+                color: AppColors.acc(context),
+              ),
+            ),
+            errorWidget: (_, url, error) => Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -65,6 +61,17 @@ class ImageViewer extends StatelessWidget {
                     style: TextStyle(
                       color: AppColors.textTertiary(context),
                       fontSize: 15,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextButton.icon(
+                    onPressed: () {
+                      CachedNetworkImage.evictFromCache(url);
+                    },
+                    icon: Icon(LucideIcons.refreshCw, size: 16, color: AppColors.acc(context)),
+                    label: Text(
+                      localeProvider.t('retry'),
+                      style: TextStyle(color: AppColors.acc(context)),
                     ),
                   ),
                 ],

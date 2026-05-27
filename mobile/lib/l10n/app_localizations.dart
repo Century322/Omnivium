@@ -4414,6 +4414,12 @@ abstract class S {
   /// In zh, this message translates to:
   /// **'从相册选择'**
   String get choose_from_gallery;
+
+  /// No description provided for @send_failed.
+  ///
+  /// In zh, this message translates to:
+  /// **'发送失败'**
+  String get send_failed;
 }
 
 class _SDelegate extends LocalizationsDelegate<S> {
@@ -4445,10 +4451,5 @@ S lookupS(Locale locale) {
       return SZh();
   }
 
-  throw FlutterError(
-    'S.delegate failed to load unsupported locale "$locale". This is likely '
-    'an issue with the localizations generation tool. Please file an issue '
-    'on GitHub with a reproducible sample app and the gen-l10n configuration '
-    'that was used.',
-  );
+  return SEn();
 }

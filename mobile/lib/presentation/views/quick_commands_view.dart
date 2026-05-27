@@ -407,6 +407,7 @@ class _QuickCommandsViewState extends State<QuickCommandsView>
                         const SizedBox(height: 6),
                         TextField(
                           controller: nameCtrl,
+                          maxLength: 100,
                           style: TextStyle(
                             color: AppColors.textPrimary(context),
                             fontSize: 15,
@@ -440,6 +441,7 @@ class _QuickCommandsViewState extends State<QuickCommandsView>
                         const SizedBox(height: 6),
                         TextField(
                           controller: promptCtrl,
+                          maxLength: 2048,
                           maxLines: 3,
                           style: TextStyle(
                             color: AppColors.textPrimary(context),

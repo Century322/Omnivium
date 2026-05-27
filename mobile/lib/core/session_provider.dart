@@ -250,10 +250,9 @@ class SessionProvider extends ChangeNotifier {
     if (idx < 0) return;
     final msgs = _orchestrator.messages;
     if (msgs.isEmpty) return;
-    final title = msgs.first.content.substring(
-      0,
-      msgs.first.content.length.clamp(0, 20),
-    );
+    final title = msgs.first.content.length > 20
+        ? '${msgs.first.content.substring(0, msgs.first.content.runes.take(20).length)}...'
+        : msgs.first.content;
     _sessions[idx] = _sessions[idx].copyWith(
       title: title,
       messages: msgs
@@ -265,8 +264,12 @@ class SessionProvider extends ChangeNotifier {
   }
 
   void _cleanEmptySessions() {
+    final now = DateTime.now();
     _sessions.removeWhere(
-      (s) => s.messages.isEmpty && s.id != _activeSessionId,
+      (s) =>
+          s.messages.isEmpty &&
+          s.id != _activeSessionId &&
+          now.difference(s.lastActiveAt).inMinutes > 5,
     );
   }
 
@@ -295,8 +298,9 @@ class SessionProvider extends ChangeNotifier {
           _deleteSessionFromCloud(key);
         }
       }
-      if (_activeSessionId != null) {
-        await db.putCache(_activeSessionKey, _activeSessionId!);
+      final activeId = _activeSessionId;
+      if (activeId != null) {
+        await db.putCache(_activeSessionKey, activeId);
       } else {
         await db.deleteCache(_activeSessionKey);
       }
@@ -421,13 +425,15 @@ class SessionProvider extends ChangeNotifier {
     } else {
       final prefs = await SharedPreferences.getInstance();
       _activeSessionId = prefs.getString(_activeSessionKey);
-      if (_activeSessionId != null) {
-        await db.putCache(_activeSessionKey, _activeSessionId!);
+      final activeId = _activeSessionId;
+      if (activeId != null) {
+        await db.putCache(_activeSessionKey, activeId);
         await prefs.remove(_activeSessionKey);
       }
     }
-    if (_activeSessionId != null) {
-      _restoreSessionMessages(_activeSessionId!);
+    final restoreId = _activeSessionId;
+    if (restoreId != null) {
+      _restoreSessionMessages(restoreId);
     }
     _notify();
   }

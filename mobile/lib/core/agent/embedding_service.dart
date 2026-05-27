@@ -36,7 +36,9 @@ class EmbeddingService {
           for (final key in keys) {
             final entryRaw = db.getCache('$_cacheKey::$key');
             if (entryRaw != null) {
-              final list = (jsonDecode(entryRaw) as List).cast<double>();
+              final list = (jsonDecode(entryRaw) as List)
+                  .map((e) => (e as num).toDouble())
+                  .toList();
               _cache[key] = list;
             }
           }

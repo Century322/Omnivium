@@ -19,8 +19,10 @@ class RemoteConfigService {
   Map<String, dynamic> get config => _config;
   Map<String, Map<String, dynamic>> get uiSchemas => _uiSchemas;
 
-  bool get _isCacheStale =>
-      _lastFetch == null || DateTime.now().difference(_lastFetch!) > _cacheTtl;
+  bool get _isCacheStale {
+    final lastFetch = _lastFetch;
+    return lastFetch == null || DateTime.now().difference(lastFetch) > _cacheTtl;
+  }
 
   bool getFeatureFlag(String key, {bool defaultValue = false}) {
     final features = _config['features'] as Map<String, dynamic>?;
@@ -175,7 +177,8 @@ class RemoteConfigService {
   }
 
   bool shouldRefresh() {
-    if (_lastFetch == null) return true;
-    return DateTime.now().difference(_lastFetch!) > const Duration(hours: 1);
+    final lastFetch = _lastFetch;
+    if (lastFetch == null) return true;
+    return DateTime.now().difference(lastFetch) > const Duration(hours: 1);
   }
 }

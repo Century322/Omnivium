@@ -64,8 +64,9 @@ class ModelProvider extends ChangeNotifier {
     if (_models.isEmpty) {
       await _loadModelsFromCache();
     }
-    if (_activeModelId != null && _models.any((m) => m.id == _activeModelId)) {
-      _activateModel(_activeModelId!);
+    final activeId = _activeModelId;
+    if (activeId != null && _models.any((m) => m.id == activeId)) {
+      _activateModel(activeId);
     } else if (_models.isNotEmpty) {
       final fastModel = _models.where((m) => m.tier == 'fast').firstOrNull;
       _activateModel(fastModel?.id ?? _models.first.id);
@@ -85,7 +86,10 @@ class ModelProvider extends ChangeNotifier {
 
   Future<void> _loadModelsFromBackend() async {
     final proxy = ApiProxyService.instance;
-    if (!proxy.isConfigured) return;
+    if (!proxy.isConfigured) {
+      _lastError = 'Waiting for sign-in…';
+      return;
+    }
     _lastError = null;
     try {
       final uri = proxy.resolveModelsUrl();
@@ -153,8 +157,9 @@ class ModelProvider extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       final json = jsonEncode(_models.map((m) => m.toJson()).toList());
       await _secure.write(_modelsSecureKey, json);
-      if (_activeModelId != null) {
-        await prefs.setString(_activeModelKey, _activeModelId!);
+      final saveId = _activeModelId;
+      if (saveId != null) {
+        await prefs.setString(_activeModelKey, saveId);
       } else {
         await prefs.remove(_activeModelKey);
       }

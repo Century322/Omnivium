@@ -1,5 +1,6 @@
 import '../../core/app_logger.dart';
-import 'dart:io';
+import 'dart:io' if (dart.library.html) '';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:image_picker/image_picker.dart';
@@ -215,7 +216,7 @@ class MediaPicker {
       await _sendMediaMessage(
         provider,
         roomId,
-        file.path!,
+        file.path ?? '',
         file.name,
         isImage: false,
       );
@@ -293,12 +294,18 @@ class MediaThumbnail extends StatelessWidget {
             child: isImage
                 ? ClipRRect(
                     borderRadius: BorderRadius.circular(8),
-                    child: Image.file(
-                      File(filePath),
-                      semanticLabel: localeProvider.t('selected_image'),
-                      fit: BoxFit.cover,
-                      width: 80,
-                      height: 80,
+                    child: kIsWeb
+                        ? Icon(
+                            LucideIcons.image,
+                            size: 32,
+                            color: AppColors.iconGray(context),
+                          )
+                        : Image.file(
+                            File(filePath),
+                            semanticLabel: localeProvider.t('selected_image'),
+                            fit: BoxFit.cover,
+                            width: 80,
+                            height: 80,
                       errorBuilder: (_, _, _) => _buildFilePlaceholder(context),
                     ),
                   )

@@ -17,8 +17,9 @@ class DeepLinkService {
 
   Future<void> init() async {
     try {
-      _initialLink = await _appLinks.getInitialLink();
-      if (_initialLink != null && !_isValidDeepLink(_initialLink!)) {
+      final initial = await _appLinks.getInitialLink();
+      _initialLink = initial;
+      if (initial != null && !_isValidDeepLink(initial)) {
         AppLogger.instance.warning(
           'Blocked invalid initial deep link: $_initialLink',
         );

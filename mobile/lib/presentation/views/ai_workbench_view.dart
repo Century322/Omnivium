@@ -170,8 +170,10 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView>
 
   Future<void> _generate() async {
     final input = _inputController.text.trim();
-    if (input.isEmpty || _selectedTemplate == null) return;
-    if (_selectedModel == null) {
+    final selectedTemplate = _selectedTemplate;
+    final selectedModel = _selectedModel;
+    if (input.isEmpty || selectedTemplate == null) return;
+    if (selectedModel == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(t('no_model_configured')),
@@ -186,17 +188,18 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView>
       _generatedContent = '';
     });
 
-    ChatService.instance.setModel(_selectedModel!.name);
+    ChatService.instance.setModel(selectedModel.name);
 
     final messages = [
-      ChatMessage(role: 'system', content: _selectedTemplate!.systemPrompt),
+      ChatMessage(role: 'system', content: selectedTemplate.systemPrompt),
       ChatMessage(
         role: 'user',
-        content: _selectedTemplate!.userPromptTemplate + input,
+        content: selectedTemplate.userPromptTemplate + input,
       ),
     ];
 
     try {
+      _streamSub?.cancel();
       final stream = await ChatService.instance.chat(
         messages,
         temperature: 0.7,
@@ -482,16 +485,17 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (_selectedTemplate != null) ...[
+            final selTemplate = _selectedTemplate;
+            if (selTemplate != null) ...[
               Row(
                 children: [
                   Text(
-                    _selectedTemplate!.emoji,
+                    selTemplate.emoji,
                     style: const TextStyle(fontSize: 16),
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    t(_selectedTemplate!.nameKey),
+                    t(selTemplate.nameKey),
                     style: TextStyle(
                       color: AppColors.acc(context),
                       fontSize: 13,
@@ -601,6 +605,7 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView>
                 constraints: const BoxConstraints(maxHeight: 120),
                 child: TextField(
                   controller: _inputController,
+                  maxLength: 4096,
                   maxLines: null,
                   keyboardType: TextInputType.multiline,
                   style: TextStyle(

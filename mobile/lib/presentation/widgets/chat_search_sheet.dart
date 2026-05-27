@@ -49,6 +49,7 @@ class ChatSearchSheet extends StatelessWidget {
                           Expanded(
                             child: TextField(
                               controller: searchCtrl,
+                              maxLength: 256,
                               autofocus: true,
                               style: TextStyle(
                                 color: AppColors.textPrimary(context),

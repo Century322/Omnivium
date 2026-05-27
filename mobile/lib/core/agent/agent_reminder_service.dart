@@ -288,8 +288,9 @@ class ReminderService {
       if (reminder.status != ReminderStatus.active) continue;
       if (reminder.type == ReminderType.messageNotification) continue;
 
-      if (reminder.nextTriggerAt != null &&
-          now.isAfter(reminder.nextTriggerAt!)) {
+      final triggerAt = reminder.nextTriggerAt;
+      if (triggerAt != null &&
+          now.isAfter(triggerAt)) {
         try {
           await _fireReminder(reminder);
           _consecutiveFailures[reminder.id] = 0;
@@ -325,14 +326,17 @@ class ReminderService {
   Future<void> _fireReminder(Reminder reminder) async {
     String body = reminder.description;
 
-    if (reminder.type == ReminderType.aiSmart && _onAiTrigger != null) {
-      final aiResponse = await _onAiTrigger!(
-        reminder.aiPrompt ?? reminder.description,
-      );
+    if (reminder.type == ReminderType.aiSmart) {
+      final aiTrigger = _onAiTrigger;
+      if (aiTrigger != null) {
+        final aiResponse = await aiTrigger(
+          reminder.aiPrompt ?? reminder.description,
+        );
       if (aiResponse != null && aiResponse.isNotEmpty) {
         body = aiResponse.length > 200
             ? '${aiResponse.substring(0, 200)}...'
             : aiResponse;
+        }
       }
     }
 

@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
+import 'dart:io' if (dart.library.html) '';
 import 'runtime_transport.dart';
 
 class WebSocketTransport implements RuntimeTransport {
@@ -53,9 +53,10 @@ class WebSocketTransport implements RuntimeTransport {
     try {
       final uri = Uri.parse('$_serverUrl?nodeId=$_localNodeId');
       final socket = await WebSocket.connect(uri.toString());
-      _channel = _IOWebSocketChannel(socket);
+      final channel = _IOWebSocketChannel(socket);
+      _channel = channel;
 
-      _subscription = _channel!.stream.listen(
+      _subscription = channel.stream.listen(
         _onData,
         onError: _onError,
         onDone: _onDone,
@@ -86,7 +87,10 @@ class WebSocketTransport implements RuntimeTransport {
     if (_state != TransportState.connected || _channel == null) {
       throw StateError('Transport not connected');
     }
-    _channel!.sink.add(jsonEncode(message.toJson()));
+    final ch = _channel;
+    if (ch != null) {
+      ch.sink.add(jsonEncode(message.toJson()));
+    }
   }
 
   @override
@@ -109,7 +113,8 @@ class WebSocketTransport implements RuntimeTransport {
         },
       );
       return response;
-    } catch (_) {
+    } catch (e) {
+      AppLogger.instance.debug('WS handshake failed', error: e);
       return null;
     } finally {
       _pendingRequests.remove(message.id);
@@ -142,7 +147,8 @@ class WebSocketTransport implements RuntimeTransport {
         timeout: const Duration(seconds: 5),
       );
       return response != null;
-    } catch (_) {
+    } catch (e) {
+      AppLogger.instance.debug('WS send failed', error: e);
       return false;
     }
   }
@@ -158,8 +164,9 @@ class WebSocketTransport implements RuntimeTransport {
       } else {
         _incomingController.add(message);
       }
-    } catch (_) {}
-  }
+    } catch (e) {
+      AppLogger.instance.debug('WS message parse failed', error: e);
+    }
 
   TransportMessage _parseMessage(Map<String, dynamic> json) {
     final tsJson = json['timestamp'] as Map<String, dynamic>? ?? {};
@@ -199,7 +206,13 @@ class WebSocketTransport implements RuntimeTransport {
     if (_reconnectAttempts >= _maxReconnectAttempts) return;
 
     _reconnectTimer?.cancel();
-    _reconnectTimer = Timer(_reconnectInterval, () {
+    final delay = Duration(
+      milliseconds: _reconnectInterval.inMilliseconds *
+          (1 << _reconnectAttempts.clamp(0, 5)),
+    );
+    final maxDelay = const Duration(seconds: 30);
+    final actualDelay = delay < maxDelay ? delay : maxDelay;
+    _reconnectTimer = Timer(actualDelay, () {
       _reconnectAttempts++;
       connect();
     });

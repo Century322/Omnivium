@@ -169,9 +169,10 @@ class _FileManagerViewState extends State<FileManagerView>
       itemBuilder: (_, i) {
         final file = files[i];
         final client = widget.provider.matrix.client;
-        final thumbnailUrl = file.thumbnailMxcUrl != null && client != null
+        final thumbnailMxc = file.thumbnailMxcUrl;
+        final thumbnailUrl = thumbnailMxc != null && client != null
             ? Uri.parse(
-                file.thumbnailMxcUrl!,
+                thumbnailMxc,
               ).getThumbnailUri(client, width: 200, height: 200).toString()
             : null;
         return GestureDetector(
@@ -299,9 +300,9 @@ class _FileManagerViewState extends State<FileManagerView>
                   ],
                 ),
               ),
-              if (file.size != null)
+              if (file.size case final fileSize?)
                 Text(
-                  _formatSize(file.size!),
+                  _formatSize(fileSize),
                   style: TextStyle(
                     color: AppColors.iconGray(context),
                     fontSize: 12,

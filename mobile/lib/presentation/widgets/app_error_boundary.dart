@@ -108,14 +108,37 @@ class _AppErrorBoundaryState extends State<AppErrorBoundary> {
   }
 }
 
-class _ErrorCatcher extends StatelessWidget {
+class _ErrorCatcher extends StatefulWidget {
   final Widget child;
   final void Function(Object, StackTrace) onCaught;
   const _ErrorCatcher({required this.child, required this.onCaught, super.key});
 
   @override
+  State<_ErrorCatcher> createState() => _ErrorCatcherState();
+}
+
+class _ErrorCatcherState extends State<_ErrorCatcher> {
+  @override
+  void initState() {
+    super.initState();
+    final originalOnError = FlutterError.onError;
+    FlutterError.onError = (details) {
+      widget.onCaught(details.exception, details.stack ?? StackTrace.empty);
+      originalOnError?.call(details);
+    };
+  }
+
+  @override
+  void dispose() {
+    FlutterError.onError = (details) {
+      FlutterError.presentError(details);
+    };
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return child;
+    return widget.child;
   }
 }
 

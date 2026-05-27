@@ -108,6 +108,7 @@ class ConversationContent extends StatelessWidget {
   }
 
   List<ListItemData> _buildItems(BuildContext context) {
+    final longPress = onMessageLongPress;
     final items = <ListItemData>[];
     for (var i = 0; i < messages.length; i++) {
       final msg = messages[i];
@@ -116,8 +117,8 @@ class ConversationContent extends StatelessWidget {
           ListItemData(
             UserBubble(
               content: msg.content,
-              onLongPress: onMessageLongPress != null
-                  ? () => onMessageLongPress!(i)
+              onLongPress: longPress != null
+                  ? () => longPress(i)
                   : null,
             ),
             12,
@@ -141,8 +142,8 @@ class ConversationContent extends StatelessWidget {
             AiTextBubble(
               content: msg.content,
               isStreaming: msg.isStreaming,
-              onLongPress: onMessageLongPress != null
-                  ? () => onMessageLongPress!(i)
+              onLongPress: longPress != null
+                  ? () => longPress(i)
                   : null,
             ),
             12,

@@ -65,6 +65,8 @@ class AgentOrchestrator extends ChangeNotifier {
   static const _notifyThrottleMs = 50;
   bool _hasPendingNotify = false;
   bool _enabled = true;
+  bool _disposed = false;
+  Timer? _throttleTimer;
 
   bool get isEnabled => _enabled;
   void setEnabled(bool v) {
@@ -86,6 +88,7 @@ class AgentOrchestrator extends ChangeNotifier {
   OmniviumSDK? get runtime => _sdk;
 
   void _throttledNotify() {
+    if (_disposed) return;
     final now = DateTime.now();
     final elapsed = now.difference(_lastNotifyTime).inMilliseconds;
     if (elapsed >= _notifyThrottleMs) {
@@ -94,8 +97,9 @@ class AgentOrchestrator extends ChangeNotifier {
       notifyListeners();
     } else if (!_hasPendingNotify) {
       _hasPendingNotify = true;
-      Future.delayed(Duration(milliseconds: _notifyThrottleMs - elapsed), () {
-        if (_hasPendingNotify) {
+      _throttleTimer?.cancel();
+      _throttleTimer = Timer(Duration(milliseconds: _notifyThrottleMs - elapsed), () {
+        if (_hasPendingNotify && !_disposed) {
           _hasPendingNotify = false;
           _lastNotifyTime = DateTime.now();
           notifyListeners();
@@ -105,6 +109,7 @@ class AgentOrchestrator extends ChangeNotifier {
   }
 
   void _immediateNotify() {
+    if (_disposed) return;
     _hasPendingNotify = false;
     _lastNotifyTime = DateTime.now();
     notifyListeners();
@@ -128,8 +133,10 @@ class AgentOrchestrator extends ChangeNotifier {
   bool get isReflecting => state == AgentState.reflecting;
   bool get isMemorizing => state == AgentState.memorizing;
   bool get isStreaming => _streamingController.isStreaming;
-  bool get isWaitingPermission =>
-      _permissionCompleter != null && !_permissionCompleter!.isCompleted;
+  bool get isWaitingPermission {
+    final completer = _permissionCompleter;
+    return completer != null && !completer.isCompleted;
+  }
   String? get pendingSkillName => _pendingSkillName;
 
   void stopStreaming() {
@@ -141,15 +148,17 @@ class AgentOrchestrator extends ChangeNotifier {
   }
 
   void grantPermission() {
-    if (_permissionCompleter != null && !_permissionCompleter!.isCompleted) {
-      _permissionCompleter!.complete(true);
+    final completer = _permissionCompleter;
+    if (completer != null && !completer.isCompleted) {
+      completer.complete(true);
       _pendingSkillName = null;
     }
   }
 
   void denyPermission() {
-    if (_permissionCompleter != null && !_permissionCompleter!.isCompleted) {
-      _permissionCompleter!.complete(false);
+    final completer = _permissionCompleter;
+    if (completer != null && !completer.isCompleted) {
+      completer.complete(false);
       _pendingSkillName = null;
     }
   }
@@ -378,8 +387,9 @@ class AgentOrchestrator extends ChangeNotifier {
     final skillList = skills
         .map((s) => '- ${s.name} (${s.id}): ${s.description}')
         .join('\n');
-    final langSuffix = _agentLanguage != null && _agentLanguage!.isNotEmpty
-        ? '\n- Respond in ${_agentLanguage!}'
+    final agentLang = _agentLanguage;
+    final langSuffix = agentLang != null && agentLang.isNotEmpty
+        ? '\n- Respond in $agentLang'
         : '';
 
     if (remotePrompt != null && remotePrompt.isNotEmpty) {
@@ -429,6 +439,8 @@ Guidelines:
 
   @override
   void dispose() {
+    _disposed = true;
+    _throttleTimer?.cancel();
     _cardRuntime.dispose();
     _streamingController.dispose();
     super.dispose();

@@ -721,5 +721,6 @@
     "chat_wallpaper_desc": "Customize chat background",
     "preset_wallpapers": "Preset Wallpapers",
     "custom_wallpaper": "Custom Wallpaper",
-    "choose_from_gallery": "Choose from Gallery"
+    "choose_from_gallery": "Choose from Gallery",
+    "send_failed": "Failed to send message"
 }

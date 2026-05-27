@@ -12,10 +12,19 @@ class SupabaseSyncService {
   static const _retryDelay = Duration(seconds: 2);
 
   bool get isAvailable => _initialized && _userId != null;
+  String get requireUserId {
+    final id = _userId;
+    if (id == null) throw StateError('SupabaseSyncService not initialized');
+    return id;
+  }
 
   Future<void> init() async {
     final auth = AuthService.instance;
-    if (!auth.isAuthenticated) return;
+    if (!auth.isAuthenticated) {
+      _userId = null;
+      _initialized = false;
+      return;
+    }
     _userId = auth.matrixUserId ?? auth.currentUser?.id;
     _initialized = _userId != null;
   }
@@ -61,7 +70,7 @@ class SupabaseSyncService {
         final response = await client
             .from('sessions')
             .select()
-            .eq('user_id', _userId!)
+            .eq('user_id', requireUserId)
             .order('created_at', ascending: false);
         return List<Map<String, dynamic>>.from(response);
       });
@@ -71,8 +80,8 @@ class SupabaseSyncService {
     }
   }
 
-  Future<void> upsertSession(Map<String, dynamic> session) async {
-    if (!isAvailable) return;
+  Future<bool> upsertSession(Map<String, dynamic> session) async {
+    if (!isAvailable) return false;
     try {
       await _withRetry(() async {
         final client = AuthService.instance.client;
@@ -81,8 +90,14 @@ class SupabaseSyncService {
         data['user_id'] = _userId;
         await client.from('sessions').upsert(data, onConflict: 'id');
       });
-    } catch (e) {
-      AppLogger.instance.info('Upsert session failed: $e');
+      return true;
+    } catch (e, stackTrace) {
+      AppLogger.instance.error(
+        'Upsert session failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      return false;
     }
   }
 
@@ -96,7 +111,7 @@ class SupabaseSyncService {
             .from('sessions')
             .delete()
             .eq('id', id)
-            .eq('user_id', _userId!);
+            .eq('user_id', requireUserId);
       });
     } catch (e) {
       AppLogger.instance.info('Delete session failed: $e');
@@ -112,7 +127,7 @@ class SupabaseSyncService {
         final response = await client
             .from('notes')
             .select()
-            .eq('user_id', _userId!)
+            .eq('user_id', requireUserId)
             .order('updated_at', ascending: false);
         return List<Map<String, dynamic>>.from(response);
       });
@@ -147,7 +162,7 @@ class SupabaseSyncService {
             .from('notes')
             .delete()
             .eq('id', id)
-            .eq('user_id', _userId!);
+            .eq('user_id', requireUserId);
       });
     } catch (e) {
       AppLogger.instance.info('Delete note failed: $e');
@@ -163,7 +178,7 @@ class SupabaseSyncService {
         final response = await client
             .from('memories')
             .select()
-            .eq('user_id', _userId!)
+            .eq('user_id', requireUserId)
             .order('created_at', ascending: false);
         return List<Map<String, dynamic>>.from(response);
       });
@@ -197,7 +212,7 @@ class SupabaseSyncService {
         final response = await client
             .from('quick_commands')
             .select()
-            .eq('user_id', _userId!)
+            .eq('user_id', requireUserId)
             .order('sort_order', ascending: true);
         return List<Map<String, dynamic>>.from(response);
       });
@@ -232,7 +247,7 @@ class SupabaseSyncService {
             .from('quick_commands')
             .delete()
             .eq('id', id)
-            .eq('user_id', _userId!);
+            .eq('user_id', requireUserId);
       });
     } catch (e) {
       AppLogger.instance.info('Delete quick command failed: $e');

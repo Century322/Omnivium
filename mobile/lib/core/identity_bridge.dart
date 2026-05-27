@@ -31,6 +31,12 @@ class IdentityBridge {
   String? get activeShadowId => _activeShadowId;
   bool get isShadowActive => _activeShadowId != null;
 
+  SovereignIdentity get requireIdentity {
+    final id = _identity;
+    if (id == null) throw StateError('No identity bound');
+    return id;
+  }
+
   SovereignIdentity get activeIdentity {
     if (_activeShadowId != null) {
       final shadow = _shadowIdentities.where(
@@ -53,23 +59,26 @@ class IdentityBridge {
     if (existing != null) {
       _identity = existing;
       if (matrixId != null && existing.federationId != matrixId) {
-        _identity = existing.joinFederation(matrixId);
-        await _persistToStorage(_identity!);
+        final joined = existing.joinFederation(matrixId);
+        _identity = joined;
+        await _persistToStorage(joined);
       }
       await _loadShadowIdentities();
       AppLogger.instance.info(
-        'IdentityBridge: restored identity ${_identity!.did}',
+        'IdentityBridge: restored identity ${requireIdentity.did}',
       );
       return;
     }
-    _identity = SovereignIdentity.generate(
+    final generated = SovereignIdentity.generate(
       nodeId: _omniviumId,
       federationId: matrixId,
     );
-    await _persistToStorage(_identity!);
-    await _persistOmniviumId(_omniviumId!);
+    _identity = generated;
+    await _persistToStorage(generated);
+    final oid = _omniviumId;
+    if (oid != null) await _persistOmniviumId(oid);
     AppLogger.instance.info(
-      'IdentityBridge: generated root identity ${_identity!.did}',
+      'IdentityBridge: generated root identity ${generated.did}',
     );
   }
 
@@ -80,30 +89,34 @@ class IdentityBridge {
     if (existing != null) {
       _identity = existing;
       if (matrixId != null && existing.federationId != matrixId) {
-        _identity = existing.joinFederation(matrixId);
-        await _persistToStorage(_identity!);
+        final joined = existing.joinFederation(matrixId);
+        _identity = joined;
+        await _persistToStorage(joined);
       }
       await _loadShadowIdentities();
       AppLogger.instance.info(
-        'IdentityBridge: restored identity ${_identity!.did}',
+        'IdentityBridge: restored identity ${requireIdentity.did}',
       );
       return;
     }
-    _identity = SovereignIdentity.generate(
+    final generated = SovereignIdentity.generate(
       nodeId: userId,
       federationId: matrixId,
     );
-    await _persistToStorage(_identity!);
+    _identity = generated;
+    await _persistToStorage(generated);
     AppLogger.instance.info(
-      'IdentityBridge: generated identity ${_identity!.did}',
+      'IdentityBridge: generated identity ${generated.did}',
     );
   }
 
   Future<void> onMatrixLinked(String matrixId) async {
     _matrixUserId = matrixId;
-    if (_identity != null && _identity!.federationId != matrixId) {
-      _identity = _identity!.joinFederation(matrixId);
-      await _persistToStorage(_identity!);
+    final id = _identity;
+    if (id != null && id.federationId != matrixId) {
+      final joined = id.joinFederation(matrixId);
+      _identity = joined;
+      await _persistToStorage(joined);
     }
   }
 
@@ -114,18 +127,21 @@ class IdentityBridge {
   }
 
   Future<void> rotateKey() async {
-    if (_identity == null) return;
-    _identity = _identity!.rotateKey();
-    await _persistToStorage(_identity!);
+    final id = _identity;
+    if (id == null) return;
+    final rotated = id.rotateKey();
+    _identity = rotated;
+    await _persistToStorage(rotated);
     AppLogger.instance.info(
-      'IdentityBridge: rotated key for ${_identity!.did}',
+      'IdentityBridge: rotated key for ${rotated.did}',
     );
   }
 
   Future<SovereignIdentity> createShadowIdentity(String label) async {
-    if (_identity == null) throw StateError('No root identity bound');
+    final id = _identity;
+    if (id == null) throw StateError('No root identity bound');
     final shadow = SovereignIdentity.deriveSubIdentity(
-      _identity!,
+      id,
       'shadow.$label',
       federationId: _matrixUserId,
     );
@@ -164,8 +180,9 @@ class IdentityBridge {
   }
 
   SovereignIdentity deriveAgentIdentity(String agentId) {
-    if (_identity == null) throw StateError('No root identity bound');
-    return SovereignIdentity.deriveSubIdentity(_identity!, 'agent.$agentId');
+    final id = _identity;
+    if (id == null) throw StateError('No root identity bound');
+    return SovereignIdentity.deriveSubIdentity(id, 'agent.$agentId');
   }
 
   Future<void> onLogout() async {
@@ -183,7 +200,7 @@ class IdentityBridge {
     AppLogger.instance.info('IdentityBridge: identity cleared');
   }
 
-  SovereignIdentity? requireIdentity() {
+  SovereignIdentity? requireIdentityOrNull() {
     if (_identity == null) {
       AppLogger.instance.warning(
         'IdentityBridge: identity required but not bound',
@@ -194,13 +211,15 @@ class IdentityBridge {
 
   Map<String, String> authHeaders() {
     final active = activeIdentity;
+    final omniviumId = _omniviumId;
+    final activeShadowId = _activeShadowId;
     return {
       'X-DID': active.did,
       'X-Node-Id': active.nodeId,
       'X-Public-Key': active.publicKey,
       'X-Trust-Level': active.trustLevel.name,
-      'X-Omnivium-Id': ?_omniviumId,
-      if (_activeShadowId != null) 'X-Shadow-Id': ?_activeShadowId,
+      if (omniviumId != null) 'X-Omnivium-Id': omniviumId,
+      if (activeShadowId != null) 'X-Shadow-Id': activeShadowId,
     };
   }
 
@@ -251,13 +270,10 @@ class IdentityBridge {
       if (raw == null) return;
       final list = jsonDecode(raw) as List<dynamic>;
       _shadowIdentities = list
-          .map((j) => _deserializeIdentity(j as Map<String, dynamic>))
+          .map((e) => _deserializeIdentity(e as Map<String, dynamic>))
           .toList();
-      final activeId = await storage.read(_activeShadowKey);
-      if (activeId != null &&
-          _shadowIdentities.any((s) => s.nodeId == activeId)) {
-        _activeShadowId = activeId;
-      }
+      final activeRaw = await storage.read(_activeShadowKey);
+      _activeShadowId = activeRaw;
     } catch (e) {
       AppLogger.instance.warning(
         'IdentityBridge: failed to load shadow identities',
@@ -269,8 +285,10 @@ class IdentityBridge {
   Future<void> _persistShadowIdentities() async {
     try {
       final storage = SecureStorageService.instance;
-      final data = _shadowIdentities.map((s) => s.toJson()).toList();
-      await storage.write(_shadowIdentitiesKey, jsonEncode(data));
+      final encoded = jsonEncode(
+        _shadowIdentities.map((e) => e.toJson()).toList(),
+      );
+      await storage.write(_shadowIdentitiesKey, encoded);
     } catch (e) {
       AppLogger.instance.warning(
         'IdentityBridge: failed to persist shadow identities',
@@ -282,8 +300,9 @@ class IdentityBridge {
   Future<void> _persistActiveShadow() async {
     try {
       final storage = SecureStorageService.instance;
-      if (_activeShadowId != null) {
-        await storage.write(_activeShadowKey, _activeShadowId!);
+      final activeShadowId = _activeShadowId;
+      if (activeShadowId != null) {
+        await storage.write(_activeShadowKey, activeShadowId);
       } else {
         await storage.delete(_activeShadowKey);
       }
@@ -296,45 +315,6 @@ class IdentityBridge {
   }
 
   SovereignIdentity _deserializeIdentity(Map<String, dynamic> json) {
-    final keyPairJson = json['keyPair'] as Map<String, dynamic>;
-    final sigJson = json['selfSig'] as Map<String, dynamic>;
-    final credsJson = json['credentials'] as List<dynamic>? ?? [];
-    final rotationsJson = json['keyRotations'] as List<dynamic>? ?? [];
-
-    return SovereignIdentity(
-      did: json['did'] as String,
-      nodeId: json['nodeId'] as String,
-      keyPair: SovereignKeyPair.fromJson(keyPairJson),
-      civilizationEpoch: json['epoch'] as int,
-      federationId: json['federation'] as String?,
-      trustLevel: TrustLevel.values.firstWhere(
-        (t) => t.name == json['trust'],
-        orElse: () => TrustLevel.untrusted,
-      ),
-      constitutionalAncestry: (json['ancestry'] as List<dynamic>)
-          .cast<String>(),
-      createdAt: json['created'] as int,
-      selfSignature: SovereignSignature.fromJson(sigJson),
-      credentials: credsJson
-          .map((c) => _deserializeCredential(c as Map<String, dynamic>))
-          .toList(),
-      keyRotationHistory: rotationsJson
-          .map((r) => KeyRotationRecord.fromJson(r as Map<String, dynamic>))
-          .toList(),
-    );
-  }
-
-  VerifiableCredential _deserializeCredential(Map<String, dynamic> json) {
-    return VerifiableCredential(
-      credentialId: json['id'] as String,
-      issuerDid: json['issuer'] as String,
-      subjectDid: json['subject'] as String,
-      credentialType: json['type'] as String,
-      claims: (json['claims'] as Map<String, dynamic>?) ?? {},
-      issuedAt: json['issuedAt'] as int,
-      expiresAt: json['expiresAt'] as int? ?? 0,
-      proof: json['proof'] as String? ?? '',
-      verificationTag: json['verificationTag'] as String? ?? '',
-    );
+    return SovereignIdentity.fromJson(json);
   }
 }

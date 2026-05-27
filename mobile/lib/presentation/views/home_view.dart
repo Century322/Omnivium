@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'dart:async';
 import '../theme/app_colors.dart';
 import '../../core/app_provider.dart';
@@ -153,6 +152,19 @@ class _HomeViewState extends State<HomeView>
     super.dispose();
   }
 
+  @override
+  void didUpdateWidget(covariant HomeView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.provider.orchestrator != widget.provider.orchestrator) {
+      oldWidget.provider.orchestrator.removeListener(_onOrchestratorChanged);
+      widget.provider.orchestrator.addListener(_onOrchestratorChanged);
+    }
+    if (oldWidget.provider.matrix != widget.provider.matrix) {
+      oldWidget.provider.matrix.removeListener(_onMatrixChanged);
+      widget.provider.matrix.addListener(_onMatrixChanged);
+    }
+  }
+
   void _onCapabilityConfirm(Map<String, dynamic>? data) {
     if (!mounted) return;
     final capId = data?['capabilityId'] as String? ?? '';
@@ -268,6 +280,7 @@ class _HomeViewState extends State<HomeView>
     final voice = VoiceService.instance;
     if (_isListening) {
       await voice.stopListening();
+      if (!mounted) return;
       _listeningGlow.stop();
       _listeningGlow.reverse();
       setState(() => _isListening = false);
@@ -285,6 +298,7 @@ class _HomeViewState extends State<HomeView>
         return;
       }
       await voice.startListening();
+      if (!mounted) return;
       setState(() => _isListening = true);
       _listeningGlow.repeat(reverse: true);
     }
@@ -627,17 +641,10 @@ class _HomeViewState extends State<HomeView>
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (context) => AnnotatedRegion<SystemUiOverlayStyle>(
-        value: SystemUiOverlayStyle(
-          statusBarColor: Colors.black.withValues(alpha: 0.54),
-          statusBarIconBrightness: Brightness.light,
-          statusBarBrightness: Brightness.dark,
-        ),
-        child: SlidingSheet(
-          child: OptionsContent(
-            onClose: () => Navigator.pop(context),
-            provider: widget.provider,
-          ),
+      builder: (context) => SlidingSheet(
+        child: OptionsContent(
+          onClose: () => Navigator.pop(context),
+          provider: widget.provider,
         ),
       ),
     );
@@ -648,17 +655,10 @@ class _HomeViewState extends State<HomeView>
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (context) => AnnotatedRegion<SystemUiOverlayStyle>(
-        value: SystemUiOverlayStyle(
-          statusBarColor: Colors.black.withValues(alpha: 0.54),
-          statusBarIconBrightness: Brightness.light,
-          statusBarBrightness: Brightness.dark,
-        ),
-        child: SlidingSheet(
-          child: ModelsContent(
-            onClose: () => Navigator.pop(context),
-            provider: widget.provider,
-          ),
+      builder: (context) => SlidingSheet(
+        child: ModelsContent(
+          onClose: () => Navigator.pop(context),
+          provider: widget.provider,
         ),
       ),
     );

@@ -1,4 +1,5 @@
 import 'app_logger.dart';
+
 import 'dart:io';
 
 Future<Map<String, bool>> performSecurityCheck() async {
@@ -40,7 +41,9 @@ Future<Map<String, bool>> performSecurityCheck() async {
       if (result.exitCode == 0 && (result.stdout as String).trim().isNotEmpty) {
         rooted = true;
       }
-    } catch (_) {}
+    } catch (e) {
+      AppLogger.instance.debug('Root check failed', error: e);
+    }
 
     emulator = await _checkAndroidEmulator();
   }
@@ -98,12 +101,16 @@ Future<bool> _checkAndroidEmulator() async {
       indicators['hardware'] =
           content.contains('ranchu') || content.contains('vbox86');
     }
-  } catch (_) {}
+  } catch (e) {
+    AppLogger.instance.debug('Emulator build.prop check failed', error: e);
+  }
 
   try {
     final qemu = File('/dev/qemu_pipe');
     indicators['qemu_pipe'] = await qemu.exists();
-  } catch (_) {}
+  } catch (e) {
+    AppLogger.instance.debug('QEMU pipe check failed', error: e);
+  }
 
   try {
     final goldfish = File('/sys/class/thermal/thermal_zone0/type');
@@ -111,7 +118,9 @@ Future<bool> _checkAndroidEmulator() async {
       final content = await goldfish.readAsString();
       indicators['goldfish'] = content.trim() == 'goldfish';
     }
-  } catch (_) {}
+  } catch (e) {
+    AppLogger.instance.debug('Goldfish thermal check failed', error: e);
+  }
 
   final emulatorCount = indicators.values.where((v) => v).length;
   return emulatorCount >= 2;
@@ -124,13 +133,17 @@ Future<bool> _checkIOSEmulator() async {
       final model = (result.stdout as String).toLowerCase();
       return model.contains('simulator') || model.contains('x86');
     }
-  } catch (_) {}
+  } catch (e) {
+    AppLogger.instance.debug('iOS sysctl check failed', error: e);
+  }
 
   try {
     if (Platform.environment.containsKey('SIMULATOR_DEVICE_NAME')) {
       return true;
     }
-  } catch (_) {}
+  } catch (e) {
+    AppLogger.instance.debug('iOS simulator env check failed', error: e);
+  }
 
   return false;
 }

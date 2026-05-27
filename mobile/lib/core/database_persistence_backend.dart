@@ -35,7 +35,8 @@ class DatabasePersistenceBackend implements PersistenceBackend {
     if (raw == null) return null;
     try {
       return jsonDecode(raw) as Map<String, dynamic>;
-    } catch (_) {
+    } catch (e) {
+      AppLogger.instance.debug('Persistence read failed', error: e);
       return null;
     }
   }

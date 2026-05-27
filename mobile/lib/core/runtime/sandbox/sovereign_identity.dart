@@ -340,10 +340,9 @@ class SovereignIdentity {
   }
 
   static String _generateNodeId() {
-    final random =
-        DateTime.now().microsecondsSinceEpoch.toString() +
-        DateTime.now().millisecond.toString();
-    return sha256.convert(utf8.encode(random)).toString().substring(0, 16);
+    final random = Random.secure();
+    final randomBytes = List<int>.generate(32, (_) => random.nextInt(256));
+    return sha256.convert(randomBytes).toString().substring(0, 16);
   }
 
   static SovereignKeyPair _generateKeyPair() {

@@ -1,6 +1,15 @@
-import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'app_logger.dart';
+
+int _getProcessorCount() {
+  if (kIsWeb) return 4;
+  try {
+    return Platform.numberOfProcessors;
+  } catch (e) {
+    AppLogger.instance.debug('Processor count detection failed', error: e);
+    return 4;
+  }
+}
 
 class LiteMode {
   static final LiteMode _instance = LiteMode._();
@@ -67,13 +76,13 @@ class LiteMode {
     int performanceScore = 100;
 
     if (kDebugMode) performanceScore -= 10;
-    if (kIsWeb) performanceScore -= 20;
 
-    final processors = Platform.numberOfProcessors;
+    final processors = _getProcessorCount();
     if (processors <= 2) {
       performanceScore -= 30;
-    } else if (processors <= 4)
+    } else if (processors <= 4) {
       performanceScore -= 10;
+    }
 
     if (performanceScore < 50) {
       _preset = presetLow;

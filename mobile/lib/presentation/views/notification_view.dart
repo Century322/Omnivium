@@ -150,7 +150,13 @@ class NotificationView extends StatelessWidget {
         ),
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
-          onTap: () => provider.notification.markAsRead(notif.id),
+          onTap: () {
+            provider.notification.markAsRead(notif.id);
+            final roomId = notif.roomId;
+            if (roomId != null && roomId.isNotEmpty) {
+              provider.navigation.openFriendChat(roomId);
+            }
+          },
           child: Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(

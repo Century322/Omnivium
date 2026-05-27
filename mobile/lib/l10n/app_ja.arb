@@ -673,5 +673,6 @@
     "unit_kb": "KB",
     "unit_mb": "MB",
     "size_zero_mb": "0 MB",
-    "matrix_id_hint": "@user:server.com"
+    "matrix_id_hint": "@user:server.com",
+    "send_failed": "メッセージの送信に失敗しました"
 }

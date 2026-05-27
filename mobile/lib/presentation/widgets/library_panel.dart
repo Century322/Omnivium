@@ -76,6 +76,7 @@ class _LibraryPanelState extends State<LibraryPanel> {
                       child: TextField(
                         controller: _searchController,
                         focusNode: _searchFocus,
+                        maxLength: 256,
                         autofocus: true,
                         style: TextStyle(
                           color: AppColors.textPrimary(context),
@@ -311,7 +312,8 @@ class _LibraryPanelState extends State<LibraryPanel> {
           _isSearching = false;
         });
       }
-    } catch (_) {
+    } catch (e) {
+      AppLogger.instance.debug('Search failed', error: e);
       if (mounted) setState(() => _isSearching = false);
     }
   }
@@ -322,7 +324,9 @@ class _LibraryPanelState extends State<LibraryPanel> {
       if (mounted) {
         widget.provider.matrix.setActiveRoom(roomId);
       }
-    } catch (_) {}
+    } catch (e) {
+      AppLogger.instance.debug('Open room failed', error: e);
+    }
   }
 
   Widget _buildChatItem(ChatItemData data) {

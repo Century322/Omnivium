@@ -11,8 +11,12 @@ class AppDataGateway {
   PersistenceBackend? _persistence;
 
   PersistenceBackend get persistence {
-    _persistence ??= DatabasePersistenceBackend();
-    return _persistence!;
+    var backend = _persistence;
+    if (backend == null) {
+      backend = DatabasePersistenceBackend();
+      _persistence = backend;
+    }
+    return backend;
   }
 
   void init({PersistenceBackend? backend}) {
@@ -52,7 +56,9 @@ class AppDataGateway {
         'key': key,
         'size': value.length,
       });
-    } catch (_) {}
+    } catch (e) {
+      AppLogger.instance.debug('Audit write failed', error: e);
+    }
   }
 
   void _auditDelete(String key) {
@@ -60,7 +66,9 @@ class AppDataGateway {
     if (!sdk.isInitialized) return;
     try {
       sdk.container.eventJournal.append('data.delete', {'key': key});
-    } catch (_) {}
+    } catch (e) {
+      AppLogger.instance.debug('Audit delete failed', error: e);
+    }
   }
 
   void _auditClear(String prefix) {
@@ -68,6 +76,8 @@ class AppDataGateway {
     if (!sdk.isInitialized) return;
     try {
       sdk.container.eventJournal.append('data.clear', {'prefix': prefix});
-    } catch (_) {}
+    } catch (e) {
+      AppLogger.instance.debug('Audit clear failed', error: e);
+    }
   }
 }

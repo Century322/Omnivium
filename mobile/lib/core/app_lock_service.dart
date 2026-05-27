@@ -11,14 +11,18 @@ class AppLockService {
   static const _hashKey = 'omnivium_passcode_hash';
   static const _saltKey = 'omnivium_passcode_salt';
   static const _typeKey = 'omnivium_passcode_type';
+  static const _iterationsKey = 'omnivium_passcode_iterations';
   static const _autoLockKey = 'omnivium_auto_lock_minutes';
   static const _lastUnlockKey = 'omnivium_last_unlock_time';
   static const _attemptsKey = 'omnivium_passcode_attempts';
   static const _lockUntilKey = 'omnivium_lock_until';
   static const _screenshotKey = 'omnivium_block_screenshot';
 
+  static const _pbkdf2Iterations = 100000;
+
   String? _hash;
   String? _salt;
+  int _iterations = _pbkdf2Iterations;
   PasscodeType _type = PasscodeType.none;
   int _autoLockMinutes = 0;
   DateTime? _lastUnlockTime;
@@ -35,17 +39,22 @@ class AppLockService {
 
   bool get isLocked {
     if (!isEnabled) return false;
-    if (_lockUntil != null && DateTime.now().isBefore(_lockUntil!)) return true;
-    if (_autoLockMinutes > 0 && _lastUnlockTime != null) {
-      final elapsed = DateTime.now().difference(_lastUnlockTime!);
-      if (elapsed.inMinutes >= _autoLockMinutes) return true;
+    final lockUntil = _lockUntil;
+    if (lockUntil != null && DateTime.now().isBefore(lockUntil)) return true;
+    if (_autoLockMinutes > 0) {
+      final lastUnlock = _lastUnlockTime;
+      if (lastUnlock != null) {
+        final elapsed = DateTime.now().difference(lastUnlock);
+        if (elapsed.inMinutes >= _autoLockMinutes) return true;
+      }
     }
     return false;
   }
 
   int get lockoutSeconds {
-    if (_lockUntil == null) return 0;
-    final remaining = _lockUntil!.difference(DateTime.now());
+    final lockUntil = _lockUntil;
+    if (lockUntil == null) return 0;
+    final remaining = lockUntil.difference(DateTime.now());
     return remaining.isNegative ? 0 : remaining.inSeconds;
   }
 
@@ -53,6 +62,8 @@ class AppLockService {
     final storage = SecureStorageService.instance;
     _hash = await storage.read(_hashKey);
     _salt = await storage.read(_saltKey);
+    final iterationsStr = await storage.read(_iterationsKey);
+    _iterations = int.tryParse(iterationsStr ?? '') ?? 1;
     final typeStr = await storage.read(_typeKey);
     _type = typeStr == 'pin'
         ? PasscodeType.pin
@@ -80,17 +91,16 @@ class AppLockService {
     final saltBytes = List<int>.generate(16, (_) => random.nextInt(256));
     _salt = base64Encode(saltBytes);
     _type = type;
+    _iterations = _pbkdf2Iterations;
 
-    final passcodeBytes = utf8.encode(passcode);
-    final saltDecoded = base64Decode(_salt!);
-    final bytes = List<int>.from(saltDecoded)
-      ..addAll(passcodeBytes)
-      ..addAll(saltDecoded);
-    _hash = sha256.convert(bytes).toString();
+    _hash = _computeHash(passcode, saltBytes, _iterations);
 
     final storage = SecureStorageService.instance;
-    await storage.write(_hashKey, _hash!);
-    await storage.write(_saltKey, _salt!);
+    final hash = _hash;
+    final salt = _salt;
+    if (hash != null) await storage.write(_hashKey, hash);
+    if (salt != null) await storage.write(_saltKey, salt);
+    await storage.write(_iterationsKey, _iterations.toString());
     await storage.write(
       _typeKey,
       type == PasscodeType.pin ? 'pin' : 'password',
@@ -99,6 +109,15 @@ class AppLockService {
     await storage.write(_attemptsKey, '0');
     await storage.delete(_lockUntilKey);
     _lockUntil = null;
+  }
+
+  String _computeHash(String passcode, List<int> salt, int iterations) {
+    var block = <int>[...salt, ...utf8.encode(passcode), ...salt];
+    var hash = sha256.convert(block);
+    for (var i = 1; i < iterations; i++) {
+      hash = sha256.convert([...hash.bytes, ...block]);
+    }
+    return hash.toString();
   }
 
   Future<void> removePasscode() async {
@@ -118,16 +137,14 @@ class AppLockService {
   Future<bool> verify(String passcode) async {
     if (_hash == null || _salt == null) return true;
 
-    if (_lockUntil != null && DateTime.now().isBefore(_lockUntil!)) {
+    final lockUntil = _lockUntil;
+    if (lockUntil != null && DateTime.now().isBefore(lockUntil)) {
       return false;
     }
 
-    final passcodeBytes = utf8.encode(passcode);
-    final saltDecoded = base64Decode(_salt!);
-    final bytes = List<int>.from(saltDecoded)
-      ..addAll(passcodeBytes)
-      ..addAll(saltDecoded);
-    final computedHash = sha256.convert(bytes).toString();
+    final salt = _salt;
+    final saltDecoded = salt != null ? base64Decode(salt) : <int>[];
+    final computedHash = _computeHash(passcode, saltDecoded, _iterations);
 
     final storage = SecureStorageService.instance;
 
@@ -137,7 +154,10 @@ class AppLockService {
       _lastUnlockTime = DateTime.now();
       await storage.write(_attemptsKey, '0');
       await storage.delete(_lockUntilKey);
-      await storage.write(_lastUnlockKey, _lastUnlockTime!.toIso8601String());
+      final unlockTime = _lastUnlockTime;
+      if (unlockTime != null) {
+        await storage.write(_lastUnlockKey, unlockTime.toIso8601String());
+      }
       return true;
     } else {
       _failedAttempts++;
@@ -145,8 +165,9 @@ class AppLockService {
 
       final lockoutSeconds = _calculateLockout(_failedAttempts);
       if (lockoutSeconds > 0) {
-        _lockUntil = DateTime.now().add(Duration(seconds: lockoutSeconds));
-        await storage.write(_lockUntilKey, _lockUntil!.toIso8601String());
+        final lockTime = DateTime.now().add(Duration(seconds: lockoutSeconds));
+        _lockUntil = lockTime;
+        await storage.write(_lockUntilKey, lockTime.toIso8601String());
       }
       return false;
     }
@@ -173,9 +194,11 @@ class AppLockService {
 
   void recordUnlock() {
     _lastUnlockTime = DateTime.now();
-    SecureStorageService.instance.write(
-      _lastUnlockKey,
-      _lastUnlockTime!.toIso8601String(),
+    final unlockTime = _lastUnlockTime;
+    if (unlockTime != null) {
+      SecureStorageService.instance.write(
+        _lastUnlockKey,
+        unlockTime.toIso8601String(),
     );
   }
 }

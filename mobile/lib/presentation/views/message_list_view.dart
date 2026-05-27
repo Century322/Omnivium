@@ -78,8 +78,9 @@ class _MessageListViewState extends State<MessageListView> {
                 }
                 return ListView.builder(
                   itemCount: rooms.length,
-                  itemBuilder: (context, index) =>
-                      _buildChatTile(context, rooms[index]),
+                  itemBuilder: (context, index) => RepaintBoundary(
+                    child: _buildChatTile(context, rooms[index]),
+                  ),
                 );
               },
             ),
@@ -116,6 +117,7 @@ class _MessageListViewState extends State<MessageListView> {
             const SizedBox(width: 10),
             Expanded(
               child: TextField(
+                maxLength: 128,
                 style: TextStyle(
                   color: AppColors.textPrimary(context),
                   fontSize: 14,
@@ -250,18 +252,20 @@ class _MessageListViewState extends State<MessageListView> {
                 ),
               ),
             if (unreadCount > 0)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: AppColors.acc(context),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  '$unreadCount',
-                  style: TextStyle(
-                    color: AppColors.bg(context),
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
+              Flexible(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: AppColors.acc(context),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    unreadCount > 999 ? '999+' : '$unreadCount',
+                    style: TextStyle(
+                      color: AppColors.bg(context),
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
               ),
@@ -396,74 +400,75 @@ class _MessageListViewState extends State<MessageListView> {
 
   void _showCreateGroup(BuildContext context) {
     final nameController = TextEditingController();
-    try {
-      showDialog(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          backgroundColor: AppColors.sf(context),
-          title: Text(
-            localeProvider.t('new_group'),
-            style: TextStyle(color: AppColors.textPrimary(context)),
-          ),
-          content: TextField(
-            controller: nameController,
-            style: TextStyle(color: AppColors.textPrimary(context)),
-            decoration: InputDecoration(
-              labelText: localeProvider.t('group_name'),
-              hintStyle: TextStyle(color: AppColors.textDisabled(context)),
-              enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: AppColors.divider(context)),
-              ),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: AppColors.acc(context)),
-              ),
-            ),
-            autofocus: true,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: Text(
-                localeProvider.t('cancel'),
-                style: TextStyle(color: AppColors.mut(context)),
-              ),
-            ),
-            FilledButton(
-              onPressed: () async {
-                final name = nameController.text.trim();
-                if (name.isEmpty) return;
-                Navigator.pop(ctx);
-                try {
-                  final roomId = await widget.provider.matrix.createGroupChat(
-                    name,
-                  );
-                  if (!mounted) return;
-                  widget.provider.matrix.setActiveRoom(roomId);
-                } catch (e) {
-                  if (mounted && context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          '$e'.isEmpty ? localeProvider.t('error') : '$e',
-                        ),
-                        backgroundColor: AppColors.dng(context),
-                      ),
-                    );
-                  }
-                }
-              },
-              style: FilledButton.styleFrom(
-                backgroundColor: AppColors.acc(context),
-                foregroundColor: AppColors.bg(context),
-              ),
-              child: Text(localeProvider.t('create')),
-            ),
-          ],
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.sf(context),
+        title: Text(
+          localeProvider.t('new_group'),
+          style: TextStyle(color: AppColors.textPrimary(context)),
         ),
-      );
-    } finally {
-      nameController.dispose();
-    }
+        content: TextField(
+          controller: nameController,
+          maxLength: 100,
+          style: TextStyle(color: AppColors.textPrimary(context)),
+          decoration: InputDecoration(
+            labelText: localeProvider.t('group_name'),
+            hintStyle: TextStyle(color: AppColors.textDisabled(context)),
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: AppColors.divider(context)),
+            ),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: AppColors.acc(context)),
+            ),
+          ),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              nameController.dispose();
+            },
+            child: Text(
+              localeProvider.t('cancel'),
+              style: TextStyle(color: AppColors.mut(context)),
+            ),
+          ),
+          FilledButton(
+            onPressed: () async {
+              final name = nameController.text.trim();
+              if (name.isEmpty) return;
+              Navigator.pop(ctx);
+              nameController.dispose();
+              try {
+                final roomId = await widget.provider.matrix.createGroupChat(
+                  name,
+                );
+                if (!mounted) return;
+                widget.provider.matrix.setActiveRoom(roomId);
+              } catch (e) {
+                if (mounted && context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        '$e'.isEmpty ? localeProvider.t('error') : '$e',
+                      ),
+                      backgroundColor: AppColors.dng(context),
+                    ),
+                  );
+                }
+              }
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.acc(context),
+              foregroundColor: AppColors.bg(context),
+            ),
+            child: Text(localeProvider.t('create')),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showChatOptions(BuildContext context, Room room) {
@@ -590,11 +595,27 @@ class _MessageListViewState extends State<MessageListView> {
         return CircleAvatar(
           radius: 24,
           backgroundColor: AppColors.accBg(context),
-          backgroundImage: CachedNetworkImageProvider(
-            httpUrl.toString(),
-            headers: client.accessToken != null
+          child: CachedNetworkImage(
+            imageUrl: httpUrl.toString(),
+            httpHeaders: client.accessToken != null
                 ? {'authorization': 'Bearer ${client.accessToken}'}
                 : null,
+            imageBuilder: (_, imageProvider) => Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+              ),
+            ),
+            errorWidget: (_, _, _) => Center(
+              child: Text(
+                initial.toUpperCase(),
+                style: TextStyle(
+                  color: AppColors.acc(context),
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
           ),
         );
       }

@@ -65,7 +65,11 @@ class FriendProfileView extends StatelessWidget {
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
+        padding: EdgeInsets.only(
+          left: 24,
+          right: 24,
+          bottom: MediaQuery.of(context).padding.bottom + 40,
+        ),
         child: Column(
           children: [
             const SizedBox(height: 8),
@@ -390,66 +394,67 @@ class FriendProfileView extends StatelessWidget {
     String Function(String) t,
   ) {
     final ctrl = TextEditingController(text: room.getLocalizedDisplayname());
-    try {
-      showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          backgroundColor: AppColors.sf(context),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: Text(
-            t('edit_group_name'),
-            style: TextStyle(color: AppColors.textPrimary(context)),
-          ),
-          content: TextField(
-            controller: ctrl,
-            style: TextStyle(color: AppColors.textPrimary(context)),
-            decoration: InputDecoration(
-              labelText: t('enter_new_group_name'),
-              hintStyle: TextStyle(color: AppColors.textDisabled(context)),
-              filled: true,
-              fillColor: AppColors.sfAlt(context),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none,
-              ),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(
-                t('cancel'),
-                style: TextStyle(color: AppColors.sec(context)),
-              ),
-            ),
-            TextButton(
-              onPressed: () async {
-                final name = ctrl.text.trim();
-                if (name.isEmpty) return;
-                Navigator.pop(context);
-                try {
-                  await room.setName(name);
-                } catch (e, stackTrace) {
-                  AppLogger.instance.error(
-                    'Operation failed',
-                    error: e,
-                    stackTrace: stackTrace,
-                  );
-                }
-              },
-              child: Text(
-                t('confirm'),
-                style: TextStyle(color: AppColors.acc(context)),
-              ),
-            ),
-          ],
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: AppColors.sf(context),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
         ),
-      );
-    } finally {
-      ctrl.dispose();
-    }
+        title: Text(
+          t('edit_group_name'),
+          style: TextStyle(color: AppColors.textPrimary(context)),
+        ),
+        content: TextField(
+          controller: ctrl,
+          maxLength: 100,
+          style: TextStyle(color: AppColors.textPrimary(context)),
+          decoration: InputDecoration(
+            labelText: t('enter_new_group_name'),
+            hintStyle: TextStyle(color: AppColors.textDisabled(context)),
+            filled: true,
+            fillColor: AppColors.sfAlt(context),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              ctrl.dispose();
+            },
+            child: Text(
+              t('cancel'),
+              style: TextStyle(color: AppColors.sec(context)),
+            ),
+          ),
+          TextButton(
+            onPressed: () async {
+              final name = ctrl.text.trim();
+              if (name.isEmpty) return;
+              Navigator.pop(context);
+              ctrl.dispose();
+              try {
+                await room.setName(name);
+              } catch (e, stackTrace) {
+                AppLogger.instance.error(
+                  'Operation failed',
+                  error: e,
+                  stackTrace: stackTrace,
+                );
+              }
+            },
+            child: Text(
+              t('confirm'),
+              style: TextStyle(color: AppColors.acc(context)),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showInviteMember(
@@ -458,72 +463,73 @@ class FriendProfileView extends StatelessWidget {
     String Function(String) t,
   ) {
     final ctrl = TextEditingController();
-    try {
-      showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          backgroundColor: AppColors.sf(context),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: Text(
-            t('invite_member'),
-            style: TextStyle(color: AppColors.textPrimary(context)),
-          ),
-          content: TextField(
-            controller: ctrl,
-            style: TextStyle(
-              color: AppColors.textPrimary(context),
-              fontSize: 14,
-            ),
-            decoration: InputDecoration(
-              labelText: t('enter_matrix_id'),
-              hintStyle: TextStyle(
-                color: AppColors.textDisabled(context),
-                fontSize: 13,
-              ),
-              filled: true,
-              fillColor: AppColors.sfAlt(context),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none,
-              ),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(
-                t('cancel'),
-                style: TextStyle(color: AppColors.sec(context)),
-              ),
-            ),
-            TextButton(
-              onPressed: () async {
-                final userId = ctrl.text.trim();
-                if (userId.isEmpty) return;
-                Navigator.pop(context);
-                try {
-                  await room.invite(userId);
-                } catch (e, stackTrace) {
-                  AppLogger.instance.error(
-                    'Operation failed',
-                    error: e,
-                    stackTrace: stackTrace,
-                  );
-                }
-              },
-              child: Text(
-                t('invite'),
-                style: TextStyle(color: AppColors.acc(context)),
-              ),
-            ),
-          ],
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: AppColors.sf(context),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
         ),
-      );
-    } finally {
-      ctrl.dispose();
-    }
+        title: Text(
+          t('invite_member'),
+          style: TextStyle(color: AppColors.textPrimary(context)),
+        ),
+        content: TextField(
+          controller: ctrl,
+          maxLength: 512,
+          style: TextStyle(
+            color: AppColors.textPrimary(context),
+            fontSize: 14,
+          ),
+          decoration: InputDecoration(
+            labelText: t('enter_matrix_id'),
+            hintStyle: TextStyle(
+              color: AppColors.textDisabled(context),
+              fontSize: 13,
+            ),
+            filled: true,
+            fillColor: AppColors.sfAlt(context),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              ctrl.dispose();
+            },
+            child: Text(
+              t('cancel'),
+              style: TextStyle(color: AppColors.sec(context)),
+            ),
+          ),
+          TextButton(
+            onPressed: () async {
+              final userId = ctrl.text.trim();
+              if (userId.isEmpty) return;
+              Navigator.pop(context);
+              ctrl.dispose();
+              try {
+                await room.invite(userId);
+              } catch (e, stackTrace) {
+                AppLogger.instance.error(
+                  'Operation failed',
+                  error: e,
+                  stackTrace: stackTrace,
+                );
+              }
+            },
+            child: Text(
+              t('invite'),
+              style: TextStyle(color: AppColors.acc(context)),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   void _leaveGroup(BuildContext context, Room room) {
@@ -557,6 +563,15 @@ class FriendProfileView extends StatelessWidget {
                   error: e,
                   stackTrace: stackTrace,
                 );
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(localeProvider.t('operation_failed')),
+                      backgroundColor: AppColors.dng(context),
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                }
               }
             },
             child: Text(
@@ -627,7 +642,7 @@ class FriendProfileView extends StatelessWidget {
               ),
               onTap: () {
                 Navigator.pop(context);
-                _reportUser(context);
+                _reportUser(context, room);
               },
             ),
             ListTile(
@@ -638,7 +653,7 @@ class FriendProfileView extends StatelessWidget {
               ),
               onTap: () {
                 Navigator.pop(context);
-                _blockUser(context);
+                _blockUser(context, room);
               },
             ),
             if (room.isDirectChat)
@@ -662,8 +677,10 @@ class FriendProfileView extends StatelessWidget {
     );
   }
 
-  void _reportUser(BuildContext context) {
+  void _reportUser(BuildContext context, Room room) {
     final t = localeProvider.t;
+    final client = provider.matrix.client;
+    if (client == null) return;
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -683,15 +700,38 @@ class FriendProfileView extends StatelessWidget {
             child: Text(t('cancel')),
           ),
           FilledButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(t('report_submitted')),
-                  backgroundColor: AppColors.acc(context),
-                  duration: const Duration(seconds: 2),
-                ),
-              );
+              try {
+                await room.reportEvent(
+                  '',
+                  reason: t('report'),
+                );
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(t('report_submitted')),
+                      backgroundColor: AppColors.acc(context),
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                }
+              } catch (e, stackTrace) {
+                AppLogger.instance.error(
+                  'Report failed',
+                  error: e,
+                  stackTrace: stackTrace,
+                );
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(t('operation_failed')),
+                      backgroundColor: AppColors.dng(context),
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                }
+              }
             },
             child: Text(t('report')),
           ),
@@ -700,8 +740,11 @@ class FriendProfileView extends StatelessWidget {
     );
   }
 
-  void _blockUser(BuildContext context) {
+  void _blockUser(BuildContext context, Room room) {
     final t = localeProvider.t;
+    final client = provider.matrix.client;
+    if (client == null) return;
+    final otherUserId = room.directChatMatrixID;
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -724,15 +767,39 @@ class FriendProfileView extends StatelessWidget {
             style: FilledButton.styleFrom(
               backgroundColor: AppColors.dng(context),
             ),
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(t('user_blocked')),
-                  backgroundColor: AppColors.dng(context),
-                  duration: const Duration(seconds: 2),
-                ),
-              );
+              try {
+                if (otherUserId != null) {
+                  await client.ignoreUser(otherUserId);
+                }
+                await room.leave();
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(t('user_blocked')),
+                      backgroundColor: AppColors.dng(context),
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                  Navigator.pop(context);
+                }
+              } catch (e, stackTrace) {
+                AppLogger.instance.error(
+                  'Block failed',
+                  error: e,
+                  stackTrace: stackTrace,
+                );
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(t('operation_failed')),
+                      backgroundColor: AppColors.dng(context),
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                }
+              }
             },
             child: Text(t('block')),
           ),
@@ -801,13 +868,40 @@ class FriendProfileView extends StatelessWidget {
             onPressed: () async {
               Navigator.pop(context);
               try {
-                await room.leave();
+                final timeline = await room.getTimeline();
+                for (final event in timeline.events) {
+                  if (event.senderId == room.client.userID) {
+                    try {
+                      await event.redact();
+                    } catch (e) {
+                      AppLogger.instance.debug('Redact event failed', error: e);
+                    }
+                  }
+                }
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(localeProvider.t('chat_cleared')),
+                      backgroundColor: AppColors.acc(context),
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                }
               } catch (e, stackTrace) {
                 AppLogger.instance.error(
-                  'Operation failed',
+                  'Clear chat failed',
                   error: e,
                   stackTrace: stackTrace,
                 );
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(localeProvider.t('operation_failed')),
+                      backgroundColor: AppColors.dng(context),
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                }
               }
             },
             child: Text(

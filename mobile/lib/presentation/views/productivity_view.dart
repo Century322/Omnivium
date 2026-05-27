@@ -328,8 +328,9 @@ class _ProductivityViewState extends State<ProductivityView>
   }
 
   Widget _buildScheduleCard(NoteItem schedule) {
+    final dueDate = schedule.dueDate;
     final isOverdue =
-        schedule.dueDate != null && schedule.dueDate!.isBefore(DateTime.now());
+        dueDate != null && dueDate.isBefore(DateTime.now());
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 3),
       decoration: BoxDecoration(
@@ -356,7 +357,7 @@ class _ProductivityViewState extends State<ProductivityView>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                schedule.dueDate != null ? '${schedule.dueDate!.day}' : '-',
+                dueDate != null ? '${dueDate.day}' : '-',
                 style: TextStyle(
                   color: isOverdue
                       ? AppColors.dng(context)
@@ -366,8 +367,8 @@ class _ProductivityViewState extends State<ProductivityView>
                 ),
               ),
               Text(
-                schedule.dueDate != null
-                    ? _monthShort(schedule.dueDate!.month)
+                dueDate != null
+                    ? _monthShort(dueDate.month)
                     : '',
                 style: TextStyle(
                   color: isOverdue
@@ -388,9 +389,9 @@ class _ProductivityViewState extends State<ProductivityView>
             fontWeight: FontWeight.w500,
           ),
         ),
-        subtitle: schedule.dueDate != null
+        subtitle: dueDate != null
             ? Text(
-                _formatDateTime(schedule.dueDate!),
+                _formatDateTime(dueDate),
                 style: TextStyle(
                   color: isOverdue
                       ? AppColors.dng(context)
@@ -491,6 +492,7 @@ class _ProductivityViewState extends State<ProductivityView>
                       children: [
                         TextField(
                           controller: titleCtrl,
+                          maxLength: 200,
                           style: TextStyle(
                             color: AppColors.textPrimary(context),
                             fontSize: 15,
@@ -517,6 +519,7 @@ class _ProductivityViewState extends State<ProductivityView>
                         if (type == NoteType.text)
                           TextField(
                             controller: contentCtrl,
+                            maxLength: 8192,
                             maxLines: 4,
                             style: TextStyle(
                               color: AppColors.textPrimary(context),
@@ -577,7 +580,7 @@ class _ProductivityViewState extends State<ProductivityView>
                                     const SizedBox(width: 8),
                                     Text(
                                       dueDate != null
-                                          ? _formatDateTime(dueDate!)
+                                          ? _formatDateTime(dueDate)
                                           : t('select_date'),
                                       style: TextStyle(
                                         color: dueDate != null
@@ -623,7 +626,7 @@ class _ProductivityViewState extends State<ProductivityView>
                                     const SizedBox(width: 8),
                                     Text(
                                       dueTime != null
-                                          ? '${dueTime!.hour.toString().padLeft(2, '0')}:${dueTime!.minute.toString().padLeft(2, '0')}'
+                                          ? '${dueTime.hour.toString().padLeft(2, '0')}:${dueTime.minute.toString().padLeft(2, '0')}'
                                           : t('select_time'),
                                       style: TextStyle(
                                         color: dueTime != null
@@ -655,9 +658,9 @@ class _ProductivityViewState extends State<ProductivityView>
                       DateTime? finalDueDate;
                       if (type == NoteType.schedule && dueDate != null) {
                         finalDueDate = DateTime(
-                          dueDate!.year,
-                          dueDate!.month,
-                          dueDate!.day,
+                          dueDate.year,
+                          dueDate.month,
+                          dueDate.day,
                           dueTime?.hour ?? 0,
                           dueTime?.minute ?? 0,
                         );
@@ -720,6 +723,7 @@ class _ProductivityViewState extends State<ProductivityView>
                 children: [
                   TextField(
                     controller: titleCtrl,
+                    maxLength: 200,
                     style: TextStyle(
                       color: AppColors.textPrimary(context),
                       fontSize: 15,
@@ -745,6 +749,7 @@ class _ProductivityViewState extends State<ProductivityView>
                   const SizedBox(height: 12),
                   TextField(
                     controller: contentCtrl,
+                    maxLength: 8192,
                     maxLines: 4,
                     style: TextStyle(
                       color: AppColors.textPrimary(context),
@@ -818,6 +823,7 @@ class _ProductivityViewState extends State<ProductivityView>
           ),
           content: TextField(
             controller: titleCtrl,
+            maxLength: 200,
             autofocus: true,
             style: TextStyle(color: AppColors.textPrimary(context)),
             decoration: InputDecoration(hintText: localeProvider.t('title')),
@@ -865,6 +871,7 @@ class _ProductivityViewState extends State<ProductivityView>
               children: [
                 TextField(
                   controller: titleCtrl,
+                  maxLength: 200,
                   autofocus: true,
                   style: TextStyle(color: AppColors.textPrimary(ctx)),
                   decoration: InputDecoration(
@@ -884,7 +891,7 @@ class _ProductivityViewState extends State<ProductivityView>
                   },
                   child: Text(
                     newDate != null
-                        ? _formatDateTime(newDate!)
+                        ? _formatDateTime(newDate)
                         : localeProvider.t('select_date'),
                     style: TextStyle(color: AppColors.acc(ctx)),
                   ),

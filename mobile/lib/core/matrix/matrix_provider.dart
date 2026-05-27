@@ -1,7 +1,8 @@
 import '../app_logger.dart';
 import '../call_service.dart';
 import 'dart:async';
-import 'dart:io';
+import 'dart:io' if (dart.library.html) '';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'matrix_service.dart';
 import 'package:matrix/matrix.dart';
@@ -42,6 +43,16 @@ class MatrixProvider extends ChangeNotifier {
     }
   }
 
+  Map<String, String>? getMediaHeaders() {
+    final c = _service.client;
+    if (c == null) return null;
+    final token = c.accessToken;
+    if (token != null && token.isNotEmpty) {
+      return {'Authorization': 'Bearer $token'};
+    }
+    return null;
+  }
+
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
@@ -50,12 +61,23 @@ class MatrixProvider extends ChangeNotifier {
 
   String? _activeRoomId;
   String? get activeRoomId => _activeRoomId;
-  Room? get activeRoom =>
-      _activeRoomId != null ? _service.getRoom(_activeRoomId!) : null;
+  Room? get activeRoom {
+    final roomId = _activeRoomId;
+    return roomId != null ? _service.getRoom(roomId) : null;
+  }
 
   final List<Event> _newEvents = [];
   List<Event> get newEvents => List.unmodifiable(_newEvents);
   void clearNewEvents() => _newEvents.clear();
+
+  static const _maxNewEvents = 100;
+
+  void _addNewEvent(Event event) {
+    _newEvents.add(event);
+    if (_newEvents.length > _maxNewEvents) {
+      _newEvents.removeRange(0, _newEvents.length - _maxNewEvents);
+    }
+  }
 
   Future<void> login(
     String username,
@@ -142,14 +164,24 @@ class MatrixProvider extends ChangeNotifier {
     return roomId;
   }
 
-  Future<String> createGroupChat(String name, {List<String>? userIds}) async {
-    final roomId = await _service.createGroupChat(name, invite: userIds);
+  Future<String> createGroupChat(String name, {List<String>? userIds, String? topic}) async {
+    final roomId = await _service.createGroupChat(name, invite: userIds, topic: topic);
     if (!_disposed) notifyListeners();
     return roomId;
   }
 
-  Future<void> sendMessage(String roomId, String text) async {
-    await _service.sendMessage(roomId, text);
+  Future<bool> sendMessage(String roomId, String text) async {
+    try {
+      await _service.sendMessage(roomId, text);
+      return true;
+    } catch (e, stackTrace) {
+      AppLogger.instance.error(
+        'Send message failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      return false;
+    }
   }
 
   Future<void> sendTypingNotification(
@@ -174,14 +206,21 @@ class MatrixProvider extends ChangeNotifier {
     String filePath,
     String fileName,
   ) async {
+    if (kIsWeb) return;
     final room = _service.getRoom(roomId);
     if (room == null) return;
     try {
       final bytes = await File(filePath).readAsBytes();
+      if (bytes.length > 20 * 1024 * 1024) {
+        throw Exception('Image size exceeds 20MB limit');
+      }
+      final ext = fileName.contains('.') ? fileName.split('.').last.toLowerCase() : 'jpg';
+      final mimeMap = {'jpg': 'jpeg', 'jpeg': 'jpeg', 'png': 'png', 'gif': 'gif', 'webp': 'webp'};
+      final mimeType = 'image/${mimeMap[ext] ?? ext}';
       final file = MatrixFile.fromMimeType(
         bytes: bytes,
         name: fileName,
-        mimeType: 'image/${fileName.split('.').last}',
+        mimeType: mimeType,
       );
       await room.sendFileEvent(file);
     } catch (e, stackTrace) {
@@ -194,10 +233,14 @@ class MatrixProvider extends ChangeNotifier {
   }
 
   Future<void> sendFile(String roomId, String filePath, String fileName) async {
+    if (kIsWeb) return;
     final room = _service.getRoom(roomId);
     if (room == null) return;
     try {
       final bytes = await File(filePath).readAsBytes();
+      if (bytes.length > 50 * 1024 * 1024) {
+        throw Exception('File size exceeds 50MB limit');
+      }
       final file = MatrixFile(bytes: bytes, name: fileName);
       await room.sendFileEvent(file);
     } catch (e, stackTrace) {
@@ -232,7 +275,7 @@ class MatrixProvider extends ChangeNotifier {
                   final event = Event.fromMatrixEvent(eventMap, room);
                   if (event.type == EventTypes.Message &&
                       event.senderId != userId) {
-                    _newEvents.add(event);
+                    _addNewEvent(event);
                   }
                 }
               } catch (e, stackTrace) {

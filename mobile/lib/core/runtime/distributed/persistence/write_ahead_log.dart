@@ -142,7 +142,7 @@ class WriteAheadLog {
     );
 
     _log.add(withChecksum);
-    _persistEntry(withChecksum);
+    await _persistEntry(withChecksum);
 
     if (transactionId.isNotEmpty) {
       final tx = _activeTransactions[transactionId];
@@ -260,8 +260,8 @@ class WriteAheadLog {
     _checkpointLsn = 0;
   }
 
-  void _persistEntry(WalEntry entry) {
-    _persistence?.write('wal_${entry.lsn}', entry.toJson());
+  Future<void> _persistEntry(WalEntry entry) async {
+    await _persistence?.write('wal_${entry.lsn}', entry.toJson());
   }
 
   Future<void> loadFromPersistence() async {

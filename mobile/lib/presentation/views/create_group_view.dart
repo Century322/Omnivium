@@ -1,6 +1,9 @@
+import 'dart:io' if (dart.library.html) '';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:matrix/matrix.dart';
+import 'package:image_picker/image_picker.dart';
 import '../theme/app_colors.dart';
 import '../theme/locale_provider.dart';
 import '../../core/app_provider.dart';
@@ -18,6 +21,7 @@ class _CreateGroupViewState extends State<CreateGroupView> {
   final _descCtrl = TextEditingController();
   final Set<String> _selectedMembers = {};
   String _searchQuery = '';
+  String? _avatarPath;
   final _searchCtrl = TextEditingController();
 
   @override
@@ -43,7 +47,7 @@ class _CreateGroupViewState extends State<CreateGroupView> {
         .where(
           (r) =>
               r.name.toLowerCase().contains(q) ||
-              r.directChatMatrixID!.toLowerCase().contains(q),
+              (r.directChatMatrixID?.toLowerCase().contains(q) ?? false),
         )
         .toList();
   }
@@ -93,7 +97,11 @@ class _CreateGroupViewState extends State<CreateGroupView> {
         children: [
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+              padding: EdgeInsets.only(
+                left: 24,
+                right: 24,
+                bottom: MediaQuery.of(context).padding.bottom + 40,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -125,19 +133,39 @@ class _CreateGroupViewState extends State<CreateGroupView> {
         Row(
           children: [
             GestureDetector(
-              onTap: () {},
+              onTap: () async {
+                final picker = ImagePicker();
+                final image = await picker.pickImage(
+                  source: ImageSource.gallery,
+                  maxWidth: 512,
+                  maxHeight: 512,
+                );
+                if (image != null && mounted) {
+                  setState(() {
+                    _avatarPath = image.path;
+                  });
+                }
+              },
               child: Container(
                 width: 64,
                 height: 64,
                 decoration: BoxDecoration(
                   color: AppColors.sfAlt(context),
                   borderRadius: BorderRadius.circular(20),
+                  image: _avatarPath case final avatarPath?
+                      ? DecorationImage(
+                          image: FileImage(File(avatarPath)),
+                          fit: BoxFit.cover,
+                        )
+                      : null,
                 ),
-                child: Icon(
-                  LucideIcons.camera,
-                  size: 24,
-                  color: AppColors.iconGray(context),
-                ),
+                child: _avatarPath == null
+                    ? Icon(
+                        LucideIcons.camera,
+                        size: 24,
+                        color: AppColors.iconGray(context),
+                      )
+                    : null,
               ),
             ),
             const SizedBox(width: 16),
@@ -146,6 +174,7 @@ class _CreateGroupViewState extends State<CreateGroupView> {
                 children: [
                   TextField(
                     controller: _nameCtrl,
+                    maxLength: 100,
                     style: TextStyle(
                       color: AppColors.textPrimary(context),
                       fontSize: 16,
@@ -169,6 +198,7 @@ class _CreateGroupViewState extends State<CreateGroupView> {
                   const SizedBox(height: 8),
                   TextField(
                     controller: _descCtrl,
+                    maxLength: 512,
                     style: TextStyle(
                       color: AppColors.textSecondary(context),
                       fontSize: 14,
@@ -260,6 +290,7 @@ class _CreateGroupViewState extends State<CreateGroupView> {
       ),
       child: TextField(
         controller: _searchCtrl,
+        maxLength: 128,
         style: TextStyle(color: AppColors.textPrimary(context), fontSize: 14),
         decoration: InputDecoration(
           labelText: localeProvider.t('search_friends'),
@@ -416,6 +447,7 @@ class _CreateGroupViewState extends State<CreateGroupView> {
       final roomId = await matrix.createGroupChat(
         name,
         userIds: _selectedMembers.toList(),
+        topic: _descCtrl.text.trim().isEmpty ? null : _descCtrl.text.trim(),
       );
       if (mounted) {
         Navigator.pop(context, roomId);

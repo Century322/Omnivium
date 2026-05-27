@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'app_logger.dart';
 
@@ -19,7 +20,7 @@ class PermissionService {
 
   Future<bool> requestPhotos() async {
     if (Platform.isAndroid) {
-      final sdkInt = _getAndroidSdk();
+      final sdkInt = await _getAndroidSdk();
       if (sdkInt >= 33) {
         final status = await Permission.photos.request();
         if (status.isGranted) return true;
@@ -91,10 +92,14 @@ class PermissionService {
     }
   }
 
-  int _getAndroidSdk() {
+  Future<int> _getAndroidSdk() async {
     try {
-      return int.parse(Platform.version.split('.').first);
-    } catch (_) {
+      if (!Platform.isAndroid) return 30;
+      final deviceInfo = DeviceInfoPlugin();
+      final androidInfo = await deviceInfo.androidInfo;
+      return androidInfo.version.sdkInt;
+    } catch (e) {
+      AppLogger.instance.debug('SDK version detection failed', error: e);
       return 30;
     }
   }

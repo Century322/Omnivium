@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
+import '../../core/lite_mode.dart';
 
 class SkeletonLoader extends StatefulWidget {
   final double width;
@@ -19,38 +20,52 @@ class SkeletonLoader extends StatefulWidget {
 
 class _SkeletonLoaderState extends State<SkeletonLoader>
     with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
+  AnimationController? _controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1500),
-    )..repeat();
+    if (LiteMode.instance.smoothAnimationsEnabled) {
+      _controller = AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 1500),
+      )..repeat();
+    }
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_controller == null) {
+      return Container(
+        width: widget.width,
+        height: widget.height,
+        decoration: BoxDecoration(
+          borderRadius: widget.borderRadius ?? BorderRadius.circular(4),
+          color: AppColors.sf(context).withValues(alpha: 0.3),
+        ),
+      );
+    }
     return Semantics(
       excludeSemantics: true,
       child: AnimatedBuilder(
-        animation: _controller,
+        animation: _controller ?? kAlwaysCompleteAnimation,
         builder: (context, child) {
+          final ctrl = _controller;
+          final value = ctrl?.value ?? 0.0;
           return Container(
             width: widget.width,
             height: widget.height,
             decoration: BoxDecoration(
               borderRadius: widget.borderRadius ?? BorderRadius.circular(4),
               gradient: LinearGradient(
-                begin: Alignment(-1.0 + 2.0 * _controller.value, 0),
-                end: Alignment(1.0 + 2.0 * _controller.value, 0),
+                begin: Alignment(-1.0 + 2.0 * value, 0),
+                end: Alignment(1.0 + 2.0 * value, 0),
                 colors: [
                   AppColors.sf(context),
                   AppColors.sf(context).withValues(alpha: 0.3),

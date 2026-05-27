@@ -1,5 +1,5 @@
 import 'app_logger.dart';
-import 'dart:io';
+import 'dart:io' if (dart.library.html) '';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
@@ -74,9 +74,9 @@ class FileDownloadService {
       _progress[url] = 0;
 
       final request = http.Request('GET', Uri.parse(url));
-      final response = await ApiProxyService.instance.secureClient.send(
-        request,
-      );
+      final response = await ApiProxyService.instance.secureClient
+          .send(request)
+          .timeout(const Duration(seconds: 60));
 
       if (response.statusCode != 200) {
         _progress.remove(url);
@@ -126,24 +126,35 @@ class FileDownloadService {
   }
 
   Future<Directory?> _getDownloadDirectory() async {
-    if (Platform.isAndroid) {
-      final dirs = await getExternalStorageDirectories(
-        type: StorageDirectory.downloads,
-      );
-      if (dirs != null && dirs.isNotEmpty) return dirs.first;
-      return await getApplicationDocumentsDirectory();
-    } else if (Platform.isIOS) {
+    if (kIsWeb) return null;
+    try {
+      if (Platform.isAndroid) {
+        final dirs = await getExternalStorageDirectories(
+          type: StorageDirectory.downloads,
+        );
+        if (dirs != null && dirs.isNotEmpty) return dirs.first;
+        return await getApplicationDocumentsDirectory();
+      } else if (Platform.isIOS) {
+        return await getApplicationDocumentsDirectory();
+      }
+    } catch (e) {
+      AppLogger.instance.debug('Download directory fallback', error: e);
       return await getApplicationDocumentsDirectory();
     }
     return null;
   }
 
   Future<bool> _requestStoragePermission() async {
-    if (Platform.isAndroid) {
-      final status = await Permission.storage.status;
-      if (status.isGranted) return true;
-      final result = await Permission.storage.request();
-      return result.isGranted;
+    if (kIsWeb) return false;
+    try {
+      if (Platform.isAndroid) {
+        final status = await Permission.storage.status;
+        if (status.isGranted) return true;
+        final result = await Permission.storage.request();
+        return result.isGranted;
+      }
+    } catch (e) {
+      AppLogger.instance.debug('Storage permission check failed', error: e);
     }
     return true;
   }

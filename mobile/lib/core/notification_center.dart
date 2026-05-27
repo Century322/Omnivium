@@ -68,7 +68,9 @@ class NotificationCenter {
       for (final observer in List<_Observer>.from(observers)) {
         try {
           observer.callback(data);
-        } catch (_) {}
+        } catch (e) {
+          AppLogger.instance.debug('Observer callback failed', error: e);
+        }
       }
     }
     _forwardToEventBus(event, data);
@@ -83,7 +85,9 @@ class NotificationCenter {
         data ?? {},
         source: RuntimeIdentity.forPlugin('NotificationCenter'),
       );
-    } catch (_) {}
+    } catch (e) {
+      AppLogger.instance.debug('EventBus forward failed', error: e);
+    }
   }
 }
 

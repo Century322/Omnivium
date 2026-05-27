@@ -93,6 +93,11 @@ class NoteService {
 
   bool _initialized = false;
 
+  void reset() {
+    _items = [];
+    _initialized = false;
+  }
+
   Future<void> init() async {
     if (_initialized) return;
     final db = DatabaseService.instance;
@@ -131,7 +136,9 @@ class NoteService {
         if (localIdx < 0) {
           try {
             _items.add(NoteItem.fromJson(cloud));
-          } catch (_) {}
+          } catch (e) {
+            AppLogger.instance.warning('Parse cloud note failed', error: e);
+          }
         } else {
           final cloudUpdated = cloud['updated_at'] as String?;
           final localUpdated = _items[localIdx].updatedAt.toIso8601String();
@@ -139,7 +146,9 @@ class NoteService {
               cloudUpdated.compareTo(localUpdated) > 0) {
             try {
               _items[localIdx] = NoteItem.fromJson(cloud);
-            } catch (_) {}
+            } catch (e) {
+              AppLogger.instance.warning('Update note from cloud failed', error: e);
+            }
           }
         }
       }
@@ -152,42 +161,42 @@ class NoteService {
     }
   }
 
-  Future<void> _save() async {
+  Future<void> _save({NoteItem? changedItem}) async {
     final db = DatabaseService.instance;
     await db.data.put(
       _boxKey,
       jsonEncode(_items.map((n) => n.toJson()).toList()),
     );
-    _syncAllToCloud();
+    if (changedItem != null) {
+      _syncItemToCloud(changedItem);
+    }
   }
 
-  void _syncAllToCloud() {
+  void _syncItemToCloud(NoteItem item) {
     final sync = SupabaseSyncService.instance;
     if (!sync.isAvailable) return;
-    for (final item in _items) {
-      sync.upsertNote({
-        'id': item.id,
-        'title': item.title,
-        'content': item.content,
-        'type': item.type.name,
-        'is_done': item.isDone,
-        'due_date': item.dueDate?.toIso8601String(),
-        'created_at': item.createdAt.toIso8601String(),
-        'updated_at': item.updatedAt.toIso8601String(),
-      });
-    }
+    sync.upsertNote({
+      'id': item.id,
+      'title': item.title,
+      'content': item.content,
+      'type': item.type.name,
+      'is_done': item.isDone,
+      'due_date': item.dueDate?.toIso8601String(),
+      'created_at': item.createdAt.toIso8601String(),
+      'updated_at': item.updatedAt.toIso8601String(),
+    });
   }
 
   Future<void> addItem(NoteItem item) async {
     _items.insert(0, item);
-    await _save();
+    await _save(changedItem: item);
   }
 
   Future<void> updateItem(NoteItem item) async {
     final idx = _items.indexWhere((n) => n.id == item.id);
     if (idx != -1) {
       _items[idx] = item;
-      await _save();
+      await _save(changedItem: item);
     }
   }
 
@@ -200,7 +209,7 @@ class NoteService {
     final idx = _items.indexWhere((n) => n.id == id);
     if (idx != -1) {
       _items[idx] = _items[idx].copyWith(isDone: !_items[idx].isDone);
-      await _save();
+      await _save(changedItem: _items[idx]);
     }
   }
 

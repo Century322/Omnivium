@@ -4,9 +4,20 @@ import 'app_logger.dart';
 
 class QuickCommandProvider extends ChangeNotifier {
   final QuickCommandService _service = QuickCommandService.instance;
+  bool _disposed = false;
 
   List<QuickCommand> get commands => _service.commands;
   Set<String> get categories => _service.categories;
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
+
+  void _notify() {
+    if (!_disposed) notifyListeners();
+  }
 
   Future<void> init() async {
     try {
@@ -18,7 +29,7 @@ class QuickCommandProvider extends ChangeNotifier {
         stackTrace: stackTrace,
       );
     }
-    notifyListeners();
+    _notify();
   }
 
   Future<void> addCommand(QuickCommand command) async {
@@ -31,7 +42,7 @@ class QuickCommandProvider extends ChangeNotifier {
         stackTrace: stackTrace,
       );
     }
-    notifyListeners();
+    _notify();
   }
 
   Future<void> updateCommand(QuickCommand command) async {
@@ -44,7 +55,7 @@ class QuickCommandProvider extends ChangeNotifier {
         stackTrace: stackTrace,
       );
     }
-    notifyListeners();
+    _notify();
   }
 
   Future<void> deleteCommand(String id) async {
@@ -57,7 +68,7 @@ class QuickCommandProvider extends ChangeNotifier {
         stackTrace: stackTrace,
       );
     }
-    notifyListeners();
+    _notify();
   }
 
   Future<void> reorderCommands(int oldIndex, int newIndex) async {
@@ -70,7 +81,7 @@ class QuickCommandProvider extends ChangeNotifier {
         stackTrace: stackTrace,
       );
     }
-    notifyListeners();
+    _notify();
   }
 
   Future<void> resetToDefaults() async {
@@ -83,7 +94,7 @@ class QuickCommandProvider extends ChangeNotifier {
         stackTrace: stackTrace,
       );
     }
-    notifyListeners();
+    _notify();
   }
 
   List<QuickCommand> getCommandsByCategory(String category) {

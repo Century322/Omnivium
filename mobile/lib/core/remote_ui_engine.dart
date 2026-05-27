@@ -65,10 +65,9 @@ class RemoteUIEngine {
       if (host.isEmpty) return false;
       if (host == 'localhost' || host == '127.0.0.1') return false;
       return true;
-    } catch (_) {
-      return false;
-    }
-  }
+    } catch (e) {
+      AppLogger.instance.debug('URL validation failed', error: e);
+      return false;  }
 
   static Widget render(
     Map<String, dynamic> schema,
@@ -226,14 +225,19 @@ class RemoteUIEngine {
     final itemTemplate = schema['itemTemplate'] as Map<String, dynamic>?;
     if (itemTemplate == null) return const SizedBox.shrink();
 
-    return Column(
-      children: items.map<Widget>((item) {
-        final resolved = _resolveTemplate(
-          itemTemplate,
-          item as Map<String, dynamic>,
-        );
-        return render(resolved, context, depth + 1);
-      }).toList(),
+    return SizedBox(
+      height: 400,
+      child: ListView.builder(
+        itemCount: items.length,
+        itemBuilder: (context, index) {
+          final item = items[index] as Map<String, dynamic>;
+          final resolved = _resolveTemplate(
+            itemTemplate,
+            item,
+          );
+          return render(resolved, context, depth + 1);
+        },
+      ),
     );
   }
 

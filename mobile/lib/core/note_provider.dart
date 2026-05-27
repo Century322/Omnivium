@@ -4,6 +4,7 @@ import 'app_logger.dart';
 
 class NoteProvider extends ChangeNotifier {
   final NoteService _service = NoteService.instance;
+  bool _disposed = false;
 
   List<NoteItem> get items => _service.items;
   List<NoteItem> get notes => _service.getNotes();
@@ -12,10 +13,20 @@ class NoteProvider extends ChangeNotifier {
   List<NoteItem> get todaySchedules => _service.getTodaySchedules();
   List<NoteItem> get pendingTodos => _service.getPendingTodos();
 
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
+
+  void _notify() {
+    if (!_disposed) notifyListeners();
+  }
+
   Future<void> init() async {
     try {
       await _service.init();
-      notifyListeners();
+      _notify();
     } catch (e, stackTrace) {
       AppLogger.instance.warning(
         'NoteProvider init failed',
@@ -28,7 +39,7 @@ class NoteProvider extends ChangeNotifier {
   Future<void> addItem(NoteItem item) async {
     try {
       await _service.addItem(item);
-      notifyListeners();
+      _notify();
     } catch (e, stackTrace) {
       AppLogger.instance.warning(
         'NoteProvider addItem failed',
@@ -41,7 +52,7 @@ class NoteProvider extends ChangeNotifier {
   Future<void> updateItem(NoteItem item) async {
     try {
       await _service.updateItem(item);
-      notifyListeners();
+      _notify();
     } catch (e, stackTrace) {
       AppLogger.instance.warning(
         'NoteProvider updateItem failed',
@@ -54,7 +65,7 @@ class NoteProvider extends ChangeNotifier {
   Future<void> deleteItem(String id) async {
     try {
       await _service.deleteItem(id);
-      notifyListeners();
+      _notify();
     } catch (e, stackTrace) {
       AppLogger.instance.warning(
         'NoteProvider deleteItem failed',
@@ -67,7 +78,7 @@ class NoteProvider extends ChangeNotifier {
   Future<void> toggleDone(String id) async {
     try {
       await _service.toggleDone(id);
-      notifyListeners();
+      _notify();
     } catch (e, stackTrace) {
       AppLogger.instance.warning(
         'NoteProvider toggleDone failed',

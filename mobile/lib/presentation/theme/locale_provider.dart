@@ -8,16 +8,27 @@ class LocaleProvider extends ChangeNotifier {
   Locale get locale => _locale;
   Map<String, String>? _cachedMap;
   Locale? _cachedLocale;
+  bool _disposed = false;
 
   LocaleProvider() {
     _load();
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
+
+  void _notify() {
+    if (!_disposed) notifyListeners();
   }
 
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
     final saved = prefs.getString('omnivium_locale') ?? 'zh';
     _locale = Locale(saved);
-    notifyListeners();
+    _notify();
   }
 
   Future<void> setLocale(Locale locale) async {
@@ -25,7 +36,7 @@ class LocaleProvider extends ChangeNotifier {
     _cachedMap = null;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('omnivium_locale', locale.languageCode);
-    notifyListeners();
+    _notify();
   }
 
   void setLocaleFromLabel(String labelOrCode) {
@@ -64,14 +75,16 @@ class LocaleProvider extends ChangeNotifier {
 
   String t(String key) {
     try {
-      if (_cachedMap != null && _cachedLocale == _locale) {
-        return _cachedMap![key] ?? key;
+      final cachedMap = _cachedMap;
+      if (cachedMap != null && _cachedLocale == _locale) {
+        return cachedMap[key] ?? key;
       }
       final s = _s;
-      _cachedMap = _buildMap(s);
+      final newMap = _buildMap(s);
+      _cachedMap = newMap;
       _cachedLocale = _locale;
-      return _cachedMap![key] ?? key;
-    } catch (_) {
+      return newMap[key] ?? key;
+    } catch (e) {
       return key;
     }
   }

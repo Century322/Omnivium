@@ -214,6 +214,7 @@ class AppDrawerState extends State<AppDrawer>
           ),
           content: TextField(
             controller: controller,
+            maxLength: 100,
             autofocus: true,
             style: TextStyle(color: AppColors.textPrimary(context)),
             decoration: InputDecoration(

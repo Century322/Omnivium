@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../theme/app_colors.dart';
@@ -50,8 +51,10 @@ class ChatInputArea extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final showQuickCmds = !isFriendChat && textController.text.isEmpty;
+    final viewBottom = MediaQuery.of(context).viewInsets.bottom;
+    final safeBottom = MediaQuery.of(context).padding.bottom;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+      padding: EdgeInsets.fromLTRB(16, 0, 16, viewBottom > 0 ? viewBottom : max(24, safeBottom)),
       child: Center(
         child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: maxWidth - 32),
@@ -131,6 +134,7 @@ class ChatInputArea extends StatelessWidget {
                           child: TextField(
                             controller: textController,
                             focusNode: focusNode,
+                            maxLength: 4096,
                             style: TextStyle(
                               color: AppColors.textPrimary(context),
                               fontSize: 16,

@@ -145,19 +145,19 @@ class AgentReplayView extends StatelessWidget {
               LucideIcons.arrowRight,
               AppColors.acc(context),
             ),
-            if (log.output != null)
+            if (log.output case final output?)
               _buildSection(
                 context,
                 localeProvider.t('output'),
-                log.output!,
+                output,
                 LucideIcons.arrowLeft,
                 AppColors.ok(context),
               ),
-            if (log.error != null)
+            if (log.error case final err?)
               _buildSection(
                 context,
                 localeProvider.t('error'),
-                log.error!,
+                err,
                 LucideIcons.alertTriangle,
                 AppColors.dng(context),
               ),

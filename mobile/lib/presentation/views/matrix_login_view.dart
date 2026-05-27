@@ -121,7 +121,9 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
       if (mounted && widget.provider.matrix.isLoggedIn) {
         try {
           AuthService.instance.onMatrixLogin();
-        } catch (_) {}
+        } catch (e) {
+          AppLogger.instance.warning('Post-login callback failed', error: e);
+        }
         if (TotpService.instance.isEnabled) {
           setState(() {
             _showTotp = true;
@@ -152,7 +154,12 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
         child: Center(
           child: SingleChildScrollView(
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            padding: const EdgeInsets.symmetric(horizontal: 32),
+            padding: EdgeInsets.fromLTRB(
+              32,
+              40,
+              32,
+              MediaQuery.of(context).viewInsets.bottom + 40,
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -180,10 +187,19 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
                         ),
                       ],
                     ),
-                    child: Icon(
-                      LucideIcons.messageCircle,
-                      size: 40,
-                      color: AppColors.textPrimary(context),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(24),
+                      child: Image.asset(
+                        'assets/icon/app_icon.png',
+                        width: 80,
+                        height: 80,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, _, _) => Icon(
+                          LucideIcons.messageCircle,
+                          size: 40,
+                          color: AppColors.textPrimary(context),
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -196,6 +212,7 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
                     ),
                     child: TextField(
                       controller: _apiUrlCtrl,
+                      maxLength: 256,
                       style: TextStyle(
                         color: AppColors.textPrimary(context),
                         fontSize: 14,
@@ -236,7 +253,7 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
                 const SizedBox(height: 24),
                 Center(
                   child: Text(
-                    'Omnivium',
+                    localeProvider.t('app_name'),
                     style: TextStyle(
                       color: AppColors.textPrimary(context),
                       fontSize: 28,
@@ -266,6 +283,7 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
                       TextField(
                         controller: _usernameCtrl,
                         focusNode: _usernameFocus,
+                        maxLength: 128,
                         style: TextStyle(
                           color: AppColors.textPrimary(context),
                           fontSize: 16,
@@ -307,6 +325,7 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
                         controller: _passwordCtrl,
                         focusNode: _passwordFocus,
                         obscureText: _obscurePassword,
+                        maxLength: 256,
                         style: TextStyle(
                           color: AppColors.textPrimary(context),
                           fontSize: 16,
@@ -420,6 +439,7 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
                     ),
                     child: TextField(
                       controller: _homeserverCtrl,
+                      maxLength: 256,
                       focusNode: _homeserverFocus,
                       style: TextStyle(
                         color: AppColors.textPrimary(context),
@@ -487,7 +507,7 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
-                      _error!,
+                      _error ?? '',
                       style: TextStyle(
                         color: AppColors.dng(context),
                         fontSize: 13,

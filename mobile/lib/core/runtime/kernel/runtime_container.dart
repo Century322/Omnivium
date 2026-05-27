@@ -72,21 +72,25 @@ class RuntimeContainer implements RuntimeContext {
   }
 
   static RuntimeContainer get instance {
-    if (_instance == null) {
+    final inst = _instance;
+    if (inst == null) {
       throw StateError(
         'RuntimeContainer not initialized. Call RuntimeContainer.boot() first.',
       );
     }
-    return _instance!;
+    return inst;
   }
 
-  static bool get isBooted =>
-      _instance != null && _instance!._status == RuntimeStatus.running;
+  static bool get isBooted {
+    final inst = _instance;
+    return inst != null && inst._status == RuntimeStatus.running;
+  }
 
   static Future<RuntimeContainer> boot([RuntimeConfig? config]) async {
-    if (_instance != null && _instance!._status == RuntimeStatus.running) {
+    final existing = _instance;
+    if (existing != null && existing._status == RuntimeStatus.running) {
       AppLogger.instance.warning('RuntimeContainer already booted');
-      return _instance!;
+      return existing;
     }
 
     final effectiveConfig = config ?? const RuntimeConfig();
@@ -153,38 +157,39 @@ class RuntimeContainer implements RuntimeContext {
   }
 
   static Future<void> shutdown() async {
-    if (_instance == null) return;
+    final inst = _instance;
+    if (inst == null) return;
 
-    _instance!._status = RuntimeStatus.shuttingDown;
-    _instance!.metricsService.increment('runtime.shutdown');
+    inst._status = RuntimeStatus.shuttingDown;
+    inst.metricsService.increment('runtime.shutdown');
 
-    _instance!.snapshotService.take(
+    inst.snapshotService.take(
       status: RuntimeStatus.shuttingDown,
-      pluginStates: _instance!.pluginRegistry.pluginStates.map(
+      pluginStates: inst.pluginRegistry.pluginStates.map(
         (k, v) => MapEntry(k, v),
       ),
-      sessions: _instance!._sessions,
-      capabilityCache: _instance!.pluginRegistry.loadedDescriptors
+      sessions: inst._sessions,
+      capabilityCache: inst.pluginRegistry.loadedDescriptors
           .expand((d) => d.capabilityIds)
           .toList(),
-      resourceUsage: _instance!.resourceController.usage,
+      resourceUsage: inst.resourceController.usage,
     );
 
-    _instance!.eventJournal.append('runtime.shutdown', {
-      'snapshotId': _instance!.snapshotService.latest?.snapshotId,
+    inst.eventJournal.append('runtime.shutdown', {
+      'snapshotId': inst.snapshotService.latest?.snapshotId,
     });
 
-    _instance!.scheduler.cancelAll();
+    inst.scheduler.cancelAll();
 
-    final pluginIds = _instance!.pluginRegistry.loadedDescriptors
+    final pluginIds = inst.pluginRegistry.loadedDescriptors
         .map((d) => d.id)
         .toList();
     for (final id in pluginIds) {
-      await _instance!.pluginRegistry.unload(id);
+      await inst.pluginRegistry.unload(id);
     }
 
-    _instance!._sessions.clear();
-    _instance!.capabilityRouter.invalidateAll();
+    inst._sessions.clear();
+    inst.capabilityRouter.invalidateAll();
 
     _instance = null;
     AppLogger.instance.info('RuntimeContainer shutdown complete');
