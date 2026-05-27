@@ -557,12 +557,13 @@ class AutonomousLegislature {
 
   LegislativeProposal simulate() {
     if (activeProposal == null) throw StateError('No active proposal');
+    final proposal = activeProposal!;
 
     final stats = _traceGraph.computeStatistics();
-    final lawViolations = stats.violationCounts[activeProposal!.targetLaw] ?? 0;
+    final lawViolations = stats.violationCounts[proposal.targetLaw] ?? 0;
     final totalDecisions = stats.totalDecisions;
     final affectedSandboxes = _traceGraph
-        .violationsForLaw(activeProposal!.targetLaw)
+        .violationsForLaw(proposal.targetLaw)
         .map((d) => d.sandboxId)
         .toSet()
         .length;
@@ -581,7 +582,7 @@ class AutonomousLegislature {
           : 'low',
     };
 
-    final updated = activeProposal!.copyWith(
+    final updated = proposal.copyWith(
       stage: LegislativeStage.simulating,
       simulationResult: simulationResult,
     );
@@ -591,8 +592,9 @@ class AutonomousLegislature {
 
   LegislativeProposal analyzeImpact() {
     if (activeProposal == null) throw StateError('No active proposal');
+    final proposal = activeProposal!;
 
-    final sim = activeProposal!.simulationResult;
+    final sim = proposal.simulationResult;
     final constitutionalScore = _reputationEconomy.constitutionalScore();
     final lowestEntities = _reputationEconomy.lowestReputationEntities(
       limit: 3,
@@ -606,7 +608,7 @@ class AutonomousLegislature {
       'affectedTrustLevels': ['untrusted', 'blocked'],
     };
 
-    final updated = activeProposal!.copyWith(
+    final updated = proposal.copyWith(
       stage: LegislativeStage.impactAnalysis,
       impactAnalysis: impactAnalysis,
     );
@@ -616,15 +618,16 @@ class AutonomousLegislature {
 
   LegislativeProposal judiciaryCheck() {
     if (activeProposal == null) throw StateError('No active proposal');
+    final proposal = activeProposal!;
 
-    final targetLaw = activeProposal!.targetLaw;
+    final targetLaw = proposal.targetLaw;
     final stats = _traceGraph.computeStatistics();
     final currentViolations = stats.violationCounts[targetLaw] ?? 0;
     final isConstitutional =
-        currentViolations > 0 || activeProposal!.proposedChange.isNotEmpty;
+        currentViolations > 0 || proposal.proposedChange.isNotEmpty;
     final conflictsWithExisting = _detectLawConflict(
       targetLaw,
-      activeProposal!.proposedChange,
+      proposal.proposedChange,
     );
 
     final recommendation = isConstitutional && !conflictsWithExisting
@@ -641,7 +644,7 @@ class AutonomousLegislature {
       'recommendation': recommendation,
     };
 
-    final updated = activeProposal!.copyWith(
+    final updated = proposal.copyWith(
       stage: LegislativeStage.judiciaryReview,
       judiciaryReview: review,
     );
@@ -653,9 +656,10 @@ class AutonomousLegislature {
     final existingProposals = _proposals.where(
       (p) => p.targetLaw == targetLaw && p.stage != LegislativeStage.rejected,
     );
+    final currentId = activeProposal?.proposalId;
     for (final p in existingProposals) {
       if (p.proposedChange == proposedChange &&
-          p.proposalId != activeProposal!.proposalId) {
+          p.proposalId != currentId) {
         return true;
       }
     }
@@ -664,25 +668,26 @@ class AutonomousLegislature {
 
   LegislativeProposal submitToVote(int timestamp) {
     if (activeProposal == null) throw StateError('No active proposal');
+    final proposal = activeProposal!;
 
-    final review = activeProposal!.judiciaryReview;
+    final review = proposal.judiciaryReview;
     final recommendation = review['recommendation'];
     if (recommendation == 'reject') {
-      final rejected = activeProposal!.copyWith(
+      final rejected = proposal.copyWith(
         stage: LegislativeStage.rejected,
       );
       _updateProposal(rejected);
       return rejected;
     }
     if (recommendation == 'review') {
-      final updated = activeProposal!.copyWith(
+      final updated = proposal.copyWith(
         stage: LegislativeStage.consensusVoting,
       );
       _updateProposal(updated);
       return updated;
     }
 
-    final updated = activeProposal!.copyWith(
+    final updated = proposal.copyWith(
       stage: LegislativeStage.consensusVoting,
     );
     _updateProposal(updated);
@@ -691,11 +696,12 @@ class AutonomousLegislature {
 
   LegislativeProposal enact(int timestamp) {
     if (activeProposal == null) throw StateError('No active proposal');
+    final proposal = activeProposal!;
 
-    final result = _consensus.tallyVotes(activeProposal!.proposalId, timestamp);
+    final result = _consensus.tallyVotes(proposal.proposalId, timestamp);
 
     if (result.passed) {
-      final enacted = activeProposal!.copyWith(
+      final enacted = proposal.copyWith(
         stage: LegislativeStage.enacted,
         enactedAt: timestamp,
         consensusResult: result,
@@ -704,7 +710,7 @@ class AutonomousLegislature {
       activeProposal = null;
       return enacted;
     } else {
-      final rejected = activeProposal!.copyWith(
+      final rejected = proposal.copyWith(
         stage: LegislativeStage.rejected,
         consensusResult: result,
       );

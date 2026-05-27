@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'app_logger.dart';
 import 'runtime/sdk/omnivium_sdk.dart';
 import 'runtime/vocabulary/runtime_identity.dart';
 

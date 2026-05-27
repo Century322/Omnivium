@@ -1,6 +1,7 @@
 ﻿import '../../core/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:matrix/matrix.dart';
 import '../widgets/skeleton_loader.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../theme/app_colors.dart';
@@ -91,7 +92,7 @@ class _SearchViewState extends State<SearchView> {
               }
             }
           } finally {
-            timeline?.dispose();
+            timeline = null;
           }
         }
       } catch (e, stackTrace) {

@@ -23,7 +23,10 @@ class RuntimeSpan {
     this.tags = const {},
   });
 
-  int get durationMs => endTimeMs != null ? endTimeMs! - startTimeMs : 0;
+  int get durationMs {
+    final end = endTimeMs;
+    return end != null ? end - startTimeMs : 0;
+  }
 
   void finish({String? status, int? endTimeMs}) {
     this.endTimeMs = endTimeMs ?? DateTime.now().millisecondsSinceEpoch;
@@ -67,8 +70,8 @@ class RuntimeTrace {
   int get totalDurationMs {
     if (spans.isEmpty) return 0;
     final endTimes = spans
-        .where((s) => s.endTimeMs != null)
-        .map((s) => s.endTimeMs!);
+        .map((s) => s.endTimeMs)
+        .whereType<int>();
     if (endTimes.isEmpty) return 0;
     return endTimes.reduce((a, b) => a > b ? a : b) - spans.first.startTimeMs;
   }

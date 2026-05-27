@@ -21,9 +21,9 @@ class ImageViewer extends StatelessWidget {
           icon: Icon(LucideIcons.x, color: AppColors.textPrimary(context)),
           onPressed: () => Navigator.pop(context),
         ),
-        title: title case final t?
+        title: title != null
             ? Text(
-                t,
+                title!,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
@@ -39,7 +39,6 @@ class ImageViewer extends StatelessWidget {
           maxScale: 4.0,
           child: CachedNetworkImage(
             imageUrl: imageUrl,
-            semanticLabel: title ?? localeProvider.t('full_size_image'),
             fit: BoxFit.contain,
             placeholder: (_, __) => Center(
               child: CircularProgressIndicator(

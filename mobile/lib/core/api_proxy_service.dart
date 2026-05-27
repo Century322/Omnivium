@@ -46,6 +46,7 @@ class ApiProxyService {
     } catch (e) {
       AppLogger.instance.debug('Load API URL failed', error: e);
     }
+  }
 
   String get backendUrl {
     final configured = _userConfiguredUrl;
@@ -683,13 +684,17 @@ class ApiProxyException implements Exception {
   bool get isNetworkError => originalError != null;
   bool get isRateLimited => statusCode == 429;
   bool get isAuthError => statusCode == 401 || statusCode == 403;
-  bool get isServerError => statusCode != null && statusCode! >= 500;
+  bool get isServerError {
+    final code = statusCode;
+    return code != null && code >= 500;
+  }
 
   @override
   String toString() {
     final parts = <String>['ApiProxyException: $message'];
     if (statusCode != null) parts.add('status=$statusCode');
-    if (retryAfter != null) parts.add('retryAfter=${retryAfter!.inSeconds}s');
+    final ra = retryAfter;
+    if (ra != null) parts.add('retryAfter=${ra.inSeconds}s');
     return parts.join(', ');
   }
 }

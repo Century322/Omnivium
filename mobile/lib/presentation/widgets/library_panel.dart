@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:matrix/matrix.dart';
+import '../../core/app_logger.dart';
 import '../utils/format_utils.dart';
 import '../theme/app_colors.dart';
 import '../theme/locale_provider.dart';

@@ -1,3 +1,4 @@
+import '../../app_logger.dart';
 import 'vocabulary/distributed_session_lease.dart';
 import 'hybrid_logical_clock.dart';
 

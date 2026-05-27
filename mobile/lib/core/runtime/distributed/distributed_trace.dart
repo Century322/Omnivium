@@ -31,7 +31,10 @@ class DistributedSpan {
     this.remoteNodeId,
   });
 
-  int get durationHlc => endTimeHlc != null ? endTimeHlc! - startTimeHlc : 0;
+  int get durationHlc {
+    final end = endTimeHlc;
+    return end != null ? end - startTimeHlc : 0;
+  }
 
   bool get isRemote => remoteNodeId != null;
 

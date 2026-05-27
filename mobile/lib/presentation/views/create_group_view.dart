@@ -152,9 +152,9 @@ class _CreateGroupViewState extends State<CreateGroupView> {
                 decoration: BoxDecoration(
                   color: AppColors.sfAlt(context),
                   borderRadius: BorderRadius.circular(20),
-                  image: _avatarPath case final avatarPath?
+                  image: _avatarPath != null
                       ? DecorationImage(
-                          image: FileImage(File(avatarPath)),
+                          image: FileImage(File(_avatarPath!)),
                           fit: BoxFit.cover,
                         )
                       : null,

@@ -199,7 +199,8 @@ class AppLockService {
       SecureStorageService.instance.write(
         _lastUnlockKey,
         unlockTime.toIso8601String(),
-    );
+      );
+    }
   }
 }
 

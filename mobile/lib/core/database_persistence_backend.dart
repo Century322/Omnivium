@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'app_logger.dart';
 import 'database_service.dart';
 import 'runtime/plugins/persistence_backend.dart';
 

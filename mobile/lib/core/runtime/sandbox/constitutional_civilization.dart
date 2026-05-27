@@ -136,6 +136,7 @@ class ConstitutionalEvolutionEngine {
       final capIds = violations
           .where((v) => v.capabilityId != null)
           .map((v) => v.capabilityId!)
+          .cast<String>()
           .toSet()
           .toList();
 

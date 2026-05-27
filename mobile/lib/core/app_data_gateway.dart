@@ -1,3 +1,4 @@
+import 'app_logger.dart';
 import 'runtime/sdk/omnivium_sdk.dart';
 import 'runtime/plugins/persistence_backend.dart';
 import 'database_persistence_backend.dart';

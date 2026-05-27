@@ -61,9 +61,10 @@ class PushNotificationService {
     await _localNotifications.initialize(
       settings,
       onDidReceiveNotificationResponse: (NotificationResponse response) {
-        if (response.payload != null && response.payload!.isNotEmpty) {
+        final payload = response.payload;
+        if (payload != null && payload.isNotEmpty) {
           try {
-            final data = _parsePayload(response.payload!);
+            final data = _parsePayload(payload);
             _onMessageOpenedApp.add(data);
           } catch (e, stackTrace) {
             AppLogger.instance.error(

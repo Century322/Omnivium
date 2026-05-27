@@ -461,6 +461,7 @@ class _AppShellState extends State<_AppShell>
     } catch (e) {
       AppLogger.instance.warning('Auth event handling failed', error: e);
     }
+  }
 
   @override
   void dispose() {
@@ -659,7 +660,7 @@ class _AppShellState extends State<_AppShell>
   @override
   Widget build(BuildContext context) {
     if (!_initialized) {
-      final isDark = MediaQuery.platformBrightness == Brightness.dark;
+      final isDark = MediaQuery.of(context).platformBrightness == Brightness.dark;
       final bgColor = isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F7);
       return AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle(

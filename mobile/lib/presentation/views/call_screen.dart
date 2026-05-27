@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import '../../core/app_logger.dart';
 import '../../core/call_service.dart';
 import '../theme/app_colors.dart';
 import '../theme/locale_provider.dart';
@@ -81,18 +82,16 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
 
     _localRenderer = RTCVideoRenderer();
     _remoteRenderer = RTCVideoRenderer();
-    final localRenderer = _localRenderer;
-    final remoteRenderer = _remoteRenderer;
-    await localRenderer.initialize();
+    await _localRenderer!.initialize();
     if (!mounted) return;
-    await remoteRenderer.initialize();
+    await _remoteRenderer!.initialize();
     if (!mounted) return;
 
     if (call.localStream != null) {
-      localRenderer.srcObject = call.localStream;
+      _localRenderer?.srcObject = call.localStream;
     }
     if (call.remoteStream != null) {
-      remoteRenderer.srcObject = call.remoteStream;
+      _remoteRenderer?.srcObject = call.remoteStream;
     }
     _renderersInitialized = true;
     if (mounted) setState(() {});
@@ -284,14 +283,14 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
   Widget _buildVideoLayout(BuildContext context, VoIPCall call) {
     return Stack(
       children: [
-        if (_remoteRenderer case final remote? && call.remoteStream != null)
+        if (_remoteRenderer != null && call.remoteStream != null)
           Positioned.fill(
             child: RTCVideoView(
-              remote,
+              _remoteRenderer!,
               objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
             ),
           ),
-        if (_localRenderer case final local? && call.localStream != null && !_isCameraOff)
+        if (_localRenderer != null && call.localStream != null && !_isCameraOff)
           Positioned(
             top: 60,
             right: 16,
@@ -304,7 +303,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
               ),
               clipBehavior: Clip.antiAlias,
               child: RTCVideoView(
-                local,
+                _localRenderer!,
                 mirror: true,
                 objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
               ),

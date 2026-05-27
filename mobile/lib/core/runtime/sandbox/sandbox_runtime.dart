@@ -1,4 +1,4 @@
-import '../governance/resource_controller.dart';
+﻿import '../governance/resource_controller.dart';
 import '../governance/policy_engine.dart';
 import '../distributed/hybrid_logical_clock.dart';
 import '../stability/security.dart';
@@ -149,8 +149,9 @@ class SandboxIsolate {
   bool tryAcquireTokens(int count, {bool hasTraceSpan = true}) {
     if (!isRunning) return false;
 
-    if (constitutionalGuard != null) {
-      final guardResult = constitutionalGuard!.checkTaskCreation(
+    final guard = constitutionalGuard;
+    if (guard != null) {
+      final guardResult = guard.checkTaskCreation(
         sandboxId: identity.sandboxId,
         wasScheduledThroughScheduler: true,
         budgetApproved:
@@ -184,8 +185,9 @@ class SandboxIsolate {
   }) {
     if (!isRunning) return false;
 
-    if (constitutionalGuard != null) {
-      final guardResult = constitutionalGuard!.checkTaskCreation(
+    final guard = constitutionalGuard;
+    if (guard != null) {
+      final guardResult = guard.checkTaskCreation(
         sandboxId: identity.sandboxId,
         wasScheduledThroughScheduler: wasScheduledThroughScheduler,
         budgetApproved:
@@ -216,8 +218,9 @@ class SandboxIsolate {
   bool tryAcquireStream({bool hasTraceSpan = true}) {
     if (!isRunning) return false;
 
-    if (constitutionalGuard != null) {
-      final guardResult = constitutionalGuard!.checkTaskCreation(
+    final guard = constitutionalGuard;
+    if (guard != null) {
+      final guardResult = guard.checkTaskCreation(
         sandboxId: identity.sandboxId,
         wasScheduledThroughScheduler: true,
         budgetApproved:
@@ -254,8 +257,9 @@ class SandboxIsolate {
       return CapabilityAccessResult.denied('Sandbox not running');
     }
 
-    if (constitutionalGuard != null) {
-      final guardResult = constitutionalGuard!.checkCapabilityInvocation(
+    final guard = constitutionalGuard;
+    if (guard != null) {
+      final guardResult = guard.checkCapabilityInvocation(
         sandboxId: identity.sandboxId,
         capabilityId: capabilityId,
         callerId: identity.pluginId,
@@ -275,7 +279,7 @@ class SandboxIsolate {
         );
       }
 
-      if (constitutionalGuard!.shouldTerminate(identity.sandboxId)) {
+      if (guard.shouldTerminate(identity.sandboxId)) {
         terminate('constitutional_violation_escalation');
         return CapabilityAccessResult.denied(
           'Sandbox terminated by constitutional guard',
@@ -354,8 +358,9 @@ class SandboxIsolate {
   }
 
   void _checkGuardTermination() {
-    if (constitutionalGuard != null &&
-        constitutionalGuard!.shouldTerminate(identity.sandboxId)) {
+    final guard = constitutionalGuard;
+    if (guard != null &&
+        guard.shouldTerminate(identity.sandboxId)) {
       terminate('constitutional_violation_escalation');
     }
   }

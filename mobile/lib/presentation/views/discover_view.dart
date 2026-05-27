@@ -641,9 +641,10 @@ class _DiscoverViewState extends State<DiscoverView> {
                             item.author,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: AppColors.textTertiary(context),
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: AppColors.textTertiary(context),
+                            ),
                           ),
                         ),
                         const Spacer(),

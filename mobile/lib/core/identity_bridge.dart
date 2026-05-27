@@ -315,6 +315,34 @@ class IdentityBridge {
   }
 
   SovereignIdentity _deserializeIdentity(Map<String, dynamic> json) {
-    return SovereignIdentity.fromJson(json);
+    return SovereignIdentity(
+      did: json['did'] as String,
+      nodeId: json['nodeId'] as String,
+      keyPair: SovereignKeyPair.fromJson(json['keyPair'] as Map<String, dynamic>),
+      civilizationEpoch: json['epoch'] as int,
+      federationId: json['federation'] as String?,
+      trustLevel: TrustLevel.values.firstWhere(
+        (t) => t.name == json['trust'],
+        orElse: () => TrustLevel.untrusted,
+      ),
+      constitutionalAncestry: (json['ancestry'] as List?)?.cast<String>() ?? [],
+      createdAt: json['created'] as int,
+      selfSignature: SovereignSignature.fromJson(json['selfSig'] as Map<String, dynamic>),
+      credentials: (json['credentials'] as List?)?.map((c) {
+        final m = c as Map<String, dynamic>;
+        return VerifiableCredential(
+          credentialId: m['id'] as String,
+          issuerDid: m['issuer'] as String,
+          subjectDid: m['subject'] as String,
+          credentialType: m['type'] as String,
+          claims: m['claims'] as Map<String, dynamic>? ?? {},
+          issuedAt: m['issuedAt'] as int,
+          expiresAt: m['expiresAt'] as int,
+          proof: m['proof'] as String,
+          verificationTag: m['tag'] as String,
+        );
+      }).toList() ?? [],
+      keyRotationHistory: (json['keyRotations'] as List?)?.map((r) => KeyRotationRecord.fromJson(r as Map<String, dynamic>)).toList() ?? [],
+    );
   }
 }

@@ -1,3 +1,4 @@
+import 'dart:io' if (dart.library.html) '';
 import 'package:flutter/foundation.dart';
 import 'app_logger.dart';
 

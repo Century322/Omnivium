@@ -4,6 +4,7 @@ import '../theme/app_colors.dart';
 import '../../presentation/utils/format_utils.dart';
 import '../theme/locale_provider.dart';
 import '../../core/app_provider.dart';
+import '../../core/navigation_provider.dart';
 import '../../core/notification/app_notification.dart';
 
 class NotificationView extends StatelessWidget {
@@ -154,7 +155,7 @@ class NotificationView extends StatelessWidget {
             provider.notification.markAsRead(notif.id);
             final roomId = notif.roomId;
             if (roomId != null && roomId.isNotEmpty) {
-              provider.navigation.openFriendChat(roomId);
+              provider.navigation.setCurrentView(ViewState.home);
             }
           },
           child: Container(

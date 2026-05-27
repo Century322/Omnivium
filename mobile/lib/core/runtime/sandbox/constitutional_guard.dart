@@ -575,7 +575,7 @@ class ConstitutionalGuard {
         'cap': capabilityId,
       });
       return ConstitutionalCheckResult.denied(
-        reason: routingResult.violation!,
+        reason: routingResult.violation ?? 'Routing violation',
         violatedLaw: RuntimeLawId.noBypassCapabilityRouter,
       );
     }
@@ -608,7 +608,7 @@ class ConstitutionalGuard {
         'caller': callerId,
       });
       return ConstitutionalCheckResult.denied(
-        reason: trustResult.violation!,
+        reason: trustResult.violation ?? 'Trust violation',
         violatedLaw: RuntimeLawId.trustLevelMustBeRespected,
       );
     }
@@ -636,7 +636,7 @@ class ConstitutionalGuard {
         'cap': capabilityId,
       });
       return ConstitutionalCheckResult.denied(
-        reason: traceResult.violation!,
+        reason: traceResult.violation ?? 'Trace violation',
         violatedLaw: RuntimeLawId.allOpsMustBeTraced,
       );
     }
@@ -699,7 +699,7 @@ class ConstitutionalGuard {
       );
       _appendLedger('law.violation', sandboxId, {'law': 'noBypassScheduler'});
       return ConstitutionalCheckResult.denied(
-        reason: schedulerResult.violation!,
+        reason: schedulerResult.violation ?? 'Scheduler violation',
         violatedLaw: RuntimeLawId.noBypassScheduler,
       );
     }
@@ -719,7 +719,7 @@ class ConstitutionalGuard {
       );
       _appendLedger('law.violation', sandboxId, {'law': 'noBudgetBypass'});
       return ConstitutionalCheckResult.denied(
-        reason: budgetResult.violation!,
+        reason: budgetResult.violation ?? 'Budget violation',
         violatedLaw: RuntimeLawId.noBudgetBypass,
       );
     }
@@ -739,7 +739,7 @@ class ConstitutionalGuard {
       );
       _appendLedger('law.violation', sandboxId, {'law': 'allOpsMustBeTraced'});
       return ConstitutionalCheckResult.denied(
-        reason: traceResult.violation!,
+        reason: traceResult.violation ?? 'Trace violation',
         violatedLaw: RuntimeLawId.allOpsMustBeTraced,
       );
     }
@@ -800,7 +800,7 @@ class ConstitutionalGuard {
         'law': 'noGlobalStateSharing',
       });
       return ConstitutionalCheckResult.denied(
-        reason: globalStateResult.violation!,
+        reason: globalStateResult.violation ?? 'Global state violation',
         violatedLaw: RuntimeLawId.noGlobalStateSharing,
       );
     }
@@ -823,7 +823,7 @@ class ConstitutionalGuard {
       );
       _appendLedger('law.violation', sandboxId, {'law': 'noSideChannels'});
       return ConstitutionalCheckResult.denied(
-        reason: sideChannelResult.violation!,
+        reason: sideChannelResult.violation ?? 'Side channel violation',
         violatedLaw: RuntimeLawId.noSideChannels,
       );
     }
@@ -843,7 +843,7 @@ class ConstitutionalGuard {
       );
       _appendLedger('law.violation', sandboxId, {'law': 'allOpsMustBeTraced'});
       return ConstitutionalCheckResult.denied(
-        reason: traceResult.violation!,
+        reason: traceResult.violation ?? 'Trace violation',
         violatedLaw: RuntimeLawId.allOpsMustBeTraced,
       );
     }

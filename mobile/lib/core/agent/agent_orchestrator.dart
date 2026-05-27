@@ -173,7 +173,7 @@ class AgentOrchestrator extends ChangeNotifier {
     _registerSkillAsRuntimeCapability(skill);
   }
 
-  void _registerSkillAsRuntimeCapability(Skill skill) {
+  Future<void> _registerSkillAsRuntimeCapability(Skill skill) async {
     final sdk = _sdk;
     if (sdk == null || !sdk.isInitialized) return;
     try {
@@ -304,9 +304,9 @@ class AgentOrchestrator extends ChangeNotifier {
         timeoutMs: 30000,
       );
 
-      if (capResult.status == CapabilityStatus.success &&
-          capResult.data != null) {
-        final data = capResult.data!;
+      if (capResult.status == CapabilityStatus.success) {
+        final data = capResult.data;
+        if (data != null) {
         if (data.containsKey('stream')) {
           final agentStream = data['stream'] as AgentStream;
           await for (final event in agentStream.events) {
@@ -319,6 +319,7 @@ class AgentOrchestrator extends ChangeNotifier {
             msgIndex,
             data['content'] as String,
           );
+        }
         }
       } else {
         await _streamAIDirect(contextMessages, skillsList, msgIndex);

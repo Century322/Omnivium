@@ -67,7 +67,9 @@ class RemoteUIEngine {
       return true;
     } catch (e) {
       AppLogger.instance.debug('URL validation failed', error: e);
-      return false;  }
+      return false;
+    }
+  }
 
   static Widget render(
     Map<String, dynamic> schema,

@@ -1,4 +1,5 @@
 ﻿import '../../core/app_logger.dart';
+import '../../core/app_provider.dart';
 import 'dart:async';
 import 'dart:io' if (dart.library.html) '';
 import 'package:flutter/foundation.dart';
@@ -254,19 +255,20 @@ class _VoiceMessagePlayerState extends State<VoiceMessagePlayer> {
     } else {
       String playUrl = widget.url;
       if (playUrl.startsWith('mxc://')) {
-        final converted = MatrixProvider.instance.getMediaUrl(playUrl);
+        final mp = AppProvider.instance;
+        if (mp == null) return;
+        final converted = mp.matrix.getMediaUrl(playUrl);
         if (converted != null) {
           playUrl = converted;
         } else {
           return;
         }
       }
-      final headers = MatrixProvider.instance.getMediaHeaders();
       if (_position > Duration.zero && _position < _duration) {
         await _player.resume();
       } else {
         await _player.play(
-          UrlSource(playUrl, headers: headers ?? const {}),
+          UrlSource(playUrl),
         );
       }
     }

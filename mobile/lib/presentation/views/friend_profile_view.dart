@@ -703,9 +703,9 @@ class FriendProfileView extends StatelessWidget {
             onPressed: () async {
               Navigator.pop(context);
               try {
-                await room.reportEvent(
-                  '',
-                  reason: t('report'),
+                await room.client.reportRoom(
+                  room.id,
+                  t('report'),
                 );
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -872,7 +872,7 @@ class FriendProfileView extends StatelessWidget {
                 for (final event in timeline.events) {
                   if (event.senderId == room.client.userID) {
                     try {
-                      await event.redact();
+                      await room.redactEvent(event.eventId);
                     } catch (e) {
                       AppLogger.instance.debug('Redact event failed', error: e);
                     }

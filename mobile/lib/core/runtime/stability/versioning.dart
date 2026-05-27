@@ -94,8 +94,10 @@ class DeprecationNotice {
     this.level = DeprecationLevel.deprecated,
   });
 
-  bool isRemovedIn(SemanticVersion version) =>
-      removedIn != null && version >= removedIn!;
+  bool isRemovedIn(SemanticVersion version) {
+    final removed = removedIn;
+    return removed != null && version >= removed;
+  }
 
   bool isDeprecatedIn(SemanticVersion version) => version >= deprecatedIn;
 }

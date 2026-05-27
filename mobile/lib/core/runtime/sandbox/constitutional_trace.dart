@@ -152,15 +152,15 @@ class ConstitutionalTraceGraph {
         totalCompliant++;
       } else {
         totalViolations++;
-        if (d.violatedLaw != null) {
-          violationCounts[d.violatedLaw!] =
-              (violationCounts[d.violatedLaw!] ?? 0) + 1;
+        if (d.violatedLaw case final law?) {
+          violationCounts[law] =
+              (violationCounts[law] ?? 0) + 1;
         }
         sandboxViolationCounts[d.sandboxId] =
             (sandboxViolationCounts[d.sandboxId] ?? 0) + 1;
-        if (d.capabilityId != null) {
-          capabilityViolationCounts[d.capabilityId!] =
-              (capabilityViolationCounts[d.capabilityId!] ?? 0) + 1;
+        if (d.capabilityId case final capId?) {
+          capabilityViolationCounts[capId] =
+              (capabilityViolationCounts[capId] ?? 0) + 1;
         }
       }
       escalationDistribution[d.escalationAfter] =

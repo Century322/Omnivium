@@ -223,12 +223,14 @@ class NoteService {
     final now = DateTime.now();
     return _items
         .where(
-          (n) =>
-              n.type == NoteType.schedule &&
-              n.dueDate != null &&
-              n.dueDate!.year == now.year &&
-              n.dueDate!.month == now.month &&
-              n.dueDate!.day == now.day,
+          (n) {
+            final due = n.dueDate;
+            return n.type == NoteType.schedule &&
+              due != null &&
+              due.year == now.year &&
+              due.month == now.month &&
+              due.day == now.day;
+          },
         )
         .toList();
   }

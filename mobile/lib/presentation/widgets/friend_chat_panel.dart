@@ -148,7 +148,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
     }
     if (oldWidget.chatTargetId != widget.chatTargetId) {
       _saveDraft();
-      _timeline?.dispose();
+      _timeline = null;
       _timeline = null;
       _loadMatrixMessages(widget.chatTargetId);
       _markRoomAsRead(widget.chatTargetId);
@@ -192,7 +192,6 @@ class _FriendChatPanelState extends State<FriendChatPanel>
     _saveDraft();
     _voiceResultSub?.cancel();
     _presenceTimer?.cancel();
-    _timeline?.dispose();
     _textController.dispose();
     _focusNode.dispose();
     _scrollController.dispose();
@@ -1194,6 +1193,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
                   color: AppColors.textPrimary(context),
                   fontSize: 18,
                 ),
+              ),
             ),
           ],
         ),
@@ -2470,12 +2470,11 @@ class _FriendChatPanelState extends State<FriendChatPanel>
     if (msg.eventId == null) return false;
     if (!msg.isMe) return false;
     try {
-      final readMarkers = room.readMarkers;
-      final mRead = readMarkers['m.read'];
+      final mRead = room.notificationCount;
       if (mRead == null) return false;
-      final timeline = room.timeline;
-      if (timeline == null) return false;
-      final events = timeline.events;
+      final tl = _timeline;
+      if (tl == null) return false;
+      final events = tl.events;
       if (events.isEmpty) return false;
       final msgIndex = events.indexWhere((e) => e.eventId == msg.eventId);
       final readIndex = events.indexWhere((e) => e.eventId == mRead);

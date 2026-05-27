@@ -485,8 +485,7 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            final selTemplate = _selectedTemplate;
-            if (selTemplate != null) ...[
+            if (_selectedTemplate case final selTemplate?) ...[
               Row(
                 children: [
                   Text(

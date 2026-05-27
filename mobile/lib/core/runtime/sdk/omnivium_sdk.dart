@@ -173,9 +173,13 @@ class OmniviumSDK {
     }
 
     try {
+      final targetNode = route.targetNodeId;
+      if (targetNode == null) {
+        throw StateError('No target node in route for $capabilityId');
+      }
       final result = await dist.sendAndReceive(
         capabilityId: capabilityId,
-        targetNodeId: route.targetNodeId!,
+        targetNodeId: targetNode,
         params: params,
         timeout: Duration(milliseconds: timeoutMs),
       );

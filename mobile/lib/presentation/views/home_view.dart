@@ -59,6 +59,7 @@ class _HomeViewState extends State<HomeView>
   final Set<int> _expandedThoughts = {};
 
   final GlobalKey<AppDrawerState> _drawerKey = GlobalKey();
+  final GlobalKey lastUserBubbleKey = GlobalKey();
   double _swipeStartX = 0;
 
   late AnimationController _listeningGlow;
