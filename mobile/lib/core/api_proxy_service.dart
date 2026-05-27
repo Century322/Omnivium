@@ -1,4 +1,4 @@
-import 'app_logger.dart';
+﻿import 'app_logger.dart';
 import 'app_config.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -162,7 +162,7 @@ class ApiProxyService {
       return false;
     } catch (e, stackTrace) {
       AppLogger.instance.warning(
-        'Operation failed',
+        'App error',
         error: e,
         stackTrace: stackTrace,
       );

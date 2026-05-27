@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:math';
 import 'dart:io' if (dart.library.html) '';
@@ -293,7 +293,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
       });
     } catch (e, stackTrace) {
       AppLogger.instance.error(
-        'Operation failed',
+        'App error',
         error: e,
         stackTrace: stackTrace,
       );
@@ -1407,7 +1407,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
       return parts.join('\n');
     } catch (e, stackTrace) {
       AppLogger.instance.warning(
-        'Operation failed',
+        'App error',
         error: e,
         stackTrace: stackTrace,
       );
@@ -1431,7 +1431,7 @@ class _FriendChatPanelState extends State<FriendChatPanel>
       );
     } catch (e, stackTrace) {
       AppLogger.instance.warning(
-        'Operation failed',
+        'App error',
         error: e,
         stackTrace: stackTrace,
       );

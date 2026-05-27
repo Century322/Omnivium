@@ -1,4 +1,4 @@
-import '../../core/app_logger.dart';
+﻿import '../../core/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../widgets/skeleton_loader.dart';
@@ -97,7 +97,7 @@ class _SearchViewState extends State<SearchView> {
       } catch (e, stackTrace) {
         messageSearchFailed = true;
         AppLogger.instance.error(
-          'Operation failed',
+          'App error',
           error: e,
           stackTrace: stackTrace,
         );
@@ -119,7 +119,7 @@ class _SearchViewState extends State<SearchView> {
       } catch (e, stackTrace) {
         userSearchFailed = true;
         AppLogger.instance.error(
-          'Operation failed',
+          'App error',
           error: e,
           stackTrace: stackTrace,
         );

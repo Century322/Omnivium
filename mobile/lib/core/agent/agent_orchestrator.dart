@@ -191,8 +191,14 @@ class AgentOrchestrator extends ChangeNotifier {
           ),
         ],
       );
-      sdk.container.registerPlugin(descriptor, _SkillPluginHandler(skill));
-      sdk.container.activatePlugin(descriptor.id);
+      final registered = await sdk.container.registerPlugin(descriptor, _SkillPluginHandler(skill));
+      if (registered) {
+        await sdk.container.activatePlugin(descriptor.id);
+      } else {
+        AppLogger.instance.warning(
+          'Skill registration: plugin limit reached, skipping ${skill.id}',
+        );
+      }
     } catch (e) {
       AppLogger.instance.warning(
         'Skill registration: failed to register skill as runtime capability',

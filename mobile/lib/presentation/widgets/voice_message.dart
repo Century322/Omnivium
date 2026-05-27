@@ -1,4 +1,4 @@
-import '../../core/app_logger.dart';
+﻿import '../../core/app_logger.dart';
 import 'dart:async';
 import 'dart:io' if (dart.library.html) '';
 import 'package:flutter/foundation.dart';
@@ -54,7 +54,7 @@ class _VoiceRecorderButtonState extends State<VoiceRecorderButton> {
       });
     } catch (e, stackTrace) {
       AppLogger.instance.error(
-        'Operation failed',
+        'App error',
         error: e,
         stackTrace: stackTrace,
       );
@@ -72,7 +72,7 @@ class _VoiceRecorderButtonState extends State<VoiceRecorderButton> {
       }
     } catch (e, stackTrace) {
       AppLogger.instance.error(
-        'Operation failed',
+        'App error',
         error: e,
         stackTrace: stackTrace,
       );

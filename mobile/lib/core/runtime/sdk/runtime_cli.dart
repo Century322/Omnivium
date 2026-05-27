@@ -1,3 +1,4 @@
+import '../../app_logger.dart';
 import '../kernel/runtime_container.dart';
 import '../distributed/distributed_runtime.dart';
 
@@ -43,7 +44,8 @@ class RuntimeCLI {
         default:
           return 'Unknown command: $command\n${cmdHelp()}';
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      AppLogger.instance.warning('CLI command failed: $command', error: e, stackTrace: stackTrace);
       return 'Error: $e';
     }
   }

@@ -1,4 +1,4 @@
-import 'app_logger.dart';
+﻿import 'app_logger.dart';
 import 'notification_center.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -6,6 +6,7 @@ import 'dart:io' if (dart.library.html) '';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'api_proxy_service.dart';
+import 'auth_service.dart';
 import 'deep_link_service.dart';
 import 'encryption_service.dart';
 import 'push_notification_service_stub.dart'
@@ -20,6 +21,10 @@ class PushNotificationService {
       FlutterLocalNotificationsPlugin();
   String? _fcmToken;
   String? get fcmToken => _fcmToken;
+  Timer? _registerRetryTimer;
+  int _registerRetryCount = 0;
+  static const _maxRegisterRetries = 5;
+  static const _registerRetryDelays = [2, 5, 15, 60, 300];
 
   final StreamController<Map<String, dynamic>> _onMessageOpenedApp =
       StreamController.broadcast();
@@ -62,7 +67,7 @@ class PushNotificationService {
             _onMessageOpenedApp.add(data);
           } catch (e, stackTrace) {
             AppLogger.instance.error(
-              'Operation failed',
+              'App error',
               error: e,
               stackTrace: stackTrace,
             );
@@ -97,6 +102,7 @@ class PushNotificationService {
 
   void setFcmToken(String token) {
     _fcmToken = token;
+    _registerRetryCount = 0;
     _registerTokenWithBackend();
   }
 
@@ -104,21 +110,52 @@ class PushNotificationService {
     final token = _fcmToken;
     if (token == null) return;
     final proxy = ApiProxyService.instance;
-    if (!proxy.isConfigured) return;
+    if (!proxy.isConfigured) {
+      _scheduleRegisterRetry();
+      return;
+    }
     try {
-      await proxy.registerDevice(
+      final userId = AuthService.instance.currentUser?.id;
+      final success = await proxy.registerDevice(
         deviceId: proxy.buildDeviceHeaders()['X-Device-Id'] ?? 'unknown',
         fcmToken: token,
         platform: defaultTargetPlatform.name,
         appVersion: proxy.buildDeviceHeaders()['X-App-Version'] ?? '1.0.0',
+        userId: userId,
       );
+      if (success) {
+        _registerRetryCount = 0;
+        AppLogger.instance.info('FCM token registered successfully');
+      } else {
+        _scheduleRegisterRetry();
+      }
     } catch (e, stackTrace) {
       AppLogger.instance.warning(
         'Register FCM token failed',
         error: e,
         stackTrace: stackTrace,
       );
+      _scheduleRegisterRetry();
     }
+  }
+
+  void _scheduleRegisterRetry() {
+    if (_registerRetryCount >= _maxRegisterRetries) {
+      AppLogger.instance.warning(
+        'FCM token registration exhausted $_maxRegisterRetries retries',
+      );
+      return;
+    }
+    _registerRetryTimer?.cancel();
+    final delaySeconds = _registerRetryDelays[_registerRetryCount];
+    _registerRetryCount++;
+    AppLogger.instance.info(
+      'FCM token registration retry #$_registerRetryCount in ${delaySeconds}s',
+    );
+    _registerRetryTimer = Timer(
+      Duration(seconds: delaySeconds),
+      () => _registerTokenWithBackend(),
+    );
   }
 
   Future<void> showLocalNotification({
@@ -219,6 +256,7 @@ class PushNotificationService {
   }
 
   void dispose() {
+    _registerRetryTimer?.cancel();
     _onMessageOpenedApp.close();
   }
 

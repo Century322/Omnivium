@@ -1,4 +1,4 @@
-import '../../core/app_logger.dart';
+﻿import '../../core/app_logger.dart';
 import '../../core/app_navigator.dart';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
@@ -775,7 +775,7 @@ class _SettingsViewState extends State<SettingsView>
                 await widget.provider.matrix.logout();
               } catch (e, stackTrace) {
                 AppLogger.instance.error(
-                  'Operation failed',
+                  'App error',
                   error: e,
                   stackTrace: stackTrace,
                 );

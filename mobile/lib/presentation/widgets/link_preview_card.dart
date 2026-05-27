@@ -1,4 +1,4 @@
-import '../../core/app_logger.dart';
+﻿import '../../core/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -198,7 +198,7 @@ class LinkPreviewCard extends StatelessWidget {
       return uri.host.replaceAll('www.', '');
     } catch (e, stackTrace) {
       AppLogger.instance.warning(
-        'Operation failed',
+        'App error',
         error: e,
         stackTrace: stackTrace,
       );

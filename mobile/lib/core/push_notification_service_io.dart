@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import 'app_logger.dart';
 import 'push_notification_service.dart';
 import 'notification_queue.dart';
 
@@ -16,8 +17,9 @@ Future<void> initFirebaseMessaging(PushNotificationService service) async {
   try {
     await Firebase.initializeApp();
   } catch (e) {
-    debugPrint(
-      'Firebase init failed (google-services.json may be missing): $e',
+    AppLogger.instance.warning(
+      'Firebase init failed (google-services.json may be missing)',
+      error: e,
     );
     return;
   }
@@ -47,6 +49,8 @@ Future<void> initFirebaseMessaging(PushNotificationService service) async {
       final token = await messaging.getToken();
       if (token != null) {
         service.setFcmToken(token);
+      } else {
+        AppLogger.instance.warning('FCM getToken returned null');
       }
 
       _firebaseSubs.add(
@@ -80,9 +84,17 @@ Future<void> initFirebaseMessaging(PushNotificationService service) async {
       if (initialMessage != null) {
         service.handleMessageOpened(initialMessage.data);
       }
+    } else {
+      AppLogger.instance.info(
+        'Push notification permission denied: ${settings.authorizationStatus}',
+      );
     }
-  } catch (e) {
-    debugPrint('Firebase messaging setup failed: $e');
+  } catch (e, stackTrace) {
+    AppLogger.instance.warning(
+      'Firebase messaging setup failed',
+      error: e,
+      stackTrace: stackTrace,
+    );
   }
 }
 

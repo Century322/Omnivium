@@ -1,4 +1,4 @@
-import '../../core/app_logger.dart';
+﻿import '../../core/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../theme/app_colors.dart';
@@ -55,7 +55,7 @@ class _StorageViewState extends State<StorageView> {
       }
     } catch (e, stackTrace) {
       AppLogger.instance.error(
-        'Operation failed',
+        'App error',
         error: e,
         stackTrace: stackTrace,
       );
@@ -398,7 +398,7 @@ class _StorageViewState extends State<StorageView> {
                 }
               } catch (e, stackTrace) {
                 AppLogger.instance.error(
-                  'Operation failed',
+                  'App error',
                   error: e,
                   stackTrace: stackTrace,
                 );

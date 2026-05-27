@@ -1,4 +1,4 @@
-import '../../core/app_logger.dart';
+﻿import '../../core/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:matrix/matrix.dart';
@@ -441,7 +441,7 @@ class FriendProfileView extends StatelessWidget {
                 await room.setName(name);
               } catch (e, stackTrace) {
                 AppLogger.instance.error(
-                  'Operation failed',
+                  'App error',
                   error: e,
                   stackTrace: stackTrace,
                 );
@@ -516,7 +516,7 @@ class FriendProfileView extends StatelessWidget {
                 await room.invite(userId);
               } catch (e, stackTrace) {
                 AppLogger.instance.error(
-                  'Operation failed',
+                  'App error',
                   error: e,
                   stackTrace: stackTrace,
                 );
@@ -559,7 +559,7 @@ class FriendProfileView extends StatelessWidget {
                 if (context.mounted) Navigator.pop(context);
               } catch (e, stackTrace) {
                 AppLogger.instance.error(
-                  'Operation failed',
+                  'App error',
                   error: e,
                   stackTrace: stackTrace,
                 );
@@ -605,7 +605,7 @@ class FriendProfileView extends StatelessWidget {
       }
     } catch (e, stackTrace) {
       AppLogger.instance.error(
-        'Operation failed',
+        'App error',
         error: e,
         stackTrace: stackTrace,
       );

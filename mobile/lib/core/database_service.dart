@@ -1,4 +1,4 @@
-import 'app_logger.dart';
+﻿import 'app_logger.dart';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -143,7 +143,7 @@ class DatabaseService {
       return jsonDecode(raw) as Map<String, dynamic>;
     } catch (e, stackTrace) {
       AppLogger.instance.warning(
-        'Operation failed',
+        'App error',
         error: e,
         stackTrace: stackTrace,
       );
@@ -158,7 +158,7 @@ class DatabaseService {
             return jsonDecode(raw) as Map<String, dynamic>;
           } catch (e, stackTrace) {
             AppLogger.instance.warning(
-              'Operation failed',
+              'App error',
               error: e,
               stackTrace: stackTrace,
             );
@@ -184,7 +184,7 @@ class DatabaseService {
       return jsonDecode(raw) as Map<String, dynamic>;
     } catch (e, stackTrace) {
       AppLogger.instance.warning(
-        'Operation failed',
+        'App error',
         error: e,
         stackTrace: stackTrace,
       );
@@ -199,7 +199,7 @@ class DatabaseService {
             return jsonDecode(raw) as Map<String, dynamic>;
           } catch (e, stackTrace) {
             AppLogger.instance.warning(
-              'Operation failed',
+              'App error',
               error: e,
               stackTrace: stackTrace,
             );
@@ -245,7 +245,7 @@ class DatabaseService {
       return jsonDecode(raw) as Map<String, dynamic>;
     } catch (e, stackTrace) {
       AppLogger.instance.warning(
-        'Operation failed',
+        'App error',
         error: e,
         stackTrace: stackTrace,
       );
@@ -289,7 +289,7 @@ class DatabaseService {
         await prefs.remove('omnivium_sessions');
       } catch (e, stackTrace) {
         AppLogger.instance.error(
-          'Operation failed',
+          'App error',
           error: e,
           stackTrace: stackTrace,
         );
@@ -309,7 +309,7 @@ class DatabaseService {
         await prefs.remove('omnivium_memories');
       } catch (e, stackTrace) {
         AppLogger.instance.error(
-          'Operation failed',
+          'App error',
           error: e,
           stackTrace: stackTrace,
         );

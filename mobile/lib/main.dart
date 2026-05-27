@@ -660,8 +660,7 @@ class _AppShellState extends State<_AppShell>
   Widget build(BuildContext context) {
     if (!_initialized) {
       final isDark = MediaQuery.platformBrightness == Brightness.dark;
-      final bgColor = isDark ? const Color(0xFF1C1C1E) : Colors.white;
-      final fgColor = isDark ? Colors.white : Colors.black;
+      final bgColor = isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF5F5F7);
       return AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle(
           statusBarColor: bgColor,
@@ -676,24 +675,10 @@ class _AppShellState extends State<_AppShell>
           home: Scaffold(
             backgroundColor: bgColor,
             body: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Image.asset(
-                    'assets/icon/app_icon.png',
-                    width: 120,
-                    height: 120,
-                  ),
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: AppColors.acc(context),
-                    ),
-                  ),
-                ],
+              child: Image.asset(
+                'assets/icon/app_icon.png',
+                width: 120,
+                height: 120,
               ),
             ),
           ),

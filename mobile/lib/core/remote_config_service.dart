@@ -1,4 +1,4 @@
-import 'app_logger.dart';
+﻿import 'app_logger.dart';
 import 'dart:convert';
 import 'api_proxy_service.dart';
 import 'database_service.dart';
@@ -87,7 +87,7 @@ class RemoteConfigService {
       }
     } catch (e, stackTrace) {
       AppLogger.instance.error(
-        'Operation failed',
+        'App error',
         error: e,
         stackTrace: stackTrace,
       );
@@ -115,7 +115,7 @@ class RemoteConfigService {
       }
     } catch (e, stackTrace) {
       AppLogger.instance.error(
-        'Operation failed',
+        'App error',
         error: e,
         stackTrace: stackTrace,
       );
@@ -137,7 +137,7 @@ class RemoteConfigService {
         }
       } catch (e, stackTrace) {
         AppLogger.instance.error(
-          'Operation failed',
+          'App error',
           error: e,
           stackTrace: stackTrace,
         );
@@ -151,7 +151,7 @@ class RemoteConfigService {
         _uiSchemas = data.map((k, v) => MapEntry(k, v as Map<String, dynamic>));
       } catch (e, stackTrace) {
         AppLogger.instance.error(
-          'Operation failed',
+          'App error',
           error: e,
           stackTrace: stackTrace,
         );

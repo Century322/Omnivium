@@ -1,4 +1,4 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'app_logger.dart';
@@ -124,11 +124,30 @@ class ModelProvider extends ChangeNotifier {
     } catch (e, stackTrace) {
       _lastError = e.toString();
       AppLogger.instance.error(
-        'Operation failed',
+        'Model load from backend failed',
         error: e,
         stackTrace: stackTrace,
       );
+      _scheduleModelRetry();
     }
+  }
+
+  Timer? _modelRetryTimer;
+  int _modelRetryCount = 0;
+  static const _maxModelRetries = 3;
+
+  void _scheduleModelRetry() {
+    if (_modelRetryCount >= _maxModelRetries || _disposed) return;
+    _modelRetryTimer?.cancel();
+    final delay = Duration(seconds: 5 * (_modelRetryCount + 1));
+    _modelRetryCount++;
+    _modelRetryTimer = Timer(delay, () async {
+      await _loadModelsFromBackend();
+      if (_lastError == null) {
+        _modelRetryCount = 0;
+        if (!_disposed) notifyListeners();
+      }
+    });
   }
 
   Future<void> _loadModelsFromCache() async {
@@ -143,7 +162,7 @@ class ModelProvider extends ChangeNotifier {
         }
       } catch (e, stackTrace) {
         AppLogger.instance.error(
-          'Operation failed',
+          'App error',
           error: e,
           stackTrace: stackTrace,
         );
@@ -165,7 +184,7 @@ class ModelProvider extends ChangeNotifier {
       }
     } catch (e, stackTrace) {
       AppLogger.instance.error(
-        'Operation failed',
+        'App error',
         error: e,
         stackTrace: stackTrace,
       );

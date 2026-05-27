@@ -1,4 +1,4 @@
-import '../app_logger.dart';
+﻿import '../app_logger.dart';
 import '../call_service.dart';
 import 'dart:async';
 import 'dart:io' if (dart.library.html) '';
@@ -35,7 +35,7 @@ class MatrixProvider extends ChangeNotifier {
       return '${c.homeserver}/_matrix/media/v3/download/${parts[0]}/${parts[1]}';
     } catch (e, stackTrace) {
       AppLogger.instance.warning(
-        'Operation failed',
+        'App error',
         error: e,
         stackTrace: stackTrace,
       );
@@ -194,7 +194,7 @@ class MatrixProvider extends ChangeNotifier {
       await room.setTyping(isTyping, timeout: isTyping ? 5000 : 0);
     } catch (e, stackTrace) {
       AppLogger.instance.error(
-        'Operation failed',
+        'App error',
         error: e,
         stackTrace: stackTrace,
       );
@@ -280,7 +280,7 @@ class MatrixProvider extends ChangeNotifier {
                 }
               } catch (e, stackTrace) {
                 AppLogger.instance.error(
-                  'Operation failed',
+                  'App error',
                   error: e,
                   stackTrace: stackTrace,
                 );
@@ -307,7 +307,7 @@ class MatrixProvider extends ChangeNotifier {
                 }
               } catch (e, stackTrace) {
                 AppLogger.instance.error(
-                  'Operation failed',
+                  'App error',
                   error: e,
                   stackTrace: stackTrace,
                 );

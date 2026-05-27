@@ -1,4 +1,4 @@
-import '../app_logger.dart';
+﻿import '../app_logger.dart';
 import '../notification_center.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -36,7 +36,7 @@ class NotificationProvider extends ChangeNotifier {
         if (!_disposed) notifyListeners();
       } catch (e, stackTrace) {
         AppLogger.instance.error(
-          'Operation failed',
+          'App error',
           error: e,
           stackTrace: stackTrace,
         );
@@ -135,7 +135,7 @@ class NotificationProvider extends ChangeNotifier {
             }
           } catch (e, stackTrace) {
             AppLogger.instance.error(
-              'Operation failed',
+              'App error',
               error: e,
               stackTrace: stackTrace,
             );

@@ -1,4 +1,4 @@
-import 'app_logger.dart';
+﻿import 'app_logger.dart';
 import 'dart:convert';
 import 'dart:async';
 import 'package:flutter/material.dart';
@@ -306,7 +306,7 @@ class SessionProvider extends ChangeNotifier {
       }
     } catch (e, stackTrace) {
       AppLogger.instance.error(
-        'Operation failed',
+        'App error',
         error: e,
         stackTrace: stackTrace,
       );
@@ -388,7 +388,7 @@ class SessionProvider extends ChangeNotifier {
           _sessions.add(ConversationSession.fromJson(data));
         } catch (e, stackTrace) {
           AppLogger.instance.error(
-            'Operation failed',
+            'App error',
             error: e,
             stackTrace: stackTrace,
           );
@@ -411,7 +411,7 @@ class SessionProvider extends ChangeNotifier {
           await prefs.remove('omnivium_sessions');
         } catch (e, stackTrace) {
           AppLogger.instance.error(
-            'Operation failed',
+            'App error',
             error: e,
             stackTrace: stackTrace,
           );

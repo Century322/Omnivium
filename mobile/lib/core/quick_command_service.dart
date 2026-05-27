@@ -1,4 +1,4 @@
-import 'app_logger.dart';
+﻿import 'app_logger.dart';
 import 'dart:convert';
 import 'database_service.dart';
 import 'remote_config_service.dart';
@@ -86,7 +86,7 @@ class QuickCommandService {
             .toList();
       } catch (e, stackTrace) {
         AppLogger.instance.warning(
-          'Operation failed',
+          'App error',
           error: e,
           stackTrace: stackTrace,
         );
