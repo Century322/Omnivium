@@ -1,1 +1,1 @@
-﻿         ^^^^^
+﻿Gradle task assembleRelease failed with exit code 1
