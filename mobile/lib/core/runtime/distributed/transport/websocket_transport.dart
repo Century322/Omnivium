@@ -167,6 +167,7 @@ class WebSocketTransport implements RuntimeTransport {
     } catch (e) {
       AppLogger.instance.debug('WS message parse failed', error: e);
     }
+  }
 
   TransportMessage _parseMessage(Map<String, dynamic> json) {
     final tsJson = json['timestamp'] as Map<String, dynamic>? ?? {};
@@ -207,7 +208,8 @@ class WebSocketTransport implements RuntimeTransport {
 
     _reconnectTimer?.cancel();
     final delay = Duration(
-      milliseconds: _reconnectInterval.inMilliseconds *
+      milliseconds:
+          _reconnectInterval.inMilliseconds *
           (1 << _reconnectAttempts.clamp(0, 5)),
     );
     final maxDelay = const Duration(seconds: 30);

@@ -75,9 +75,9 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
       appBar: AppBar(
         backgroundColor: AppColors.bg(context),
         foregroundColor: AppColors.textPrimary(context),
-        title: widget.title case final videoTitle?
+        title: widget.title != null
             ? Text(
-                videoTitle,
+                widget.title!,
                 style: TextStyle(
                   color: AppColors.textPrimary(context),
                   fontSize: 16,
