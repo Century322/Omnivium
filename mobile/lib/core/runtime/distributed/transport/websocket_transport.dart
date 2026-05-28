@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io' if (dart.library.html) '';
+import '../../../app_logger.dart';
 import 'runtime_transport.dart';
 
 class WebSocketTransport implements RuntimeTransport {
