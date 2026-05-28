@@ -1,0 +1,2152 @@
+﻿00:00 +0: loading C:/Users/19468/Desktop/Omnivium/mobile/test/about_view_test.dart
+00:00 +0: C:/Users/19468/Desktop/Omnivium/mobile/test/about_view_test.dart: AboutView renders app info
+00:01 +1: C:/Users/19468/Desktop/Omnivium/mobile/test/about_view_test.dart: AboutView renders app info
+00:01 +2: C:/Users/19468/Desktop/Omnivium/mobile/test/about_view_test.dart: AboutView renders app info
+00:01 +3: C:/Users/19468/Desktop/Omnivium/mobile/test/about_view_test.dart: AboutView renders app info
+00:01 +4: C:/Users/19468/Desktop/Omnivium/mobile/test/about_view_test.dart: AboutView renders app info
+00:01 +5: C:/Users/19468/Desktop/Omnivium/mobile/test/about_view_test.dart: AboutView renders app info
+00:01 +6: C:/Users/19468/Desktop/Omnivium/mobile/test/about_view_test.dart: AboutView renders app info
+00:01 +7: C:/Users/19468/Desktop/Omnivium/mobile/test/about_view_test.dart: AboutView renders app info
+00:01 +8: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_orchestrator_model_test.dart: AgentLogEntry isRunning returns true when endTime is null
+00:01 +9: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_orchestrator_model_test.dart: AgentLogEntry isRunning returns false when endTime is set
+00:01 +10: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_orchestrator_model_test.dart: AgentLogEntry duration returns zero when endTime is null
+00:01 +11: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_orchestrator_model_test.dart: AgentLogEntry duration returns correct difference
+00:01 +12: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_orchestrator_model_test.dart: AgentLogEntry creates with all fields
+00:01 +13: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_orchestrator_model_test.dart: ConversationMessage creates with required fields
+00:01 +14: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_orchestrator_model_test.dart: ConversationMessage creates with all fields
+00:01 +15: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_orchestrator_model_test.dart: ConversationMessage copyWith updates specified fields
+00:01 +16: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_orchestrator_model_test.dart: ConversationMessage copyWith without args keeps original
+00:03 +17: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_reminder_service_test.dart: ReminderType has all expected values
+00:03 +18: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_reminder_service_test.dart: ReminderStatus has all expected values
+00:03 +19: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_reminder_service_test.dart: ReminderFrequency everyMinute has 1 minute interval
+00:03 +20: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_reminder_service_test.dart: ReminderFrequency every30Minutes has 30 minute interval
+00:03 +21: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_reminder_service_test.dart: ReminderFrequency every2Hours has 2 hour interval
+00:03 +22: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_reminder_service_test.dart: ReminderFrequency every6Hours has 6 hour interval
+00:03 +23: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_reminder_service_test.dart: ReminderFrequency everyDay has 1 day interval
+00:03 +24: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_reminder_service_test.dart: ReminderFrequency custom creates custom frequency
+00:03 +25: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_reminder_service_test.dart: Reminder constructor sets all fields
+00:03 +26: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_reminder_service_test.dart: Reminder copyWith updates status
+00:03 +27: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_reminder_service_test.dart: Reminder copyWith updates nextTriggerAt
+00:03 +28: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_reminder_service_test.dart: Reminder toJson returns valid map
+00:03 +29: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_reminder_service_test.dart: Reminder with matrixRoomId
+00:03 +30: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_reminder_service_test.dart: Reminder with aiPrompt
+00:04 +31: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_replay_view_test.dart: AgentReplayView renders replay view
+00:05 +32: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_replay_view_test.dart: AgentReplayView renders replay view
+00:05 +33: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_replay_view_test.dart: AgentReplayView renders replay view
+00:05 +34: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_replay_view_test.dart: AgentReplayView renders replay view
+00:05 +35: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_replay_view_test.dart: AgentReplayView renders replay view
+00:05 +36: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_replay_view_test.dart: AgentReplayView renders replay view
+00:05 +37: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_replay_view_test.dart: AgentReplayView renders replay view
+00:05 +38: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_replay_view_test.dart: AgentReplayView renders replay view
+00:05 +39: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_replay_view_test.dart: AgentReplayView renders replay view
+00:05 +40: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_replay_view_test.dart: AgentReplayView renders replay view
+00:05 +41: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_replay_view_test.dart: AgentReplayView renders replay view
+00:05 +42: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_replay_view_test.dart: AgentReplayView renders replay view
+00:05 +43: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_replay_view_test.dart: AgentReplayView renders replay view
+00:05 +44: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_replay_view_test.dart: AgentReplayView renders replay view
+00:05 +45: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_replay_view_test.dart: AgentReplayView renders replay view
+00:05 +46: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_replay_view_test.dart: AgentReplayView renders replay view
+00:05 +47: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_replay_view_test.dart: AgentReplayView renders replay view
+00:05 +48: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_replay_view_test.dart: AgentReplayView renders replay view
+00:05 +49: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_replay_view_test.dart: AgentReplayView renders replay view
+00:05 +50: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_replay_view_test.dart: AgentReplayView renders replay view
+00:05 +51: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_replay_view_test.dart: AgentReplayView renders replay view
+00:05 +52: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_replay_view_test.dart: AgentReplayView renders replay view
+00:05 +53: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_replay_view_test.dart: AgentReplayView renders replay view
+00:05 +54: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_replay_view_test.dart: AgentReplayView renders replay view
+00:05 +55: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_replay_view_test.dart: AgentReplayView renders replay view
+00:05 +56: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_state_machine_test.dart: AgentStateMachine interrupted -> idle is valid
+00:05 +57: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_state_machine_test.dart: AgentStateMachine full slow path with memorizing
+00:05 +58: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_state_machine_test.dart: AgentStateMachine fast path: idle -> thinking -> completed
+00:05 +59: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_state_machine_test.dart: AgentStateMachine recovery path: checking -> recovering -> executing
+00:05 +60: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_state_machine_test.dart: AgentStateMachine reflection-rethink path: reflecting -> thinking -> planning -> ...
+00:05 +61: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_state_machine_test.dart: AgentStateMachine forceState bypasses rules
+00:05 +62: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_state_machine_test.dart: AgentStateMachine forceState records history with forced condition
+00:05 +63: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_state_machine_test.dart: AgentStateMachine transition records history
+00:05 +64: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_state_machine_test.dart: AgentStateMachine transition with condition records condition
+00:05 +65: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_state_machine_test.dart: AgentStateMachine invalid transition does not record history
+00:05 +66: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_state_machine_test.dart: AgentStateMachine interrupt forces interrupted state
+00:05 +67: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_state_machine_test.dart: AgentStateMachine reset returns to idle and clears history
+00:05 +68: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_state_machine_test.dart: AgentStateMachine recoverCount increments on recovering transition
+00:05 +69: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_state_machine_test.dart: AgentStateMachine recoverCount increments multiple times
+00:05 +70: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_state_machine_test.dart: AgentStateMachine canRecover is true when under max attempts
+00:05 +71: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_state_machine_test.dart: AgentStateMachine canRecover is false after max recover attempts
+00:05 +72: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_state_machine_test.dart: AgentStateMachine recoverCount resets on idle
+00:05 +73: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_state_machine_test.dart: AgentStateMachine recoverCount resets on completed
+00:05 +74: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_state_machine_test.dart: AgentState all states exist
+00:05 +75: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_state_machine_test.dart: AgentState all states are distinct
+00:05 +76: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_state_machine_test.dart: AgentState state names are readable
+00:05 +77: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_state_test.dart: AgentState initial state is idle
+00:05 +78: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_state_test.dart: AgentState all states are distinct
+00:05 +79: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_state_test.dart: IntentChannel has fast and slow channels
+00:05 +80: C:/Users/19468/Desktop/Omnivium/mobile/test/agent_state_test.dart: ThoughtStep creates with required fields
+00:07 +81: C:/Users/19468/Desktop/Omnivium/mobile/test/ai_operation_log_view_test.dart: AiOperationLogView renders operation log view
+00:08 +82: C:/Users/19468/Desktop/Omnivium/mobile/test/ai_permission_view_test.dart: AiPermissionView renders permission view
+00:08 +83: C:/Users/19468/Desktop/Omnivium/mobile/test/ai_permission_view_test.dart: AiPermissionView renders permission view
+00:08 +84: C:/Users/19468/Desktop/Omnivium/mobile/test/ai_permission_view_test.dart: AiPermissionView renders permission view
+00:08 +85: C:/Users/19468/Desktop/Omnivium/mobile/test/ai_permission_view_test.dart: AiPermissionView renders permission view
+00:08 +86: C:/Users/19468/Desktop/Omnivium/mobile/test/ai_permission_view_test.dart: AiPermissionView renders permission view
+00:08 +87: C:/Users/19468/Desktop/Omnivium/mobile/test/ai_permission_view_test.dart: AiPermissionView renders permission view
+00:08 +88: C:/Users/19468/Desktop/Omnivium/mobile/test/ai_permission_view_test.dart: AiPermissionView renders permission view
+00:08 +89: C:/Users/19468/Desktop/Omnivium/mobile/test/ai_permission_view_test.dart: AiPermissionView renders permission view
+00:08 +90: C:/Users/19468/Desktop/Omnivium/mobile/test/ai_permission_view_test.dart: AiPermissionView renders permission view
+00:08 +91: C:/Users/19468/Desktop/Omnivium/mobile/test/ai_permission_view_test.dart: AiPermissionView renders permission view
+00:08 +92: C:/Users/19468/Desktop/Omnivium/mobile/test/ai_permission_view_test.dart: AiPermissionView renders permission view
+00:08 +93: C:/Users/19468/Desktop/Omnivium/mobile/test/ai_permission_view_test.dart: AiPermissionView renders permission view
+00:08 +94: C:/Users/19468/Desktop/Omnivium/mobile/test/ai_permission_view_test.dart: AiPermissionView renders permission view
+00:08 +95: C:/Users/19468/Desktop/Omnivium/mobile/test/ai_permission_view_test.dart: AiPermissionView renders permission view
+00:08 +96: C:/Users/19468/Desktop/Omnivium/mobile/test/ai_permission_view_test.dart: AiPermissionView renders permission view
+00:08 +97: C:/Users/19468/Desktop/Omnivium/mobile/test/ai_permission_view_test.dart: AiPermissionView renders permission view
+00:09 +98: C:/Users/19468/Desktop/Omnivium/mobile/test/ai_permission_view_test.dart: AiPermissionView has scaffold
+00:09 +99: C:/Users/19468/Desktop/Omnivium/mobile/test/ai_permission_view_test.dart: AiPermissionView renders without error
+00:09 +100: C:/Users/19468/Desktop/Omnivium/mobile/test/ai_workbench_view_test.dart: AIWorkbenchView renders workbench view
+00:10 +101: C:/Users/19468/Desktop/Omnivium/mobile/test/ai_workbench_view_test.dart: AIWorkbenchView renders workbench view
+00:10 +102: C:/Users/19468/Desktop/Omnivium/mobile/test/ai_workbench_view_test.dart: AIWorkbenchView renders workbench view
+00:10 +103: C:/Users/19468/Desktop/Omnivium/mobile/test/ai_workbench_view_test.dart: AIWorkbenchView renders workbench view
+00:10 +104: C:/Users/19468/Desktop/Omnivium/mobile/test/ai_workbench_view_test.dart: AIWorkbenchView renders workbench view
+00:10 +105: C:/Users/19468/Desktop/Omnivium/mobile/test/ai_workbench_view_test.dart: AIWorkbenchView renders workbench view
+00:10 +106: C:/Users/19468/Desktop/Omnivium/mobile/test/ai_workbench_view_test.dart: AIWorkbenchView renders workbench view
+00:10 +107: C:/Users/19468/Desktop/Omnivium/mobile/test/ai_workbench_view_test.dart: AIWorkbenchView renders workbench view
+00:10 +108: C:/Users/19468/Desktop/Omnivium/mobile/test/ai_workbench_view_test.dart: AIWorkbenchView renders workbench view
+00:10 +109: C:/Users/19468/Desktop/Omnivium/mobile/test/ai_workbench_view_test.dart: AIWorkbenchView renders workbench view
+00:10 +110: C:/Users/19468/Desktop/Omnivium/mobile/test/ai_workbench_view_test.dart: AIWorkbenchView renders workbench view
+00:10 +111: C:/Users/19468/Desktop/Omnivium/mobile/test/ai_workbench_view_test.dart: AIWorkbenchView renders workbench view
+00:10 +112: C:/Users/19468/Desktop/Omnivium/mobile/test/ai_workbench_view_test.dart: AIWorkbenchView renders workbench view
+00:10 +113: C:/Users/19468/Desktop/Omnivium/mobile/test/ai_workbench_view_test.dart: AIWorkbenchView renders workbench view
+00:11 +114: C:/Users/19468/Desktop/Omnivium/mobile/test/ai_workbench_view_test.dart: AIWorkbenchView has scaffold with app bar
+00:11 +115: C:/Users/19468/Desktop/Omnivium/mobile/test/ai_workbench_view_test.dart: AIWorkbenchView has text input field
+00:11 +116: C:/Users/19468/Desktop/Omnivium/mobile/test/ai_workbench_view_test.dart: AIWorkbenchView can enter text in input field
+00:11 +117: C:/Users/19468/Desktop/Omnivium/mobile/test/animated_toggle_test.dart: AnimatedToggle renders and toggles
+00:11 +118: C:/Users/19468/Desktop/Omnivium/mobile/test/animated_toggle_test.dart: AnimatedToggle renders and toggles
+00:12 +119: C:/Users/19468/Desktop/Omnivium/mobile/test/animated_toggle_test.dart: AnimatedToggle renders and toggles
+00:12 +120: C:/Users/19468/Desktop/Omnivium/mobile/test/animated_toggle_test.dart: AnimatedToggle renders and toggles
+00:12 +121: C:/Users/19468/Desktop/Omnivium/mobile/test/api_proxy_test.dart: ApiProxyService buildAuthHeaders returns map
+00:12 +122: C:/Users/19468/Desktop/Omnivium/mobile/test/animated_toggle_test.dart: AnimatedToggle calls onChanged when tapped
+00:12 +123: C:/Users/19468/Desktop/Omnivium/mobile/test/animated_toggle_test.dart: AnimatedToggle calls onChanged when tapped
+00:12 +124: C:/Users/19468/Desktop/Omnivium/mobile/test/animated_toggle_test.dart: AnimatedToggle calls onChanged when tapped
+00:12 +125: C:/Users/19468/Desktop/Omnivium/mobile/test/animated_toggle_test.dart: AnimatedToggle calls onChanged when tapped
+00:12 +126: C:/Users/19468/Desktop/Omnivium/mobile/test/animated_toggle_test.dart: AnimatedToggle calls onChanged when tapped
+00:13 +127: C:/Users/19468/Desktop/Omnivium/mobile/test/app_capability_service_test.dart: AppCapabilityService instance is singleton
+00:13 +128: C:/Users/19468/Desktop/Omnivium/mobile/test/app_capability_service_test.dart: AppCapabilityService invoke returns result when SDK not initialized
+[INFO] AppCapability: fallback for agent.chat (SDK not available)
+00:13 +129: C:/Users/19468/Desktop/Omnivium/mobile/test/app_capability_service_test.dart: AppCapabilityService checkPermission returns value when SDK not initialized
+00:13 +130: C:/Users/19468/Desktop/Omnivium/mobile/test/app_capability_service_test.dart: AppCapabilityService isAllowed returns value when SDK not initialized
+00:13 +131: C:/Users/19468/Desktop/Omnivium/mobile/test/app_capability_service_test.dart: AppCapabilityService invoke with timeout parameter
+[INFO] AppCapability: fallback for agent.chat (SDK not available)
+00:14 +132: C:/Users/19468/Desktop/Omnivium/mobile/test/app_colors_test.dart: AccentPreset has 8 presets
+00:14 +133: C:/Users/19468/Desktop/Omnivium/mobile/test/app_colors_test.dart: AccentPreset each preset has unique key
+00:14 +134: C:/Users/19468/Desktop/Omnivium/mobile/test/app_colors_test.dart: AccentPreset fromKey returns correct preset
+00:14 +135: C:/Users/19468/Desktop/Omnivium/mobile/test/app_colors_test.dart: AccentPreset fromKey unknown returns teal
+00:14 +136: C:/Users/19468/Desktop/Omnivium/mobile/test/app_colors_test.dart: AccentPreset each preset has non-zero colors
+00:14 +137: C:/Users/19468/Desktop/Omnivium/mobile/test/app_colors_test.dart: AccentPreset static preset references match list
+00:14 +138: C:/Users/19468/Desktop/Omnivium/mobile/test/app_colors_test.dart: AppColors static color constants are not zero
+00:14 +139: C:/Users/19468/Desktop/Omnivium/mobile/test/app_colors_test.dart: AppColors light mode constants are not zero
+00:15 +140: C:/Users/19468/Desktop/Omnivium/mobile/test/app_config_test.dart: AppConfig environment defaults to dev
+00:15 +141: C:/Users/19468/Desktop/Omnivium/mobile/test/app_config_test.dart: AppConfig isDev is true by default
+00:15 +142: C:/Users/19468/Desktop/Omnivium/mobile/test/app_config_test.dart: AppConfig isStaging is false by default
+00:15 +143: C:/Users/19468/Desktop/Omnivium/mobile/test/app_config_test.dart: AppConfig isProd is false by default
+00:15 +144: C:/Users/19468/Desktop/Omnivium/mobile/test/app_config_test.dart: AppConfig apiBaseUrl for dev
+00:15 +145: C:/Users/19468/Desktop/Omnivium/mobile/test/app_config_test.dart: AppConfig appName for dev
+00:15 +146: C:/Users/19468/Desktop/Omnivium/mobile/test/app_config_test.dart: AppConfig enableSentry is false in dev
+00:15 +147: C:/Users/19468/Desktop/Omnivium/mobile/test/app_config_test.dart: AppConfig enableVerboseLogging is true in dev
+00:15 +148: C:/Users/19468/Desktop/Omnivium/mobile/test/app_config_test.dart: AppConfig enablePerformanceOverlay is true in dev
+00:15 +149: C:/Users/19468/Desktop/Omnivium/mobile/test/app_config_test.dart: AppConfig enableHotReload is true in dev
+00:15 +150: C:/Users/19468/Desktop/Omnivium/mobile/test/app_config_test.dart: AppConfig toDiagnosticMap returns valid map
+00:15 +151: C:/Users/19468/Desktop/Omnivium/mobile/test/app_config_test.dart: AppConfig AppEnvironment enum has all values
+00:16 +152: C:/Users/19468/Desktop/Omnivium/mobile/test/app_data_gateway_test.dart: AppDataGateway instance is singleton
+00:16 +153: C:/Users/19468/Desktop/Omnivium/mobile/test/app_data_gateway_test.dart: AppDataGateway persistence getter exists
+00:16 +154: C:/Users/19468/Desktop/Omnivium/mobile/test/app_data_gateway_test.dart: AppDataGateway db getter exists
+00:17 +155: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService initial state is not enabled
+00:17 +156: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService setPasscode enables lock
+00:17 +157: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService verify correct PIN
+00:17 +158: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService verify correct PIN
+00:18 +159: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService verify correct PIN
+00:18 +160: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService verify correct PIN
+00:18 +160: C:/Users/19468/Desktop/Omnivium/mobile/test/app_logger_test.dart: AppLogger debug does not throw
+[DEBUG] test message
+00:18 +161: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService verify correct PIN
+00:18 +161: C:/Users/19468/Desktop/Omnivium/mobile/test/app_logger_test.dart: AppLogger info does not throw
+[INFO] test message
+00:18 +162: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService verify correct PIN
+00:18 +162: C:/Users/19468/Desktop/Omnivium/mobile/test/app_logger_test.dart: AppLogger warning does not throw
+[WARN] test warning 
+00:18 +163: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService verify correct PIN
+00:18 +163: C:/Users/19468/Desktop/Omnivium/mobile/test/app_logger_test.dart: AppLogger error does not throw
+[ERROR] test error 
+00:18 +164: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService verify correct PIN
+00:18 +164: C:/Users/19468/Desktop/Omnivium/mobile/test/app_logger_test.dart: AppLogger fatal does not throw
+[FATAL] test fatal 
+00:18 +165: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService verify correct PIN
+00:18 +165: C:/Users/19468/Desktop/Omnivium/mobile/test/app_logger_test.dart: AppLogger debug with tag does not throw
+[DEBUG::MyTag] test
+00:18 +166: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService verify correct PIN
+00:18 +166: C:/Users/19468/Desktop/Omnivium/mobile/test/app_logger_test.dart: AppLogger minLevel filters messages
+[ERROR] should pass 
+00:18 +167: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService verify correct PIN
+00:18 +168: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService verify correct PIN
+00:18 +169: C:/Users/19468/Desktop/Omnivium/mobile/test/app_provider_test.dart: AppProvider creates all sub-providers
+00:18 +170: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService verify wrong PIN
+00:18 +171: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService verify wrong PIN
+00:18 +172: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService verify wrong PIN
+00:18 +173: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService verify wrong PIN
+00:18 +174: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService verify wrong PIN
+00:18 +175: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService verify wrong PIN
+00:18 +176: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService verify wrong PIN
+00:18 +177: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService verify wrong PIN
+00:18 +178: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService verify wrong PIN
+00:19 +179: C:/Users/19468/Desktop/Omnivium/mobile/test/audit_log_service_test.dart: AuditLogEntry toJson returns correct map
+00:19 +180: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService setPasscode with password type
+00:19 +181: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService setPasscode with password type
+00:19 +182: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService setPasscode with password type
+00:19 +183: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService setPasscode with password type
+00:19 +184: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService setPasscode with password type
+00:20 +185: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService removePasscode disables lock
+00:20 +186: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService removePasscode disables lock
+00:20 +187: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService removePasscode disables lock
+00:20 +188: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService removePasscode disables lock
+00:20 +189: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService removePasscode disables lock
+00:20 +190: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService removePasscode disables lock
+00:20 +191: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService removePasscode disables lock
+00:20 +192: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService removePasscode disables lock
+00:21 +193: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService verify returns true when no passcode set
+00:21 +194: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService setAutoLock
+00:21 +195: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService setBlockScreenshot
+00:21 +196: C:/Users/19468/Desktop/Omnivium/mobile/test/app_lock_service_test.dart: AppLockService PasscodeType enum
+00:21 +197: C:/Users/19468/Desktop/Omnivium/mobile/test/biometric_service_test.dart: BiometricService instance is singleton
+00:21 +198: C:/Users/19468/Desktop/Omnivium/mobile/test/biometric_service_test.dart: BiometricService isAvailable is false before init
+00:21 +199: C:/Users/19468/Desktop/Omnivium/mobile/test/biometric_service_test.dart: BiometricService biometricTypes is empty before init
+00:21 +200: C:/Users/19468/Desktop/Omnivium/mobile/test/biometric_service_test.dart: BiometricService hasBiometric is false before init
+00:21 +201: C:/Users/19468/Desktop/Omnivium/mobile/test/biometric_service_test.dart: BiometricService authenticate returns false when not available
+00:21 +202: C:/Users/19468/Desktop/Omnivium/mobile/test/biometric_service_test.dart: BiometricService shouldShowBiometric returns false when not available
+00:22 +203: C:/Users/19468/Desktop/Omnivium/mobile/test/call_screen_test.dart: CallScreen renders call screen widget
+00:23 +204: C:/Users/19468/Desktop/Omnivium/mobile/test/card_runtime_test.dart: CardLifecycle has all expected values
+00:23 +205: C:/Users/19468/Desktop/Omnivium/mobile/test/call_screen_test.dart: CallScreen renders without crash
+00:23 +206: C:/Users/19468/Desktop/Omnivium/mobile/test/call_screen_test.dart: CallScreen renders without crash
+00:23 +207: C:/Users/19468/Desktop/Omnivium/mobile/test/call_screen_test.dart: CallScreen renders without crash
+00:23 +208: C:/Users/19468/Desktop/Omnivium/mobile/test/card_runtime_test.dart: CardState isExpired returns false within ttl
+00:23 +209: C:/Users/19468/Desktop/Omnivium/mobile/test/card_runtime_test.dart: CardState isExpired returns true after ttl
+00:23 +210: C:/Users/19468/Desktop/Omnivium/mobile/test/card_runtime_test.dart: CardState copyWith updates specified fields
+00:23 +211: C:/Users/19468/Desktop/Omnivium/mobile/test/card_runtime_test.dart: CardState copyWith without args keeps original values
+00:23 +212: C:/Users/19468/Desktop/Omnivium/mobile/test/card_runtime_test.dart: CardRuntime starts with empty cards
+00:23 +213: C:/Users/19468/Desktop/Omnivium/mobile/test/card_runtime_test.dart: CardRuntime create adds a card
+00:23 +214: C:/Users/19468/Desktop/Omnivium/mobile/test/card_runtime_test.dart: CardRuntime create with custom data and ttl
+00:23 +215: C:/Users/19468/Desktop/Omnivium/mobile/test/card_runtime_test.dart: CardRuntime get returns card by id
+00:23 +216: C:/Users/19468/Desktop/Omnivium/mobile/test/card_runtime_test.dart: CardRuntime get returns null for unknown id
+00:23 +217: C:/Users/19468/Desktop/Omnivium/mobile/test/card_runtime_test.dart: CardRuntime update modifies card lifecycle and data
+00:23 +218: C:/Users/19468/Desktop/Omnivium/mobile/test/card_runtime_test.dart: CardRuntime update returns null for unknown id
+00:23 +219: C:/Users/19468/Desktop/Omnivium/mobile/test/card_runtime_test.dart: CardRuntime dismiss removes card
+00:23 +220: C:/Users/19468/Desktop/Omnivium/mobile/test/card_runtime_test.dart: CardRuntime dismiss unknown id does nothing
+00:23 +221: C:/Users/19468/Desktop/Omnivium/mobile/test/card_runtime_test.dart: CardRuntime expireCards removes expired cards
+00:23 +222: C:/Users/19468/Desktop/Omnivium/mobile/test/card_runtime_test.dart: CardRuntime cards map is unmodifiable
+00:24 +223: C:/Users/19468/Desktop/Omnivium/mobile/test/chaos_engineering_test.dart: Event Storm 1000 events/sec backpressure handling
+flutter : lib/core/runtime/sandbox/civilization_network.dart:740:11: Error: 
+The getter 'AppLogger' isn't defined for the type 'CivilizationNetwork'.
+At line:1 char:44
++ ... ers\19468\Desktop\Omnivium\mobile; flutter test --no-pub 2>&1 | Out-F 
+...
++                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (lib/core/runtim...zationNetwor 
+   k'.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+ - 'CivilizationNetwork' is from 'package:omnivium/core/runtime/sandbox/civi
+lization_network.dart' ('lib/core/runtime/sandbox/civilization_network.dart'
+).
+Try correcting the name to the name of an existing getter, or defining a get
+ter or field named 'AppLogger'.
+          AppLogger.instance.debug('Broadcast message send failed', error: e
+);
+          ^^^^^^^^^
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "chaos-agent" registered with 10 capabilities
+[INFO] Plugin "chaos-agent" activated
+[INFO] Plugin "fake-agent" registered with 4 capabilities
+[INFO] Plugin "fake-agent" activated
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "logger" registered with 2 capabilities
+[INFO] Plugin "logger" activated
+00:24 +223 -1: loading C:/Users/19468/Desktop/Omnivium/mobile/test/civilization_kernel_test.dart [E]
+  Failed to load "C:/Users/19468/Desktop/Omnivium/mobile/test/civilization_kernel_test.dart":
+  Compilation failed for testPath=C:/Users/19468/Desktop/Omnivium/mobile/test/civilization_kernel_test.dart: lib/core/runtime/sandbox/civilization_network.dart:740:11: Error: The getter 'AppLogger' isn't defined for the type 'CivilizationNetwork'.
+   - 'CivilizationNetwork' is from 'package:omnivium/core/runtime/sandbox/civilization_network.dart' ('lib/core/runtime/sandbox/civilization_network.dart').
+  Try correcting the name to the name of an existing getter, or defining a getter or field named 'AppLogger'.
+            AppLogger.instance.debug('Broadcast message send failed', error: e);
+            ^^^^^^^^^
+  .
+00:24 +223 -1: C:/Users/19468/Desktop/Omnivium/mobile/test/chaos_engineering_test.dart: Event Storm 1000 events/sec backpressure handling
+[INFO] Plugin "chaos-agent" unloaded
+[INFO] Plugin "fake-agent" unloaded
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "logger" unloaded
+[INFO] RuntimeContainer shutdown complete
+00:24 +224 -1: C:/Users/19468/Desktop/Omnivium/mobile/test/chaos_engineering_test.dart: Plugin Crash Isolation chaos.crash does not kill Runtime
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "chaos-agent" registered with 10 capabilities
+[INFO] Plugin "chaos-agent" activated
+[INFO] Plugin "fake-agent" registered with 4 capabilities
+[INFO] Plugin "fake-agent" activated
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "logger" registered with 2 capabilities
+[INFO] Plugin "logger" activated
+[INFO] Plugin "chaos-agent" unloaded
+[INFO] Plugin "fake-agent" unloaded
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "logger" unloaded
+[INFO] RuntimeContainer shutdown complete
+00:25 +225 -1: C:/Users/19468/Desktop/Omnivium/mobile/test/chaos_engineering_test.dart: Plugin Crash Isolation chaos.timeout triggers circuit breaker
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "chaos-agent" registered with 10 capabilities
+[INFO] Plugin "chaos-agent" activated
+[INFO] Plugin "fake-agent" registered with 4 capabilities
+[INFO] Plugin "fake-agent" activated
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "logger" registered with 2 capabilities
+[INFO] Plugin "logger" activated
+[WARN] Circuit breaker opened for "chaos.timeout" after 5 failures 
+[WARN] Circuit breaker open for "chaos.timeout" 
+[INFO] Plugin "chaos-agent" unloaded
+[INFO] Plugin "fake-agent" unloaded
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "logger" unloaded
+[INFO] RuntimeContainer shutdown complete
+00:26 +226 -1: C:/Users/19468/Desktop/Omnivium/mobile/test/chaos_engineering_test.dart: Capability Cascade Failure chaos.retry_storm triggers retries but Runtime survives
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "chaos-agent" registered with 10 capabilities
+[INFO] Plugin "chaos-agent" activated
+[INFO] Plugin "fake-agent" registered with 4 capabilities
+[INFO] Plugin "fake-agent" activated
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "logger" registered with 2 capabilities
+[INFO] Plugin "logger" activated
+[INFO] Plugin "chaos-agent" unloaded
+[INFO] Plugin "fake-agent" unloaded
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "logger" unloaded
+[INFO] RuntimeContainer shutdown complete
+00:26 +227 -1: C:/Users/19468/Desktop/Omnivium/mobile/test/chaos_engineering_test.dart: Capability Cascade Failure chaos.partial_failure some succeed some fail
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "chaos-agent" registered with 10 capabilities
+[INFO] Plugin "chaos-agent" activated
+[INFO] Plugin "fake-agent" registered with 4 capabilities
+[INFO] Plugin "fake-agent" activated
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "logger" registered with 2 capabilities
+[INFO] Plugin "logger" activated
+[INFO] Plugin "chaos-agent" unloaded
+[INFO] Plugin "fake-agent" unloaded
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "logger" unloaded
+[INFO] RuntimeContainer shutdown complete
+00:26 +228 -1: C:/Users/19468/Desktop/Omnivium/mobile/test/chaos_engineering_test.dart: Cancellation Propagation cancel task stops execution
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "chaos-agent" registered with 10 capabilities
+[INFO] Plugin "chaos-agent" activated
+[INFO] Plugin "fake-agent" registered with 4 capabilities
+[INFO] Plugin "fake-agent" activated
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "logger" registered with 2 capabilities
+[INFO] Plugin "logger" activated
+[INFO] Plugin "chaos-agent" unloaded
+[INFO] Plugin "fake-agent" unloaded
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "logger" unloaded
+[INFO] RuntimeContainer shutdown complete
+00:26 +229 -1: C:/Users/19468/Desktop/Omnivium/mobile/test/chaos_engineering_test.dart: Cancellation Propagation chaos.cancel_test respects cancellation
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "chaos-agent" registered with 10 capabilities
+[INFO] Plugin "chaos-agent" activated
+[INFO] Plugin "fake-agent" registered with 4 capabilities
+[INFO] Plugin "fake-agent" activated
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "logger" registered with 2 capabilities
+[INFO] Plugin "logger" activated
+[INFO] Plugin "chaos-agent" unloaded
+[INFO] Plugin "fake-agent" unloaded
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "logger" unloaded
+[INFO] RuntimeContainer shutdown complete
+00:26 +230 -1: C:/Users/19468/Desktop/Omnivium/mobile/test/chaos_engineering_test.dart: Hot Reload Consistency reload plugin 50 times without leak
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "chaos-agent" registered with 10 capabilities
+[INFO] Plugin "chaos-agent" activated
+[INFO] Plugin "fake-agent" registered with 4 capabilities
+[INFO] Plugin "fake-agent" activated
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "logger" registered with 2 capabilities
+[INFO] Plugin "logger" activated
+[WARN] Plugin "storage" already registered, unloading previous 
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[WARN] Plugin "storage" already registered, unloading previous 
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[WARN] Plugin "storage" already registered, unloading previous 
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[WARN] Plugin "storage" already registered, unloading previous 
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[WARN] Plugin "storage" already registered, unloading previous 
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[WARN] Plugin "storage" already registered, unloading previous 
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[WARN] Plugin "storage" already registered, unloading previous 
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[WARN] Plugin "storage" already registered, unloading previous 
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[WARN] Plugin "storage" already registered, unloading previous 
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[WARN] Plugin "storage" already registered, unloading previous 
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[WARN] Plugin "storage" already registered, unloading previous 
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[WARN] Plugin "storage" already registered, unloading previous 
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[WARN] Plugin "storage" already registered, unloading previous 
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[WARN] Plugin "storage" already registered, unloading previous 
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[WARN] Plugin "storage" already registered, unloading previous 
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[WARN] Plugin "storage" already registered, unloading previous 
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[WARN] Plugin "storage" already registered, unloading previous 
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[WARN] Plugin "storage" already registered, unloading previous 
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[WARN] Plugin "storage" already registered, unloading previous 
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[WARN] Plugin "storage" already registered, unloading previous 
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[WARN] Plugin "storage" already registered, unloading previous 
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[WARN] Plugin "storage" already registered, unloading previous 
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[WARN] Plugin "storage" already registered, unloading previous 
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[WARN] Plugin "storage" already registered, unloading previous 
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[WARN] Plugin "storage" already registered, unloading previous 
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[WARN] Plugin "storage" already registered, unloading previous 
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[WARN] Plugin "storage" already registered, unloading previous 
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[WARN] Plugin "storage" already registered, unloading previous 
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[WARN] Plugin "storage" already registered, unloading previous 
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+00:26 +231 -1: C:/Users/19468/Desktop/Omnivium/mobile/test/chaos_engineering_test.dart: Scheduler Fairness critical tasks complete despite low priority flood
+00:26 +232 -1: C:/Users/19468/Desktop/Omnivium/mobile/test/chaos_engineering_test.dart: Runtime Invariants no violations after normal operations
+00:26 +233 -1: C:/Users/19468/Desktop/Omnivium/mobile/test/chaos_engineering_test.dart: Runtime Invariants task terminal state invariant after tasks complete
+00:26 +234 -1: C:/Users/19468/Desktop/Omnivium/mobile/test/chaos_engineering_test.dart: Timeline Replay record and replay events
+00:26 +235 -1: C:/Users/19468/Desktop/Omnivium/mobile/test/chaos_engineering_test.dart: Benchmark Suite benchmark produces results
+lib/core/runtime/sandbox/civilization_network.dart:740:11: Error: The getter
+ 'AppLogger' isn't defined for the type 'CivilizationNetwork'.
+ - 'CivilizationNetwork' is from 'package:omnivium/core/runtime/sandbox/civi
+lization_network.dart' ('lib/core/runtime/sandbox/civilization_network.dart'
+).
+Try correcting the name to the name of an existing getter, or defining a get
+ter or field named 'AppLogger'.
+          AppLogger.instance.debug('Broadcast message send failed', error: e
+);
+          ^^^^^^^^^
+00:31 +236 -2: loading C:/Users/19468/Desktop/Omnivium/mobile/test/civilization_network_test.dart [E]
+  Failed to load "C:/Users/19468/Desktop/Omnivium/mobile/test/civilization_network_test.dart":
+  Compilation failed for testPath=C:/Users/19468/Desktop/Omnivium/mobile/test/civilization_network_test.dart: lib/core/runtime/sandbox/civilization_network.dart:740:11: Error: The getter 'AppLogger' isn't defined for the type 'CivilizationNetwork'.
+   - 'CivilizationNetwork' is from 'package:omnivium/core/runtime/sandbox/civilization_network.dart' ('lib/core/runtime/sandbox/civilization_network.dart').
+  Try correcting the name to the name of an existing getter, or defining a getter or field named 'AppLogger'.
+            AppLogger.instance.debug('Broadcast message send failed', error: e);
+            ^^^^^^^^^
+  .
+lib/core/runtime/distributed/persistence/write_ahead_log.dart:145:5: Error: 
+'await' can only be used in 'async' or 'async*' methods.
+    await _persistEntry(withChecksum);
+    ^^^^^
+lib/core/runtime/distributed/lease/unified_lease.dart:188:7: Error: The gett
+er 'AppLogger' isn't defined for the type 'UnifiedLeaseManager'.
+ - 'UnifiedLeaseManager' is from 'package:omnivium/core/runtime/distributed/
+lease/unified_lease.dart' ('lib/core/runtime/distributed/lease/unified_lease
+.dart').
+Try correcting the name to the name of an existing getter, or defining a get
+ter or field named 'AppLogger'.
+      AppLogger.instance.debug('Unified lease acquire failed', error: e);
+      ^^^^^^^^^
+00:38 +236 -3: loading C:/Users/19468/Desktop/Omnivium/mobile/test/consolidation_test.dart [E]
+  Failed to load "C:/Users/19468/Desktop/Omnivium/mobile/test/consolidation_test.dart":
+  Compilation failed for testPath=C:/Users/19468/Desktop/Omnivium/mobile/test/consolidation_test.dart: lib/core/runtime/distributed/persistence/write_ahead_log.dart:145:5: Error: 'await' can only be used in 'async' or 'async*' methods.
+      await _persistEntry(withChecksum);
+      ^^^^^
+  lib/core/runtime/distributed/lease/unified_lease.dart:188:7: Error: The getter 'AppLogger' isn't defined for the type 'UnifiedLeaseManager'.
+   - 'UnifiedLeaseManager' is from 'package:omnivium/core/runtime/distributed/lease/unified_lease.dart' ('lib/core/runtime/distributed/lease/unified_lease.dart').
+  Try correcting the name to the name of an existing getter, or defining a getter or field named 'AppLogger'.
+        AppLogger.instance.debug('Unified lease acquire failed', error: e);
+        ^^^^^^^^^
+  .
+00:38 +236 -3: C:/Users/19468/Desktop/Omnivium/mobile/test/connectivity_service_test.dart: NetworkQuality has all expected values
+00:39 +237 -3: C:/Users/19468/Desktop/Omnivium/mobile/test/connectivity_service_test.dart: ConnectivityService initial state
+00:39 +238 -3: C:/Users/19468/Desktop/Omnivium/mobile/test/connectivity_service_test.dart: ConnectivityService dispose does not throw
+lib/core/runtime/sandbox/civilization_network.dart:740:11: Error: The getter
+ 'AppLogger' isn't defined for the type 'CivilizationNetwork'.
+ - 'CivilizationNetwork' is from 'package:omnivium/core/runtime/sandbox/civi
+lization_network.dart' ('lib/core/runtime/sandbox/civilization_network.dart'
+).
+Try correcting the name to the name of an existing getter, or defining a get
+ter or field named 'AppLogger'.
+          AppLogger.instance.debug('Broadcast message send failed', error: e
+);
+          ^^^^^^^^^
+00:45 +239 -4: loading C:/Users/19468/Desktop/Omnivium/mobile/test/constitutional_civilization_layer_test.dart [E]
+  Failed to load "C:/Users/19468/Desktop/Omnivium/mobile/test/constitutional_civilization_layer_test.dart":
+  Compilation failed for testPath=C:/Users/19468/Desktop/Omnivium/mobile/test/constitutional_civilization_layer_test.dart: lib/core/runtime/sandbox/civilization_network.dart:740:11: Error: The getter 'AppLogger' isn't defined for the type 'CivilizationNetwork'.
+   - 'CivilizationNetwork' is from 'package:omnivium/core/runtime/sandbox/civilization_network.dart' ('lib/core/runtime/sandbox/civilization_network.dart').
+  Try correcting the name to the name of an existing getter, or defining a getter or field named 'AppLogger'.
+            AppLogger.instance.debug('Broadcast message send failed', error: e);
+            ^^^^^^^^^
+  .
+lib/core/runtime/sandbox/civilization_network.dart:740:11: Error: The getter
+ 'AppLogger' isn't defined for the type 'CivilizationNetwork'.
+ - 'CivilizationNetwork' is from 'package:omnivium/core/runtime/sandbox/civi
+lization_network.dart' ('lib/core/runtime/sandbox/civilization_network.dart'
+).
+Try correcting the name to the name of an existing getter, or defining a get
+ter or field named 'AppLogger'.
+          AppLogger.instance.debug('Broadcast message send failed', error: e
+);
+          ^^^^^^^^^
+00:52 +239 -5: loading C:/Users/19468/Desktop/Omnivium/mobile/test/constitutional_civilization_test.dart [E]
+  Failed to load "C:/Users/19468/Desktop/Omnivium/mobile/test/constitutional_civilization_test.dart":
+  Compilation failed for testPath=C:/Users/19468/Desktop/Omnivium/mobile/test/constitutional_civilization_test.dart: lib/core/runtime/sandbox/civilization_network.dart:740:11: Error: The getter 'AppLogger' isn't defined for the type 'CivilizationNetwork'.
+   - 'CivilizationNetwork' is from 'package:omnivium/core/runtime/sandbox/civilization_network.dart' ('lib/core/runtime/sandbox/civilization_network.dart').
+  Try correcting the name to the name of an existing getter, or defining a getter or field named 'AppLogger'.
+            AppLogger.instance.debug('Broadcast message send failed', error: e);
+            ^^^^^^^^^
+  .
+lib/core/runtime/sandbox/civilization_network.dart:740:11: Error: The getter
+ 'AppLogger' isn't defined for the type 'CivilizationNetwork'.
+ - 'CivilizationNetwork' is from 'package:omnivium/core/runtime/sandbox/civi
+lization_network.dart' ('lib/core/runtime/sandbox/civilization_network.dart'
+).
+Try correcting the name to the name of an existing getter, or defining a get
+ter or field named 'AppLogger'.
+          AppLogger.instance.debug('Broadcast message send failed', error: e
+);
+          ^^^^^^^^^
+00:59 +239 -6: loading C:/Users/19468/Desktop/Omnivium/mobile/test/constitutional_guard_test.dart [E]
+  Failed to load "C:/Users/19468/Desktop/Omnivium/mobile/test/constitutional_guard_test.dart":
+  Compilation failed for testPath=C:/Users/19468/Desktop/Omnivium/mobile/test/constitutional_guard_test.dart: lib/core/runtime/sandbox/civilization_network.dart:740:11: Error: The getter 'AppLogger' isn't defined for the type 'CivilizationNetwork'.
+   - 'CivilizationNetwork' is from 'package:omnivium/core/runtime/sandbox/civilization_network.dart' ('lib/core/runtime/sandbox/civilization_network.dart').
+  Try correcting the name to the name of an existing getter, or defining a getter or field named 'AppLogger'.
+            AppLogger.instance.debug('Broadcast message send failed', error: e);
+            ^^^^^^^^^
+  .
+lib/core/runtime/sandbox/civilization_network.dart:740:11: Error: The getter
+ 'AppLogger' isn't defined for the type 'CivilizationNetwork'.
+ - 'CivilizationNetwork' is from 'package:omnivium/core/runtime/sandbox/civi
+lization_network.dart' ('lib/core/runtime/sandbox/civilization_network.dart'
+).
+Try correcting the name to the name of an existing getter, or defining a get
+ter or field named 'AppLogger'.
+          AppLogger.instance.debug('Broadcast message send failed', error: e
+);
+          ^^^^^^^^^
+01:05 +239 -7: loading C:/Users/19468/Desktop/Omnivium/mobile/test/constitutional_sovereign_test.dart [E]
+  Failed to load "C:/Users/19468/Desktop/Omnivium/mobile/test/constitutional_sovereign_test.dart":
+  Compilation failed for testPath=C:/Users/19468/Desktop/Omnivium/mobile/test/constitutional_sovereign_test.dart: lib/core/runtime/sandbox/civilization_network.dart:740:11: Error: The getter 'AppLogger' isn't defined for the type 'CivilizationNetwork'.
+   - 'CivilizationNetwork' is from 'package:omnivium/core/runtime/sandbox/civilization_network.dart' ('lib/core/runtime/sandbox/civilization_network.dart').
+  Try correcting the name to the name of an existing getter, or defining a getter or field named 'AppLogger'.
+            AppLogger.instance.debug('Broadcast message send failed', error: e);
+            ^^^^^^^^^
+  .
+lib/core/runtime/sandbox/civilization_network.dart:740:11: Error: The getter
+ 'AppLogger' isn't defined for the type 'CivilizationNetwork'.
+ - 'CivilizationNetwork' is from 'package:omnivium/core/runtime/sandbox/civi
+lization_network.dart' ('lib/core/runtime/sandbox/civilization_network.dart'
+).
+Try correcting the name to the name of an existing getter, or defining a get
+ter or field named 'AppLogger'.
+          AppLogger.instance.debug('Broadcast message send failed', error: e
+);
+          ^^^^^^^^^
+01:12 +239 -8: loading C:/Users/19468/Desktop/Omnivium/mobile/test/constitutional_trace_test.dart [E]
+  Failed to load "C:/Users/19468/Desktop/Omnivium/mobile/test/constitutional_trace_test.dart":
+  Compilation failed for testPath=C:/Users/19468/Desktop/Omnivium/mobile/test/constitutional_trace_test.dart: lib/core/runtime/sandbox/civilization_network.dart:740:11: Error: The getter 'AppLogger' isn't defined for the type 'CivilizationNetwork'.
+   - 'CivilizationNetwork' is from 'package:omnivium/core/runtime/sandbox/civilization_network.dart' ('lib/core/runtime/sandbox/civilization_network.dart').
+  Try correcting the name to the name of an existing getter, or defining a getter or field named 'AppLogger'.
+            AppLogger.instance.debug('Broadcast message send failed', error: e);
+            ^^^^^^^^^
+  .
+01:20 +239 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/context_budget_test.dart: ContextBudget default values
+01:20 +240 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/context_budget_test.dart: ContextBudget availableForHistory calculation
+01:20 +241 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/context_budget_test.dart: ContextBudget custom values
+01:20 +242 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/context_budget_test.dart: ContextBudgetManager remainingTokens starts at maxTokens
+01:20 +243 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/context_budget_test.dart: ContextBudgetManager canFit returns true when enough space
+01:20 +244 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/context_budget_test.dart: ContextBudgetManager canFit returns false when exceeds availableForHistory
+01:20 +245 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/context_budget_test.dart: ContextBudgetManager allocate reduces remaining
+01:21 +246 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/conversation_manager_test.dart: ConversationMessage constructor sets fields
+01:21 +247 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/conversation_manager_test.dart: ConversationMessage copyWith updates content
+01:21 +248 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/conversation_manager_test.dart: ConversationMessage copyWith updates isStreaming
+01:21 +249 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/conversation_manager_test.dart: ConversationMessage copyWith updates thoughts
+01:21 +250 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/conversation_manager_test.dart: ConversationManager initial messages is empty
+01:21 +251 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/conversation_manager_test.dart: ConversationManager initial chatHistory is empty
+01:21 +252 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/conversation_manager_test.dart: ConversationManager addUserMessage adds message
+01:21 +253 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/conversation_manager_test.dart: ConversationManager addStreamingAssistant returns index
+01:21 +254 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/conversation_manager_test.dart: ConversationManager updateStreamingContent updates content
+01:21 +255 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/conversation_manager_test.dart: ConversationManager finalizeStreaming sets isStreaming false
+01:21 +256 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/conversation_manager_test.dart: ConversationManager messages is unmodifiable
+01:21 +257 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/conversation_manager_test.dart: ConversationManager multiple user messages
+01:21 +258 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/conversation_manager_test.dart: ConversationManager currentThoughts is empty initially
+01:21 +259 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/deep_link_test.dart: DeepLinkService parseSessionId from omnivium://chat?id=123
+01:21 +260 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/deep_link_test.dart: DeepLinkService parseSessionId from omnivium://chat/456
+01:21 +261 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/deep_link_test.dart: DeepLinkService parseSessionId returns null for wrong scheme
+01:21 +262 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/deep_link_test.dart: DeepLinkService parseRoomId from omnivium://room?id=room1
+01:21 +263 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/deep_link_test.dart: DeepLinkService parseRoomId from omnivium://room/room2
+01:21 +264 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/deep_link_test.dart: DeepLinkService parseRoomId returns null for wrong host
+01:23 +265 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/discover_view_test.dart: DiscoverView renders discover view
+01:24 +266 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/discover_view_test.dart: DiscoverView shows loading indicator initially
+01:24 +267 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/discover_view_test.dart: DiscoverView has scaffold structure
+01:24 +268 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/discover_view_test.dart: DiscoverView renders fallback content when API unavailable
+01:24 +269 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Distributed Invariants all 7 invariants are defined
+01:24 +270 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Distributed Invariants message ordering is per-session
+01:24 +271 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Distributed Invariants delivery semantics are differentiated by object type
+01:24 +272 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Distributed Invariants session ownership is single writer
+01:24 +273 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Distributed Invariants capability consistency is eventually consistent
+01:24 +274 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Distributed Invariants time authority is hybrid logical clock
+01:24 +275 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Distributed Invariants node failure is isolated
+01:24 +276 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Distributed Invariants network is hostile
+01:24 +277 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Distributed Invariants each invariant has unique id
+01:24 +278 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Hybrid Logical Clock tick produces monotonically increasing timestamps
+01:24 +279 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Hybrid Logical Clock receive handles remote timestamp correctly
+01:24 +280 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Hybrid Logical Clock concurrent events are detected
+01:24 +281 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Hybrid Logical Clock causality is preserved across nodes
+01:24 +282 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Hybrid Logical Clock timestamp serialization round-trip
+01:24 +283 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Hybrid Logical Clock happens-before relation
+01:24 +284 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Node Descriptor create and serialize
+01:24 +285 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Node Descriptor state transitions
+01:24 +286 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Node Discovery join and list alive nodes
+01:24 +287 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Node Discovery leave removes node
+01:24 +288 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Node Discovery suspect and dead transitions
+01:24 +289 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Node Discovery gossip target selection respects fanout
+01:24 +290 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Node Discovery receive gossip propagates node joins
+01:24 +291 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Node Discovery duplicate join with lower incarnation is ignored
+01:24 +292 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Node Discovery event queue drains correctly
+01:24 +293 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Remote Capability Router local capability routes locally
+01:24 +294 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Remote Capability Router unknown capability is unavailable
+01:24 +295 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Remote Capability Router remote capability routes remotely
+01:24 +296 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Remote Capability Router fallback routing works
+01:24 +297 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Remote Capability Router withdraw node removes its capabilities
+01:25 +298 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Remote Capability Router create advertisement for local capabilities
+01:25 +299 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Remote Capability Router mark capability unreachable
+01:25 +300 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Distributed Session Lease acquire lease
+01:25 +301 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Distributed Session Lease single writer: same node re-acquire returns existing lease
+01:25 +302 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Distributed Session Lease single writer: cannot write after release
+01:25 +303 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Distributed Session Lease released session can be re-acquired
+01:25 +304 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Distributed Session Lease renew lease extends expiry
+01:25 +305 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Distributed Session Lease release lease
+01:25 +306 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Distributed Session Lease lease expiry detection
+01:25 +307 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Distributed Session Lease tryAcquire returns null for owned session
+01:25 +308 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Distributed Session Lease revoke lease by another node
+01:25 +309 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Distributed Session Lease lease serialization round-trip
+01:25 +310 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Distributed Trace start trace and span
+01:25 +311 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Distributed Trace cross-node trace propagation
+01:25 +312 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Distributed Trace receive remote span and correlate
+01:25 +313 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Distributed Trace trace propagation context from headers
+01:25 +314 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Distributed Trace receive remote spans merges into trace
+01:25 +315 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Local Transport connect and disconnect
+01:25 +316 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Local Transport health check
+01:25 +317 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Local Transport state change callback
+01:25 +318 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Local Transport send throws when disconnected
+01:25 +319 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Transport Registry register and retrieve transport
+01:25 +320 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Transport Registry connect all transports
+01:25 +321 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Cluster Event serialization round-trip
+01:25 +322 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Distributed Runtime Integration start and stop lifecycle
+01:25 +323 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Distributed Runtime Integration register local capabilities
+01:25 +324 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Distributed Runtime Integration node failure handling
+01:25 +325 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Distributed Runtime Integration partition detection and healing
+01:25 +326 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Distributed Runtime Integration session lease management in distributed context
+01:25 +327 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/distributed_test.dart: Distributed Runtime Integration distributed trace across operations
+01:25 +328 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/embedding_service_test.dart: EmbeddingService cosineSimilarity identical vectors return 1.0
+01:25 +329 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/embedding_service_test.dart: EmbeddingService cosineSimilarity orthogonal vectors return 0.0
+01:25 +330 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/embedding_service_test.dart: EmbeddingService cosineSimilarity opposite vectors return -1.0
+01:25 +331 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/embedding_service_test.dart: EmbeddingService cosineSimilarity different length vectors return 0
+01:25 +332 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/embedding_service_test.dart: EmbeddingService cosineSimilarity empty vectors return 0
+01:25 +333 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/embedding_service_test.dart: EmbeddingService cosineSimilarity zero vectors return 0
+01:25 +334 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/embedding_service_test.dart: EmbeddingService cosineSimilarity known values calculate correctly
+01:25 +335 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/embedding_service_test.dart: EmbeddingService cosineSimilarity single element vectors
+01:26 +336 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/encrypted_file_storage_test.dart: EncryptedFileStorage instance is singleton
+01:27 +337 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/encrypted_file_storage_test.dart: EncryptedFileStorage init completes without error
+01:27 +338 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/encryption_service_test.dart: EncryptionService isReady false before init
+01:27 +339 -8: C:/Users/19468/Desktop/Omnivium/mobile/test/encryption_service_test.dart: EncryptionService encrypt returns plaintext when not initialized
+01:27 +339 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/encryption_service_test.dart: EncryptionService encrypt returns plaintext when not initialized [E]
+  Bad state: EncryptionService not initialized. Call init() first.
+  package:omnivium/core/encryption_service.dart 44:7  EncryptionService.encrypt
+  test\encryption_service_test.dart 22:22             main.<fn>.<fn>
+  
+01:27 +339 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/encryption_service_test.dart: EncryptionService decrypt returns null when not initialized
+01:27 +340 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/encryption_service_test.dart: EncryptionService init sets isReady
+01:27 +341 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/encryption_service_test.dart: EncryptionService encrypt and decrypt roundtrip
+01:28 +342 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/encryption_service_test.dart: EncryptionService encrypt produces different ciphertext each time
+01:28 +343 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/encryption_service_test.dart: EncryptionService decrypt invalid data returns null
+[INFO] Decryption failed: FormatException: Invalid character (at character 17)
+not-valid-base64!!!
+                ^
+
+01:28 +344 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/encryption_service_test.dart: EncryptionService decrypt too short data returns null
+01:28 +345 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/encryption_service_test.dart: EncryptionService decrypt wrong ciphertext returns null
+[INFO] Decryption failed: Instance of 'InvalidCipherTextException'
+01:29 +346 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/faq_view_test.dart: FaqView renders FAQ content
+01:30 +346 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/file_download_service_test.dart: FileDownloadService rejects file name with path traversal
+[WARN] Invalid file name rejected: ../../../etc/passwd 
+01:30 +347 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/faq_view_test.dart: FaqView renders FAQ content
+01:30 +347 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/file_download_service_test.dart: FileDownloadService rejects file name with backslash
+[WARN] Invalid file name rejected: folder\file.txt 
+01:30 +348 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/faq_view_test.dart: FaqView renders FAQ content
+01:30 +348 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/file_download_service_test.dart: FileDownloadService rejects file name with forward slash
+[WARN] Invalid file name rejected: folder/file.txt 
+01:30 +349 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/faq_view_test.dart: FaqView renders FAQ content
+01:30 +349 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/file_download_service_test.dart: FileDownloadService rejects subfolder with ..
+[WARN] Invalid subfolder rejected: ../etc 
+01:30 +350 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/faq_view_test.dart: FaqView renders FAQ content
+01:30 +350 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/file_download_service_test.dart: FileDownloadService rejects subfolder with backslash
+[WARN] Invalid subfolder rejected: folder\sub 
+01:30 +351 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/faq_view_test.dart: FaqView renders FAQ content
+01:30 +351 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/file_download_service_test.dart: FileDownloadService rejects subfolder with empty segment
+[WARN] Invalid subfolder segment rejected: folder//sub 
+01:30 +352 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/faq_view_test.dart: FaqView renders FAQ content
+01:30 +352 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/file_download_service_test.dart: FileDownloadService rejects subfolder with . segment
+[WARN] Invalid subfolder segment rejected: folder/./sub 
+01:30 +353 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/faq_view_test.dart: FaqView renders FAQ content
+01:30 +354 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/faq_view_test.dart: FaqView renders FAQ content
+01:30 +355 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/faq_view_test.dart: FaqView renders FAQ content
+01:30 +356 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/file_manager_view_test.dart: FileManagerView renders file manager view
+01:32 +357 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/friend_profile_view_test.dart: FriendProfileView renders friend profile view
+01:32 +358 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/friend_profile_view_test.dart: FriendProfileView renders friend profile view
+01:32 +359 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/friend_profile_view_test.dart: FriendProfileView renders friend profile view
+01:32 +360 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/friend_profile_view_test.dart: FriendProfileView renders friend profile view
+01:32 +361 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/friend_profile_view_test.dart: FriendProfileView renders friend profile view
+01:32 +362 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/friend_profile_view_test.dart: FriendProfileView renders friend profile view
+01:32 +363 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/friend_profile_view_test.dart: FriendProfileView renders friend profile view
+01:32 +364 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/friend_profile_view_test.dart: FriendProfileView renders friend profile view
+01:32 +365 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/friend_profile_view_test.dart: FriendProfileView renders friend profile view
+01:32 +366 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/friend_profile_view_test.dart: FriendProfileView renders friend profile view
+01:32 +367 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/friend_profile_view_test.dart: FriendProfileView renders friend profile view
+01:32 +368 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/friend_profile_view_test.dart: FriendProfileView renders friend profile view
+01:32 +369 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/friend_profile_view_test.dart: FriendProfileView renders friend profile view
+01:32 +370 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/friend_profile_view_test.dart: FriendProfileView renders friend profile view
+01:32 +371 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/friend_profile_view_test.dart: FriendProfileView renders friend profile view
+01:32 +372 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/friend_profile_view_test.dart: FriendProfileView renders friend profile view
+01:32 +373 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/friend_profile_view_test.dart: FriendProfileView renders friend profile view
+01:32 +374 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/friend_profile_view_test.dart: FriendProfileView renders friend profile view
+01:32 +374 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/governance_test.dart: Event Journal append and replay entries
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] RuntimeContainer shutdown complete
+01:32 +375 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/friend_profile_view_test.dart: FriendProfileView renders friend profile view
+01:32 +375 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/governance_test.dart: Event Journal replay from sequence
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] RuntimeContainer shutdown complete
+01:32 +376 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/friend_profile_view_test.dart: FriendProfileView renders friend profile view
+01:32 +376 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/governance_test.dart: Event Journal compaction reduces entries
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] RuntimeContainer shutdown complete
+01:32 +377 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/friend_profile_view_test.dart: FriendProfileView renders friend profile view
+01:32 +377 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/governance_test.dart: Event Journal journal records plugin transitions
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] RuntimeContainer shutdown complete
+01:32 +378 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/friend_profile_view_test.dart: FriendProfileView renders friend profile view
+01:32 +378 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/governance_test.dart: Snapshot Service take and retrieve snapshot
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "storage" unloaded
+[INFO] RuntimeContainer shutdown complete
+01:32 +379 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/friend_profile_view_test.dart: FriendProfileView renders friend profile view
+01:32 +379 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/governance_test.dart: Snapshot Service multiple snapshots
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] RuntimeContainer shutdown complete
+01:32 +380 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/friend_profile_view_test.dart: FriendProfileView renders friend profile view
+01:32 +380 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/governance_test.dart: Snapshot Service snapshot toJson serializable
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] RuntimeContainer shutdown complete
+01:32 +381 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/friend_profile_view_test.dart: FriendProfileView renders friend profile view
+01:32 +381 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/governance_test.dart: Snapshot Service prune keeps last N snapshots
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] RuntimeContainer shutdown complete
+01:32 +382 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/friend_profile_view_test.dart: FriendProfileView renders friend profile view
+01:32 +382 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/governance_test.dart: Governance Integration RuntimeContainer has all governance services
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] RuntimeContainer shutdown complete
+01:32 +383 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/friend_profile_view_test.dart: FriendProfileView renders friend profile view
+01:32 +383 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/governance_test.dart: Governance Integration policy engine blocks agent from storage.delete via router
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "fake-agent" registered with 4 capabilities
+[INFO] Plugin "fake-agent" activated
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "fake-agent" unloaded
+[INFO] RuntimeContainer shutdown complete
+01:32 +384 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/friend_profile_view_test.dart: FriendProfileView renders friend profile view
+01:32 +384 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/governance_test.dart: Governance Integration resource controller tracks usage during operations
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "storage" unloaded
+[INFO] RuntimeContainer shutdown complete
+01:32 +385 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/friend_profile_view_test.dart: FriendProfileView renders friend profile view
+01:32 +385 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/governance_test.dart: Governance Integration event journal records boot and shutdown
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] RuntimeContainer shutdown complete
+01:32 +386 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/friend_profile_view_test.dart: FriendProfileView renders friend profile view
+01:32 +387 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/friend_profile_view_test.dart: FriendProfileView has scaffold with app bar
+01:32 +388 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/friend_profile_view_test.dart: FriendProfileView has icon buttons
+01:33 +389 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/friend_profile_view_test.dart: FriendProfileView renders without error
+01:33 +390 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/haptic_service_test.dart: HapticService enabled defaults to true after loadPreference
+01:33 +391 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/haptic_service_test.dart: HapticService setEnabled false
+01:33 +392 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/haptic_service_test.dart: HapticService setEnabled true
+01:33 +393 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/haptic_service_test.dart: HapticService loadPreference reads from SharedPreferences
+01:33 +394 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/haptic_service_test.dart: HapticService loadPreference defaults to true when not set
+01:33 +395 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/haptic_service_test.dart: HapticService lightImpact does not throw when enabled
+01:33 +396 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/haptic_service_test.dart: HapticService lightImpact does not throw when disabled
+01:33 +397 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/haptic_service_test.dart: HapticService mediumImpact does not throw
+01:33 +398 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/haptic_service_test.dart: HapticService heavyImpact does not throw
+01:33 +399 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/haptic_service_test.dart: HapticService selectionClick does not throw
+01:33 +400 -9: C:/Users/19468/Desktop/Omnivium/mobile/test/haptic_service_test.dart: HapticService convenience methods do not throw
+test/identity_bridge_test.dart:49:36: Error: 'requireIdentity' isn't a funct
+ion or method and can't be invoked.
+      expect(bridge.requireIdentity(), isNull);
+                                   ^^^^^^^^^^^^^...
+01:34 +401 -10: loading C:/Users/19468/Desktop/Omnivium/mobile/test/identity_bridge_test.dart [E]
+  Failed to load "C:/Users/19468/Desktop/Omnivium/mobile/test/identity_bridge_test.dart":
+  Compilation failed for testPath=C:/Users/19468/Desktop/Omnivium/mobile/test/identity_bridge_test.dart: test/identity_bridge_test.dart:49:36: Error: 'requireIdentity' isn't a function or method and can't be invoked.
+        expect(bridge.requireIdentity(), isNull);
+                                     ^^^^^^^^^^^^^...
+  .
+01:34 +401 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/home_components_test.dart: ChatMessageData creates with required fields
+01:34 +402 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/home_components_test.dart: ChatMessageData creates with all fields
+01:34 +403 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/home_components_test.dart: ChatItemData creates with positional fields
+01:34 +404 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/home_components_test.dart: FriendMessageData creates with required fields
+01:42 +405 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/incognito_icon_test.dart: IncognitoIcon renders with default size
+01:43 +406 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/link_preview_service_test.dart: LinkPreviewData constructor sets all fields
+01:43 +407 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/incognito_icon_test.dart: IncognitoIcon renders with custom size
+01:43 +408 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/incognito_icon_test.dart: IncognitoIcon renders with custom size
+01:43 +408 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/link_preview_service_test.dart: LinkPreviewService URL safety blocks localhost
+[WARN] Blocked unsafe URL in link preview: http://localhost/test 
+01:43 +409 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/incognito_icon_test.dart: IncognitoIcon renders with custom size
+01:43 +409 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/link_preview_service_test.dart: LinkPreviewService URL safety blocks 127.0.0.1
+[WARN] Blocked unsafe URL in link preview: http://127.0.0.1/test 
+01:43 +410 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/incognito_icon_test.dart: IncognitoIcon renders with custom size
+01:43 +411 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/link_preview_service_test.dart: LinkPreviewService URL safety blocks 169.254.169.254 (SSRF)
+[WARN] Blocked unsafe URL in link preview: http://169.254.169.254/metadata 
+01:43 +412 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/incognito_icon_test.dart: IncognitoIcon has Semantics label
+01:43 +412 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/link_preview_service_test.dart: LinkPreviewService URL safety blocks file:// scheme
+[WARN] Blocked unsafe URL in link preview: file:///etc/passwd 
+01:43 +413 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/incognito_icon_test.dart: IncognitoIcon has Semantics label
+01:43 +413 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/link_preview_service_test.dart: LinkPreviewService URL safety blocks javascript: scheme
+[WARN] Blocked unsafe URL in link preview: javascript:alert(1) 
+01:43 +414 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/incognito_icon_test.dart: IncognitoIcon has Semantics label
+01:43 +414 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/link_preview_service_test.dart: LinkPreviewService URL safety blocks data: scheme
+[WARN] Blocked unsafe URL in link preview: data:text/html,<h1>test</h1> 
+01:43 +415 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/incognito_icon_test.dart: IncognitoIcon has Semantics label
+01:43 +415 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/link_preview_service_test.dart: LinkPreviewService URL safety blocks private IP 192.168.x.x
+[WARN] Blocked unsafe URL in link preview: http://192.168.1.1/admin 
+01:43 +416 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/incognito_icon_test.dart: IncognitoIcon has Semantics label
+01:43 +416 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/link_preview_service_test.dart: LinkPreviewService URL safety blocks private IP 10.x.x.x
+[WARN] Blocked unsafe URL in link preview: http://10.0.0.1/admin 
+01:43 +417 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/incognito_icon_test.dart: IncognitoIcon has Semantics label
+01:43 +417 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/link_preview_service_test.dart: LinkPreviewService URL safety blocks private IP 172.16-31.x.x
+[WARN] Blocked unsafe URL in link preview: http://172.16.0.1/admin 
+01:43 +418 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/incognito_icon_test.dart: IncognitoIcon has Semantics label
+01:43 +419 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/incognito_icon_test.dart: IncognitoIcon has Semantics label
+01:43 +420 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/lite_mode_test.dart: LiteMode default preset is high
+01:43 +421 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/lite_mode_test.dart: LiteMode setPreset low
+01:43 +422 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/lite_mode_test.dart: LiteMode setPreset medium
+01:43 +423 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/lite_mode_test.dart: LiteMode setPreset invalid value ignored
+01:43 +424 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/lite_mode_test.dart: LiteMode high preset enables all flags
+01:43 +425 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/lite_mode_test.dart: LiteMode low preset disables most flags
+01:43 +426 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/lite_mode_test.dart: LiteMode setFlag toggles individual flag
+01:43 +427 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/lite_mode_test.dart: LiteMode isEnabled checks flag correctly
+01:43 +428 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/lite_mode_test.dart: LiteMode medium preset has partial flags
+01:44 +429 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/locale_provider_test.dart: LocaleProvider translations zh translations contain key settings
+01:44 +430 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/locale_provider_test.dart: LocaleProvider translations en translations contain key settings
+01:44 +431 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/locale_provider_test.dart: LocaleProvider translations ja translations contain key settings
+01:44 +432 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/locale_provider_test.dart: LocaleProvider translations ko translations contain key settings
+01:44 +433 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/locale_provider_test.dart: LocaleProvider translations all locales have same number of keys
+01:44 +434 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/locale_provider_test.dart: LocaleProvider translations zh translations contain security keys
+01:44 +435 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/locale_provider_test.dart: LocaleProvider translations en translations contain security keys
+01:45 +436 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/lru_cache_full_test.dart: LruCache put and get
+01:45 +437 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/lru_cache_full_test.dart: LruCache evicts oldest when full
+01:45 +438 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/lru_cache_full_test.dart: LruCache get promotes to most recent
+01:45 +439 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/lru_cache_full_test.dart: LruCache put updates existing key
+01:45 +440 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/lru_cache_full_test.dart: LruCache remove
+01:45 +441 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/lru_cache_full_test.dart: LruCache removeGroup
+01:45 +442 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/lru_cache_full_test.dart: LruCache getGroup
+01:45 +443 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/lru_cache_full_test.dart: LruCache clear
+01:45 +444 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/lru_cache_full_test.dart: LruCache containsKey
+01:45 +445 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/lru_cache_full_test.dart: LruCache forEach iterates in order
+01:45 +446 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/lru_cache_full_test.dart: LruCache size and isEmpty
+01:45 +447 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/lru_cache_full_test.dart: ImageCacheManager clearAll clears all caches
+01:45 +448 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/lru_cache_full_test.dart: ImageCacheManager clearGroup removes from memory and thumbs
+01:46 +449 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/matrix_login_view_test.dart: MatrixLoginView renders login form
+01:48 +450 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/message_list_view_test.dart: MessageListView renders message list view
+01:48 +451 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/message_list_view_test.dart: MessageListView renders message list view
+01:48 +452 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/message_list_view_test.dart: MessageListView renders message list view
+01:48 +453 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/message_list_view_test.dart: MessageListView renders message list view
+01:48 +454 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/message_list_view_test.dart: MessageListView renders message list view
+01:48 +455 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/message_list_view_test.dart: MessageListView renders message list view
+01:48 +456 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/message_list_view_test.dart: MessageListView renders message list view
+01:48 +457 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/message_list_view_test.dart: MessageListView renders message list view
+01:48 +458 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/message_list_view_test.dart: MessageListView renders message list view
+01:48 +459 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/message_list_view_test.dart: MessageListView renders message list view
+01:48 +460 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/message_list_view_test.dart: MessageListView renders message list view
+01:49 +461 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/my_id_view_test.dart: MyIdView renders my id view
+01:50 +462 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/my_id_view_test.dart: MyIdView renders my id view
+01:50 +463 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/my_id_view_test.dart: MyIdView renders my id view
+01:50 +464 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/my_id_view_test.dart: MyIdView renders my id view
+01:50 +465 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/my_id_view_test.dart: MyIdView renders my id view
+01:50 +466 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/my_id_view_test.dart: MyIdView renders my id view
+01:50 +467 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/my_id_view_test.dart: MyIdView renders my id view
+01:50 +468 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/my_id_view_test.dart: MyIdView renders my id view
+01:50 +469 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/my_id_view_test.dart: MyIdView renders my id view
+01:50 +470 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/my_id_view_test.dart: MyIdView renders my id view
+01:50 +471 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/my_id_view_test.dart: MyIdView renders my id view
+01:50 +472 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/my_id_view_test.dart: MyIdView renders my id view
+01:50 +473 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/my_id_view_test.dart: MyIdView renders my id view
+01:50 +474 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/my_id_view_test.dart: MyIdView renders my id view
+01:50 +475 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/my_id_view_test.dart: MyIdView renders my id view
+01:50 +476 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/my_id_view_test.dart: MyIdView renders my id view
+01:50 +477 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/my_id_view_test.dart: MyIdView renders my id view
+01:50 +478 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/my_id_view_test.dart: MyIdView renders my id view
+01:50 +479 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/my_id_view_test.dart: MyIdView renders my id view
+01:50 +480 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/my_id_view_test.dart: MyIdView renders my id view
+01:50 +481 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/my_id_view_test.dart: MyIdView renders my id view
+01:50 +482 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/my_id_view_test.dart: MyIdView renders my id view
+01:50 +483 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/my_id_view_test.dart: MyIdView renders my id view
+01:50 +484 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/my_id_view_test.dart: MyIdView renders my id view
+01:50 +485 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/my_id_view_test.dart: MyIdView renders my id view
+01:50 +486 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/my_id_view_test.dart: MyIdView renders my id view
+01:50 +487 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/my_id_view_test.dart: MyIdView renders my id view
+01:50 +488 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/my_id_view_test.dart: MyIdView renders my id view
+01:50 +489 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/my_id_view_test.dart: MyIdView renders my id view
+01:50 +490 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/network_security_service_test.dart: NetworkSecurityService initial state has pinning disabled
+01:50 +491 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/network_security_service_test.dart: NetworkSecurityService addPinnedHash adds hash for host
+01:50 +492 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/network_security_service_test.dart: NetworkSecurityService addPinnedHash does not add duplicate hashes
+01:50 +493 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/network_security_service_test.dart: NetworkSecurityService enablePinning sets pinningEnabled to true
+01:51 +494 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/network_security_service_test.dart: NetworkSecurityService setPinnedHashes replaces all hashes
+01:51 +495 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/network_security_service_test.dart: NetworkSecurityService verifyPinning returns true when pinning disabled
+01:51 +496 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/note_item_test.dart: NoteItem creates with required fields
+01:51 +497 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/note_item_test.dart: NoteItem creates with all fields
+01:51 +498 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/note_item_test.dart: NoteItem toJson returns correct map
+01:51 +499 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/note_item_test.dart: NoteItem fromJson creates correct item
+01:51 +500 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/note_item_test.dart: NoteItem toJson and fromJson round-trip
+01:51 +501 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/note_item_test.dart: NoteItem copyWith modifies specified fields
+01:51 +502 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/note_item_test.dart: NoteItem copyWith without args returns identical item
+01:51 +503 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/note_item_test.dart: NoteItem NoteType enum has correct values
+01:51 +504 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/note_item_test.dart: NoteItem fromJson handles missing optional fields
+01:52 +505 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/note_provider_test.dart: NoteProvider initial state
+01:52 +506 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/note_provider_test.dart: NoteProvider items getter returns service items
+01:52 +507 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/note_provider_test.dart: NoteProvider todos getter returns todo type items
+01:52 +508 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/note_provider_test.dart: NoteProvider schedules getter returns schedule type items
+01:52 +509 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/note_provider_test.dart: NoteProvider pendingTodos getter returns pending items
+01:52 +510 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/note_provider_test.dart: NoteProvider todaySchedules getter returns today items
+01:53 +511 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/note_service_test.dart: NoteItem toJson/fromJson roundtrip
+01:53 +512 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/note_service_test.dart: NoteItem todo item with dueDate
+01:53 +513 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/note_service_test.dart: NoteItem copyWith updates fields
+01:53 +514 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/note_service_test.dart: NoteItem fromJson handles missing optional fields
+01:54 +515 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/notification_center_test.dart: NotificationCenter observe and post
+01:54 +516 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/notification_center_test.dart: NotificationCenter observeOnce fires only once
+01:54 +517 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/notification_center_test.dart: NotificationCenter removeObserver stops notifications
+01:54 +518 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/notification_center_test.dart: NotificationCenter removeObserver by id
+01:54 +519 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/notification_center_test.dart: NotificationCenter postImmediate ignores debounce
+01:54 +520 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/notification_center_test.dart: NotificationCenter multiple observers for same event
+01:54 +521 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/notification_center_test.dart: NotificationCenter post with no observers does not throw
+01:54 +522 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/notification_center_test.dart: NotificationCenter Event enum has all expected values
+01:54 +523 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/notification_center_test.dart: NotificationCenter setDebounce delays notification
+01:55 +524 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/notification_queue_test.dart: NotificationQueue instance is singleton
+01:55 +525 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/notification_queue_test.dart: NotificationQueue markDialogActive and markDialogInactive
+01:55 +526 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/notification_queue_test.dart: NotificationQueue enqueue does not throw
+01:55 +527 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/notification_queue_test.dart: NotificationQueue enqueue with data does not throw
+01:55 +528 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/notification_queue_test.dart: NotificationQueue multiple markDialogActive for different dialogs
+01:55 +529 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/notification_queue_test.dart: NotificationQueue enqueue when dialog is active suppresses notification
+01:56 +530 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/notification_test.dart: AppNotification creates with required fields
+01:56 +531 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/notification_test.dart: AppNotification creates with optional fields
+01:56 +532 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/notification_test.dart: AppNotification can be copied as read
+01:56 +533 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/notification_test.dart: AppNotification supports optional roomId and senderId
+01:56 +534 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/notification_test.dart: AppNotification toJson returns correct map
+01:56 +535 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/notification_test.dart: AppNotification fromJson creates correct object
+01:56 +536 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/notification_test.dart: AppNotification fromJson handles missing optional fields
+01:56 +537 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/notification_test.dart: AppNotification toJson and fromJson round-trip
+01:56 +538 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/notification_test.dart: AppNotification different notification types
+01:57 +539 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/notification_view_test.dart: NotificationView renders notification list
+01:58 +540 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/notification_view_test.dart: NotificationView renders notification list
+01:58 +541 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/password_key_service_test.dart: PasswordKeyService deriveKey makes service ready
+01:59 +542 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/password_key_service_test.dart: PasswordKeyService deriveKey makes service ready
+01:59 +543 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/password_key_service_test.dart: PasswordKeyService deriveKey makes service ready
+01:59 +544 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/password_key_service_test.dart: PasswordKeyService deriveKey makes service ready
+01:59 +545 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/password_key_service_test.dart: PasswordKeyService deriveKey makes service ready
+01:59 +546 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/password_key_service_test.dart: PasswordKeyService deriveKey makes service ready
+01:59 +547 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/password_key_service_test.dart: PasswordKeyService deriveKey produces consistent results for same input
+02:01 +548 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/privacy_policy_view_test.dart: PrivacyPolicyView renders privacy policy content
+02:01 +549 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/productivity_view_test.dart: ProductivityView renders productivity view
+02:02 +550 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/password_key_service_test.dart: PasswordKeyService deriveKey produces different results for different passwords
+02:02 +551 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/password_key_service_test.dart: PasswordKeyService deriveKey produces different results for different passwords
+02:02 +552 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/password_key_service_test.dart: PasswordKeyService deriveKey produces different results for different passwords
+02:02 +553 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/password_key_service_test.dart: PasswordKeyService deriveKey produces different results for different passwords
+02:02 +554 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/password_key_service_test.dart: PasswordKeyService deriveKey produces different results for different passwords
+02:02 +555 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/password_key_service_test.dart: PasswordKeyService deriveKey produces different results for different passwords
+02:02 +556 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/password_key_service_test.dart: PasswordKeyService deriveKey produces different results for different passwords
+02:03 +557 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/password_key_service_test.dart: PasswordKeyService clear removes all data
+02:03 +558 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/password_key_service_test.dart: PasswordKeyService clear removes all data
+02:03 +559 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/password_key_service_test.dart: PasswordKeyService clear removes all data
+02:03 +560 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/password_key_service_test.dart: PasswordKeyService clear removes all data
+02:03 +561 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/password_key_service_test.dart: PasswordKeyService clear removes all data
+02:03 +562 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/quick_command_test.dart: QuickCommand toJson/fromJson roundtrip
+02:04 +563 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/quick_command_test.dart: QuickCommand copyWith updates fields
+02:04 +564 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/quick_command_test.dart: QuickCommand fromJson handles missing optional fields
+02:04 +565 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/remote_config_service_test.dart: RemoteConfigService instance is singleton
+02:04 +566 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/remote_config_service_test.dart: RemoteConfigService config returns empty map before init
+02:04 +567 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/remote_config_service_test.dart: RemoteConfigService getFeatureFlag returns defaultValue when not initialized
+02:04 +568 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/remote_config_service_test.dart: RemoteConfigService getValue returns defaultValue when not initialized
+02:04 +569 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/remote_config_service_test.dart: RemoteConfigService getInt returns defaultValue when not initialized
+02:04 +570 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/remote_config_service_test.dart: RemoteConfigService getDouble returns defaultValue when not initialized
+02:04 +571 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/remote_config_service_test.dart: RemoteConfigService getUISchema returns null when not initialized
+02:04 +572 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/remote_config_service_test.dart: RemoteConfigService maxMemories has default value
+02:04 +573 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/remote_config_service_test.dart: RemoteConfigService maxCacheSize has default value
+02:04 +574 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/remote_config_service_test.dart: RemoteConfigService maxInputLength has default value
+02:05 +575 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/remote_config_service_test.dart: RemoteConfigService memorySimilarityThreshold is between 0 and 1
+02:05 +576 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/remote_ui_engine_test.dart: RemoteUIEngine validateSchema returns non-null for valid column
+02:05 +577 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/remote_ui_engine_test.dart: RemoteUIEngine validateSchema returns non-null for valid text
+02:05 +578 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/remote_ui_engine_test.dart: RemoteUIEngine validateSchema returns non-null for valid button
+02:05 +579 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/remote_ui_engine_test.dart: RemoteUIEngine validateSchema returns non-null for valid divider
+02:05 +580 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/remote_ui_engine_test.dart: RemoteUIEngine validateSchema returns non-null for valid spacer
+02:05 +581 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/remote_ui_engine_test.dart: RemoteUIEngine validateSchema returns non-null for valid container
+02:05 +582 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/remote_ui_engine_test.dart: RemoteUIEngine validateSchema returns null for unknown type
+02:05 +583 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/remote_ui_engine_test.dart: RemoteUIEngine validateSchema returns null for iframe type
+02:05 +584 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/remote_ui_engine_test.dart: RemoteUIEngine validateSchema returns null for missing type
+02:05 +585 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/remote_ui_engine_test.dart: RemoteUIEngine validateSchema accepts all 14 allowed types
+lib/core/runtime/distributed/lease/unified_lease.dart:188:7: Error: The gett
+er 'AppLogger' isn't defined for the type 'UnifiedLeaseManager'.
+ - 'UnifiedLeaseManager' is from 'package:omnivium/core/runtime/distributed/
+lease/unified_lease.dart' ('lib/core/runtime/distributed/lease/unified_lease
+.dart').
+Try correcting the name to the name of an existing getter, or defining a get
+ter or field named 'AppLogger'.
+      AppLogger.instance.debug('Unified lease acquire failed', error: e);
+      ^^^^^^^^^
+lib/core/runtime/sandbox/civilization_network.dart:740:11: Error: The getter
+ 'AppLogger' isn't defined for the type 'CivilizationNetwork'.
+ - 'CivilizationNetwork' is from 'package:omnivium/core/runtime/sandbox/civi
+lization_network.dart' ('lib/core/runtime/sandbox/civilization_network.dart'
+).
+Try correcting the name to the name of an existing getter, or defining a get
+ter or field named 'AppLogger'.
+          AppLogger.instance.debug('Broadcast message send failed', error: e
+);
+          ^^^^^^^^^
+02:06 +586 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/runtime_contract_test.dart: RuntimeKernel boot creates running container
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] RuntimeContainer shutdown complete
+02:06 +587 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/runtime_contract_test.dart: RuntimeKernel boot with custom config
+[INFO] RuntimeContainer booted: nodeId=test-node, version=2.0.0
+[INFO] RuntimeContainer shutdown complete
+02:06 +588 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/runtime_contract_test.dart: RuntimeKernel shutdown clears state
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] RuntimeContainer shutdown complete
+02:06 +589 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/runtime_contract_test.dart: RuntimeKernel stateSnapshot reflects runtime state
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] RuntimeContainer shutdown complete
+02:06 +590 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/runtime_contract_test.dart: Plugin Lifecycle register and activate plugin
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "test-plugin" registered with 1 capabilities
+[INFO] Plugin "test-plugin" activated
+[INFO] Plugin "test-plugin" unloaded
+[INFO] RuntimeContainer shutdown complete
+02:06 +591 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/runtime_contract_test.dart: Plugin Lifecycle unload plugin
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "unload-test" registered with 0 capabilities
+[INFO] Plugin "unload-test" activated
+[INFO] Plugin "unload-test" unloaded
+[INFO] RuntimeContainer shutdown complete
+02:06 +592 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/runtime_contract_test.dart: Plugin Lifecycle hot reload plugin
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "reload-test" registered with 0 capabilities
+[INFO] Plugin "reload-test" activated
+[INFO] Plugin "reload-test" unloaded
+[INFO] Plugin "reload-test" registered with 0 capabilities
+[INFO] Plugin "reload-test" activated
+[INFO] Plugin "reload-test" unloaded
+[INFO] RuntimeContainer shutdown complete
+02:06 +593 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/runtime_contract_test.dart: Plugin Lifecycle suspend and reactivate plugin
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "suspend-test" registered with 0 capabilities
+[INFO] Plugin "suspend-test" activated
+[INFO] Plugin "suspend-test" suspended
+[INFO] Plugin "suspend-test" activated
+[INFO] Plugin "suspend-test" unloaded
+[INFO] RuntimeContainer shutdown complete
+02:06 +594 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/runtime_contract_test.dart: Capability Router discover capability returns binding
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "cap-plugin" registered with 1 capabilities
+[INFO] Plugin "cap-plugin" activated
+[INFO] Plugin "cap-plugin" unloaded
+[INFO] RuntimeContainer shutdown complete
+02:06 +595 -10: C:/Users/19468/Desktop/Omnivium/mobile/test/runtime_contract_test.dart: Capability Router invoke capability with auto permission
+02:06 +595 -11: loading C:/Users/19468/Desktop/Omnivium/mobile/test/sandbox_hostile_test.dart [E]
+  Failed to load "C:/Users/19468/Desktop/Omnivium/mobile/test/sandbox_hostile_test.dart":
+  Compilation failed for testPath=C:/Users/19468/Desktop/Omnivium/mobile/test/sandbox_hostile_test.dart: lib/core/runtime/distributed/lease/unified_lease.dart:188:7: Error: The getter 'AppLogger' isn't defined for the type 'UnifiedLeaseManager'.
+   - 'UnifiedLeaseManager' is from 'package:omnivium/core/runtime/distributed/lease/unified_lease.dart' ('lib/core/runtime/distributed/lease/unified_lease.dart').
+  Try correcting the name to the name of an existing getter, or defining a getter or field named 'AppLogger'.
+        AppLogger.instance.debug('Unified lease acquire failed', error: e);
+        ^^^^^^^^^
+  lib/core/runtime/sandbox/civilization_network.dart:740:11: Error: The getter 'AppLogger' isn't defined for the type 'CivilizationNetwork'.
+   - 'CivilizationNetwork' is from 'package:omnivium/core/runtime/sandbox/civilization_network.dart' ('lib/core/runtime/sandbox/civilization_network.dart').
+  Try correcting the name to the name of an existing getter, or defining a getter or field named 'AppLogger'.
+            AppLogger.instance.debug('Broadcast message send failed', error: e);
+            ^^^^^^^^^
+  .
+02:06 +595 -11: C:/Users/19468/Desktop/Omnivium/mobile/test/runtime_contract_test.dart: Capability Router invoke capability with auto permission
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "invoke-plugin" registered with 1 capabilities
+[INFO] Plugin "invoke-plugin" activated
+[INFO] Plugin "invoke-plugin" unloaded
+[INFO] RuntimeContainer shutdown complete
+02:06 +596 -11: C:/Users/19468/Desktop/Omnivium/mobile/test/runtime_contract_test.dart: Capability Router permission deny blocks capability
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "deny-plugin" registered with 1 capabilities
+[INFO] Plugin "deny-plugin" activated
+[INFO] Plugin "deny-plugin" unloaded
+[INFO] RuntimeContainer shutdown complete
+02:06 +597 -11: C:/Users/19468/Desktop/Omnivium/mobile/test/runtime_contract_test.dart: Capability Router discover non-existent capability throws
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] RuntimeContainer shutdown complete
+02:06 +598 -11: C:/Users/19468/Desktop/Omnivium/mobile/test/runtime_contract_test.dart: Event Bus publish and subscribe
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] RuntimeContainer shutdown complete
+02:06 +599 -11: C:/Users/19468/Desktop/Omnivium/mobile/test/runtime_contract_test.dart: Event Bus unsubscribe stops receiving
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] RuntimeContainer shutdown complete
+02:07 +600 -11: C:/Users/19468/Desktop/Omnivium/mobile/test/runtime_contract_test.dart: Event Bus priority ordering
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] RuntimeContainer shutdown complete
+02:07 +601 -11: C:/Users/19468/Desktop/Omnivium/mobile/test/runtime_contract_test.dart: Scheduler schedule and complete task
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] RuntimeContainer shutdown complete
+02:07 +602 -11: C:/Users/19468/Desktop/Omnivium/mobile/test/runtime_contract_test.dart: Scheduler cancel task
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] RuntimeContainer shutdown complete
+02:07 +603 -11: C:/Users/19468/Desktop/Omnivium/mobile/test/runtime_contract_test.dart: Scheduler task timeout triggers failure
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] RuntimeContainer shutdown complete
+02:08 +604 -11: C:/Users/19468/Desktop/Omnivium/mobile/test/runtime_contract_test.dart: Runtime Clock deadline and expiry
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] RuntimeContainer shutdown complete
+02:08 +605 -11: C:/Users/19468/Desktop/Omnivium/mobile/test/runtime_contract_test.dart: Runtime Clock monotonic time advances
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] RuntimeContainer shutdown complete
+lib/core/runtime/sandbox/civilization_network.dart:740:11: Error: The getter
+ 'AppLogger' isn't defined for the type 'CivilizationNetwork'.
+ - 'CivilizationNetwork' is from 'package:omnivium/core/runtime/sandbox/civi
+lization_network.dart' ('lib/core/runtime/sandbox/civilization_network.dart'
+).
+Try correcting the name to the name of an existing getter, or defining a get
+ter or field named 'AppLogger'.
+          AppLogger.instance.debug('Broadcast message send failed', error: e
+);
+          ^^^^^^^^^
+02:13 +606 -12: loading C:/Users/19468/Desktop/Omnivium/mobile/test/sandbox_test.dart [E]
+  Failed to load "C:/Users/19468/Desktop/Omnivium/mobile/test/sandbox_test.dart":
+  Compilation failed for testPath=C:/Users/19468/Desktop/Omnivium/mobile/test/sandbox_test.dart: lib/core/runtime/sandbox/civilization_network.dart:740:11: Error: The getter 'AppLogger' isn't defined for the type 'CivilizationNetwork'.
+   - 'CivilizationNetwork' is from 'package:omnivium/core/runtime/sandbox/civilization_network.dart' ('lib/core/runtime/sandbox/civilization_network.dart').
+  Try correcting the name to the name of an existing getter, or defining a getter or field named 'AppLogger'.
+            AppLogger.instance.debug('Broadcast message send failed', error: e);
+            ^^^^^^^^^
+  .
+02:21 +606 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sdk_test.dart: Omnivium SDK init and shutdown lifecycle
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "logger" registered with 2 capabilities
+[INFO] Plugin "logger" activated
+[WARN] Plugin "logger" cannot activate from PluginState.active 
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[WARN] Plugin "storage" cannot activate from PluginState.active 
+[INFO] Plugin "config" registered with 3 capabilities
+[INFO] Plugin "config" activated
+[WARN] Plugin "config" cannot activate from PluginState.active 
+[INFO] Plugin "metrics" registered with 3 capabilities
+[INFO] Plugin "metrics" activated
+[WARN] Plugin "metrics" cannot activate from PluginState.active 
+[INFO] Plugin "notification" registered with 2 capabilities
+[INFO] Plugin "notification" activated
+[WARN] Plugin "notification" cannot activate from PluginState.active 
+[INFO] Plugin "memory" registered with 4 capabilities
+[INFO] Plugin "memory" activated
+[WARN] Plugin "memory" cannot activate from PluginState.active 
+[INFO] Plugin "logger" unloaded
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "config" unloaded
+[INFO] Plugin "metrics" unloaded
+[INFO] Plugin "notification" unloaded
+[INFO] Plugin "memory" unloaded
+[INFO] RuntimeContainer shutdown complete
+02:21 +607 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sdk_test.dart: Omnivium SDK create plugin with builder
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "logger" registered with 2 capabilities
+[INFO] Plugin "logger" activated
+[WARN] Plugin "logger" cannot activate from PluginState.active 
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[WARN] Plugin "storage" cannot activate from PluginState.active 
+[INFO] Plugin "config" registered with 3 capabilities
+[INFO] Plugin "config" activated
+[WARN] Plugin "config" cannot activate from PluginState.active 
+[INFO] Plugin "metrics" registered with 3 capabilities
+[INFO] Plugin "metrics" activated
+[WARN] Plugin "metrics" cannot activate from PluginState.active 
+[INFO] Plugin "notification" registered with 2 capabilities
+[INFO] Plugin "notification" activated
+[WARN] Plugin "notification" cannot activate from PluginState.active 
+[INFO] Plugin "memory" registered with 4 capabilities
+[INFO] Plugin "memory" activated
+[WARN] Plugin "memory" cannot activate from PluginState.active 
+[INFO] Plugin "logger" unloaded
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "config" unloaded
+[INFO] Plugin "metrics" unloaded
+[INFO] Plugin "notification" unloaded
+[INFO] Plugin "memory" unloaded
+[INFO] RuntimeContainer shutdown complete
+02:21 +608 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sdk_test.dart: Omnivium SDK register plugin via builder
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "logger" registered with 2 capabilities
+[INFO] Plugin "logger" activated
+[WARN] Plugin "logger" cannot activate from PluginState.active 
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[WARN] Plugin "storage" cannot activate from PluginState.active 
+[INFO] Plugin "config" registered with 3 capabilities
+[INFO] Plugin "config" activated
+[WARN] Plugin "config" cannot activate from PluginState.active 
+[INFO] Plugin "metrics" registered with 3 capabilities
+[INFO] Plugin "metrics" activated
+[WARN] Plugin "metrics" cannot activate from PluginState.active 
+[INFO] Plugin "notification" registered with 2 capabilities
+[INFO] Plugin "notification" activated
+[WARN] Plugin "notification" cannot activate from PluginState.active 
+[INFO] Plugin "memory" registered with 4 capabilities
+[INFO] Plugin "memory" activated
+[WARN] Plugin "memory" cannot activate from PluginState.active 
+[INFO] Plugin "test-plugin" registered with 1 capabilities
+[INFO] Plugin "test-plugin" activated
+[INFO] Plugin "logger" unloaded
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "config" unloaded
+[INFO] Plugin "metrics" unloaded
+[INFO] Plugin "notification" unloaded
+[INFO] Plugin "memory" unloaded
+[INFO] Plugin "test-plugin" unloaded
+[INFO] RuntimeContainer shutdown complete
+02:21 +609 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sdk_test.dart: Omnivium SDK invoke capability through SDK
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "logger" registered with 2 capabilities
+[INFO] Plugin "logger" activated
+[WARN] Plugin "logger" cannot activate from PluginState.active 
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[WARN] Plugin "storage" cannot activate from PluginState.active 
+[INFO] Plugin "config" registered with 3 capabilities
+[INFO] Plugin "config" activated
+[WARN] Plugin "config" cannot activate from PluginState.active 
+[INFO] Plugin "metrics" registered with 3 capabilities
+[INFO] Plugin "metrics" activated
+[WARN] Plugin "metrics" cannot activate from PluginState.active 
+[INFO] Plugin "notification" registered with 2 capabilities
+[INFO] Plugin "notification" activated
+[WARN] Plugin "notification" cannot activate from PluginState.active 
+[INFO] Plugin "memory" registered with 4 capabilities
+[INFO] Plugin "memory" activated
+[WARN] Plugin "memory" cannot activate from PluginState.active 
+[INFO] Plugin "test-plugin" registered with 1 capabilities
+[INFO] Plugin "test-plugin" activated
+[INFO] Plugin "logger" unloaded
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "config" unloaded
+[INFO] Plugin "metrics" unloaded
+[INFO] Plugin "notification" unloaded
+[INFO] Plugin "memory" unloaded
+[INFO] Plugin "test-plugin" unloaded
+[INFO] RuntimeContainer shutdown complete
+02:21 +610 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sdk_test.dart: Omnivium SDK inspect returns runtime state
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "logger" registered with 2 capabilities
+[INFO] Plugin "logger" activated
+[WARN] Plugin "logger" cannot activate from PluginState.active 
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[WARN] Plugin "storage" cannot activate from PluginState.active 
+[INFO] Plugin "config" registered with 3 capabilities
+[INFO] Plugin "config" activated
+[WARN] Plugin "config" cannot activate from PluginState.active 
+[INFO] Plugin "metrics" registered with 3 capabilities
+[INFO] Plugin "metrics" activated
+[WARN] Plugin "metrics" cannot activate from PluginState.active 
+[INFO] Plugin "notification" registered with 2 capabilities
+[INFO] Plugin "notification" activated
+[WARN] Plugin "notification" cannot activate from PluginState.active 
+[INFO] Plugin "memory" registered with 4 capabilities
+[INFO] Plugin "memory" activated
+[WARN] Plugin "memory" cannot activate from PluginState.active 
+[INFO] Plugin "logger" unloaded
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "config" unloaded
+[INFO] Plugin "metrics" unloaded
+[INFO] Plugin "notification" unloaded
+[INFO] Plugin "memory" unloaded
+[INFO] RuntimeContainer shutdown complete
+02:21 +611 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sdk_test.dart: Omnivium SDK list plugins
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "logger" registered with 2 capabilities
+[INFO] Plugin "logger" activated
+[WARN] Plugin "logger" cannot activate from PluginState.active 
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[WARN] Plugin "storage" cannot activate from PluginState.active 
+[INFO] Plugin "config" registered with 3 capabilities
+[INFO] Plugin "config" activated
+[WARN] Plugin "config" cannot activate from PluginState.active 
+[INFO] Plugin "metrics" registered with 3 capabilities
+[INFO] Plugin "metrics" activated
+[WARN] Plugin "metrics" cannot activate from PluginState.active 
+[INFO] Plugin "notification" registered with 2 capabilities
+[INFO] Plugin "notification" activated
+[WARN] Plugin "notification" cannot activate from PluginState.active 
+[INFO] Plugin "memory" registered with 4 capabilities
+[INFO] Plugin "memory" activated
+[WARN] Plugin "memory" cannot activate from PluginState.active 
+[WARN] Plugin "storage" already registered, unloading previous 
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "logger" unloaded
+[INFO] Plugin "config" unloaded
+[INFO] Plugin "metrics" unloaded
+[INFO] Plugin "notification" unloaded
+[INFO] Plugin "memory" unloaded
+[INFO] Plugin "storage" unloaded
+[INFO] RuntimeContainer shutdown complete
+02:21 +612 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sdk_test.dart: Omnivium SDK list capabilities
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "logger" registered with 2 capabilities
+[INFO] Plugin "logger" activated
+[WARN] Plugin "logger" cannot activate from PluginState.active 
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[WARN] Plugin "storage" cannot activate from PluginState.active 
+[INFO] Plugin "config" registered with 3 capabilities
+[INFO] Plugin "config" activated
+[WARN] Plugin "config" cannot activate from PluginState.active 
+[INFO] Plugin "metrics" registered with 3 capabilities
+[INFO] Plugin "metrics" activated
+[WARN] Plugin "metrics" cannot activate from PluginState.active 
+[INFO] Plugin "notification" registered with 2 capabilities
+[INFO] Plugin "notification" activated
+[WARN] Plugin "notification" cannot activate from PluginState.active 
+[INFO] Plugin "memory" registered with 4 capabilities
+[INFO] Plugin "memory" activated
+[WARN] Plugin "memory" cannot activate from PluginState.active 
+[WARN] Plugin "storage" already registered, unloading previous 
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "logger" unloaded
+[INFO] Plugin "config" unloaded
+[INFO] Plugin "metrics" unloaded
+[INFO] Plugin "notification" unloaded
+[INFO] Plugin "memory" unloaded
+[INFO] Plugin "storage" unloaded
+[INFO] RuntimeContainer shutdown complete
+02:21 +613 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sdk_test.dart: Omnivium SDK list journal entries
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "logger" registered with 2 capabilities
+[INFO] Plugin "logger" activated
+[WARN] Plugin "logger" cannot activate from PluginState.active 
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[WARN] Plugin "storage" cannot activate from PluginState.active 
+[INFO] Plugin "config" registered with 3 capabilities
+[INFO] Plugin "config" activated
+[WARN] Plugin "config" cannot activate from PluginState.active 
+[INFO] Plugin "metrics" registered with 3 capabilities
+[INFO] Plugin "metrics" activated
+[WARN] Plugin "metrics" cannot activate from PluginState.active 
+[INFO] Plugin "notification" registered with 2 capabilities
+[INFO] Plugin "notification" activated
+[WARN] Plugin "notification" cannot activate from PluginState.active 
+[INFO] Plugin "memory" registered with 4 capabilities
+[INFO] Plugin "memory" activated
+[WARN] Plugin "memory" cannot activate from PluginState.active 
+[INFO] Plugin "logger" unloaded
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "config" unloaded
+[INFO] Plugin "metrics" unloaded
+[INFO] Plugin "notification" unloaded
+[INFO] Plugin "memory" unloaded
+[INFO] RuntimeContainer shutdown complete
+02:21 +614 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sdk_test.dart: Omnivium SDK create session
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "logger" registered with 2 capabilities
+[INFO] Plugin "logger" activated
+[WARN] Plugin "logger" cannot activate from PluginState.active 
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[WARN] Plugin "storage" cannot activate from PluginState.active 
+[INFO] Plugin "config" registered with 3 capabilities
+[INFO] Plugin "config" activated
+[WARN] Plugin "config" cannot activate from PluginState.active 
+[INFO] Plugin "metrics" registered with 3 capabilities
+[INFO] Plugin "metrics" activated
+[WARN] Plugin "metrics" cannot activate from PluginState.active 
+[INFO] Plugin "notification" registered with 2 capabilities
+[INFO] Plugin "notification" activated
+[WARN] Plugin "notification" cannot activate from PluginState.active 
+[INFO] Plugin "memory" registered with 4 capabilities
+[INFO] Plugin "memory" activated
+[WARN] Plugin "memory" cannot activate from PluginState.active 
+[INFO] Plugin "logger" unloaded
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "config" unloaded
+[INFO] Plugin "metrics" unloaded
+[INFO] Plugin "notification" unloaded
+[INFO] Plugin "memory" unloaded
+[INFO] RuntimeContainer shutdown complete
+02:21 +615 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sdk_test.dart: Omnivium SDK invokeRemote without distributed returns error
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "logger" registered with 2 capabilities
+[INFO] Plugin "logger" activated
+[WARN] Plugin "logger" cannot activate from PluginState.active 
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[WARN] Plugin "storage" cannot activate from PluginState.active 
+[INFO] Plugin "config" registered with 3 capabilities
+[INFO] Plugin "config" activated
+[WARN] Plugin "config" cannot activate from PluginState.active 
+[INFO] Plugin "metrics" registered with 3 capabilities
+[INFO] Plugin "metrics" activated
+[WARN] Plugin "metrics" cannot activate from PluginState.active 
+[INFO] Plugin "notification" registered with 2 capabilities
+[INFO] Plugin "notification" activated
+[WARN] Plugin "notification" cannot activate from PluginState.active 
+02:21 +616 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sdk_test.dart: Omnivium SDK inspectDistributed without distributed returns false
+02:21 +617 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sdk_test.dart: Runtime CLI help command
+02:21 +618 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sdk_test.dart: Runtime CLI unknown command returns help
+02:21 +619 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sdk_test.dart: Runtime CLI inspect command with runtime
+02:21 +620 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sdk_test.dart: Runtime CLI plugins command
+02:21 +621 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sdk_test.dart: Runtime CLI plugin detail command
+02:21 +622 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sdk_test.dart: Runtime CLI capabilities command
+02:21 +623 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sdk_test.dart: Runtime CLI journal command
+02:21 +624 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sdk_test.dart: Runtime CLI status command
+02:21 +625 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sdk_test.dart: Runtime CLI session command
+02:21 +626 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sdk_test.dart: Runtime CLI policy command
+02:21 +627 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sdk_test.dart: Runtime CLI resources command
+02:21 +628 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sdk_test.dart: Runtime CLI snapshot command
+02:21 +629 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sdk_test.dart: Runtime CLI nodes command without distributed
+02:21 +630 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sdk_test.dart: Runtime Observatory getDashboard returns runtime info
+02:21 +631 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sdk_test.dart: Runtime Observatory getPluginGraph returns nodes and edges
+02:21 +632 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sdk_test.dart: Runtime Observatory getEventTimeline returns entries
+02:21 +633 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sdk_test.dart: Runtime Observatory getTraceFlamegraph returns traces
+02:21 +634 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sdk_test.dart: Runtime Observatory getDistributedMap without distributed returns false
+02:21 +635 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sdk_test.dart: Runtime Observatory notify events emit to stream
+02:21 +636 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sdk_test.dart: Runtime Observatory event buffer respects size limit
+02:21 +637 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sdk_test.dart: Runtime Observatory start and stop polling
+02:22 +638 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/search_view_test.dart: SearchView renders search view
+02:23 +639 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/section_header_test.dart: SectionHeader renders title
+02:23 +640 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/section_header_test.dart: SectionHeader renders title
+02:23 +641 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/section_header_test.dart: SectionHeader renders title
+02:23 +642 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/section_header_test.dart: SectionHeader renders title
+02:24 +643 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/section_header_test.dart: SectionHeader renders title
+02:24 +644 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/section_header_test.dart: SectionHeader renders title
+02:24 +645 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/search_view_test.dart: SearchView can type in search field
+02:24 +646 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/search_view_test.dart: SearchView renders without error
+02:24 +647 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/security_check_test.dart: SecurityCheckService isCompromised returns false by default
+02:24 +648 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/security_check_test.dart: SecurityCheckService isRooted returns false by default
+02:24 +649 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/security_check_test.dart: SecurityCheckService isEmulator returns false by default
+02:24 +650 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/security_check_test.dart: SecurityCheckService isJailbroken returns false by default
+02:25 +651 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: SkeletonLoader accessibility SkeletonLoader renders without semantics labels
+02:26 +652 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/session_provider_test.dart: SessionMessage creates with role and content
+02:26 +653 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: SkeletonLoader accessibility MessageSkeleton renders without semantics labels
+02:26 +654 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: SkeletonLoader accessibility MessageSkeleton renders without semantics labels
+02:26 +655 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: SkeletonLoader accessibility MessageSkeleton renders without semantics labels
+02:26 +656 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: SkeletonLoader accessibility MessageSkeleton renders without semantics labels
+02:26 +657 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: SkeletonLoader accessibility MessageSkeleton renders without semantics labels
+02:26 +658 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: SkeletonLoader accessibility MessageSkeleton renders without semantics labels
+02:26 +659 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: SkeletonLoader accessibility MessageSkeleton renders without semantics labels
+02:26 +660 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: SkeletonLoader accessibility MessageSkeleton renders without semantics labels
+02:26 +661 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: SkeletonLoader accessibility MessageSkeleton renders without semantics labels
+02:26 +662 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: SkeletonLoader accessibility MessageSkeleton renders without semantics labels
+02:26 +663 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: SkeletonLoader accessibility MessageSkeleton renders without semantics labels
+02:26 +664 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: SkeletonLoader accessibility MessageSkeleton renders without semantics labels
+02:26 +665 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: SkeletonLoader accessibility MessageSkeleton renders without semantics labels
+02:26 +666 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: SkeletonLoader accessibility MessageSkeleton renders without semantics labels
+02:26 +667 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/session_provider_test.dart: ConversationSession fromJson creates correct object
+02:26 +668 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: SkeletonLoader accessibility CardSkeleton renders without semantics labels
+02:26 +669 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: SkeletonLoader accessibility CardSkeleton renders without semantics labels
+02:26 +670 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: SkeletonLoader accessibility CardSkeleton renders without semantics labels
+02:26 +671 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: SkeletonLoader accessibility CardSkeleton renders without semantics labels
+02:26 +672 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: SkeletonLoader accessibility CardSkeleton renders without semantics labels
+02:26 +673 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: SkeletonLoader accessibility CardSkeleton renders without semantics labels
+02:26 +674 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: SkeletonLoader accessibility CardSkeleton renders without semantics labels
+02:26 +675 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: SkeletonLoader accessibility CardSkeleton renders without semantics labels
+02:26 +676 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/session_provider_test.dart: SessionProvider createSession notifies listeners
+02:26 +677 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: SkeletonLoader accessibility ChatListSkeleton renders without semantics labels
+02:26 +678 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: SkeletonLoader accessibility ChatListSkeleton renders without semantics labels
+02:26 +679 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: SkeletonLoader accessibility ChatListSkeleton renders without semantics labels
+02:26 +680 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: SkeletonLoader accessibility ChatListSkeleton renders without semantics labels
+02:26 +681 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: SkeletonLoader accessibility ChatListSkeleton renders without semantics labels
+02:26 +682 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: SkeletonLoader accessibility ChatListSkeleton renders without semantics labels
+02:26 +683 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: SkeletonLoader accessibility ChatListSkeleton renders without semantics labels
+02:26 +684 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: SkeletonLoader accessibility ChatListSkeleton renders without semantics labels
+02:26 +685 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/session_provider_test.dart: SessionProvider archiveSession active session clears active
+02:26 +686 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: Semantics label verification Semantics label on GestureDetector is findable
+02:26 +687 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: Semantics label verification Semantics label on GestureDetector is findable
+02:26 +688 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: Semantics label verification Semantics label on GestureDetector is findable
+02:26 +689 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: Semantics label verification Semantics label on GestureDetector is findable
+02:26 +690 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: Semantics label verification Semantics label on GestureDetector is findable
+02:26 +691 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: Semantics label verification Semantics label on GestureDetector is findable
+02:26 +692 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: Semantics label verification Semantics label on GestureDetector is findable
+02:26 +693 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: Semantics label verification Semantics label on GestureDetector is findable
+02:26 +694 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: Semantics label verification Semantics label on GestureDetector is findable
+02:26 +695 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: Semantics label verification Semantics label on GestureDetector is findable
+02:26 +696 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: Semantics label verification Semantics label on GestureDetector is findable
+02:26 +697 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: Semantics label verification Semantics label on GestureDetector is findable
+02:26 +698 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: Semantics label verification Semantics label on GestureDetector is findable
+02:26 +699 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/session_provider_test.dart: SessionProvider switchSession notifies listeners
+02:26 +700 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: Semantics label verification Semantics label on icon button is findable
+02:26 +701 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: Semantics label verification Semantics label on icon button is findable
+02:26 +702 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: Semantics label verification Semantics label on icon button is findable
+02:26 +703 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: Semantics label verification Semantics label on icon button is findable
+02:26 +704 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: Semantics label verification Semantics excludeSemantics hides content
+02:27 +705 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: Semantics label verification Image semanticLabel is set correctly
+02:27 +706 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: Semantics label verification TextField with labelText is accessible
+02:27 +707 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/semantics_test.dart: Semantics label verification Semantics wrapper provides label for screen readers
+02:27 +708 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/settings_view_test.dart: SettingsView renders settings view
+02:28 +709 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/setting_item_test.dart: SettingItem renders title
+02:28 +710 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/setting_item_test.dart: SettingItem renders title
+02:29 +711 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/setting_item_test.dart: SettingItem renders title
+02:29 +712 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/setting_item_test.dart: SettingItem renders title
+02:29 +713 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/setting_item_test.dart: SettingItem renders title
+02:29 +714 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/skeleton_widget_test.dart: SkeletonLoader renders with default dimensions
+02:29 +715 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/skeleton_widget_test.dart: SkeletonLoader renders with default dimensions
+02:29 +716 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/skeleton_widget_test.dart: SkeletonLoader renders with default dimensions
+02:29 +717 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/skeleton_widget_test.dart: SkeletonLoader renders with default dimensions
+02:29 +718 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/skeleton_widget_test.dart: SkeletonLoader renders with default dimensions
+02:29 +719 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/skeleton_widget_test.dart: SkeletonLoader renders with default dimensions
+02:29 +720 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/skeleton_widget_test.dart: SkeletonLoader renders with default dimensions
+02:29 +721 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/skeleton_widget_test.dart: SkeletonLoader renders with default dimensions
+02:29 +722 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/skeleton_widget_test.dart: SkeletonLoader renders with default dimensions
+02:30 +723 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/skeleton_widget_test.dart: SkeletonLoader renders with custom dimensions
+02:30 +724 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/skeleton_widget_test.dart: SkeletonLoader renders with custom borderRadius
+02:30 +725 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/skeleton_widget_test.dart: SkeletonLoader animation controller repeats
+02:30 +726 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/skeleton_widget_test.dart: MessageSkeleton renders user message skeleton
+02:30 +727 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/skeleton_widget_test.dart: MessageSkeleton renders AI message skeleton with avatar
+02:30 +728 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/skeleton_widget_test.dart: ChatListSkeleton renders with default count
+02:30 +729 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/skeleton_widget_test.dart: ChatListSkeleton renders with custom count
+02:30 +730 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/skeleton_widget_test.dart: CardSkeleton renders card skeleton
+02:31 +731 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/skill_test.dart: SkillRegistry starts empty
+02:31 +732 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/skill_test.dart: SkillRegistry register adds skill
+02:31 +733 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/skill_test.dart: SkillRegistry get by id
+02:31 +734 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/skill_test.dart: SkillRegistry get returns null for unknown id
+02:31 +735 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/skill_test.dart: SkillRegistry unregister removes skill
+02:31 +736 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/skill_test.dart: SkillRegistry register multiple skills
+02:31 +737 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/skill_test.dart: SkillRegistry register same id replaces
+[WARN] Skill "test" re-registered, overwriting previous registration 
+02:31 +738 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/skill_test.dart: SkillResult ok result
+02:31 +739 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/skill_test.dart: SkillResult fail result
+02:31 +740 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/skill_test.dart: RemoteSkill properties
+02:31 +741 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignKeyPair — Ed25519 Key Generation generate produces key pair with correct format
+02:31 +742 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignKeyPair — Ed25519 Key Generation different nodeIds produce different keys
+02:32 +743 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignKeyPair — Ed25519 Key Generation verificationKey is derived from publicKey
+02:32 +744 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignKeyPair — Ed25519 Key Generation keyPair toJson includes all fields
+02:32 +745 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignKeyPair — Ed25519 Key Generation keyPair fromJson round-trips correctly
+02:32 +746 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignIdentity — DID Generation DID follows did:omnivium format
+02:32 +747 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignIdentity — DID Generation DID differs for different nodeIds
+02:32 +748 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignIdentity — DID Generation DID is 32 hex chars after prefix
+02:32 +749 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignIdentity — Ed25519 Self-Signature Verification verify returns true for valid identity
+02:32 +750 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignIdentity — Ed25519 Self-Signature Verification verify returns false for tampered publicKey
+02:32 +751 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignIdentity — Ed25519 Self-Signature Verification verify returns false for tampered DID
+02:32 +752 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignIdentity — Identity Mutations bumpEpoch increments epoch
+02:32 +753 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignIdentity — Identity Mutations joinFederation sets federationId
+02:32 +754 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignIdentity — Identity Mutations updateTrust changes trust level
+02:32 +755 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignIdentity — Identity Mutations addCredential adds verifiable credential
+02:32 +756 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignIdentity — Key Rotation rotateKey produces new keyPair but same DID
+02:32 +757 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignIdentity — Key Rotation rotated identity verifies with new key
+02:32 +758 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignIdentity — Key Rotation key rotation history is preserved across multiple rotations
+02:32 +759 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignIdentity — Key Rotation verifyKeyRotation validates rotation signature
+02:32 +760 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignIdentity — Sub-Identity Derivation deriveSubIdentity creates child identity from parent
+02:32 +761 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignIdentity — Sub-Identity Derivation derived identity has credential from parent
+02:32 +762 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/stability_test.dart: Semantic Versioning parse version string
+02:32 +763 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/stability_test.dart: Semantic Versioning parse version string
+02:32 +764 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignIdentity — Sub-Identity Derivation different subIds produce different identities
+02:32 +765 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignIdentity — Sub-Identity Derivation different subIds produce different identities
+02:32 +766 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignIdentity — Sub-Identity Derivation different subIds produce different identities
+02:32 +767 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignIdentity — Sub-Identity Derivation different subIds produce different identities
+02:32 +768 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignIdentity — Sub-Identity Derivation different subIds produce different identities
+02:32 +769 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignIdentity — Sub-Identity Derivation different subIds produce different identities
+02:32 +770 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignIdentity — Sub-Identity Derivation different subIds produce different identities
+02:32 +771 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignIdentity — Sub-Identity Derivation different subIds produce different identities
+02:32 +772 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignIdentity — Sub-Identity Derivation different subIds produce different identities
+02:32 +773 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/stability_test.dart: Deprecation Lifecycle deprecation notice creation
+02:32 +774 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignIdentity — toJson / fromJson toJson includes all fields
+02:32 +775 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignIdentity — toJson / fromJson toJson includes all fields
+02:32 +776 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignIdentity — toJson / fromJson toJson includes all fields
+02:32 +777 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/stability_test.dart: Runtime Version Registry current version is defined
+02:32 +778 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: VerifiableCredential — Ed25519 Credential Issuance and Verification issue creates valid credential
+02:32 +779 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: VerifiableCredential — Ed25519 Credential Issuance and Verification issue creates valid credential
+02:32 +780 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: VerifiableCredential — Ed25519 Credential Issuance and Verification issue creates valid credential
+02:32 +781 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: VerifiableCredential — Ed25519 Credential Issuance and Verification issue creates valid credential
+02:32 +782 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/stability_test.dart: Runtime Version Registry incompatible major versions detected
+02:32 +783 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: VerifiableCredential — Ed25519 Credential Issuance and Verification verifyCredential returns true with correct issuer public key
+02:32 +784 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: VerifiableCredential — Ed25519 Credential Issuance and Verification verifyCredential returns true with correct issuer public key
+02:32 +785 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: VerifiableCredential — Ed25519 Credential Issuance and Verification verifyCredential returns true with correct issuer public key
+02:32 +786 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/stability_test.dart: Runtime Version Registry migration steps between versions
+02:32 +787 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: VerifiableCredential — Ed25519 Credential Issuance and Verification verifyCredential returns false for wrong public key
+02:32 +788 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: VerifiableCredential — Ed25519 Credential Issuance and Verification verifyCredential returns false for wrong public key
+02:32 +789 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: VerifiableCredential — Ed25519 Credential Issuance and Verification verifyCredential returns false for wrong public key
+02:32 +790 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/stability_test.dart: Security Manager blocked plugins are always denied
+02:32 +791 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: VerifiableCredential — Ed25519 Credential Issuance and Verification verifyCredential returns false for tampered claims
+02:32 +792 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: VerifiableCredential — Ed25519 Credential Issuance and Verification verifyCredential returns false for tampered claims
+02:32 +793 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: VerifiableCredential — Ed25519 Credential Issuance and Verification verifyCredential returns false for tampered claims
+02:32 +794 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/stability_test.dart: Security Manager capability auth with prefix pattern
+02:32 +795 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: ConstitutionalPassport — Machine Sovereign Identity issue creates valid passport
+02:32 +796 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: ConstitutionalPassport — Machine Sovereign Identity issue creates valid passport
+02:32 +797 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: ConstitutionalPassport — Machine Sovereign Identity issue creates valid passport
+02:32 +798 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: ConstitutionalPassport — Machine Sovereign Identity issue creates valid passport
+02:32 +799 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: ConstitutionalPassport — Machine Sovereign Identity issue creates valid passport
+02:32 +800 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: ConstitutionalPassport — Machine Sovereign Identity issue creates valid passport
+02:32 +801 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/stability_test.dart: Secret Store store and retrieve secret
+02:32 +802 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: ConstitutionalPassport — Machine Sovereign Identity verifyPassport returns true with correct authority public key
+02:32 +803 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: ConstitutionalPassport — Machine Sovereign Identity verifyPassport returns true with correct authority public key
+02:32 +804 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: ConstitutionalPassport — Machine Sovereign Identity verifyPassport returns true with correct authority public key
+02:32 +805 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: ConstitutionalPassport — Machine Sovereign Identity verifyPassport returns true with correct authority public key
+02:32 +806 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: ConstitutionalPassport — Machine Sovereign Identity verifyPassport returns true with correct authority public key
+02:32 +807 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: ConstitutionalPassport — Machine Sovereign Identity verifyPassport returns true with correct authority public key
+02:32 +808 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: ConstitutionalPassport — Machine Sovereign Identity verifyPassport returns true with correct authority public key
+02:32 +809 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: ConstitutionalPassport — Machine Sovereign Identity verifyPassport returns true with correct authority public key
+02:32 +810 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/stability_test.dart: Trust Boundary merge boundaries takes intersection
+02:32 +811 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/stability_test.dart: Runtime Spec / RFC all 8 RFCs are registered
+02:32 +812 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: ConstitutionalPassport — Machine Sovereign Identity verifyPassport returns false for wrong authority public key
+02:32 +813 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: ConstitutionalPassport — Machine Sovereign Identity verifyPassport returns false for wrong authority public key
+02:32 +814 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: ConstitutionalPassport — Machine Sovereign Identity verifyPassport returns false for wrong authority public key
+02:32 +815 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: ConstitutionalPassport — Machine Sovereign Identity verifyPassport returns false for wrong authority public key
+02:32 +816 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: ConstitutionalPassport — Machine Sovereign Identity verifyPassport returns false for wrong authority public key
+02:32 +817 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: ConstitutionalPassport — Machine Sovereign Identity verifyPassport returns false for wrong authority public key
+02:32 +818 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: ConstitutionalPassport — Machine Sovereign Identity verifyPassport returns false for wrong authority public key
+02:32 +819 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: ConstitutionalPassport — Machine Sovereign Identity verifyPassport returns false for wrong authority public key
+02:32 +820 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: ConstitutionalPassport — Machine Sovereign Identity verifyPassport returns false for wrong authority public key
+02:32 +821 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignSignature — Ed25519 Signature Verification self-signature is valid for identity
+02:32 +822 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignSignature — Ed25519 Signature Verification tampered createdAt fails verification
+02:32 +823 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignSignature — Ed25519 Signature Verification verifySignature works with public key
+02:32 +824 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignSignature — Ed25519 Signature Verification verifySignature fails with wrong public key
+02:32 +825 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignIdentity — Cross-Node Identity two nodes have distinct DIDs and keys
+02:32 +826 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignIdentity — Cross-Node Identity node with federation has federationId
+02:33 +827 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignIdentity — Cross-Node Identity constitutional ancestry starts with genesis
+02:33 +828 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignIdentity — Cross-Node Identity epoch progression tracks civilization evolution
+02:33 +829 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/sovereign_identity_test.dart: SovereignIdentity — Cross-Node Identity generate without nodeId creates random nodeId
+02:33 +830 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/storage_view_test.dart: StorageView renders storage view
+02:34 +831 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/storage_view_test.dart: StorageView renders storage view
+02:34 +832 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/storage_view_test.dart: StorageView renders storage view
+02:34 +833 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/storage_view_test.dart: StorageView renders storage view
+02:34 +834 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/storage_view_test.dart: StorageView renders storage view
+02:34 +835 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/storage_view_test.dart: StorageView renders storage view
+02:34 +836 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/storage_view_test.dart: StorageView renders storage view
+02:34 +837 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/storage_view_test.dart: StorageView renders storage view
+02:34 +838 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/storage_view_test.dart: StorageView renders storage view
+02:34 +839 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/storage_view_test.dart: StorageView renders storage view
+02:34 +840 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/storage_view_test.dart: StorageView renders storage view
+02:34 +841 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/storage_view_test.dart: StorageView renders storage view
+02:34 +842 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/storage_view_test.dart: StorageView renders storage view
+02:34 +843 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/storage_view_test.dart: StorageView has scaffold structure
+02:34 +844 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/storage_view_test.dart: StorageView shows storage categories
+02:35 +845 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/system_plugins_test.dart: LoggerPlugin runtime.info returns version and uptime
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "logger" registered with 2 capabilities
+[INFO] Plugin "logger" activated
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "config" registered with 3 capabilities
+[INFO] Plugin "config" activated
+[INFO] Plugin "metrics" registered with 3 capabilities
+[INFO] Plugin "metrics" activated
+[INFO] Plugin "notification" registered with 2 capabilities
+[INFO] Plugin "notification" activated
+[INFO] Plugin "fake-agent" registered with 4 capabilities
+[INFO] Plugin "fake-agent" activated
+[INFO] Plugin "memory" registered with 4 capabilities
+[INFO] Plugin "memory" activated
+[INFO] Plugin "logger" unloaded
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "config" unloaded
+[INFO] Plugin "metrics" unloaded
+[INFO] Plugin "notification" unloaded
+[INFO] Plugin "fake-agent" unloaded
+[INFO] Plugin "memory" unloaded
+[INFO] RuntimeContainer shutdown complete
+02:35 +846 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/system_plugins_test.dart: LoggerPlugin runtime.health returns healthy
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "logger" registered with 2 capabilities
+[INFO] Plugin "logger" activated
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "config" registered with 3 capabilities
+[INFO] Plugin "config" activated
+[INFO] Plugin "metrics" registered with 3 capabilities
+[INFO] Plugin "metrics" activated
+[INFO] Plugin "notification" registered with 2 capabilities
+[INFO] Plugin "notification" activated
+[INFO] Plugin "fake-agent" registered with 4 capabilities
+[INFO] Plugin "fake-agent" activated
+[INFO] Plugin "memory" registered with 4 capabilities
+[INFO] Plugin "memory" activated
+[INFO] Plugin "logger" unloaded
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "config" unloaded
+[INFO] Plugin "metrics" unloaded
+[INFO] Plugin "notification" unloaded
+[INFO] Plugin "fake-agent" unloaded
+[INFO] Plugin "memory" unloaded
+[INFO] RuntimeContainer shutdown complete
+02:35 +847 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/system_plugins_test.dart: StoragePlugin write and read
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "logger" registered with 2 capabilities
+[INFO] Plugin "logger" activated
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "config" registered with 3 capabilities
+[INFO] Plugin "config" activated
+[INFO] Plugin "metrics" registered with 3 capabilities
+[INFO] Plugin "metrics" activated
+[INFO] Plugin "notification" registered with 2 capabilities
+[INFO] Plugin "notification" activated
+[INFO] Plugin "fake-agent" registered with 4 capabilities
+[INFO] Plugin "fake-agent" activated
+[INFO] Plugin "memory" registered with 4 capabilities
+[INFO] Plugin "memory" activated
+[INFO] Plugin "logger" unloaded
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "config" unloaded
+[INFO] Plugin "metrics" unloaded
+[INFO] Plugin "notification" unloaded
+[INFO] Plugin "fake-agent" unloaded
+[INFO] Plugin "memory" unloaded
+[INFO] RuntimeContainer shutdown complete
+02:35 +848 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/system_plugins_test.dart: StoragePlugin read non-existent key fails
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "logger" registered with 2 capabilities
+[INFO] Plugin "logger" activated
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "config" registered with 3 capabilities
+[INFO] Plugin "config" activated
+[INFO] Plugin "metrics" registered with 3 capabilities
+[INFO] Plugin "metrics" activated
+[INFO] Plugin "notification" registered with 2 capabilities
+[INFO] Plugin "notification" activated
+[INFO] Plugin "fake-agent" registered with 4 capabilities
+[INFO] Plugin "fake-agent" activated
+[INFO] Plugin "memory" registered with 4 capabilities
+[INFO] Plugin "memory" activated
+[INFO] Plugin "logger" unloaded
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "config" unloaded
+[INFO] Plugin "metrics" unloaded
+[INFO] Plugin "notification" unloaded
+[INFO] Plugin "fake-agent" unloaded
+[INFO] Plugin "memory" unloaded
+[INFO] RuntimeContainer shutdown complete
+02:35 +849 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/system_plugins_test.dart: StoragePlugin list keys after writes
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "logger" registered with 2 capabilities
+[INFO] Plugin "logger" activated
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "config" registered with 3 capabilities
+[INFO] Plugin "config" activated
+[INFO] Plugin "metrics" registered with 3 capabilities
+[INFO] Plugin "metrics" activated
+[INFO] Plugin "notification" registered with 2 capabilities
+[INFO] Plugin "notification" activated
+[INFO] Plugin "fake-agent" registered with 4 capabilities
+[INFO] Plugin "fake-agent" activated
+[INFO] Plugin "memory" registered with 4 capabilities
+[INFO] Plugin "memory" activated
+[INFO] Plugin "logger" unloaded
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "config" unloaded
+[INFO] Plugin "metrics" unloaded
+[INFO] Plugin "notification" unloaded
+[INFO] Plugin "fake-agent" unloaded
+[INFO] Plugin "memory" unloaded
+[INFO] RuntimeContainer shutdown complete
+02:35 +850 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/system_plugins_test.dart: ConfigPlugin set and get
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "logger" registered with 2 capabilities
+[INFO] Plugin "logger" activated
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "config" registered with 3 capabilities
+[INFO] Plugin "config" activated
+[INFO] Plugin "metrics" registered with 3 capabilities
+[INFO] Plugin "metrics" activated
+[INFO] Plugin "notification" registered with 2 capabilities
+[INFO] Plugin "notification" activated
+[INFO] Plugin "fake-agent" registered with 4 capabilities
+[INFO] Plugin "fake-agent" activated
+[INFO] Plugin "memory" registered with 4 capabilities
+[INFO] Plugin "memory" activated
+[INFO] Plugin "logger" unloaded
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "config" unloaded
+[INFO] Plugin "metrics" unloaded
+[INFO] Plugin "notification" unloaded
+[INFO] Plugin "fake-agent" unloaded
+[INFO] Plugin "memory" unloaded
+[INFO] RuntimeContainer shutdown complete
+02:35 +851 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/system_plugins_test.dart: MetricsPlugin counter increments
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "logger" registered with 2 capabilities
+[INFO] Plugin "logger" activated
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "config" registered with 3 capabilities
+[INFO] Plugin "config" activated
+[INFO] Plugin "metrics" registered with 3 capabilities
+[INFO] Plugin "metrics" activated
+[INFO] Plugin "notification" registered with 2 capabilities
+[INFO] Plugin "notification" activated
+[INFO] Plugin "fake-agent" registered with 4 capabilities
+[INFO] Plugin "fake-agent" activated
+[INFO] Plugin "memory" registered with 4 capabilities
+[INFO] Plugin "memory" activated
+[INFO] Plugin "logger" unloaded
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "config" unloaded
+[INFO] Plugin "metrics" unloaded
+[INFO] Plugin "notification" unloaded
+[INFO] Plugin "fake-agent" unloaded
+[INFO] Plugin "memory" unloaded
+[INFO] RuntimeContainer shutdown complete
+02:35 +852 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/system_plugins_test.dart: FakeAgentPlugin agent.chat returns fake response
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "logger" registered with 2 capabilities
+[INFO] Plugin "logger" activated
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "config" registered with 3 capabilities
+[INFO] Plugin "config" activated
+[INFO] Plugin "metrics" registered with 3 capabilities
+[INFO] Plugin "metrics" activated
+[INFO] Plugin "notification" registered with 2 capabilities
+[INFO] Plugin "notification" activated
+[INFO] Plugin "fake-agent" registered with 4 capabilities
+[INFO] Plugin "fake-agent" activated
+[INFO] Plugin "memory" registered with 4 capabilities
+[INFO] Plugin "memory" activated
+[INFO] Plugin "logger" unloaded
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "config" unloaded
+[INFO] Plugin "metrics" unloaded
+[INFO] Plugin "notification" unloaded
+[INFO] Plugin "fake-agent" unloaded
+[INFO] Plugin "memory" unloaded
+[INFO] RuntimeContainer shutdown complete
+02:35 +853 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/system_plugins_test.dart: FakeAgentPlugin agent.execute with parallel tasks
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "logger" registered with 2 capabilities
+[INFO] Plugin "logger" activated
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "config" registered with 3 capabilities
+[INFO] Plugin "config" activated
+[INFO] Plugin "metrics" registered with 3 capabilities
+[INFO] Plugin "metrics" activated
+[INFO] Plugin "notification" registered with 2 capabilities
+[INFO] Plugin "notification" activated
+[INFO] Plugin "fake-agent" registered with 4 capabilities
+[INFO] Plugin "fake-agent" activated
+[INFO] Plugin "memory" registered with 4 capabilities
+[INFO] Plugin "memory" activated
+[INFO] Plugin "logger" unloaded
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "config" unloaded
+[INFO] Plugin "metrics" unloaded
+[INFO] Plugin "notification" unloaded
+[INFO] Plugin "fake-agent" unloaded
+[INFO] Plugin "memory" unloaded
+[INFO] RuntimeContainer shutdown complete
+02:35 +854 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/system_plugins_test.dart: FakeAgentPlugin agent.execute with fail tool returns error
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "logger" registered with 2 capabilities
+[INFO] Plugin "logger" activated
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "config" registered with 3 capabilities
+[INFO] Plugin "config" activated
+[INFO] Plugin "metrics" registered with 3 capabilities
+[INFO] Plugin "metrics" activated
+[INFO] Plugin "notification" registered with 2 capabilities
+[INFO] Plugin "notification" activated
+[INFO] Plugin "fake-agent" registered with 4 capabilities
+[INFO] Plugin "fake-agent" activated
+[INFO] Plugin "memory" registered with 4 capabilities
+[INFO] Plugin "memory" activated
+[INFO] Plugin "logger" unloaded
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "config" unloaded
+[INFO] Plugin "metrics" unloaded
+[INFO] Plugin "notification" unloaded
+[INFO] Plugin "fake-agent" unloaded
+[INFO] Plugin "memory" unloaded
+[INFO] RuntimeContainer shutdown complete
+02:35 +855 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/system_plugins_test.dart: FakeAgentPlugin agent.cancel returns cancelled
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "logger" registered with 2 capabilities
+[INFO] Plugin "logger" activated
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "config" registered with 3 capabilities
+[INFO] Plugin "config" activated
+[INFO] Plugin "metrics" registered with 3 capabilities
+[INFO] Plugin "metrics" activated
+[INFO] Plugin "notification" registered with 2 capabilities
+[INFO] Plugin "notification" activated
+[INFO] Plugin "fake-agent" registered with 4 capabilities
+[INFO] Plugin "fake-agent" activated
+[INFO] Plugin "memory" registered with 4 capabilities
+[INFO] Plugin "memory" activated
+[INFO] Plugin "logger" unloaded
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "config" unloaded
+[INFO] Plugin "metrics" unloaded
+[INFO] Plugin "notification" unloaded
+[INFO] Plugin "fake-agent" unloaded
+[INFO] Plugin "memory" unloaded
+[INFO] RuntimeContainer shutdown complete
+02:35 +856 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/system_plugins_test.dart: MemoryPlugin write, read, and search
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "logger" registered with 2 capabilities
+[INFO] Plugin "logger" activated
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "config" registered with 3 capabilities
+[INFO] Plugin "config" activated
+[INFO] Plugin "metrics" registered with 3 capabilities
+[INFO] Plugin "metrics" activated
+[INFO] Plugin "notification" registered with 2 capabilities
+[INFO] Plugin "notification" activated
+[INFO] Plugin "fake-agent" registered with 4 capabilities
+[INFO] Plugin "fake-agent" activated
+[INFO] Plugin "memory" registered with 4 capabilities
+[INFO] Plugin "memory" activated
+[INFO] Plugin "logger" unloaded
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "config" unloaded
+[INFO] Plugin "metrics" unloaded
+[INFO] Plugin "notification" unloaded
+[INFO] Plugin "fake-agent" unloaded
+[INFO] Plugin "memory" unloaded
+[INFO] RuntimeContainer shutdown complete
+02:35 +857 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/system_plugins_test.dart: MemoryPlugin embed returns vector
+[INFO] RuntimeContainer booted: nodeId=local, version=1.0.0
+[INFO] Plugin "logger" registered with 2 capabilities
+[INFO] Plugin "logger" activated
+[INFO] Plugin "storage" registered with 4 capabilities
+[INFO] Plugin "storage" activated
+[INFO] Plugin "config" registered with 3 capabilities
+[INFO] Plugin "config" activated
+[INFO] Plugin "metrics" registered with 3 capabilities
+[INFO] Plugin "metrics" activated
+[INFO] Plugin "notification" registered with 2 capabilities
+[INFO] Plugin "notification" activated
+[INFO] Plugin "fake-agent" registered with 4 capabilities
+[INFO] Plugin "fake-agent" activated
+[INFO] Plugin "memory" registered with 4 capabilities
+[INFO] Plugin "memory" activated
+[INFO] Plugin "logger" unloaded
+[INFO] Plugin "storage" unloaded
+[INFO] Plugin "config" unloaded
+[INFO] Plugin "metrics" unloaded
+[INFO] Plugin "notification" unloaded
+[INFO] Plugin "fake-agent" unloaded
+[INFO] Plugin "memory" unloaded
+[INFO] RuntimeContainer shutdown complete
+02:35 +858 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/system_plugins_test.dart: Observability TraceService creates and finishes spans
+02:35 +859 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/system_plugins_test.dart: Observability MetricsService counters and gauges
+02:35 +860 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/system_plugins_test.dart: Observability MetricsService histogram
+02:35 +861 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/system_plugins_test.dart: Capability Taxonomy all system plugins follow domain.action naming
+02:36 +862 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/terms_of_service_view_test.dart: TermsOfServiceView renders terms content
+02:36 +863 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/terms_of_service_view_test.dart: TermsOfServiceView renders terms content
+02:36 +864 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/terms_of_service_view_test.dart: TermsOfServiceView renders terms content
+02:36 +865 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/terms_of_service_view_test.dart: TermsOfServiceView renders terms content
+02:36 +866 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/terms_of_service_view_test.dart: TermsOfServiceView renders terms content
+02:36 +867 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/terms_of_service_view_test.dart: TermsOfServiceView renders terms content
+02:37 +868 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/terms_of_service_view_test.dart: TermsOfServiceView renders terms content
+02:37 +869 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/terms_of_service_view_test.dart: TermsOfServiceView renders terms content
+02:37 +870 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/terms_of_service_view_test.dart: TermsOfServiceView renders terms content
+02:37 +871 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/terms_of_service_view_test.dart: TermsOfServiceView renders terms content
+02:37 +872 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/terms_of_service_view_test.dart: TermsOfServiceView renders terms content
+02:37 +873 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/terms_of_service_view_test.dart: TermsOfServiceView renders terms content
+02:37 +874 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/terms_of_service_view_test.dart: TermsOfServiceView renders terms content
+02:37 +875 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/terms_of_service_view_test.dart: TermsOfServiceView renders terms content
+02:37 +876 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/totp_service_test.dart: TotpService initial state
+02:37 +877 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/totp_service_test.dart: TotpService generateSecret returns base64 string
+02:37 +878 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/totp_service_test.dart: TotpService enable sets isEnabled true
+02:37 +879 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/totp_service_test.dart: TotpService disable sets isEnabled false
+02:37 +880 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/totp_service_test.dart: TotpService getOtpAuthUri returns valid URI
+02:37 +881 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/totp_service_test.dart: TotpService verify accepts valid code for current time step
+02:37 +882 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/totp_service_test.dart: TotpService verify rejects invalid code
+02:37 +883 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/totp_service_test.dart: TotpService verify accepts code within time window offset -1
+02:38 +884 -12: C:/Users/19468/Desktop/Omnivium/mobile/test/widget_test.dart: Omnivium app sanity check
+02:38 +885 -12: Some tests failed.

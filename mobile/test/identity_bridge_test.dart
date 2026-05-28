@@ -46,7 +46,7 @@ void main() {
 
     test('requireIdentity returns null before authentication', () {
       final bridge = IdentityBridge.instance;
-      expect(bridge.requireIdentity(), isNull);
+      expect(bridge.requireIdentityOrNull(), isNull);
     });
 
     test('authHeaders returns map', () {

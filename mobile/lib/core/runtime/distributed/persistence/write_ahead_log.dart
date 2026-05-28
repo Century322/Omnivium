@@ -142,7 +142,7 @@ class WriteAheadLog {
     );
 
     _log.add(withChecksum);
-    await _persistEntry(withChecksum);
+    _persistEntry(withChecksum);
 
     if (transactionId.isNotEmpty) {
       final tx = _activeTransactions[transactionId];

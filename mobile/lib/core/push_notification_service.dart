@@ -1,4 +1,4 @@
-﻿import 'app_logger.dart';
+import 'app_logger.dart';
 import 'notification_center.dart';
 import 'dart:async';
 import 'dart:convert';

@@ -17,9 +17,9 @@ void main() {
       expect(service.isReady, isFalse);
     });
 
-    test('encrypt returns plaintext when not initialized', () {
+    test('encrypt throws when not initialized', () {
       final service = EncryptionService.instance;
-      expect(service.encrypt('hello'), 'hello');
+      expect(() => service.encrypt('hello'), throwsStateError);
     });
 
     test('decrypt returns null when not initialized', () {

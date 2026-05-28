@@ -1,3 +1,4 @@
+import '../../../app_logger.dart';
 import '../hybrid_logical_clock.dart';
 
 enum LeaseType { session, resource, capability }
