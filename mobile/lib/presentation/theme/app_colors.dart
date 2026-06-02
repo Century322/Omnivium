@@ -14,50 +14,42 @@ class AccentPreset {
   static const teal = AccentPreset(
     key: 'teal',
     darkAccent: Color(0xFF1BCCB7),
-    lightAccent: Color(0xFF0FA89E),
-  );
+    lightAccent: Color(0xFF0FA89E));
 
   static const oceanBlue = AccentPreset(
     key: 'ocean_blue',
     darkAccent: Color(0xFF4A9EF5),
-    lightAccent: Color(0xFF3B82F6),
-  );
+    lightAccent: Color(0xFF3B82F6));
 
   static const lavender = AccentPreset(
     key: 'lavender',
     darkAccent: Color(0xFF8B6FC0),
-    lightAccent: Color(0xFF7C5CBF),
-  );
+    lightAccent: Color(0xFF7C5CBF));
 
   static const coral = AccentPreset(
     key: 'coral',
     darkAccent: Color(0xFFE85D5D),
-    lightAccent: Color(0xFFD94545),
-  );
+    lightAccent: Color(0xFFD94545));
 
   static const amber = AccentPreset(
     key: 'amber',
     darkAccent: Color(0xFFF0963A),
-    lightAccent: Color(0xFFE08520),
-  );
+    lightAccent: Color(0xFFE08520));
 
   static const emerald = AccentPreset(
     key: 'emerald',
     darkAccent: Color(0xFF4CAF7D),
-    lightAccent: Color(0xFF3D9E6E),
-  );
+    lightAccent: Color(0xFF3D9E6E));
 
   static const rose = AccentPreset(
     key: 'rose',
     darkAccent: Color(0xFFE07BA0),
-    lightAccent: Color(0xFFD06088),
-  );
+    lightAccent: Color(0xFFD06088));
 
   static const slate = AccentPreset(
     key: 'slate',
     darkAccent: Color(0xFF6B7FA3),
-    lightAccent: Color(0xFF5A6E8F),
-  );
+    lightAccent: Color(0xFF5A6E8F));
 
   static const List<AccentPreset> presets = [
     teal,

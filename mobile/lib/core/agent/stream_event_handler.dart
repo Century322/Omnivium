@@ -1,4 +1,4 @@
-import 'agent_state.dart';
+﻿import 'agent_state.dart';
 import 'agent_state_machine.dart';
 import 'conversation_manager.dart';
 import '../runtime/streaming_controller.dart';
@@ -73,52 +73,63 @@ class StreamEventHandler {
     final channel = data['channel'] ?? 'fast';
     _conversation.addThought(
       ThoughtType.planning,
-      'Intent classified: $intent ($channel)',
-    );
+      'Intent classified: $intent ($channel)');
     return const StreamEventResult(shouldNotify: true);
   }
 
   StreamEventResult _handleSkillResult(
     Map<String, dynamic> data,
-    int msgIndex,
-  ) {
-    final skillName = data['skill'] ?? '';
-    final success = data['success'] ?? false;
+    int msgIndex) {
+    final skillName = data['skill'] as String? ?? '';
+    final success = data['success'] as bool? ?? false;
     _conversation.addThought(
       ThoughtType.evaluation,
-      'Tool ${success ? 'succeeded' : 'failed'}: $skillName',
-    );
+      'Tool ${success ? 'succeeded' : 'failed'}: $skillName');
     return const StreamEventResult(shouldNotify: true);
   }
 
   StreamEventResult _handleError(Map<String, dynamic> data, int msgIndex) {
     _conversation.updateStreamingContent(
       msgIndex,
-      'Error: ${data['error'] ?? 'Unknown error'}',
-    );
+      'Error: ${data['error'] ?? 'Unknown error'}');
     _conversation.finalizeStreaming(
       msgIndex,
-      'Error: ${data['error'] ?? 'Unknown error'}',
-    );
+      'Error: ${data['error'] ?? 'Unknown error'}');
     return const StreamEventResult(
       shouldNotify: true,
       isComplete: true,
-      isError: true,
-    );
+      isError: true);
   }
 
+  static const _analysisStart = '<<<COGNITIVE_ANALYSIS>>>';
+  static const _analysisEnd = '<<<END_ANALYSIS>>>';
+
   StreamEventResult _handleMessage(Map<String, dynamic> data, int msgIndex) {
-    final content = data['choices']?[0]?['delta']?['content'] ?? '';
+    final choices = data['choices'] as List<dynamic>?;
+    final firstChoice = choices != null && choices.isNotEmpty
+        ? choices[0] as Map<String, dynamic>?
+        : null;
+    final delta = firstChoice?['delta'] as Map<String, dynamic>?;
+    final content = delta?['content']?.toString() ?? '';
     if (content.isEmpty) return const StreamEventResult();
 
     _streamingBuffer += content;
+
+    final displayBuffer = _stripAnalysisBlock(_streamingBuffer);
     _streamingController.addChunk(content);
-    _conversation.updateStreamingContent(msgIndex, _streamingBuffer);
+    _conversation.updateStreamingContent(msgIndex, displayBuffer);
     return const StreamEventResult(shouldNotify: true);
   }
 
+  String _stripAnalysisBlock(String buffer) {
+    final startIdx = buffer.indexOf(_analysisStart);
+    if (startIdx < 0) return buffer;
+    return buffer.substring(0, startIdx).trim();
+  }
+
   void completeStream(int msgIndex) {
-    _conversation.finalizeStreaming(msgIndex, _streamingBuffer);
+    final cleanBuffer = _stripAnalysisBlock(_streamingBuffer);
+    _conversation.finalizeStreaming(msgIndex, cleanBuffer);
     _streamingController.complete();
   }
 

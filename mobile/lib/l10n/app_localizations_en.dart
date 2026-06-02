@@ -1753,7 +1753,7 @@ class SEn extends S {
   String get allow => 'Allow';
 
   @override
-  String get delete_message_pair => 'Delete Message Pair';
+  String get delete_message_pair => 'Delete Message';
 
   @override
   String get report_not_helpful => 'Not Helpful';

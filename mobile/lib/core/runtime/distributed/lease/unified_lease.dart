@@ -1,67 +1,35 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../../app_logger.dart';
 import '../hybrid_logical_clock.dart';
 
-enum LeaseType { session, resource, capability }
+part 'unified_lease.freezed.dart';
 
+enum LeaseType { session, resource, capability }
 enum LeaseState { active, expired, released, revoked }
 
-class UnifiedLease {
-  final String leaseId;
-  final LeaseType leaseType;
-  final LeaseState state;
-  final String ownerId;
-  final String targetId;
-  final int acquiredAt;
-  final int expiresAt;
-  final int renewalCount;
-  final int incarnation;
-  final Map<String, dynamic> constraints;
+@freezed
+class UnifiedLease with _$UnifiedLease {
+  const UnifiedLease._();
 
-  const UnifiedLease({
-    required this.leaseId,
-    required this.leaseType,
-    this.state = LeaseState.active,
-    required this.ownerId,
-    required this.targetId,
-    required this.acquiredAt,
-    required this.expiresAt,
-    this.renewalCount = 0,
-    this.incarnation = 0,
-    this.constraints = const {},
-  });
-
-  UnifiedLease copyWith({
-    String? leaseId,
-    LeaseType? leaseType,
-    LeaseState? state,
-    String? ownerId,
-    String? targetId,
-    int? acquiredAt,
-    int? expiresAt,
-    int? renewalCount,
-    int? incarnation,
-    Map<String, dynamic>? constraints,
-  }) => UnifiedLease(
-    leaseId: leaseId ?? this.leaseId,
-    leaseType: leaseType ?? this.leaseType,
-    state: state ?? this.state,
-    ownerId: ownerId ?? this.ownerId,
-    targetId: targetId ?? this.targetId,
-    acquiredAt: acquiredAt ?? this.acquiredAt,
-    expiresAt: expiresAt ?? this.expiresAt,
-    renewalCount: renewalCount ?? this.renewalCount,
-    incarnation: incarnation ?? this.incarnation,
-    constraints: constraints ?? this.constraints,
-  );
+  const factory UnifiedLease({
+    required String leaseId,
+    required LeaseType leaseType,
+    @Default(LeaseState.active) LeaseState state,
+    required String ownerId,
+    required String targetId,
+    required int acquiredAt,
+    required int expiresAt,
+    @Default(0) int renewalCount,
+    @Default(0) int incarnation,
+    @Default(<String, dynamic>{}) Map<String, dynamic> constraints,
+  }) = _UnifiedLease;
 
   bool get isActive => state == LeaseState.active;
   bool get isExpired => state == LeaseState.expired;
   bool get isSessionLease => leaseType == LeaseType.session;
   bool get isResourceLease => leaseType == LeaseType.resource;
   bool get isCapabilityLease => leaseType == LeaseType.capability;
-
   bool isValidAt(int timestamp) => isActive && timestamp < expiresAt;
-
   Duration get ttl => Duration(milliseconds: expiresAt - acquiredAt);
 
   Map<String, dynamic> toJson() => {
@@ -81,20 +49,17 @@ class UnifiedLease {
     leaseId: json['leaseId'] as String,
     leaseType: LeaseType.values.firstWhere(
       (t) => t.name == json['type'],
-      orElse: () => LeaseType.session,
-    ),
+      orElse: () => LeaseType.session),
     state: LeaseState.values.firstWhere(
       (s) => s.name == json['state'],
-      orElse: () => LeaseState.expired,
-    ),
+      orElse: () => LeaseState.expired),
     ownerId: json['ownerId'] as String,
     targetId: json['targetId'] as String,
     acquiredAt: json['acquiredAt'] as int,
     expiresAt: json['expiresAt'] as int,
     renewalCount: json['renewalCount'] as int? ?? 0,
     incarnation: json['incarnation'] as int? ?? 0,
-    constraints: json['constraints'] as Map<String, dynamic>? ?? {},
-  );
+    constraints: json['constraints'] as Map<String, dynamic>? ?? {});
 }
 
 class LeaseConfig {
@@ -114,12 +79,9 @@ class LeaseConfig {
 
   Duration ttlForType(LeaseType type) {
     switch (type) {
-      case LeaseType.session:
-        return sessionTtl;
-      case LeaseType.resource:
-        return resourceTtl;
-      case LeaseType.capability:
-        return capabilityTtl;
+      case LeaseType.session: return sessionTtl;
+      case LeaseType.resource: return resourceTtl;
+      case LeaseType.capability: return capabilityTtl;
     }
   }
 }
@@ -171,8 +133,7 @@ class UnifiedLeaseManager {
       targetId: targetId,
       acquiredAt: now.physicalTime,
       expiresAt: now.physicalTime + ttl.inMilliseconds,
-      constraints: constraints,
-    );
+      constraints: constraints);
 
     _leases[targetId] = lease;
     return lease;
@@ -201,15 +162,13 @@ class UnifiedLeaseManager {
     final ttl = _config.ttlForType(lease.leaseType);
     _leases[targetId] = lease.copyWith(
       expiresAt: now.physicalTime + ttl.inMilliseconds,
-      renewalCount: lease.renewalCount + 1,
-    );
+      renewalCount: lease.renewalCount + 1);
     return true;
   }
 
   bool release(String targetId) {
     final lease = _leases[targetId];
     if (lease == null || lease.ownerId != _localNodeId) return false;
-
     _leases[targetId] = lease.copyWith(state: LeaseState.released);
     return true;
   }
@@ -217,7 +176,6 @@ class UnifiedLeaseManager {
   bool revoke(String targetId, String revokerNodeId) {
     final lease = _leases[targetId];
     if (lease == null) return false;
-
     _leases[targetId] = lease.copyWith(state: LeaseState.revoked);
     return true;
   }
@@ -246,12 +204,10 @@ class UnifiedLeaseManager {
   void reclaimExpired() {
     final now = _clock.tick().physicalTime;
     final graceMs = _config.expiryGracePeriod.inMilliseconds;
-
     final toRemove = _leases.entries
         .where((e) => e.value.isExpired && now - e.value.expiresAt > graceMs)
         .map((e) => e.key)
         .toList();
-
     for (final key in toRemove) {
       _leases.remove(key);
     }

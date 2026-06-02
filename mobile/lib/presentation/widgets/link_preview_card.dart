@@ -4,7 +4,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../theme/app_colors.dart';
-import '../theme/locale_provider.dart';
+import '../theme/locale_cubit.dart';
 import '../../core/link_preview_service.dart';
 
 class LinkPreviewCard extends StatelessWidget {
@@ -28,8 +28,7 @@ class LinkPreviewCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.sf(context),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.divider(context)),
-          ),
+            border: Border.all(color: AppColors.divider(context))),
           clipBehavior: Clip.antiAlias,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,11 +42,8 @@ class LinkPreviewCard extends StatelessWidget {
                     fit: BoxFit.cover,
                     placeholder: (_, _) => Container(
                       height: 120,
-                      color: AppColors.sfActive(context),
-                    ),
-                    errorWidget: (_, _, _) => const SizedBox.shrink(),
-                  ),
-                ),
+                      color: AppColors.sfActive(context)),
+                    errorWidget: (_, _, _) => const SizedBox.shrink())),
               Padding(
                 padding: const EdgeInsets.all(12),
                 child: Column(
@@ -59,9 +55,7 @@ class LinkPreviewCard extends StatelessWidget {
                         style: TextStyle(
                           color: AppColors.acc(context),
                           fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                          fontWeight: FontWeight.w600)),
                     const SizedBox(height: 2),
                     if (p.title case final pTitle?)
                       Text(
@@ -69,11 +63,9 @@ class LinkPreviewCard extends StatelessWidget {
                         style: TextStyle(
                           color: AppColors.textPrimary(context),
                           fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
+                          fontWeight: FontWeight.w600),
                         maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                        overflow: TextOverflow.ellipsis),
                     if (p.description case final pDesc?) ...[
                       const SizedBox(height: 4),
                       Text(
@@ -81,11 +73,9 @@ class LinkPreviewCard extends StatelessWidget {
                         style: TextStyle(
                           color: AppColors.mut(context),
                           fontSize: 12,
-                          height: 1.4,
-                        ),
+                          height: 1.4),
                         maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                        overflow: TextOverflow.ellipsis),
                     ],
                     const SizedBox(height: 4),
                     Row(
@@ -93,30 +83,19 @@ class LinkPreviewCard extends StatelessWidget {
                         Icon(
                           LucideIcons.link,
                           size: 12,
-                          color: AppColors.textDisabled(context),
-                        ),
+                          color: AppColors.textDisabled(context)),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
                             _truncateUrl(url),
                             style: TextStyle(
                               color: AppColors.textDisabled(context),
-                              fontSize: 11,
-                            ),
+                              fontSize: 11),
                             maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+                            overflow: TextOverflow.ellipsis)),
+                      ]),
+                  ])),
+            ]))));
   }
 
   Widget _buildFallback(BuildContext context) {
@@ -129,8 +108,7 @@ class LinkPreviewCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.sf(context),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.divider(context)),
-        ),
+          border: Border.all(color: AppColors.divider(context))),
         child: Row(
           children: [
             Container(
@@ -138,14 +116,11 @@ class LinkPreviewCard extends StatelessWidget {
               height: 40,
               decoration: BoxDecoration(
                 color: AppColors.accBg(context),
-                borderRadius: BorderRadius.circular(8),
-              ),
+                borderRadius: BorderRadius.circular(8)),
               child: Icon(
                 LucideIcons.link,
                 size: 20,
-                color: AppColors.acc(context),
-              ),
-            ),
+                color: AppColors.acc(context))),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -156,33 +131,23 @@ class LinkPreviewCard extends StatelessWidget {
                     style: TextStyle(
                       color: AppColors.acc(context),
                       fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                    ),
+                      fontWeight: FontWeight.w500),
                     maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                    overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 2),
                   Text(
                     url,
                     style: TextStyle(
                       color: AppColors.textDisabled(context),
-                      fontSize: 11,
-                    ),
+                      fontSize: 11),
                     maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
+                    overflow: TextOverflow.ellipsis),
+                ])),
             Icon(
               LucideIcons.externalLink,
               size: 16,
-              color: AppColors.textDisabled(context),
-            ),
-          ],
-        ),
-      ),
-    );
+              color: AppColors.textDisabled(context)),
+          ])));
   }
 
   Future<void> _launchUrl(String url) async {

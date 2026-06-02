@@ -1,26 +1,25 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'di/app_di.dart';
 import 'app_logger.dart';
 import 'dart:convert';
 import 'database_service.dart';
 import 'remote_config_service.dart';
 
-class QuickCommand {
-  final String id;
-  final String name;
-  final String emoji;
-  final String prompt;
-  final String category;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+part 'quick_command_service.freezed.dart';
 
-  const QuickCommand({
-    required this.id,
-    required this.name,
-    required this.emoji,
-    required this.prompt,
-    this.category = 'general',
-    required this.createdAt,
-    required this.updatedAt,
-  });
+@freezed
+class QuickCommand with _$QuickCommand {
+  const QuickCommand._();
+
+  const factory QuickCommand({
+    required String id,
+    required String name,
+    required String emoji,
+    required String prompt,
+    @Default('general') String category,
+    required DateTime createdAt,
+    required DateTime updatedAt,
+  }) = _QuickCommand;
 
   Map<String, dynamic> toJson() => {
     'id': id,
@@ -39,25 +38,19 @@ class QuickCommand {
     prompt: json['prompt'] as String,
     category: json['category'] as String? ?? 'general',
     createdAt: DateTime.parse(json['createdAt'] as String),
-    updatedAt: DateTime.parse(json['updatedAt'] as String),
-  );
+    updatedAt: DateTime.parse(json['updatedAt'] as String));
 
-  QuickCommand copyWith({
+  QuickCommand copyWithFields({
     String? name,
     String? emoji,
     String? prompt,
     String? category,
-  }) {
-    return QuickCommand(
-      id: id,
-      name: name ?? this.name,
-      emoji: emoji ?? this.emoji,
-      prompt: prompt ?? this.prompt,
-      category: category ?? this.category,
-      createdAt: createdAt,
-      updatedAt: DateTime.now(),
-    );
-  }
+  }) => copyWith(
+    name: name ?? this.name,
+    emoji: emoji ?? this.emoji,
+    prompt: prompt ?? this.prompt,
+    category: category ?? this.category,
+    updatedAt: DateTime.now());
 }
 
 class QuickCommandService {
@@ -74,13 +67,13 @@ class QuickCommandService {
 
   Future<void> init() async {
     if (_initialized) return;
-    final db = DatabaseService.instance;
+    final db = getIt<DatabaseService>();
     if (!db.isInitialized) return;
 
     final raw = db.data.get(_boxKey);
     if (raw != null) {
       try {
-        final list = jsonDecode(raw) as List;
+        final list = jsonDecode(raw) as List<dynamic>;
         _commands = list
             .map((item) => QuickCommand.fromJson(item as Map<String, dynamic>))
             .toList();
@@ -88,8 +81,7 @@ class QuickCommandService {
         AppLogger.instance.warning(
           'App error',
           error: e,
-          stackTrace: stackTrace,
-        );
+          stackTrace: stackTrace);
         _commands = [];
       }
     }
@@ -104,9 +96,8 @@ class QuickCommandService {
 
   List<QuickCommand> _defaultCommands() {
     final now = DateTime.now();
-    final remote = RemoteConfigService.instance.getValue<List<dynamic>>(
-      'default_quick_commands',
-    );
+    final remote = getIt<RemoteConfigService>().getValue<List<dynamic>>(
+      'default_quick_commands');
     if (remote != null && remote.isNotEmpty) {
       return remote.map((item) {
         final m = item as Map<String, dynamic>;
@@ -117,70 +108,21 @@ class QuickCommandService {
           prompt: m['prompt'] as String? ?? '',
           category: m['category'] as String? ?? 'tool',
           createdAt: now,
-          updatedAt: now,
-        );
+          updatedAt: now);
       }).toList();
     }
     return [
-      QuickCommand(
-        id: 'qc_search',
-        name: '搜索',
-        emoji: '🔍',
-        prompt: '帮我搜索最新的',
-        category: 'tool',
-        createdAt: now,
-        updatedAt: now,
-      ),
-      QuickCommand(
-        id: 'qc_summarize',
-        name: '总结',
-        emoji: '📝',
-        prompt: '请总结一下我们之前的对话',
-        category: 'tool',
-        createdAt: now,
-        updatedAt: now,
-      ),
-      QuickCommand(
-        id: 'qc_translate',
-        name: '翻译',
-        emoji: '🌐',
-        prompt: '请将以下内容翻译成英文：',
-        category: 'tool',
-        createdAt: now,
-        updatedAt: now,
-      ),
-      QuickCommand(
-        id: 'qc_draw',
-        name: '画图',
-        emoji: '🎨',
-        prompt: '请生成一张图片：',
-        category: 'creative',
-        createdAt: now,
-        updatedAt: now,
-      ),
-      QuickCommand(
-        id: 'qc_email',
-        name: '邮件',
-        emoji: '📧',
-        prompt: '帮我写一封邮件：',
-        category: 'creative',
-        createdAt: now,
-        updatedAt: now,
-      ),
-      QuickCommand(
-        id: 'qc_explain',
-        name: '解释',
-        emoji: '💡',
-        prompt: '请用简单的话解释一下：',
-        category: 'tool',
-        createdAt: now,
-        updatedAt: now,
-      ),
+      QuickCommand(id: 'qc_search', name: '搜索', emoji: '🔍', prompt: '帮我搜索最新的', category: 'tool', createdAt: now, updatedAt: now),
+      QuickCommand(id: 'qc_summarize', name: '总结', emoji: '📝', prompt: '请总结一下我们之前的对话', category: 'tool', createdAt: now, updatedAt: now),
+      QuickCommand(id: 'qc_translate', name: '翻译', emoji: '🌐', prompt: '请将以下内容翻译成英文：', category: 'tool', createdAt: now, updatedAt: now),
+      QuickCommand(id: 'qc_draw', name: '画图', emoji: '🎨', prompt: '请生成一张图片：', category: 'creative', createdAt: now, updatedAt: now),
+      QuickCommand(id: 'qc_email', name: '邮件', emoji: '📧', prompt: '帮我写一封邮件：', category: 'creative', createdAt: now, updatedAt: now),
+      QuickCommand(id: 'qc_explain', name: '解释', emoji: '💡', prompt: '请用简单的话解释一下：', category: 'tool', createdAt: now, updatedAt: now),
     ];
   }
 
   Future<void> _save() async {
-    final db = DatabaseService.instance;
+    final db = getIt<DatabaseService>();
     final jsonList = _commands.map((c) => c.toJson()).toList();
     await db.data.put(_boxKey, jsonEncode(jsonList));
   }

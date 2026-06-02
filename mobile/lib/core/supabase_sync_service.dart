@@ -1,3 +1,5 @@
+
+import 'di/app_di.dart';
 import 'app_logger.dart';
 import 'auth_service.dart';
 
@@ -19,7 +21,7 @@ class SupabaseSyncService {
   }
 
   Future<void> init() async {
-    final auth = AuthService.instance;
+    final auth = getIt<AuthService>();
     if (!auth.isAuthenticated) {
       _userId = null;
       _initialized = false;
@@ -36,14 +38,12 @@ class SupabaseSyncService {
       } catch (e) {
         if (attempt < _maxRetries) {
           AppLogger.instance.info(
-            'Supabase operation failed (attempt ${attempt + 1}/$_maxRetries): $e',
-          );
-          await Future.delayed(_retryDelay * (attempt + 1));
+            'Supabase operation failed (attempt ${attempt + 1}/$_maxRetries): $e');
+          await Future<void>.delayed(_retryDelay * (attempt + 1));
         } else {
           AppLogger.instance.error(
             'Supabase operation failed after $_maxRetries retries',
-            error: e,
-          );
+            error: e);
           rethrow;
         }
       }
@@ -52,7 +52,7 @@ class SupabaseSyncService {
   }
 
   Future<void> ensureTables() async {
-    final client = AuthService.instance.client;
+    final client = getIt<AuthService>().client;
     if (client == null) return;
     try {
       await client.from('sessions').select('id').limit(1);
@@ -65,7 +65,7 @@ class SupabaseSyncService {
     if (!isAvailable) return [];
     try {
       return await _withRetry(() async {
-        final client = AuthService.instance.client;
+        final client = getIt<AuthService>().client;
         if (client == null) return <Map<String, dynamic>>[];
         final response = await client
             .from('sessions')
@@ -84,7 +84,7 @@ class SupabaseSyncService {
     if (!isAvailable) return false;
     try {
       await _withRetry(() async {
-        final client = AuthService.instance.client;
+        final client = getIt<AuthService>().client;
         if (client == null) return;
         final data = Map<String, dynamic>.from(session);
         data['user_id'] = _userId;
@@ -95,8 +95,7 @@ class SupabaseSyncService {
       AppLogger.instance.error(
         'Upsert session failed',
         error: e,
-        stackTrace: stackTrace,
-      );
+        stackTrace: stackTrace);
       return false;
     }
   }
@@ -105,7 +104,7 @@ class SupabaseSyncService {
     if (!isAvailable) return;
     try {
       await _withRetry(() async {
-        final client = AuthService.instance.client;
+        final client = getIt<AuthService>().client;
         if (client == null) return;
         await client
             .from('sessions')
@@ -122,7 +121,7 @@ class SupabaseSyncService {
     if (!isAvailable) return [];
     try {
       return await _withRetry(() async {
-        final client = AuthService.instance.client;
+        final client = getIt<AuthService>().client;
         if (client == null) return <Map<String, dynamic>>[];
         final response = await client
             .from('notes')
@@ -141,7 +140,7 @@ class SupabaseSyncService {
     if (!isAvailable) return;
     try {
       await _withRetry(() async {
-        final client = AuthService.instance.client;
+        final client = getIt<AuthService>().client;
         if (client == null) return;
         final data = Map<String, dynamic>.from(note);
         data['user_id'] = _userId;
@@ -156,7 +155,7 @@ class SupabaseSyncService {
     if (!isAvailable) return;
     try {
       await _withRetry(() async {
-        final client = AuthService.instance.client;
+        final client = getIt<AuthService>().client;
         if (client == null) return;
         await client
             .from('notes')
@@ -173,7 +172,7 @@ class SupabaseSyncService {
     if (!isAvailable) return [];
     try {
       return await _withRetry(() async {
-        final client = AuthService.instance.client;
+        final client = getIt<AuthService>().client;
         if (client == null) return <Map<String, dynamic>>[];
         final response = await client
             .from('memories')
@@ -192,7 +191,7 @@ class SupabaseSyncService {
     if (!isAvailable) return;
     try {
       await _withRetry(() async {
-        final client = AuthService.instance.client;
+        final client = getIt<AuthService>().client;
         if (client == null) return;
         final data = Map<String, dynamic>.from(memory);
         data['user_id'] = _userId;
@@ -207,7 +206,7 @@ class SupabaseSyncService {
     if (!isAvailable) return [];
     try {
       return await _withRetry(() async {
-        final client = AuthService.instance.client;
+        final client = getIt<AuthService>().client;
         if (client == null) return <Map<String, dynamic>>[];
         final response = await client
             .from('quick_commands')
@@ -226,7 +225,7 @@ class SupabaseSyncService {
     if (!isAvailable) return;
     try {
       await _withRetry(() async {
-        final client = AuthService.instance.client;
+        final client = getIt<AuthService>().client;
         if (client == null) return;
         final data = Map<String, dynamic>.from(command);
         data['user_id'] = _userId;
@@ -241,7 +240,7 @@ class SupabaseSyncService {
     if (!isAvailable) return;
     try {
       await _withRetry(() async {
-        final client = AuthService.instance.client;
+        final client = getIt<AuthService>().client;
         if (client == null) return;
         await client
             .from('quick_commands')

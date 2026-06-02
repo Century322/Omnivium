@@ -1,3 +1,5 @@
+
+import 'di/app_di.dart';
 import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
@@ -17,7 +19,7 @@ class PasswordKeyService {
   bool get isReady => _salt != null;
 
   Future<void> init() async {
-    final storage = SecureStorageService.instance;
+    final storage = getIt<SecureStorageService>();
     final saltStr = await storage.read(_saltKey);
     if (saltStr != null) _salt = base64Decode(saltStr);
   }
@@ -26,7 +28,7 @@ class PasswordKeyService {
     final s = _salt ?? _generateSalt();
     if (_salt == null) {
       _salt = s;
-      await SecureStorageService.instance.write(_saltKey, base64Encode(s));
+      await getIt<SecureStorageService>().write(_saltKey, base64Encode(s));
     }
 
     final passwordBytes = utf8.encode(password);
@@ -45,8 +47,7 @@ class PasswordKeyService {
   Uint8List _generateSalt() {
     final random = Random.secure();
     return Uint8List.fromList(
-      List<int>.generate(32, (_) => random.nextInt(256)),
-    );
+      List<int>.generate(32, (_) => random.nextInt(256)));
   }
 
   Uint8List _pbkdf2(List<int> password, List<int> salt, int iterations) {
@@ -69,6 +70,6 @@ class PasswordKeyService {
 
   Future<void> clear() async {
     _salt = null;
-    await SecureStorageService.instance.delete(_saltKey);
+    await getIt<SecureStorageService>().delete(_saltKey);
   }
 }

@@ -1,4 +1,4 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import '../../app_logger.dart';
 import '../distributed/transport/runtime_transport.dart';
@@ -63,11 +63,10 @@ class WireMessage {
     targetId: json['target'] as String,
     sequenceNumber: json['seq'] as int,
     epoch: json['epoch'] as int,
-    payload: Map<String, dynamic>.from(json['payload'] as Map),
+    payload: Map<String, dynamic>.from(json['payload'] as Map<String, dynamic>),
     timestamp: json['ts'] as int,
     messageId: json['msgId'] as String,
-    signature: json['sig'] as String,
-  );
+    signature: json['sig'] as String);
 
   List<int> toBytes() {
     return utf8.encode(jsonEncode(toJson()));
@@ -84,8 +83,7 @@ class WireMessage {
     String targetId,
     int timestamp,
     int seq,
-    Map<String, dynamic> payload,
-  ) {
+    Map<String, dynamic> payload) {
     final input = '$senderId|$targetId|$timestamp|$seq|${jsonEncode(payload)}';
     final bytes = utf8.encode(input);
     final digest = sha256.convert(bytes);
@@ -130,8 +128,7 @@ class GossipProtocol {
         payload: message.payload,
         timestamp: message.timestamp,
         messageId: message.messageId,
-        signature: message.signature,
-      );
+        signature: message.signature);
       _pendingGossip.add(relay);
       relayed.add(relay);
     }
@@ -174,8 +171,7 @@ class ConstitutionalReplication {
   ReplicationResult replicateFrom(
     String remoteNodeId,
     LawManifest remoteManifest,
-    int timestamp,
-  ) {
+    int timestamp) {
     final existing = _replicatedManifests[remoteNodeId];
     final lag = existing != null ? remoteManifest.epoch - existing.epoch : 0;
     _replicationLag[remoteNodeId] = lag;
@@ -191,16 +187,14 @@ class ConstitutionalReplication {
       localEpoch: _localManifest.epoch,
       forkDetected: fork != null,
       forkResolution: fork?.resolution,
-      timestamp: timestamp,
-    );
+      timestamp: timestamp);
     _replicationLog.add(entry);
 
     return ReplicationResult(
       replicated: true,
       forkDetected: fork != null,
       fork: fork,
-      lag: lag,
-    );
+      lag: lag);
   }
 
   LawFork? _detectFork(LawManifest remoteManifest) {
@@ -231,8 +225,7 @@ class ConstitutionalReplication {
       localManifest: _localManifest,
       remoteManifest: remoteManifest,
       resolution: resolution,
-      detectedAt: DateTime.now().millisecondsSinceEpoch,
-    );
+      detectedAt: DateTime.now().millisecondsSinceEpoch);
   }
 
   int replicationLagFor(String nodeId) => _replicationLag[nodeId] ?? 0;
@@ -295,8 +288,7 @@ class ByzantineDetector {
   void reportInconsistentMessage(
     String nodeId,
     String messageId,
-    int timestamp,
-  ) {
+    int timestamp) {
     _inconsistentMessages[nodeId] = (_inconsistentMessages[nodeId] ?? 0) + 1;
     _checkThreshold(nodeId, 'inconsistent_messages', timestamp);
   }
@@ -330,8 +322,7 @@ class ByzantineDetector {
           'conflictingVotes': _conflictingVotes[nodeId] ?? 0,
           'totalEvidence': totalEvidence,
         },
-        timestamp: timestamp,
-      );
+        timestamp: timestamp);
       _accusations.add(accusation);
       _verdicts[nodeId] = ByzantineVerdict.suspected;
     }
@@ -420,8 +411,7 @@ class NetworkNode {
     lastSeen: lastSeen ?? this.lastSeen,
     connectedAt: connectedAt,
     trustLevel: trustLevel ?? this.trustLevel,
-    latency: latency ?? this.latency,
-  );
+    latency: latency ?? this.latency);
 
   bool get isAlive => status == NodeStatus.connected;
   bool get isTrusted => trustLevel.index <= TrustLevel.verified.index;
@@ -454,13 +444,11 @@ class CivilizationNetwork {
   }) : _traceGraph = traceGraph,
        _replication = ConstitutionalReplication(
          localNodeId: localNodeId,
-         initialEpoch: initialEpoch,
-       ),
+         initialEpoch: initialEpoch),
        _gossip = GossipProtocol(localNodeId: localNodeId, fanout: gossipFanout),
        _byzantine = ByzantineDetector(
          localNodeId: localNodeId,
-         accusationThreshold: byzantineThreshold,
-       ),
+         accusationThreshold: byzantineThreshold),
        _heartbeatInterval = heartbeatInterval;
 
   void attachTransport(RuntimeTransport transport) {
@@ -469,8 +457,7 @@ class CivilizationNetwork {
       final wireMsg = WireMessage.fromBytes(
         msg.payload['raw'] is List<int>
             ? msg.payload['raw'] as List<int>
-            : utf8.encode(jsonEncode(msg.payload)),
-      );
+            : utf8.encode(jsonEncode(msg.payload)));
       _receiveQueue.add(wireMsg);
     });
   }
@@ -488,16 +475,14 @@ class CivilizationNetwork {
     String nodeId,
     String endpoint,
     TrustLevel trustLevel,
-    int timestamp,
-  ) {
+    int timestamp) {
     final node = NetworkNode(
       nodeId: nodeId,
       endpoint: endpoint,
       status: NodeStatus.connecting,
       lastSeen: timestamp,
       connectedAt: timestamp,
-      trustLevel: trustLevel,
-    );
+      trustLevel: trustLevel);
     _nodes[nodeId] = node;
     return node;
   }
@@ -507,8 +492,7 @@ class CivilizationNetwork {
     if (node == null) return null;
     _nodes[nodeId] = node.copyWith(
       status: NodeStatus.connected,
-      lastSeen: timestamp,
-    );
+      lastSeen: timestamp);
     return _nodes[nodeId];
   }
 
@@ -517,8 +501,7 @@ class CivilizationNetwork {
     if (node == null) return null;
     _nodes[nodeId] = node.copyWith(
       status: NodeStatus.disconnected,
-      lastSeen: timestamp,
-    );
+      lastSeen: timestamp);
     return _nodes[nodeId];
   }
 
@@ -527,16 +510,14 @@ class CivilizationNetwork {
     if (node == null) return;
     _nodes[nodeId] = node.copyWith(
       status: NodeStatus.banned,
-      lastSeen: timestamp,
-    );
+      lastSeen: timestamp);
     _byzantine.confirmByzantine(nodeId, timestamp);
   }
 
   WireMessage sendConstitutionSync(
     String targetId,
     LawManifest manifest,
-    int timestamp,
-  ) {
+    int timestamp) {
     final msg = _createWireMessage(
       type: WireMessageType.constitutionSync,
       targetId: targetId,
@@ -545,8 +526,7 @@ class CivilizationNetwork {
         'lawCount': manifest.lawVersions.length,
         'epoch': manifest.epoch,
       },
-      timestamp: timestamp,
-    );
+      timestamp: timestamp);
     _sendQueue.add(msg);
     return msg;
   }
@@ -554,14 +534,12 @@ class CivilizationNetwork {
   WireMessage sendJudiciaryBroadcast(
     String targetId,
     Map<String, dynamic> sanctionData,
-    int timestamp,
-  ) {
+    int timestamp) {
     final msg = _createWireMessage(
       type: WireMessageType.judiciaryBroadcast,
       targetId: targetId,
       payload: sanctionData,
-      timestamp: timestamp,
-    );
+      timestamp: timestamp);
     _sendQueue.add(msg);
     _gossip.gossip(msg, _aliveNodeIds());
     return msg;
@@ -570,14 +548,12 @@ class CivilizationNetwork {
   WireMessage sendLegislativeGossip(
     String targetId,
     Map<String, dynamic> proposalData,
-    int timestamp,
-  ) {
+    int timestamp) {
     final msg = _createWireMessage(
       type: WireMessageType.legislativeGossip,
       targetId: targetId,
       payload: proposalData,
-      timestamp: timestamp,
-    );
+      timestamp: timestamp);
     _sendQueue.add(msg);
     _gossip.gossip(msg, _aliveNodeIds());
     return msg;
@@ -588,8 +564,7 @@ class CivilizationNetwork {
     String amendmentId,
     bool support,
     String? reason,
-    int timestamp,
-  ) {
+    int timestamp) {
     final msg = _createWireMessage(
       type: WireMessageType.consensusVote,
       targetId: targetId,
@@ -598,8 +573,7 @@ class CivilizationNetwork {
         'support': support,
         'reason': reason,
       },
-      timestamp: timestamp,
-    );
+      timestamp: timestamp);
     _sendQueue.add(msg);
     return msg;
   }
@@ -613,8 +587,7 @@ class CivilizationNetwork {
         'status': 'alive',
         'nodes': _aliveNodeIds().length,
       },
-      timestamp: timestamp,
-    );
+      timestamp: timestamp);
     _sendQueue.add(msg);
     return msg;
   }
@@ -622,14 +595,12 @@ class CivilizationNetwork {
   WireMessage sendByzantineAccusation(
     String targetId,
     ByzantineAccusation accusation,
-    int timestamp,
-  ) {
+    int timestamp) {
     final msg = _createWireMessage(
       type: WireMessageType.byzantineAccusation,
       targetId: targetId,
       payload: accusation.toJson(),
-      timestamp: timestamp,
-    );
+      timestamp: timestamp);
     _sendQueue.add(msg);
     _gossip.gossip(msg, _aliveNodeIds());
     return msg;
@@ -638,8 +609,7 @@ class CivilizationNetwork {
   WireMessage sendLawEnactment(
     String targetId,
     LegislativeProposal proposal,
-    int timestamp,
-  ) {
+    int timestamp) {
     final msg = _createWireMessage(
       type: WireMessageType.lawEnactment,
       targetId: targetId,
@@ -649,8 +619,7 @@ class CivilizationNetwork {
         'lawId': proposal.targetLaw.name,
         'stage': proposal.stage.name,
       },
-      timestamp: timestamp,
-    );
+      timestamp: timestamp);
     _sendQueue.add(msg);
     _gossip.gossip(msg, _aliveNodeIds());
     return msg;
@@ -685,8 +654,7 @@ class CivilizationNetwork {
         for (final entry in rawVersions.entries) {
           final lawId = RuntimeLawId.values.firstWhere(
             (l) => l.name == entry.key,
-            orElse: () => RuntimeLawId.noBypassCapabilityRouter,
-          );
+            orElse: () => RuntimeLawId.noBypassCapabilityRouter);
           versions[lawId] = entry.value as int;
         }
       }
@@ -694,8 +662,7 @@ class CivilizationNetwork {
         nodeId: manifestJson['node'] as String? ?? message.senderId,
         epoch: manifestJson['epoch'] as int? ?? 0,
         lawVersions: versions,
-        hash: manifestJson['hash'] as int? ?? 0,
-      );
+        hash: manifestJson['hash'] as int? ?? 0);
       _replication.replicateFrom(message.senderId, manifest, message.timestamp);
     }
   }
@@ -713,8 +680,7 @@ class CivilizationNetwork {
       _byzantine.reportInconsistentMessage(
         accusedId,
         message.messageId,
-        message.timestamp,
-      );
+        message.timestamp);
     }
   }
 
@@ -733,9 +699,7 @@ class CivilizationNetwork {
             payload: {'raw': msg.toBytes()},
             timestamp: HybridTimestampLike(
               physicalTime: msg.timestamp,
-              nodeId: msg.senderId,
-            ),
-          );
+              nodeId: msg.senderId));
           transport.send(transportMsg);
         } catch (e) {
           AppLogger.instance.debug('Broadcast message send failed', error: e);
@@ -756,8 +720,7 @@ class CivilizationNetwork {
       if (entry.value.isAlive && timestamp - entry.value.lastSeen > timeout) {
         _byzantine.reportMissingHeartbeat(entry.key, timestamp);
         _nodes[entry.key] = entry.value.copyWith(
-          status: NodeStatus.disconnected,
-        );
+          status: NodeStatus.disconnected);
       }
     }
   }
@@ -778,8 +741,7 @@ class CivilizationNetwork {
       targetId,
       timestamp,
       seq,
-      payload,
-    );
+      payload);
     return WireMessage(
       type: type,
       senderId: localNodeId,
@@ -789,7 +751,6 @@ class CivilizationNetwork {
       payload: payload,
       timestamp: timestamp,
       messageId: msgId,
-      signature: sig,
-    );
+      signature: sig);
   }
 }

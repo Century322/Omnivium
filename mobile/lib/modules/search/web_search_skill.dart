@@ -1,3 +1,5 @@
+﻿
+import '../../core/di/app_di.dart';
 import 'dart:convert';
 import '../../core/agent/agent_state.dart';
 import '../../core/skills/skill.dart';
@@ -36,7 +38,7 @@ class WebSearchSkill extends Skill {
     }
 
     try {
-      final proxy = ApiProxyService.instance;
+      final proxy = getIt<ApiProxyService>();
       final uri = Uri.parse('${proxy.backendUrl}/ai/search');
       final response = await proxy.secureClient
           .post(
@@ -46,8 +48,7 @@ class WebSearchSkill extends Skill {
               ...proxy.buildDeviceHeaders(),
               'Content-Type': 'application/json',
             },
-            body: jsonEncode({'q': query}),
-          )
+            body: jsonEncode({'q': query}))
           .timeout(Duration(milliseconds: timeoutMs));
 
       if (response.statusCode != 200) {
@@ -60,7 +61,7 @@ class WebSearchSkill extends Skill {
       }
       final results = <Map<String, String>>[];
 
-      final organic = json['organic'] as List?;
+      final organic = json['organic'] as List<dynamic>?;
       if (organic != null) {
         for (final item in organic.take(5)) {
           if (item is Map<String, dynamic>) {

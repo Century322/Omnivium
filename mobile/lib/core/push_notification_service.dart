@@ -1,3 +1,5 @@
+
+import 'di/app_di.dart';
 import 'app_logger.dart';
 import 'notification_center.dart';
 import 'dart:async';
@@ -46,17 +48,14 @@ class PushNotificationService {
   Future<void> _initLocalNotifications() async {
     if (kIsWeb) return;
     const androidSettings = AndroidInitializationSettings(
-      '@mipmap/ic_launcher',
-    );
+      '@mipmap/ic_launcher');
     const iosSettings = DarwinInitializationSettings(
       requestAlertPermission: false,
       requestBadgePermission: false,
-      requestSoundPermission: false,
-    );
+      requestSoundPermission: false);
     const settings = InitializationSettings(
       android: androidSettings,
-      iOS: iosSettings,
-    );
+      iOS: iosSettings);
 
     await _localNotifications.initialize(
       settings,
@@ -70,12 +69,10 @@ class PushNotificationService {
             AppLogger.instance.error(
               'App error',
               error: e,
-              stackTrace: stackTrace,
-            );
+              stackTrace: stackTrace);
           }
         }
-      },
-    );
+      });
 
     if (Platform.isAndroid) {
       final androidPlugin = _localNotifications
@@ -87,17 +84,13 @@ class PushNotificationService {
           'messages',
           'Messages',
           description: 'Chat message notifications',
-          importance: Importance.high,
-        ),
-      );
+          importance: Importance.high));
       await androidPlugin?.createNotificationChannel(
         const AndroidNotificationChannel(
           'invites',
           'Invites',
           description: 'Friend and group invitations',
-          importance: Importance.defaultImportance,
-        ),
-      );
+          importance: Importance.defaultImportance));
     }
   }
 
@@ -110,20 +103,19 @@ class PushNotificationService {
   Future<void> _registerTokenWithBackend() async {
     final token = _fcmToken;
     if (token == null) return;
-    final proxy = ApiProxyService.instance;
+    final proxy = getIt<ApiProxyService>();
     if (!proxy.isConfigured) {
       _scheduleRegisterRetry();
       return;
     }
     try {
-      final userId = AuthService.instance.currentUser?.id;
+      final userId = getIt<AuthService>().currentUser?.id;
       final success = await proxy.registerDevice(
         deviceId: proxy.buildDeviceHeaders()['X-Device-Id'] ?? 'unknown',
         fcmToken: token,
         platform: defaultTargetPlatform.name,
         appVersion: proxy.buildDeviceHeaders()['X-App-Version'] ?? '1.0.0',
-        userId: userId,
-      );
+        userId: userId);
       if (success) {
         _registerRetryCount = 0;
         AppLogger.instance.info('FCM token registered successfully');
@@ -134,8 +126,7 @@ class PushNotificationService {
       AppLogger.instance.warning(
         'Register FCM token failed',
         error: e,
-        stackTrace: stackTrace,
-      );
+        stackTrace: stackTrace);
       _scheduleRegisterRetry();
     }
   }
@@ -143,20 +134,17 @@ class PushNotificationService {
   void _scheduleRegisterRetry() {
     if (_registerRetryCount >= _maxRegisterRetries) {
       AppLogger.instance.warning(
-        'FCM token registration exhausted $_maxRegisterRetries retries',
-      );
+        'FCM token registration exhausted $_maxRegisterRetries retries');
       return;
     }
     _registerRetryTimer?.cancel();
     final delaySeconds = _registerRetryDelays[_registerRetryCount];
     _registerRetryCount++;
     AppLogger.instance.info(
-      'FCM token registration retry #$_registerRetryCount in ${delaySeconds}s',
-    );
+      'FCM token registration retry #$_registerRetryCount in ${delaySeconds}s');
     _registerRetryTimer = Timer(
       Duration(seconds: delaySeconds),
-      () => _registerTokenWithBackend(),
-    );
+      () => _registerTokenWithBackend());
   }
 
   Future<void> showLocalNotification({
@@ -169,7 +157,7 @@ class PushNotificationService {
     try {
       String displayTitle = title;
       String displayBody = body;
-      final enc = EncryptionService.instance;
+      final enc = getIt<EncryptionService>();
       if (enc.isReady && data?['encrypted'] == '1') {
         final decryptedTitle = enc.decrypt(title);
         final decryptedBody = enc.decrypt(body);
@@ -195,31 +183,26 @@ class PushNotificationService {
             : 'Friend and group invitations',
         importance: Importance.high,
         priority: Priority.high,
-        showWhen: true,
-      );
+        showWhen: true);
       const iosDetails = DarwinNotificationDetails();
       final details = NotificationDetails(
         android: androidDetails,
-        iOS: iosDetails,
-      );
+        iOS: iosDetails);
 
       await _localNotifications.show(
         notificationId,
         displayTitle,
         displayBody,
         details,
-        payload: data != null ? jsonEncode(data) : null,
-      );
+        payload: data != null ? jsonEncode(data) : null);
       NotificationCenter.post(
         Event.pushNotification,
-        data: {'title': displayTitle, 'body': displayBody, 'data': data},
-      );
+        data: {'title': displayTitle, 'body': displayBody, 'data': data});
     } catch (e, stackTrace) {
       AppLogger.instance.warning(
         'Show local notification failed',
         error: e,
-        stackTrace: stackTrace,
-      );
+        stackTrace: stackTrace);
     }
   }
 
@@ -243,8 +226,7 @@ class PushNotificationService {
       AppLogger.instance.warning(
         'Request notification permissions failed',
         error: e,
-        stackTrace: stackTrace,
-      );
+        stackTrace: stackTrace);
     }
   }
 
@@ -270,9 +252,7 @@ class PushNotificationService {
         Uri(
           scheme: 'omnivium',
           host: sessionId != null ? 'chat' : 'room',
-          queryParameters: {'id': sessionId ?? roomId},
-        ),
-      );
+          queryParameters: {'id': sessionId ?? roomId}));
     }
   }
 

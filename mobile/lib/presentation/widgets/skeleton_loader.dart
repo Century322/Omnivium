@@ -1,3 +1,5 @@
+
+import '../../core/di/app_di.dart';
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../../core/lite_mode.dart';
@@ -25,11 +27,10 @@ class _SkeletonLoaderState extends State<SkeletonLoader>
   @override
   void initState() {
     super.initState();
-    if (LiteMode.instance.smoothAnimationsEnabled) {
+    if (getIt<LiteMode>().smoothAnimationsEnabled) {
       _controller = AnimationController(
         vsync: this,
-        duration: const Duration(milliseconds: 1500),
-      )..repeat();
+        duration: const Duration(milliseconds: 1500))..repeat();
     }
   }
 
@@ -47,9 +48,7 @@ class _SkeletonLoaderState extends State<SkeletonLoader>
         height: widget.height,
         decoration: BoxDecoration(
           borderRadius: widget.borderRadius ?? BorderRadius.circular(4),
-          color: AppColors.sf(context).withValues(alpha: 0.3),
-        ),
-      );
+          color: AppColors.sf(context).withValues(alpha: 0.3)));
     }
     return Semantics(
       excludeSemantics: true,
@@ -70,13 +69,8 @@ class _SkeletonLoaderState extends State<SkeletonLoader>
                   AppColors.sf(context),
                   AppColors.sf(context).withValues(alpha: 0.3),
                   AppColors.sf(context),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
-    );
+                ])));
+        }));
   }
 }
 
@@ -93,8 +87,7 @@ class MessageSkeleton extends StatelessWidget {
           left: isUser ? 60 : 16,
           right: isUser ? 16 : 60,
           top: 8,
-          bottom: 8,
-        ),
+          bottom: 8),
         child: Column(
           crossAxisAlignment: isUser
               ? CrossAxisAlignment.end
@@ -107,21 +100,16 @@ class MessageSkeleton extends StatelessWidget {
                   const SkeletonLoader(
                     width: 32,
                     height: 32,
-                    borderRadius: BorderRadius.all(Radius.circular(16)),
-                  ),
+                    borderRadius: BorderRadius.all(Radius.circular(16))),
                   const SizedBox(width: 8),
                 ],
                 const SkeletonLoader(width: 80, height: 12),
-              ],
-            ),
+              ]),
             const SizedBox(height: 6),
             const SkeletonLoader(width: 200, height: 14),
             const SizedBox(height: 4),
             const SkeletonLoader(width: 150, height: 14),
-          ],
-        ),
-      ),
-    );
+          ])));
   }
 }
 
@@ -136,10 +124,7 @@ class ChatListSkeleton extends StatelessWidget {
       child: Column(
         children: List.generate(
           count,
-          (i) => const MessageSkeleton(isUser: false),
-        ),
-      ),
-    );
+          (i) => const MessageSkeleton(isUser: false))));
   }
 }
 
@@ -164,10 +149,6 @@ class CardSkeleton extends StatelessWidget {
               SkeletonLoader(width: 200, height: 12),
               SizedBox(height: 4),
               SkeletonLoader(width: 160, height: 12),
-            ],
-          ),
-        ),
-      ),
-    );
+            ]))));
   }
 }

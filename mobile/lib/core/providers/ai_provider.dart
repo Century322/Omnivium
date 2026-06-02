@@ -1,3 +1,5 @@
+﻿
+import '../di/app_di.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -55,12 +57,11 @@ class ChatService {
 
   void _handleAuthFailure() {
     AppLogger.instance.warning(
-      'AI API auth failure, not affecting Matrix session',
-    );
+      'AI API auth failure, not affecting Matrix session');
   }
 
   Map<String, String> _headersWithBody(String body) {
-    final proxy = ApiProxyService.instance;
+    final proxy = getIt<ApiProxyService>();
     return {
       ...proxy.buildAuthHeaders(body: body),
       ...proxy.buildDeviceHeaders(),
@@ -74,7 +75,7 @@ class ChatService {
     double temperature = 0.7,
     int maxTokens = 4096,
   }) async {
-    final proxy = ApiProxyService.instance;
+    final proxy = getIt<ApiProxyService>();
     final uri = proxy.resolveChatUrl();
     final useModel = model ?? _currentModel;
 
@@ -119,15 +120,19 @@ class ChatService {
         .where((line) => line.startsWith('data: ') && !line.contains('[DONE]'))
         .map((line) {
           try {
-            final json = jsonDecode(line.substring(6));
-            final delta = json['choices']?[0]?['delta']?['content'];
-            return delta ?? '';
+            final json = jsonDecode(line.substring(6)) as Map<String, dynamic>;
+            final choices = json['choices'] as List<dynamic>?;
+            final firstChoice = choices != null && choices.isNotEmpty
+                ? choices[0] as Map<String, dynamic>?
+                : null;
+            final delta = firstChoice?['delta'] as Map<String, dynamic>?;
+            final content = delta?['content']?.toString() ?? '';
+            return content;
           } catch (e, stackTrace) {
             AppLogger.instance.warning(
               'SSE parse failed',
               error: e,
-              stackTrace: stackTrace,
-            );
+              stackTrace: stackTrace);
             return '';
           }
         })
@@ -141,7 +146,7 @@ class ChatService {
     double temperature = 0.7,
     int maxTokens = 4096,
   }) async {
-    final proxy = ApiProxyService.instance;
+    final proxy = getIt<ApiProxyService>();
     final uri = proxy.resolveChatUrl();
     final useModel = model ?? _currentModel;
 
@@ -174,11 +179,13 @@ class ChatService {
     }
 
     final json = jsonDecode(response.body) as Map<String, dynamic>;
-    final choices = json['choices'] as List?;
-    final content =
-        choices?.firstOrNull?['message']?['content']?.toString() ?? '';
+    final choices = json['choices'] as List<dynamic>?;
+    final firstChoice = choices?.firstOrNull as Map<String, dynamic>?;
+    final messageMap =
+        firstChoice?['message'] as Map<String, dynamic>?;
+    final messageContent = messageMap?['content']?.toString() ?? '';
     return AIResponse(
-      content: content,
+      content: messageContent,
       model: json['model'] as String? ?? useModel,
       promptTokens:
           (json['usage'] as Map<String, dynamic>?)?['prompt_tokens'] as int? ??
@@ -186,8 +193,7 @@ class ChatService {
       completionTokens:
           (json['usage'] as Map<String, dynamic>?)?['completion_tokens']
               as int? ??
-          0,
-    );
+          0);
   }
 
   Future<AgentStream> agentChat(
@@ -197,7 +203,7 @@ class ChatService {
     int maxTokens = 4096,
     List<Map<String, dynamic>>? skills,
   }) async {
-    final proxy = ApiProxyService.instance;
+    final proxy = getIt<ApiProxyService>();
     final uri = proxy.resolveChatUrl();
     final useModel = model ?? _currentModel;
 
@@ -241,8 +247,7 @@ class ChatService {
     return AgentStream(
       response.stream
           .transform(const Utf8Decoder())
-          .transform(const LineSplitter()),
-    );
+          .transform(const LineSplitter()));
   }
 }
 
@@ -283,12 +288,9 @@ class _AgentEventTransformer extends StreamTransformerBase<String, AgentEvent> {
             } catch (e) {
               AppLogger.instance.warning(
                 'SSE: failed to parse event data',
-                error: e,
-              );
+                error: e);
             }
           }
-        },
-      ),
-    );
+        }));
   }
 }

@@ -1,3 +1,5 @@
+﻿
+import 'di/app_di.dart';
 import 'dart:convert';
 import 'app_logger.dart';
 import 'secure_storage_service.dart';
@@ -40,8 +42,7 @@ class IdentityBridge {
   SovereignIdentity get activeIdentity {
     if (_activeShadowId != null) {
       final shadow = _shadowIdentities.where(
-        (s) => s.nodeId == _activeShadowId,
-      );
+        (s) => s.nodeId == _activeShadowId);
       if (shadow.isNotEmpty) return shadow.first;
     }
     return _identity ?? SovereignIdentity.generate();
@@ -65,21 +66,18 @@ class IdentityBridge {
       }
       await _loadShadowIdentities();
       AppLogger.instance.info(
-        'IdentityBridge: restored identity ${requireIdentity.did}',
-      );
+        'IdentityBridge: restored identity ${requireIdentity.did}');
       return;
     }
     final generated = SovereignIdentity.generate(
       nodeId: _omniviumId,
-      federationId: matrixId,
-    );
+      federationId: matrixId);
     _identity = generated;
     await _persistToStorage(generated);
     final oid = _omniviumId;
     if (oid != null) await _persistOmniviumId(oid);
     AppLogger.instance.info(
-      'IdentityBridge: generated root identity ${generated.did}',
-    );
+      'IdentityBridge: generated root identity ${generated.did}');
   }
 
   Future<void> onUserAuthenticated(String userId, {String? matrixId}) async {
@@ -95,19 +93,16 @@ class IdentityBridge {
       }
       await _loadShadowIdentities();
       AppLogger.instance.info(
-        'IdentityBridge: restored identity ${requireIdentity.did}',
-      );
+        'IdentityBridge: restored identity ${requireIdentity.did}');
       return;
     }
     final generated = SovereignIdentity.generate(
       nodeId: userId,
-      federationId: matrixId,
-    );
+      federationId: matrixId);
     _identity = generated;
     await _persistToStorage(generated);
     AppLogger.instance.info(
-      'IdentityBridge: generated identity ${generated.did}',
-    );
+      'IdentityBridge: generated identity ${generated.did}');
   }
 
   Future<void> onMatrixLinked(String matrixId) async {
@@ -141,13 +136,11 @@ class IdentityBridge {
     final shadow = SovereignIdentity.deriveSubIdentity(
       id,
       'shadow.$label',
-      federationId: _matrixUserId,
-    );
+      federationId: _matrixUserId);
     _shadowIdentities.add(shadow);
     await _persistShadowIdentities();
     AppLogger.instance.info(
-      'IdentityBridge: created shadow identity ${shadow.did}',
-    );
+      'IdentityBridge: created shadow identity ${shadow.did}');
     return shadow;
   }
 
@@ -161,8 +154,7 @@ class IdentityBridge {
     }
     await _persistActiveShadow();
     AppLogger.instance.info(
-      'IdentityBridge: ${_activeShadowId != null ? "activated shadow $_activeShadowId" : "switched to root identity"}',
-    );
+      'IdentityBridge: ${_activeShadowId != null ? "activated shadow $_activeShadowId" : "switched to root identity"}');
   }
 
   Future<void> revokeShadow(String shadowNodeId) async {
@@ -173,8 +165,7 @@ class IdentityBridge {
     }
     await _persistShadowIdentities();
     AppLogger.instance.info(
-      'IdentityBridge: revoked shadow identity $shadowNodeId',
-    );
+      'IdentityBridge: revoked shadow identity $shadowNodeId');
   }
 
   SovereignIdentity deriveAgentIdentity(String agentId) {
@@ -190,7 +181,7 @@ class IdentityBridge {
     _supabaseUserId = null;
     _shadowIdentities = [];
     _activeShadowId = null;
-    final storage = SecureStorageService.instance;
+    final storage = getIt<SecureStorageService>();
     await storage.delete(_storageKey);
     await storage.delete(_omniviumIdKey);
     await storage.delete(_shadowIdentitiesKey);
@@ -201,8 +192,7 @@ class IdentityBridge {
   SovereignIdentity? requireIdentityOrNull() {
     if (_identity == null) {
       AppLogger.instance.warning(
-        'IdentityBridge: identity required but not bound',
-      );
+        'IdentityBridge: identity required but not bound');
     }
     return _identity;
   }
@@ -223,7 +213,7 @@ class IdentityBridge {
 
   Future<SovereignIdentity?> _loadFromStorage() async {
     try {
-      final storage = SecureStorageService.instance;
+      final storage = getIt<SecureStorageService>();
       final raw = await storage.read(_storageKey);
       if (raw == null) return null;
       final json = jsonDecode(raw) as Map<String, dynamic>;
@@ -231,39 +221,36 @@ class IdentityBridge {
     } catch (e) {
       AppLogger.instance.warning(
         'IdentityBridge: failed to load identity',
-        error: e,
-      );
+        error: e);
       return null;
     }
   }
 
   Future<void> _persistToStorage(SovereignIdentity identity) async {
     try {
-      final storage = SecureStorageService.instance;
+      final storage = getIt<SecureStorageService>();
       await storage.write(_storageKey, jsonEncode(identity.toJson()));
     } catch (e) {
       AppLogger.instance.warning(
         'IdentityBridge: failed to persist identity',
-        error: e,
-      );
+        error: e);
     }
   }
 
   Future<void> _persistOmniviumId(String id) async {
     try {
-      final storage = SecureStorageService.instance;
+      final storage = getIt<SecureStorageService>();
       await storage.write(_omniviumIdKey, id);
     } catch (e) {
       AppLogger.instance.warning(
         'IdentityBridge: failed to persist Omnivium ID',
-        error: e,
-      );
+        error: e);
     }
   }
 
   Future<void> _loadShadowIdentities() async {
     try {
-      final storage = SecureStorageService.instance;
+      final storage = getIt<SecureStorageService>();
       final raw = await storage.read(_shadowIdentitiesKey);
       if (raw == null) return;
       final list = jsonDecode(raw) as List<dynamic>;
@@ -275,29 +262,26 @@ class IdentityBridge {
     } catch (e) {
       AppLogger.instance.warning(
         'IdentityBridge: failed to load shadow identities',
-        error: e,
-      );
+        error: e);
     }
   }
 
   Future<void> _persistShadowIdentities() async {
     try {
-      final storage = SecureStorageService.instance;
+      final storage = getIt<SecureStorageService>();
       final encoded = jsonEncode(
-        _shadowIdentities.map((e) => e.toJson()).toList(),
-      );
+        _shadowIdentities.map((e) => e.toJson()).toList());
       await storage.write(_shadowIdentitiesKey, encoded);
     } catch (e) {
       AppLogger.instance.warning(
         'IdentityBridge: failed to persist shadow identities',
-        error: e,
-      );
+        error: e);
     }
   }
 
   Future<void> _persistActiveShadow() async {
     try {
-      final storage = SecureStorageService.instance;
+      final storage = getIt<SecureStorageService>();
       final activeShadowId = _activeShadowId;
       if (activeShadowId != null) {
         await storage.write(_activeShadowKey, activeShadowId);
@@ -307,8 +291,7 @@ class IdentityBridge {
     } catch (e) {
       AppLogger.instance.warning(
         'IdentityBridge: failed to persist active shadow',
-        error: e,
-      );
+        error: e);
     }
   }
 
@@ -317,21 +300,18 @@ class IdentityBridge {
       did: json['did'] as String,
       nodeId: json['nodeId'] as String,
       keyPair: SovereignKeyPair.fromJson(
-        json['keyPair'] as Map<String, dynamic>,
-      ),
+        json['keyPair'] as Map<String, dynamic>),
       civilizationEpoch: json['epoch'] as int,
       federationId: json['federation'] as String?,
       trustLevel: TrustLevel.values.firstWhere(
         (t) => t.name == json['trust'],
-        orElse: () => TrustLevel.untrusted,
-      ),
-      constitutionalAncestry: (json['ancestry'] as List?)?.cast<String>() ?? [],
+        orElse: () => TrustLevel.untrusted),
+      constitutionalAncestry: (json['ancestry'] as List<dynamic>?)?.cast<String>() ?? [],
       createdAt: json['created'] as int,
       selfSignature: SovereignSignature.fromJson(
-        json['selfSig'] as Map<String, dynamic>,
-      ),
+        json['selfSig'] as Map<String, dynamic>),
       credentials:
-          (json['credentials'] as List?)?.map((c) {
+          (json['credentials'] as List<dynamic>?)?.map((c) {
             final m = c as Map<String, dynamic>;
             return VerifiableCredential(
               credentialId: m['id'] as String,
@@ -342,17 +322,14 @@ class IdentityBridge {
               issuedAt: m['issuedAt'] as int,
               expiresAt: m['expiresAt'] as int,
               proof: m['proof'] as String,
-              verificationTag: m['tag'] as String,
-            );
+              verificationTag: m['tag'] as String);
           }).toList() ??
           [],
       keyRotationHistory:
-          (json['keyRotations'] as List?)
+          (json['keyRotations'] as List<dynamic>?)
               ?.map(
-                (r) => KeyRotationRecord.fromJson(r as Map<String, dynamic>),
-              )
+                (r) => KeyRotationRecord.fromJson(r as Map<String, dynamic>))
               .toList() ??
-          [],
-    );
+          []);
   }
 }

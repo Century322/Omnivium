@@ -16,8 +16,7 @@ Future<SandboxResult> sandboxExecute({
   wasmBytes: wasmBytes,
   functionName: functionName,
   params: params,
-  config: config,
-);
+  config: config);
 
 Future<bool> sandboxValidate({required List<int> wasmBytes}) =>
     RustLib.instance.api.crateApiSandboxValidate(wasmBytes: wasmBytes);

@@ -14,14 +14,10 @@ class AppSemantics {
       child: InkWell(
         onTap: enabled ? onTap : null,
         customBorder: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+          borderRadius: BorderRadius.circular(8)),
         child: ConstrainedBox(
           constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
-          child: child,
-        ),
-      ),
-    );
+          child: child)));
   }
 
   static Widget header({required Widget child, required String label}) {
@@ -40,10 +36,7 @@ class AppSemantics {
         onTap: onTap,
         child: ConstrainedBox(
           constraints: const BoxConstraints(minHeight: 48),
-          child: child,
-        ),
-      ),
-    );
+          child: child)));
   }
 
   static Widget image({required Widget child, required String label}) {
@@ -60,8 +53,7 @@ class AppSemantics {
       toggled: value,
       label: label,
       enabled: onChanged != null,
-      child: child,
-    );
+      child: child);
   }
 
   static Widget slider({
@@ -73,8 +65,7 @@ class AppSemantics {
       slider: true,
       label: label,
       value: value.toStringAsFixed(0),
-      child: child,
-    );
+      child: child);
   }
 
   static Widget liveRegion({required Widget child, String? label}) {

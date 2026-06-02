@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
-import '../theme/locale_provider.dart';
+import '../theme/locale_cubit.dart';
 import '../../core/haptic_service.dart';
 
 class AnimatedToggle extends StatefulWidget {
@@ -29,12 +29,10 @@ class _AnimatedToggleState extends State<AnimatedToggle>
     super.initState();
     _controller = AnimationController(
       duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
+      vsync: this);
     _position = Tween<double>(
       begin: 0,
-      end: 1,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+      end: 1).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
     if (widget.enabled) _controller.value = 1;
   }
 
@@ -81,18 +79,15 @@ class _AnimatedToggleState extends State<AnimatedToggle>
                 color: Color.lerp(
                   AppColors.sfHover(context),
                   AppColors.acc(context),
-                  _position.value,
-                ),
-                borderRadius: BorderRadius.circular(14),
-              ),
+                  _position.value),
+                borderRadius: BorderRadius.circular(14)),
               child: Padding(
                 padding: const EdgeInsets.all(3),
                 child: Align(
                   alignment: Alignment.lerp(
                     Alignment.centerLeft,
                     Alignment.centerRight,
-                    _position.value,
-                  )!,
+                    _position.value)!,
                   child: Container(
                     width: 22,
                     height: 22,
@@ -103,17 +98,8 @@ class _AnimatedToggleState extends State<AnimatedToggle>
                         BoxShadow(
                           color: AppColors.bg(context).withValues(alpha: 0.2),
                           blurRadius: 4,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
-      ),
-    );
+                          offset: const Offset(0, 2)),
+                      ])))));
+          })));
   }
 }

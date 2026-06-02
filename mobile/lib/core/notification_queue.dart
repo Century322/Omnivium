@@ -1,3 +1,5 @@
+
+import 'di/app_di.dart';
 import 'dart:async';
 import 'push_notification_service.dart';
 import 'notification_center.dart' as nc;
@@ -44,9 +46,7 @@ class NotificationQueue {
         sender: sender,
         message: message,
         channelId: channelId,
-        data: data,
-      ),
-    );
+        data: data));
 
     _delayTimer?.cancel();
     _delayTimer = Timer(_delayDuration, _flush);
@@ -83,12 +83,11 @@ class NotificationQueue {
         body = '$totalCount 条新消息';
       }
 
-      PushNotificationService.instance.showLocalNotification(
+      getIt<PushNotificationService>().showLocalNotification(
         title: title,
         body: body,
         channelId: last.channelId,
-        data: {'dialogId': dialogId, ...?last.data},
-      );
+        data: {'dialogId': dialogId, ...?last.data});
     }
 
     nc.NotificationCenter.post(nc.Event.pushNotificationReceived);

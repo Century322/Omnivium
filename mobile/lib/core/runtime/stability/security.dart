@@ -70,16 +70,14 @@ class TrustBoundary {
         ? minimumTrustLevel
         : other.minimumTrustLevel,
     allowedCapabilities: allowedCapabilities.intersection(
-      other.allowedCapabilities,
-    ),
+      other.allowedCapabilities),
     allowedNodes: allowedNodes.intersection(other.allowedNodes),
     maxResourceBudget: maxResourceBudget < other.maxResourceBudget
         ? maxResourceBudget
         : other.maxResourceBudget,
     allowNetworkAccess: allowNetworkAccess && other.allowNetworkAccess,
     allowFileSystemAccess: allowFileSystemAccess && other.allowFileSystemAccess,
-    allowSubprocess: allowSubprocess && other.allowSubprocess,
-  );
+    allowSubprocess: allowSubprocess && other.allowSubprocess);
 }
 
 class SecretRef {
@@ -114,8 +112,7 @@ class SecretStore {
       id: id,
       scope: scope,
       createdAt: DateTime.now().millisecondsSinceEpoch,
-      expiresAt: expiresAt,
-    );
+      expiresAt: expiresAt);
   }
 
   String? retrieve(
@@ -275,8 +272,7 @@ class SecurityManager {
   bool isCapabilityInvocationAllowed(
     String capabilityId,
     String callerId,
-    TrustLevel callerTrust,
-  ) {
+    TrustLevel callerTrust) {
     final auth = _capabilityAuths[capabilityId];
     if (auth == null)
       return callerTrust.index <= _policy.minimumPluginTrustLevel.index;
@@ -331,9 +327,7 @@ class SecurityManager {
         actorId: actorId,
         timestamp: DateTime.now().millisecondsSinceEpoch,
         context: context,
-        success: success,
-      ),
-    );
+        success: success));
   }
 
   List<SecurityAuditEntry> auditLog({int? limit}) {

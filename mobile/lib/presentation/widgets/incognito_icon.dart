@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
-import '../theme/locale_provider.dart';
+import '../theme/locale_cubit.dart';
 
 class IncognitoIcon extends StatelessWidget {
   final double size;
@@ -20,9 +20,7 @@ class IncognitoIcon extends StatelessWidget {
       label: localeProvider.t('incognito_mode'),
       child: CustomPaint(
         size: Size(size, size),
-        painter: _IncognitoPainter(strokeWidth: strokeWidth, color: color),
-      ),
-    );
+        painter: _IncognitoPainter(strokeWidth: strokeWidth, color: color)));
   }
 }
 

@@ -1,7 +1,9 @@
+﻿
+import 'di/app_di.dart';
 import 'package:flutter/material.dart';
 import 'app_logger.dart';
 import '../presentation/theme/app_colors.dart';
-import '../presentation/theme/locale_provider.dart';
+import '../presentation/theme/locale_cubit.dart';
 
 class RemoteUIEngine {
   static const _maxRenderDepth = 10;
@@ -121,12 +123,10 @@ class RemoteUIEngine {
   static Widget _renderColumn(
     Map<String, dynamic> schema,
     BuildContext context,
-    int depth,
-  ) {
-    final children = (schema['children'] as List? ?? [])
+    int depth) {
+    final children = (schema['children'] as List<dynamic>? ?? [])
         .map<Widget>(
-          (c) => render(c as Map<String, dynamic>, context, depth + 1),
-        )
+          (c) => render(c as Map<String, dynamic>, context, depth + 1))
         .toList();
     return Column(
       mainAxisAlignment: _parseMainAlignment(schema['mainAxisAlignment']),
@@ -134,25 +134,21 @@ class RemoteUIEngine {
       mainAxisSize: schema['mainAxisSize'] == 'min'
           ? MainAxisSize.min
           : MainAxisSize.max,
-      children: children,
-    );
+      children: children);
   }
 
   static Widget _renderRow(
     Map<String, dynamic> schema,
     BuildContext context,
-    int depth,
-  ) {
-    final children = (schema['children'] as List? ?? [])
+    int depth) {
+    final children = (schema['children'] as List<dynamic>? ?? [])
         .map<Widget>(
-          (c) => render(c as Map<String, dynamic>, context, depth + 1),
-        )
+          (c) => render(c as Map<String, dynamic>, context, depth + 1))
         .toList();
     return Row(
       mainAxisAlignment: _parseMainAlignment(schema['mainAxisAlignment']),
       crossAxisAlignment: _parseCrossAlignment(schema['crossAxisAlignment']),
-      children: children,
-    );
+      children: children);
   }
 
   static Widget _renderText(Map<String, dynamic> schema, BuildContext context) {
@@ -160,8 +156,7 @@ class RemoteUIEngine {
     final style = TextStyle(
       fontSize: (schema['fontSize'] as num?)?.toDouble() ?? 14,
       fontWeight: _parseFontWeight(schema['fontWeight']),
-      color: _parseColor(schema['color'], context),
-    );
+      color: _parseColor(schema['color'], context));
     final maxLines = schema['maxLines'] as int?;
     final overflow = maxLines != null ? TextOverflow.ellipsis : null;
     return Text(text, style: style, maxLines: maxLines, overflow: overflow);
@@ -169,8 +164,7 @@ class RemoteUIEngine {
 
   static Widget _renderButton(
     Map<String, dynamic> schema,
-    BuildContext context,
-  ) {
+    BuildContext context) {
     final label = _resolveText(schema['label'], context);
     final action = schema['action'] as String?;
     final variant = schema['variant'] as String? ?? 'filled';
@@ -186,44 +180,36 @@ class RemoteUIEngine {
     return FilledButton(
       onPressed: onPressed,
       style: FilledButton.styleFrom(backgroundColor: AppColors.acc(context)),
-      child: Text(label),
-    );
+      child: Text(label));
   }
 
   static Widget _renderCard(
     Map<String, dynamic> schema,
     BuildContext context,
-    int depth,
-  ) {
-    final children = (schema['children'] as List? ?? [])
+    int depth) {
+    final children = (schema['children'] as List<dynamic>? ?? [])
         .map<Widget>(
-          (c) => render(c as Map<String, dynamic>, context, depth + 1),
-        )
+          (c) => render(c as Map<String, dynamic>, context, depth + 1))
         .toList();
     return Card(
       margin: _parseEdgeInsets(schema['margin']),
       elevation: (schema['elevation'] as num?)?.toDouble() ?? 1,
       color: _parseColor(schema['color'], context),
       shape: RoundedRectangleBorder(
-        borderRadius: _parseBorderRadius(schema['borderRadius']),
-      ),
+        borderRadius: _parseBorderRadius(schema['borderRadius'])),
       child: Padding(
         padding:
             _parseEdgeInsets(schema['padding']) ?? const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: children,
-        ),
-      ),
-    );
+          children: children)));
   }
 
   static Widget _renderList(
     Map<String, dynamic> schema,
     BuildContext context,
-    int depth,
-  ) {
-    final items = schema['items'] as List? ?? [];
+    int depth) {
+    final items = schema['items'] as List<dynamic>? ?? [];
     final itemTemplate = schema['itemTemplate'] as Map<String, dynamic>?;
     if (itemTemplate == null) return const SizedBox.shrink();
 
@@ -235,15 +221,12 @@ class RemoteUIEngine {
           final item = items[index] as Map<String, dynamic>;
           final resolved = _resolveTemplate(itemTemplate, item);
           return render(resolved, context, depth + 1);
-        },
-      ),
-    );
+        }));
   }
 
   static Widget _renderImage(
     Map<String, dynamic> schema,
-    BuildContext context,
-  ) {
+    BuildContext context) {
     final src = schema['src'] as String? ?? '';
     final width = (schema['width'] as num?)?.toDouble();
     final height = (schema['height'] as num?)?.toDouble();
@@ -261,9 +244,7 @@ class RemoteUIEngine {
           width: width,
           height: height,
           fit: BoxFit.cover,
-          errorBuilder: (_, _, _) => _placeholder(width, height),
-        ),
-      );
+          errorBuilder: (_, _, _) => _placeholder(width, height)));
     }
     return ClipRRect(
       borderRadius: borderRadius,
@@ -272,9 +253,7 @@ class RemoteUIEngine {
         width: width,
         height: height,
         fit: BoxFit.cover,
-        errorBuilder: (_, _, _) => _placeholder(width, height),
-      ),
-    );
+        errorBuilder: (_, _, _) => _placeholder(width, height)));
   }
 
   static Widget _placeholder(double? w, double? h) {
@@ -283,18 +262,15 @@ class RemoteUIEngine {
 
   static Widget _renderDivider(
     Map<String, dynamic> schema,
-    BuildContext context,
-  ) {
+    BuildContext context) {
     return Divider(
       height: (schema['height'] as num?)?.toDouble() ?? 1,
-      thickness: (schema['thickness'] as num?)?.toDouble() ?? 0.5,
-    );
+      thickness: (schema['thickness'] as num?)?.toDouble() ?? 0.5);
   }
 
   static Widget _renderSpacer(
     Map<String, dynamic> schema,
-    BuildContext context,
-  ) {
+    BuildContext context) {
     final flex = (schema['flex'] as int?) ?? 1;
     return Spacer(flex: flex);
   }
@@ -302,8 +278,7 @@ class RemoteUIEngine {
   static Widget _renderContainer(
     Map<String, dynamic> schema,
     BuildContext context,
-    int depth,
-  ) {
+    int depth) {
     final child = schema['child'] as Map<String, dynamic>?;
     return Container(
       width: (schema['width'] as num?)?.toDouble(),
@@ -317,32 +292,26 @@ class RemoteUIEngine {
             ? Border.all(
                 color:
                     _parseColor(schema['border'], context) ??
-                    Colors.transparent,
-              )
-            : null,
-      ),
-      child: child != null ? render(child, context, depth + 1) : null,
-    );
+                    Colors.transparent)
+            : null),
+      child: child != null ? render(child, context, depth + 1) : null);
   }
 
   static Widget _renderSwitch(
     Map<String, dynamic> schema,
-    BuildContext context,
-  ) {
+    BuildContext context) {
     return SwitchListTile(
       title: Text(_resolveText(schema['label'], context)),
       value: schema['value'] as bool? ?? false,
       onChanged: schema['action'] != null
           ? (v) => _handleAction(schema['action'], {'value': v})
           : null,
-      activeThumbColor: AppColors.acc(context),
-    );
+      activeThumbColor: AppColors.acc(context));
   }
 
   static Widget _renderInput(
     Map<String, dynamic> schema,
-    BuildContext context,
-  ) {
+    BuildContext context) {
     return TextField(
       decoration: InputDecoration(
         hintText: _resolveText(schema['placeholder'], context),
@@ -350,10 +319,7 @@ class RemoteUIEngine {
         fillColor: AppColors.sf(context),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
-      ),
-    );
+          borderSide: BorderSide.none)));
   }
 
   static Widget _renderIcon(Map<String, dynamic> schema, BuildContext context) {
@@ -365,45 +331,36 @@ class RemoteUIEngine {
 
   static Widget _renderBadge(
     Map<String, dynamic> schema,
-    BuildContext context,
-  ) {
+    BuildContext context) {
     final count = schema['count'] as int? ?? 0;
     if (count == 0) return const SizedBox.shrink();
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
         color: AppColors.acc(context),
-        borderRadius: BorderRadius.circular(10),
-      ),
+        borderRadius: BorderRadius.circular(10)),
       child: Text(
         '$count',
         style: const TextStyle(
           color: Colors.white,
           fontSize: 11,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
+          fontWeight: FontWeight.bold)));
   }
 
   static Widget _renderUnknown(
     Map<String, dynamic> schema,
-    BuildContext context,
-  ) {
+    BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: const Color(0xFFE0E0E0),
-        borderRadius: BorderRadius.circular(8),
-      ),
+        borderRadius: BorderRadius.circular(8)),
       child: Text(
         'Unsupported: ${schema['type']}',
-        style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context)),
-      ),
-    );
+        style: TextStyle(fontSize: 12, color: AppColors.textTertiary(context))));
   }
 
-  static String _resolveText(dynamic text, BuildContext context) {
+  static String _resolveText(Object? text, BuildContext context) {
     if (text == null) return '';
     if (text is String) return text;
     if (text is Map) {
@@ -418,8 +375,7 @@ class RemoteUIEngine {
 
   static Map<String, dynamic> _resolveTemplate(
     Map<String, dynamic> template,
-    Map<String, dynamic> data,
-  ) {
+    Map<String, dynamic> data) {
     final result = <String, dynamic>{};
     for (final entry in template.entries) {
       if (entry.value is String) {
@@ -431,8 +387,7 @@ class RemoteUIEngine {
       } else if (entry.value is Map<String, dynamic>) {
         result[entry.key] = _resolveTemplate(
           entry.value as Map<String, dynamic>,
-          data,
-        );
+          data);
       } else {
         result[entry.key] = entry.value;
       }
@@ -442,10 +397,10 @@ class RemoteUIEngine {
 
   static void _handleAction(String? action, Map<String, dynamic>? params) {
     if (action == null) return;
-    RemoteUIActionHandler.instance.handle(action, params ?? {});
+    getIt<RemoteUIActionHandler>().handle(action, params ?? {});
   }
 
-  static MainAxisAlignment _parseMainAlignment(dynamic value) {
+  static MainAxisAlignment _parseMainAlignment(Object? value) {
     switch (value) {
       case 'center':
         return MainAxisAlignment.center;
@@ -462,7 +417,7 @@ class RemoteUIEngine {
     }
   }
 
-  static CrossAxisAlignment _parseCrossAlignment(dynamic value) {
+  static CrossAxisAlignment _parseCrossAlignment(Object? value) {
     switch (value) {
       case 'center':
         return CrossAxisAlignment.center;
@@ -475,7 +430,7 @@ class RemoteUIEngine {
     }
   }
 
-  static FontWeight _parseFontWeight(dynamic value) {
+  static FontWeight _parseFontWeight(Object? value) {
     switch (value) {
       case 'bold':
         return FontWeight.bold;
@@ -494,7 +449,7 @@ class RemoteUIEngine {
     }
   }
 
-  static Color? _parseColor(dynamic value, BuildContext context) {
+  static Color? _parseColor(Object? value, BuildContext context) {
     if (value == null) return null;
     if (value is String) {
       switch (value) {
@@ -526,7 +481,7 @@ class RemoteUIEngine {
     return Color(int.parse(hex, radix: 16));
   }
 
-  static EdgeInsets? _parseEdgeInsets(dynamic value) {
+  static EdgeInsets? _parseEdgeInsets(Object? value) {
     if (value == null) return null;
     if (value is num) return EdgeInsets.all(value.toDouble());
     if (value is List && value.length >= 4) {
@@ -534,13 +489,12 @@ class RemoteUIEngine {
         (value[0] as num).toDouble(),
         (value[1] as num).toDouble(),
         (value[2] as num).toDouble(),
-        (value[3] as num).toDouble(),
-      );
+        (value[3] as num).toDouble());
     }
     return null;
   }
 
-  static BorderRadius _parseBorderRadius(dynamic value) {
+  static BorderRadius _parseBorderRadius(Object? value) {
     if (value == null) return BorderRadius.zero;
     if (value is num) return BorderRadius.circular(value.toDouble());
     return BorderRadius.zero;
@@ -586,19 +540,17 @@ class RemoteUIActionHandler {
 
   void register(
     String action,
-    Future<void> Function(Map<String, dynamic>) handler,
-  ) {
+    Future<void> Function(Map<String, dynamic>) handler) {
     _handlers[action] = handler;
   }
 
   void handle(String action, Map<String, dynamic> params) {
     final handler = _handlers[action];
     if (handler == null) return;
-    handler(params).catchError((e) {
+    handler(params).catchError((Object e) {
       AppLogger.instance.warning(
         'RemoteUI action handler failed: $action',
-        error: e,
-      );
+        error: e);
     });
   }
 }

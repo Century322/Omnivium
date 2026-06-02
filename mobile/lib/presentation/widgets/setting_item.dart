@@ -40,9 +40,7 @@ class SettingItem extends StatelessWidget {
                         title,
                         style: TextStyle(
                           fontSize: 16,
-                          color: effectiveTextColor,
-                        ),
-                      ),
+                          color: effectiveTextColor)),
                       if (subtitle case final sub?)
                         Padding(
                           padding: const EdgeInsets.only(top: 4),
@@ -51,19 +49,9 @@ class SettingItem extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 13,
                               color: AppColors.mut(context),
-                              height: 1.4,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
+                              height: 1.4))),
+                    ])),
                 rightContent ?? const SizedBox.shrink(),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
+              ])))));
   }
 }

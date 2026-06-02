@@ -81,8 +81,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   SandboxConfig sse_decode_box_autoadd_sandbox_config(
-    SseDeserializer deserializer,
-  );
+    SseDeserializer deserializer);
 
   @protected
   List<String> sse_decode_list_String(SseDeserializer deserializer);
@@ -95,21 +94,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<SandboxExport> sse_decode_list_sandbox_export(
-    SseDeserializer deserializer,
-  );
+    SseDeserializer deserializer);
 
   @protected
   List<SandboxParam> sse_decode_list_sandbox_param(
-    SseDeserializer deserializer,
-  );
+    SseDeserializer deserializer);
 
   @protected
   String? sse_decode_opt_String(SseDeserializer deserializer);
 
   @protected
   SandboxConfig? sse_decode_opt_box_autoadd_sandbox_config(
-    SseDeserializer deserializer,
-  );
+    SseDeserializer deserializer);
 
   @protected
   SandboxConfig sse_decode_sandbox_config(SseDeserializer deserializer);
@@ -147,8 +143,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_box_autoadd_sandbox_config(
     SandboxConfig self,
-    SseSerializer serializer,
-  );
+    SseSerializer serializer);
 
   @protected
   void sse_encode_list_String(List<String> self, SseSerializer serializer);
@@ -159,20 +154,17 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_prim_u_8_strict(
     Uint8List self,
-    SseSerializer serializer,
-  );
+    SseSerializer serializer);
 
   @protected
   void sse_encode_list_sandbox_export(
     List<SandboxExport> self,
-    SseSerializer serializer,
-  );
+    SseSerializer serializer);
 
   @protected
   void sse_encode_list_sandbox_param(
     List<SandboxParam> self,
-    SseSerializer serializer,
-  );
+    SseSerializer serializer);
 
   @protected
   void sse_encode_opt_String(String? self, SseSerializer serializer);
@@ -180,8 +172,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_opt_box_autoadd_sandbox_config(
     SandboxConfig? self,
-    SseSerializer serializer,
-  );
+    SseSerializer serializer);
 
   @protected
   void sse_encode_sandbox_config(SandboxConfig self, SseSerializer serializer);

@@ -4,6 +4,7 @@ import '../vocabulary/runtime_message.dart';
 import '../vocabulary/runtime_event.dart';
 import '../vocabulary/capability_context.dart';
 import 'persistence_backend.dart';
+import '../vocabulary/capability_params.dart';
 
 class StoragePlugin implements PluginHandler {
   final Map<String, dynamic> _store = {};
@@ -27,40 +28,36 @@ class StoragePlugin implements PluginHandler {
   @override
   Future<HandlerResult> handleMessage(
     RuntimeMessage message,
-    CapabilityContext context,
-  ) async {
+    CapabilityContext context) async {
     return HandlerResult.ok();
   }
 
   @override
   Future<HandlerResult> handleEvent(
     RuntimeEvent event,
-    CapabilityContext context,
-  ) async {
+    CapabilityContext context) async {
     return HandlerResult.ok();
   }
 
   @override
   Future<CapabilityResult> invokeCapability(
     String capabilityId,
-    dynamic params,
-    CapabilityContext context,
-  ) async {
+    CapabilityParams params,
+    CapabilityContext context) async {
     if (!_loaded) await loadFromPersistence();
     switch (capabilityId) {
       case 'storage.read':
-        final key = params is Map ? params['key'] as String : params as String;
+        final key = params.string('') ?? params.string('value') ?? '';
         final value = _store[key];
         if (value == null) {
           return CapabilityResult.fail(
-            RuntimeError(code: 'NOT_FOUND', message: 'Key not found: $key'),
-          );
+            RuntimeError(code: 'NOT_FOUND', message: 'Key not found: $key'));
         }
         return CapabilityResult.ok(value);
       case 'storage.write':
-        if (params is Map) {
-          final key = params['key'] as String;
-          final value = params['value'];
+        if (params.isNotEmpty) {
+          final key = params.string('')!;
+          final value = params.raw['value'];
           _store[key] = value;
           if (_persistence != null) {
             await _persistence.write('store_$key', {'value': value});
@@ -68,7 +65,7 @@ class StoragePlugin implements PluginHandler {
         }
         return CapabilityResult.ok(true);
       case 'storage.delete':
-        final key = params is Map ? params['key'] as String : params as String;
+        final key = params.string('') ?? params.string('value') ?? '';
         _store.remove(key);
         if (_persistence != null) {
           await _persistence.delete('store_$key');
@@ -80,9 +77,7 @@ class StoragePlugin implements PluginHandler {
         return CapabilityResult.fail(
           RuntimeError(
             code: 'UNKNOWN_CAPABILITY',
-            message: 'Unknown capability: $capabilityId',
-          ),
-        );
+            message: 'Unknown capability: $capabilityId'));
     }
   }
 
@@ -96,27 +91,22 @@ class StoragePlugin implements PluginHandler {
         id: 'storage.read',
         name: 'Read',
         description: 'Read a value by key',
-        permission: 'auto',
-      ),
+        permission: 'auto'),
       CapabilityDeclaration(
         id: 'storage.write',
         name: 'Write',
         description: 'Write a key-value pair',
-        permission: 'confirm',
-      ),
+        permission: 'confirm'),
       CapabilityDeclaration(
         id: 'storage.delete',
         name: 'Delete',
         description: 'Delete a key',
         permission: 'confirm',
-        isDestructive: true,
-      ),
+        isDestructive: true),
       CapabilityDeclaration(
         id: 'storage.list',
         name: 'List',
         description: 'List all keys',
-        permission: 'auto',
-      ),
-    ],
-  );
+        permission: 'auto'),
+    ]);
 }

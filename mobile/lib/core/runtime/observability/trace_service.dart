@@ -85,8 +85,7 @@ class TraceService {
         'trace_${DateTime.now().millisecondsSinceEpoch}_${_spanCounter++}';
     final trace = RuntimeTrace(
       traceId: id,
-      createdAt: DateTime.now().millisecondsSinceEpoch,
-    );
+      createdAt: DateTime.now().millisecondsSinceEpoch);
     _traces[id] = trace;
     return trace;
   }
@@ -107,8 +106,7 @@ class TraceService {
       pluginId: pluginId,
       capabilityId: capabilityId,
       startTimeMs: DateTime.now().millisecondsSinceEpoch,
-      tags: tags,
-    );
+      tags: tags);
 
     final trace = _traces[traceId];
     if (trace != null) {

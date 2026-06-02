@@ -73,8 +73,7 @@ class TaskTerminalStateInvariant implements RuntimeInvariant {
         description: '${stuck.length} tasks in non-terminal states',
         severity: severity,
         context: {'stuckTasks': stuck.keys.toList()},
-        timestamp: ctx.clock.now(),
-      );
+        timestamp: ctx.clock.now());
     }
     return null;
   }
@@ -103,8 +102,7 @@ class SchedulerNoOrphanTasksInvariant implements RuntimeInvariant {
         description: 'Task count mismatch: total=$total accounted=$accounted',
         severity: severity,
         context: {'total': total, 'accounted': accounted},
-        timestamp: ctx.clock.now(),
-      );
+        timestamp: ctx.clock.now());
     }
     return null;
   }
@@ -129,8 +127,7 @@ class EventBusNoLeakedSubscriptionsInvariant implements RuntimeInvariant {
             'Potential subscription leak: $subCount subs for $pluginCount plugins',
         severity: InvariantSeverity.warning,
         context: {'subscriptionCount': subCount, 'pluginCount': pluginCount},
-        timestamp: ctx.clock.now(),
-      );
+        timestamp: ctx.clock.now());
     }
     return null;
   }

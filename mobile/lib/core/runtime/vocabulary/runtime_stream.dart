@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'runtime_metadata.dart';
 import 'runtime_route.dart';
 import 'runtime_event.dart';
@@ -7,7 +7,7 @@ enum BackpressureStrategy { buffer, dropOldest, dropNewest, pause }
 
 class StreamChunk {
   final int index;
-  final dynamic data;
+  final Object? data;
   final RuntimeMetadata metadata;
   final bool isFinal;
 
@@ -59,8 +59,7 @@ class RuntimeStream {
       backpressure: backpressure,
       scope: scope,
       chunkStream: controller.stream,
-      onCancel: onCancel ?? controller.close,
-    );
+      onCancel: onCancel ?? controller.close);
     return (stream, controller);
   }
 }

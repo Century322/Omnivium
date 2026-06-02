@@ -113,8 +113,7 @@ class EscalationState {
     weightedScore: weightedScore ?? this.weightedScore,
     totalViolations: totalViolations ?? this.totalViolations,
     lastEscalationAt: lastEscalationAt ?? this.lastEscalationAt,
-    restrictionReason: restrictionReason ?? this.restrictionReason,
-  );
+    restrictionReason: restrictionReason ?? this.restrictionReason);
 }
 
 class BypassPattern {
@@ -148,12 +147,10 @@ class BypassDetectionResult {
       const BypassDetectionResult(bypassDetected: false);
   factory BypassDetectionResult.detected(
     BypassPattern pattern,
-    String evidence,
-  ) => BypassDetectionResult(
+    String evidence) => BypassDetectionResult(
     bypassDetected: true,
     pattern: pattern,
-    evidence: evidence,
-  );
+    evidence: evidence);
 }
 
 class BypassDetector {
@@ -163,76 +160,64 @@ class BypassDetector {
       description: 'Capability invoked without CapabilityRouter',
       violatedLaw: RuntimeLawId.noBypassCapabilityRouter,
       violationType: SandboxViolationType.bypassAttempt,
-      critical: true,
-    ),
+      critical: true),
     BypassPattern(
       patternId: 'direct-thread-spawn',
       description: 'Thread/isolate created without Scheduler',
       violatedLaw: RuntimeLawId.noBypassScheduler,
       violationType: SandboxViolationType.bypassAttempt,
-      critical: true,
-    ),
+      critical: true),
     BypassPattern(
       patternId: 'global-state-access',
       description: 'Mutable global state accessed across sandbox boundary',
       violatedLaw: RuntimeLawId.noGlobalStateSharing,
-      violationType: SandboxViolationType.bypassAttempt,
-    ),
+      violationType: SandboxViolationType.bypassAttempt),
     BypassPattern(
       patternId: 'side-channel-socket',
       description: 'Hidden socket communication detected',
       violatedLaw: RuntimeLawId.noSideChannels,
-      violationType: SandboxViolationType.bypassAttempt,
-    ),
+      violationType: SandboxViolationType.bypassAttempt),
     BypassPattern(
       patternId: 'side-channel-file',
       description: 'Temp file used for inter-sandbox communication',
       violatedLaw: RuntimeLawId.noSideChannels,
-      violationType: SandboxViolationType.bypassAttempt,
-    ),
+      violationType: SandboxViolationType.bypassAttempt),
     BypassPattern(
       patternId: 'side-channel-cache',
       description: 'Shared cache used for inter-sandbox communication',
       violatedLaw: RuntimeLawId.noSideChannels,
-      violationType: SandboxViolationType.bypassAttempt,
-    ),
+      violationType: SandboxViolationType.bypassAttempt),
     BypassPattern(
       patternId: 'side-channel-singleton',
       description: 'In-memory singleton used for state sharing',
       violatedLaw: RuntimeLawId.noSideChannels,
-      violationType: SandboxViolationType.bypassAttempt,
-    ),
+      violationType: SandboxViolationType.bypassAttempt),
     BypassPattern(
       patternId: 'side-channel-static',
       description: 'Static variable used for state sharing',
       violatedLaw: RuntimeLawId.noSideChannels,
-      violationType: SandboxViolationType.bypassAttempt,
-    ),
+      violationType: SandboxViolationType.bypassAttempt),
     BypassPattern(
       patternId: 'side-channel-rpc',
       description: 'Hidden RPC communication detected',
       violatedLaw: RuntimeLawId.noSideChannels,
-      violationType: SandboxViolationType.bypassAttempt,
-    ),
+      violationType: SandboxViolationType.bypassAttempt),
     BypassPattern(
       patternId: 'untraced-operation',
       description: 'Operation executed without trace span',
       violatedLaw: RuntimeLawId.allOpsMustBeTraced,
-      violationType: SandboxViolationType.bypassAttempt,
-    ),
+      violationType: SandboxViolationType.bypassAttempt),
     BypassPattern(
       patternId: 'budget-bypass',
       description: 'Resource consumed without Budget approval',
       violatedLaw: RuntimeLawId.noBudgetBypass,
-      violationType: SandboxViolationType.budgetExceeded,
-    ),
+      violationType: SandboxViolationType.budgetExceeded),
     BypassPattern(
       patternId: 'trust-escalation',
       description: 'Lower-trust entity attempted higher-trust access',
       violatedLaw: RuntimeLawId.trustLevelMustBeRespected,
       violationType: SandboxViolationType.trustInsufficient,
-      critical: true,
-    ),
+      critical: true),
   ];
 
   BypassDetectionResult detect({
@@ -248,50 +233,43 @@ class BypassDetector {
     if (!routedThroughRouter) {
       return BypassDetectionResult.detected(
         knownPatterns[0],
-        'Capability call bypassed CapabilityRouter',
-      );
+        'Capability call bypassed CapabilityRouter');
     }
 
     if (!scheduledThroughScheduler) {
       return BypassDetectionResult.detected(
         knownPatterns[1],
-        'Task created without Scheduler',
-      );
+        'Task created without Scheduler');
     }
 
     if (accessedGlobalState) {
       return BypassDetectionResult.detected(
         knownPatterns[2],
-        'Global state access detected',
-      );
+        'Global state access detected');
     }
 
     if (usedSideChannel) {
       return BypassDetectionResult.detected(
         knownPatterns[3],
-        'Side channel communication detected',
-      );
+        'Side channel communication detected');
     }
 
     if (!hasTraceSpan) {
       return BypassDetectionResult.detected(
         knownPatterns[9],
-        'Operation executed without trace span',
-      );
+        'Operation executed without trace span');
     }
 
     if (!budgetApproved) {
       return BypassDetectionResult.detected(
         knownPatterns[10],
-        'Resource consumed without Budget approval',
-      );
+        'Resource consumed without Budget approval');
     }
 
     if (actualTrust.index > requiredTrust.index) {
       return BypassDetectionResult.detected(
         knownPatterns[11],
-        'Trust level ${actualTrust.name} insufficient for ${requiredTrust.name}',
-      );
+        'Trust level ${actualTrust.name} insufficient for ${requiredTrust.name}');
     }
 
     return BypassDetectionResult.clean();
@@ -311,8 +289,7 @@ class BypassDetector {
     if (index != null) {
       return BypassDetectionResult.detected(
         knownPatterns[index],
-        'Side channel type: $channelType',
-      );
+        'Side channel type: $channelType');
     }
 
     return BypassDetectionResult.clean();
@@ -385,8 +362,7 @@ class ConstitutionalGuard {
     final sharedLedger = ImmutableAuditLedger();
     final sharedReputationEconomy = ReputationEconomy(
       sharedTraceGraph,
-      policy: trustDecayPolicy,
-    );
+      policy: trustDecayPolicy);
     final sharedJudiciary = RuntimeJudiciary(sharedTraceGraph, sharedLedger);
     return ConstitutionalGuard._internal(
       enforcer: enforcer,
@@ -400,21 +376,18 @@ class ConstitutionalGuard {
       consensus: nodeId != null
           ? ConstitutionalConsensus(
               localNodeId: nodeId,
-              traceGraph: sharedTraceGraph,
-            )
+              traceGraph: sharedTraceGraph)
           : null,
       federatedReputation: nodeId != null
           ? FederatedReputation(
               localRuntimeId: nodeId,
-              traceGraph: sharedTraceGraph,
-            )
+              traceGraph: sharedTraceGraph)
           : null,
       legislature: null,
       transport: nodeId != null
           ? CivilizationTransport(
               localNodeId: nodeId,
-              traceGraph: sharedTraceGraph,
-            )
+              traceGraph: sharedTraceGraph)
           : null,
       identity: nodeId != null ? CivilizationIdentity.generate(nodeId) : null,
       economy: nodeId != null
@@ -423,10 +396,8 @@ class ConstitutionalGuard {
       network: (nodeId != null && enableNetwork)
           ? CivilizationNetwork(
               localNodeId: nodeId,
-              traceGraph: sharedTraceGraph,
-            )
-          : null,
-    );
+              traceGraph: sharedTraceGraph)
+          : null);
   }
 
   ConstitutionalGuard.withSharedState({
@@ -446,14 +417,12 @@ class ConstitutionalGuard {
        _evolutionEngine = ConstitutionalEvolutionEngine(traceGraph),
        _reputationEconomy = ReputationEconomy(
          traceGraph,
-         policy: trustDecayPolicy,
-       ),
+         policy: trustDecayPolicy),
        _judiciary = RuntimeJudiciary(traceGraph, ledger),
        _consensus = nodeId != null
            ? ConstitutionalConsensus(
                localNodeId: nodeId,
-               traceGraph: traceGraph,
-             )
+               traceGraph: traceGraph)
            : null,
        _federatedReputation = nodeId != null
            ? FederatedReputation(localRuntimeId: nodeId, traceGraph: traceGraph)
@@ -497,8 +466,7 @@ class ConstitutionalGuard {
       consensus: _consensus,
       traceGraph: _traceGraph,
       reputationEconomy: _reputationEconomy,
-      judiciary: _judiciary,
-    );
+      judiciary: _judiciary);
     _legislature = legislature;
     return legislature;
   }
@@ -522,8 +490,7 @@ class ConstitutionalGuard {
       _log(
         'capability.blocked',
         sandboxId,
-        'Sandbox terminated due to prior violations',
-      );
+        'Sandbox terminated due to prior violations');
       _recordTrace(
         sandboxId,
         'capability',
@@ -532,16 +499,14 @@ class ConstitutionalGuard {
         capabilityId,
         callerId,
         callerTrust,
-        escBefore,
-      );
+        escBefore);
       _appendLedger('capability.blocked', sandboxId, {
         'reason': 'terminated',
         'cap': capabilityId,
       });
       return ConstitutionalCheckResult.denied(
         reason: 'Sandbox terminated due to constitutional violations',
-        violatedLaw: null,
-      );
+        violatedLaw: null);
     }
 
     if (escalation.level == EscalationLevel.restricted) {
@@ -551,15 +516,13 @@ class ConstitutionalGuard {
     final routingResult = _enforcer.enforceCapabilityRouting(
       sandboxId,
       capabilityId,
-      wasRoutedThroughRouter,
-    );
+      wasRoutedThroughRouter);
     if (!routingResult.compliant) {
       _recordViolation(sandboxId, SandboxViolationType.bypassAttempt);
       _log(
         'capability.blocked',
         sandboxId,
-        'CapabilityRouter bypass: $capabilityId',
-      );
+        'CapabilityRouter bypass: $capabilityId');
       _recordTrace(
         sandboxId,
         'capability',
@@ -568,30 +531,26 @@ class ConstitutionalGuard {
         capabilityId,
         callerId,
         callerTrust,
-        escBefore,
-      );
+        escBefore);
       _appendLedger('law.violation', sandboxId, {
         'law': 'noBypassCapabilityRouter',
         'cap': capabilityId,
       });
       return ConstitutionalCheckResult.denied(
         reason: routingResult.violation ?? 'Routing violation',
-        violatedLaw: RuntimeLawId.noBypassCapabilityRouter,
-      );
+        violatedLaw: RuntimeLawId.noBypassCapabilityRouter);
     }
 
     final trustResult = _enforcer.enforceTrustLevel(
       sandboxId,
       requiredTrust,
-      callerTrust,
-    );
+      callerTrust);
     if (!trustResult.compliant) {
       _recordViolation(sandboxId, SandboxViolationType.trustInsufficient);
       _log(
         'capability.blocked',
         sandboxId,
-        'Trust level violation: ${callerTrust.name} -> $requiredTrust',
-      );
+        'Trust level violation: ${callerTrust.name} -> $requiredTrust');
       _recordTrace(
         sandboxId,
         'capability',
@@ -600,8 +559,7 @@ class ConstitutionalGuard {
         capabilityId,
         callerId,
         callerTrust,
-        escBefore,
-      );
+        escBefore);
       _appendLedger('law.violation', sandboxId, {
         'law': 'trustLevelMustBeRespected',
         'cap': capabilityId,
@@ -609,8 +567,7 @@ class ConstitutionalGuard {
       });
       return ConstitutionalCheckResult.denied(
         reason: trustResult.violation ?? 'Trust violation',
-        violatedLaw: RuntimeLawId.trustLevelMustBeRespected,
-      );
+        violatedLaw: RuntimeLawId.trustLevelMustBeRespected);
     }
 
     final traceResult = _enforcer.enforceTracing(sandboxId, hasTraceSpan);
@@ -619,8 +576,7 @@ class ConstitutionalGuard {
       _log(
         'capability.blocked',
         sandboxId,
-        'Untraced capability invocation: $capabilityId',
-      );
+        'Untraced capability invocation: $capabilityId');
       _recordTrace(
         sandboxId,
         'capability',
@@ -629,16 +585,14 @@ class ConstitutionalGuard {
         capabilityId,
         callerId,
         callerTrust,
-        escBefore,
-      );
+        escBefore);
       _appendLedger('law.violation', sandboxId, {
         'law': 'allOpsMustBeTraced',
         'cap': capabilityId,
       });
       return ConstitutionalCheckResult.denied(
         reason: traceResult.violation ?? 'Trace violation',
-        violatedLaw: RuntimeLawId.allOpsMustBeTraced,
-      );
+        violatedLaw: RuntimeLawId.allOpsMustBeTraced);
     }
 
     _log('capability.approved', sandboxId, 'Capability $capabilityId approved');
@@ -650,16 +604,14 @@ class ConstitutionalGuard {
       capabilityId,
       callerId,
       callerTrust,
-      escBefore,
-    );
+      escBefore);
     _appendLedger('capability.approved', sandboxId, {
       'cap': capabilityId,
       'caller': callerId,
     });
     _reputationEconomy.recordCompliance(
       sandboxId,
-      _enforcer.clock.tick().physicalTime,
-    );
+      _enforcer.clock.tick().physicalTime);
     return ConstitutionalCheckResult.allowed();
   }
 
@@ -677,14 +629,12 @@ class ConstitutionalGuard {
       _appendLedger('task.blocked', sandboxId, {'reason': 'terminated'});
       return ConstitutionalCheckResult.denied(
         reason: 'Sandbox terminated',
-        violatedLaw: null,
-      );
+        violatedLaw: null);
     }
 
     final schedulerResult = _enforcer.enforceSchedulerUsage(
       sandboxId,
-      wasScheduledThroughScheduler,
-    );
+      wasScheduledThroughScheduler);
     if (!schedulerResult.compliant) {
       _recordViolation(sandboxId, SandboxViolationType.bypassAttempt);
       _recordTrace(
@@ -695,13 +645,11 @@ class ConstitutionalGuard {
         null,
         null,
         null,
-        escBefore,
-      );
+        escBefore);
       _appendLedger('law.violation', sandboxId, {'law': 'noBypassScheduler'});
       return ConstitutionalCheckResult.denied(
         reason: schedulerResult.violation ?? 'Scheduler violation',
-        violatedLaw: RuntimeLawId.noBypassScheduler,
-      );
+        violatedLaw: RuntimeLawId.noBypassScheduler);
     }
 
     final budgetResult = _enforcer.enforceBudget(sandboxId, budgetApproved);
@@ -715,13 +663,11 @@ class ConstitutionalGuard {
         null,
         null,
         null,
-        escBefore,
-      );
+        escBefore);
       _appendLedger('law.violation', sandboxId, {'law': 'noBudgetBypass'});
       return ConstitutionalCheckResult.denied(
         reason: budgetResult.violation ?? 'Budget violation',
-        violatedLaw: RuntimeLawId.noBudgetBypass,
-      );
+        violatedLaw: RuntimeLawId.noBudgetBypass);
     }
 
     final traceResult = _enforcer.enforceTracing(sandboxId, hasTraceSpan);
@@ -735,21 +681,18 @@ class ConstitutionalGuard {
         null,
         null,
         null,
-        escBefore,
-      );
+        escBefore);
       _appendLedger('law.violation', sandboxId, {'law': 'allOpsMustBeTraced'});
       return ConstitutionalCheckResult.denied(
         reason: traceResult.violation ?? 'Trace violation',
-        violatedLaw: RuntimeLawId.allOpsMustBeTraced,
-      );
+        violatedLaw: RuntimeLawId.allOpsMustBeTraced);
     }
 
     _recordTrace(sandboxId, 'task', null, true, null, null, null, escBefore);
     _appendLedger('task.approved', sandboxId, {});
     _reputationEconomy.recordCompliance(
       sandboxId,
-      _enforcer.clock.tick().physicalTime,
-    );
+      _enforcer.clock.tick().physicalTime);
     return ConstitutionalCheckResult.allowed();
   }
 
@@ -771,19 +714,16 @@ class ConstitutionalGuard {
         null,
         null,
         null,
-        escBefore,
-      );
+        escBefore);
       _appendLedger('state.blocked', sandboxId, {'reason': 'terminated'});
       return ConstitutionalCheckResult.denied(
         reason: 'Sandbox terminated',
-        violatedLaw: null,
-      );
+        violatedLaw: null);
     }
 
     final globalStateResult = _enforcer.enforceNoGlobalState(
       sandboxId,
-      accessedGlobalState,
-    );
+      accessedGlobalState);
     if (!globalStateResult.compliant) {
       _recordViolation(sandboxId, SandboxViolationType.bypassAttempt);
       _recordTrace(
@@ -794,21 +734,18 @@ class ConstitutionalGuard {
         null,
         null,
         null,
-        escBefore,
-      );
+        escBefore);
       _appendLedger('law.violation', sandboxId, {
         'law': 'noGlobalStateSharing',
       });
       return ConstitutionalCheckResult.denied(
         reason: globalStateResult.violation ?? 'Global state violation',
-        violatedLaw: RuntimeLawId.noGlobalStateSharing,
-      );
+        violatedLaw: RuntimeLawId.noGlobalStateSharing);
     }
 
     final sideChannelResult = _enforcer.enforceNoSideChannels(
       sandboxId,
-      usedSideChannel,
-    );
+      usedSideChannel);
     if (!sideChannelResult.compliant) {
       _recordViolation(sandboxId, SandboxViolationType.bypassAttempt);
       _recordTrace(
@@ -819,13 +756,11 @@ class ConstitutionalGuard {
         null,
         null,
         null,
-        escBefore,
-      );
+        escBefore);
       _appendLedger('law.violation', sandboxId, {'law': 'noSideChannels'});
       return ConstitutionalCheckResult.denied(
         reason: sideChannelResult.violation ?? 'Side channel violation',
-        violatedLaw: RuntimeLawId.noSideChannels,
-      );
+        violatedLaw: RuntimeLawId.noSideChannels);
     }
 
     final traceResult = _enforcer.enforceTracing(sandboxId, hasTraceSpan);
@@ -839,21 +774,18 @@ class ConstitutionalGuard {
         null,
         null,
         null,
-        escBefore,
-      );
+        escBefore);
       _appendLedger('law.violation', sandboxId, {'law': 'allOpsMustBeTraced'});
       return ConstitutionalCheckResult.denied(
         reason: traceResult.violation ?? 'Trace violation',
-        violatedLaw: RuntimeLawId.allOpsMustBeTraced,
-      );
+        violatedLaw: RuntimeLawId.allOpsMustBeTraced);
     }
 
     _recordTrace(sandboxId, 'state', null, true, null, null, null, escBefore);
     _appendLedger('state.approved', sandboxId, {});
     _reputationEconomy.recordCompliance(
       sandboxId,
-      _enforcer.clock.tick().physicalTime,
-    );
+      _enforcer.clock.tick().physicalTime);
     return ConstitutionalCheckResult.allowed();
   }
 
@@ -875,14 +807,12 @@ class ConstitutionalGuard {
       hasTraceSpan: hasTraceSpan,
       budgetApproved: budgetApproved,
       requiredTrust: requiredTrust,
-      actualTrust: actualTrust,
-    );
+      actualTrust: actualTrust);
   }
 
   EscalationLevel updateEscalation(
     String sandboxId,
-    SandboxViolationType violationType,
-  ) {
+    SandboxViolationType violationType) {
     final current = escalationFor(sandboxId);
     final weight = _escalationPolicy.weightFor(violationType);
     final newScore = current.weightedScore + weight;
@@ -912,14 +842,12 @@ class ConstitutionalGuard {
       weightedScore: newScore,
       totalViolations: newTotal,
       lastEscalationAt: _enforcer.clock.tick().physicalTime,
-      restrictionReason: reason,
-    );
+      restrictionReason: reason);
 
     _log(
       'escalation.${newLevel.name}',
       sandboxId,
-      reason ?? 'Violation recorded (score: $newScore)',
-    );
+      reason ?? 'Violation recorded (score: $newScore)');
 
     return newLevel;
   }
@@ -939,8 +867,7 @@ class ConstitutionalGuard {
     _reputationEconomy.recordViolation(
       sandboxId,
       _enforcer.clock.tick().physicalTime,
-      type: type,
-    );
+      type: type);
   }
 
   void _recordTrace(
@@ -951,8 +878,7 @@ class ConstitutionalGuard {
     String? capabilityId,
     String? callerId,
     TrustLevel? callerTrust,
-    EscalationLevel escBefore,
-  ) {
+    EscalationLevel escBefore) {
     final escAfter = escalationFor(sandboxId).level;
     _traceGraph.record(
       sandboxId: sandboxId,
@@ -964,21 +890,18 @@ class ConstitutionalGuard {
       callerTrust: callerTrust,
       escalationBefore: escBefore,
       escalationAfter: escAfter,
-      timestamp: _enforcer.clock.tick().physicalTime,
-    );
+      timestamp: _enforcer.clock.tick().physicalTime);
   }
 
   void _appendLedger(
     String entryType,
     String sandboxId,
-    Map<String, dynamic> data,
-  ) {
+    Map<String, dynamic> data) {
     _ledger.append(
       entryType: entryType,
       sandboxId: sandboxId,
       data: data,
-      timestamp: _enforcer.clock.tick().physicalTime,
-    );
+      timestamp: _enforcer.clock.tick().physicalTime);
   }
 
   void _log(String action, String sandboxId, String detail) {
@@ -987,9 +910,7 @@ class ConstitutionalGuard {
         action: action,
         sandboxId: sandboxId,
         detail: detail,
-        timestamp: _enforcer.clock.tick().physicalTime,
-      ),
-    );
+        timestamp: _enforcer.clock.tick().physicalTime));
   }
 }
 
@@ -1012,8 +933,7 @@ class ConstitutionalCheckResult {
   }) => ConstitutionalCheckResult._(
     allowed: false,
     reason: reason,
-    violatedLaw: violatedLaw,
-  );
+    violatedLaw: violatedLaw);
 }
 
 class ConstitutionalGuardEvent {

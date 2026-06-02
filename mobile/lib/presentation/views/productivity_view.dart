@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../core/note_service.dart';
-import '../../core/note_provider.dart';
+import '../../core/note_cubit.dart';
 import '../theme/app_colors.dart';
-import '../theme/locale_provider.dart';
+import '../theme/locale_cubit.dart';
+import '../../core/di/app_di.dart';
 
 class ProductivityView extends StatefulWidget {
-  final NoteProvider provider;
-  const ProductivityView({super.key, required this.provider});
+  const ProductivityView({super.key});
 
   @override
   State<ProductivityView> createState() => _ProductivityViewState();
@@ -41,18 +41,14 @@ class _ProductivityViewState extends State<ProductivityView>
           tooltip: localeProvider.t('back'),
           icon: Icon(
             LucideIcons.chevronLeft,
-            color: AppColors.textPrimary(context),
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
+            color: AppColors.textPrimary(context)),
+          onPressed: () => Navigator.pop(context)),
         title: Text(
           t('productivity'),
           style: TextStyle(
             color: AppColors.textPrimary(context),
             fontSize: 17,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+            fontWeight: FontWeight.w600)),
         bottom: TabBar(
           controller: _tabController,
           labelColor: AppColors.acc(context),
@@ -62,30 +58,24 @@ class _ProductivityViewState extends State<ProductivityView>
             Tab(text: t('notes')),
             Tab(text: t('todos')),
             Tab(text: t('schedules')),
-          ],
-        ),
-      ),
+          ])),
       body: TabBarView(
         controller: _tabController,
-        children: [_buildNotesList(), _buildTodosList(), _buildSchedulesList()],
-      ),
+        children: [_buildNotesList(), _buildTodosList(), _buildSchedulesList()]),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddDialog(_tabController.index),
         backgroundColor: AppColors.acc(context),
         child: Icon(
           LucideIcons.plus,
           color: AppColors.textPrimary(context),
-          size: 24,
-        ),
-      ),
-    );
+          size: 24)));
   }
 
   Widget _buildNotesList() {
-    return ListenableBuilder(
-      listenable: widget.provider,
+    return StreamBuilder<NoteState>(
+      stream: getIt<NoteCubit>().stream,
       builder: (context, _) {
-        final notes = widget.provider.notes;
+        final notes = getIt<NoteCubit>().notes;
         if (notes.isEmpty) {
           return _buildEmptyState(LucideIcons.fileText, t('no_notes'));
         }
@@ -95,17 +85,15 @@ class _ProductivityViewState extends State<ProductivityView>
           itemBuilder: (context, index) {
             final note = notes[index];
             return _buildNoteCard(note);
-          },
-        );
-      },
-    );
+          });
+      });
   }
 
   Widget _buildTodosList() {
-    return ListenableBuilder(
-      listenable: widget.provider,
+    return StreamBuilder<NoteState>(
+      stream: getIt<NoteCubit>().stream,
       builder: (context, _) {
-        final todos = widget.provider.todos;
+        final todos = getIt<NoteCubit>().todos;
         if (todos.isEmpty) {
           return _buildEmptyState(LucideIcons.checkSquare, t('no_todos'));
         }
@@ -119,9 +107,7 @@ class _ProductivityViewState extends State<ProductivityView>
           return Center(
             child: Text(
               t('no_todos'),
-              style: TextStyle(color: AppColors.textTertiary(context)),
-            ),
-          );
+              style: TextStyle(color: AppColors.textTertiary(context))));
         return ListView.builder(
           padding: const EdgeInsets.symmetric(vertical: 8),
           itemCount: items.length,
@@ -135,10 +121,7 @@ class _ProductivityViewState extends State<ProductivityView>
                   style: TextStyle(
                     color: AppColors.textSecondary(context),
                     fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              );
+                    fontWeight: FontWeight.w600)));
             if (item == '_header_done')
               return Padding(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
@@ -147,22 +130,17 @@ class _ProductivityViewState extends State<ProductivityView>
                   style: TextStyle(
                     color: AppColors.textSecondary(context),
                     fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              );
+                    fontWeight: FontWeight.w600)));
             return _buildTodoCard(item);
-          },
-        );
-      },
-    );
+          });
+      });
   }
 
   Widget _buildSchedulesList() {
-    return ListenableBuilder(
-      listenable: widget.provider,
+    return StreamBuilder<NoteState>(
+      stream: getIt<NoteCubit>().stream,
       builder: (context, _) {
-        final schedules = widget.provider.schedules;
+        final schedules = getIt<NoteCubit>().schedules;
         if (schedules.isEmpty) {
           return _buildEmptyState(LucideIcons.calendar, t('no_schedules'));
         }
@@ -172,10 +150,8 @@ class _ProductivityViewState extends State<ProductivityView>
           itemBuilder: (context, index) {
             final schedule = schedules[index];
             return _buildScheduleCard(schedule);
-          },
-        );
-      },
-    );
+          });
+      });
   }
 
   Widget _buildEmptyState(IconData icon, String text) {
@@ -189,12 +165,8 @@ class _ProductivityViewState extends State<ProductivityView>
             text,
             style: TextStyle(
               color: AppColors.textSecondary(context),
-              fontSize: 15,
-            ),
-          ),
-        ],
-      ),
-    );
+              fontSize: 15)),
+        ]));
   }
 
   Widget _buildNoteCard(NoteItem note) {
@@ -202,27 +174,22 @@ class _ProductivityViewState extends State<ProductivityView>
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 3),
       decoration: BoxDecoration(
         color: AppColors.sf(context),
-        borderRadius: BorderRadius.circular(12),
-      ),
+        borderRadius: BorderRadius.circular(12)),
       child: ListTile(
         title: Text(
           note.title,
           style: TextStyle(
             color: AppColors.textPrimary(context),
             fontSize: 15,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
+            fontWeight: FontWeight.w500)),
         subtitle: note.content.isNotEmpty
             ? Text(
                 note.content,
                 style: TextStyle(
                   color: AppColors.textSecondary(context),
-                  fontSize: 13,
-                ),
+                  fontSize: 13),
                 maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              )
+                overflow: TextOverflow.ellipsis)
             : null,
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
@@ -232,23 +199,16 @@ class _ProductivityViewState extends State<ProductivityView>
               icon: Icon(
                 LucideIcons.pencil,
                 size: 16,
-                color: AppColors.textSecondary(context),
-              ),
-              onPressed: () => _showEditDialog(note),
-            ),
+                color: AppColors.textSecondary(context)),
+              onPressed: () => _showEditDialog(note)),
             IconButton(
               tooltip: localeProvider.t('delete'),
               icon: Icon(
                 LucideIcons.trash2,
                 size: 16,
-                color: AppColors.dng(context).withValues(alpha: 0.7),
-              ),
-              onPressed: () => widget.provider.deleteItem(note.id),
-            ),
-          ],
-        ),
-      ),
-    );
+                color: AppColors.dng(context).withValues(alpha: 0.7)),
+              onPressed: () => getIt<NoteCubit>().deleteItem(note.id)),
+          ])));
   }
 
   Widget _buildTodoCard(NoteItem todo) {
@@ -256,14 +216,13 @@ class _ProductivityViewState extends State<ProductivityView>
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 3),
       decoration: BoxDecoration(
         color: AppColors.sf(context),
-        borderRadius: BorderRadius.circular(12),
-      ),
+        borderRadius: BorderRadius.circular(12)),
       child: ListTile(
         leading: Semantics(
           label: localeProvider.t('toggle_completion'),
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
-            onTap: () => widget.provider.toggleDone(todo.id),
+            onTap: () => getIt<NoteCubit>().toggleDone(todo.id),
             child: Container(
               width: 24,
               height: 24,
@@ -275,20 +234,14 @@ class _ProductivityViewState extends State<ProductivityView>
                   color: todo.isDone
                       ? AppColors.acc(context)
                       : AppColors.textSecondary(context),
-                  width: 2,
-                ),
-                borderRadius: BorderRadius.circular(6),
-              ),
+                  width: 2),
+                borderRadius: BorderRadius.circular(6)),
               child: todo.isDone
                   ? Icon(
                       LucideIcons.check,
                       size: 14,
-                      color: AppColors.textPrimary(context),
-                    )
-                  : null,
-            ),
-          ),
-        ),
+                      color: AppColors.textPrimary(context))
+                  : null))),
         title: Text(
           todo.title,
           style: TextStyle(
@@ -297,9 +250,7 @@ class _ProductivityViewState extends State<ProductivityView>
                 : AppColors.textPrimary(context),
             fontSize: 15,
             fontWeight: FontWeight.w500,
-            decoration: todo.isDone ? TextDecoration.lineThrough : null,
-          ),
-        ),
+            decoration: todo.isDone ? TextDecoration.lineThrough : null)),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -308,23 +259,16 @@ class _ProductivityViewState extends State<ProductivityView>
               icon: Icon(
                 LucideIcons.pencil,
                 size: 16,
-                color: AppColors.textSecondary(context),
-              ),
-              onPressed: () => _showEditTodoDialog(todo),
-            ),
+                color: AppColors.textSecondary(context)),
+              onPressed: () => _showEditTodoDialog(todo)),
             IconButton(
               tooltip: localeProvider.t('delete'),
               icon: Icon(
                 LucideIcons.trash2,
                 size: 16,
-                color: AppColors.dng(context).withValues(alpha: 0.7),
-              ),
-              onPressed: () => widget.provider.deleteItem(todo.id),
-            ),
-          ],
-        ),
-      ),
-    );
+                color: AppColors.dng(context).withValues(alpha: 0.7)),
+              onPressed: () => getIt<NoteCubit>().deleteItem(todo.id)),
+          ])));
   }
 
   Widget _buildScheduleCard(NoteItem schedule) {
@@ -338,10 +282,8 @@ class _ProductivityViewState extends State<ProductivityView>
         border: isOverdue
             ? Border.all(
                 color: AppColors.dng(context).withValues(alpha: 0.3),
-                width: 1,
-              )
-            : null,
-      ),
+                width: 1)
+            : null),
       child: ListTile(
         leading: Container(
           width: 44,
@@ -350,8 +292,7 @@ class _ProductivityViewState extends State<ProductivityView>
             color: isOverdue
                 ? AppColors.dng(context).withValues(alpha: 0.1)
                 : AppColors.acc(context).withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(10),
-          ),
+            borderRadius: BorderRadius.circular(10)),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -362,9 +303,7 @@ class _ProductivityViewState extends State<ProductivityView>
                       ? AppColors.dng(context)
                       : AppColors.acc(context),
                   fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
+                  fontWeight: FontWeight.w700)),
               Text(
                 dueDate != null ? _monthShort(dueDate.month) : '',
                 style: TextStyle(
@@ -372,20 +311,14 @@ class _ProductivityViewState extends State<ProductivityView>
                       ? AppColors.dng(context).withValues(alpha: 0.7)
                       : AppColors.acc(context).withValues(alpha: 0.7),
                   fontSize: 9,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ),
+                  fontWeight: FontWeight.w600)),
+            ])),
         title: Text(
           schedule.title,
           style: TextStyle(
             color: AppColors.textPrimary(context),
             fontSize: 15,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
+            fontWeight: FontWeight.w500)),
         subtitle: dueDate != null
             ? Text(
                 _formatDateTime(dueDate),
@@ -393,9 +326,7 @@ class _ProductivityViewState extends State<ProductivityView>
                   color: isOverdue
                       ? AppColors.dng(context)
                       : AppColors.textSecondary(context),
-                  fontSize: 12,
-                ),
-              )
+                  fontSize: 12))
             : null,
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
@@ -405,23 +336,16 @@ class _ProductivityViewState extends State<ProductivityView>
               icon: Icon(
                 LucideIcons.pencil,
                 size: 16,
-                color: AppColors.textSecondary(context),
-              ),
-              onPressed: () => _showEditScheduleDialog(schedule),
-            ),
+                color: AppColors.textSecondary(context)),
+              onPressed: () => _showEditScheduleDialog(schedule)),
             IconButton(
               tooltip: localeProvider.t('delete'),
               icon: Icon(
                 LucideIcons.trash2,
                 size: 16,
-                color: AppColors.dng(context).withValues(alpha: 0.7),
-              ),
-              onPressed: () => widget.provider.deleteItem(schedule.id),
-            ),
-          ],
-        ),
-      ),
-    );
+                color: AppColors.dng(context).withValues(alpha: 0.7)),
+              onPressed: () => getIt<NoteCubit>().deleteItem(schedule.id)),
+          ])));
   }
 
   String _monthShort(int month) {
@@ -458,7 +382,7 @@ class _ProductivityViewState extends State<ProductivityView>
     TimeOfDay? dueTime;
 
     try {
-      showDialog(
+      showDialog<void>(
         context: context,
         builder: (ctx) {
           return StatefulBuilder(
@@ -466,8 +390,7 @@ class _ProductivityViewState extends State<ProductivityView>
               return AlertDialog(
                 backgroundColor: AppColors.sf(context),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
+                  borderRadius: BorderRadius.circular(16)),
                 title: Text(
                   tabIndex == 0
                       ? t('add_note')
@@ -477,9 +400,7 @@ class _ProductivityViewState extends State<ProductivityView>
                   style: TextStyle(
                     color: AppColors.textPrimary(context),
                     fontSize: 17,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+                    fontWeight: FontWeight.w600)),
                 content: SingleChildScrollView(
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width * 0.85,
@@ -492,26 +413,20 @@ class _ProductivityViewState extends State<ProductivityView>
                           maxLength: 200,
                           style: TextStyle(
                             color: AppColors.textPrimary(context),
-                            fontSize: 15,
-                          ),
+                            fontSize: 15),
                           decoration: InputDecoration(
                             labelText: t('title_hint'),
                             hintStyle: TextStyle(
                               color: AppColors.textDisabled(context),
-                              fontSize: 14,
-                            ),
+                              fontSize: 14),
                             filled: true,
                             fillColor: AppColors.sfAlt(context),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide.none,
-                            ),
+                              borderSide: BorderSide.none),
                             contentPadding: const EdgeInsets.symmetric(
                               horizontal: 12,
-                              vertical: 10,
-                            ),
-                          ),
-                        ),
+                              vertical: 10))),
                         const SizedBox(height: 12),
                         if (type == NoteType.text)
                           TextField(
@@ -520,26 +435,20 @@ class _ProductivityViewState extends State<ProductivityView>
                             maxLines: 4,
                             style: TextStyle(
                               color: AppColors.textPrimary(context),
-                              fontSize: 15,
-                            ),
+                              fontSize: 15),
                             decoration: InputDecoration(
                               labelText: t('content_hint'),
                               hintStyle: TextStyle(
                                 color: AppColors.textDisabled(context),
-                                fontSize: 14,
-                              ),
+                                fontSize: 14),
                               filled: true,
                               fillColor: AppColors.sfAlt(context),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
-                                borderSide: BorderSide.none,
-                              ),
+                                borderSide: BorderSide.none),
                               contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 12,
-                                vertical: 10,
-                              ),
-                            ),
-                          ),
+                                vertical: 10))),
                         if (type == NoteType.schedule) ...[
                           const SizedBox(height: 8),
                           Semantics(
@@ -552,28 +461,23 @@ class _ProductivityViewState extends State<ProductivityView>
                                   initialDate: DateTime.now(),
                                   firstDate: DateTime.now(),
                                   lastDate: DateTime.now().add(
-                                    const Duration(days: 365),
-                                  ),
-                                );
+                                    const Duration(days: 365)));
                                 if (date != null)
                                   setDialogState(() => dueDate = date);
                               },
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 12,
-                                  vertical: 10,
-                                ),
+                                  vertical: 10),
                                 decoration: BoxDecoration(
                                   color: AppColors.sfAlt(context),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
+                                  borderRadius: BorderRadius.circular(10)),
                                 child: Row(
                                   children: [
                                     Icon(
                                       LucideIcons.calendar,
                                       size: 16,
-                                      color: AppColors.textSecondary(context),
-                                    ),
+                                      color: AppColors.textSecondary(context)),
                                     const SizedBox(width: 8),
                                     Text(
                                       dueDate != null
@@ -583,14 +487,8 @@ class _ProductivityViewState extends State<ProductivityView>
                                         color: dueDate != null
                                             ? AppColors.textPrimary(context)
                                             : AppColors.textDisabled(context),
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
+                                        fontSize: 14)),
+                                  ])))),
                           const SizedBox(height: 8),
                           Semantics(
                             label: localeProvider.t('select_time'),
@@ -599,27 +497,23 @@ class _ProductivityViewState extends State<ProductivityView>
                               onTap: () async {
                                 final time = await showTimePicker(
                                   context: context,
-                                  initialTime: TimeOfDay.now(),
-                                );
+                                  initialTime: TimeOfDay.now());
                                 if (time != null)
                                   setDialogState(() => dueTime = time);
                               },
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 12,
-                                  vertical: 10,
-                                ),
+                                  vertical: 10),
                                 decoration: BoxDecoration(
                                   color: AppColors.sfAlt(context),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
+                                  borderRadius: BorderRadius.circular(10)),
                                 child: Row(
                                   children: [
                                     Icon(
                                       LucideIcons.clock,
                                       size: 16,
-                                      color: AppColors.textSecondary(context),
-                                    ),
+                                      color: AppColors.textSecondary(context)),
                                     const SizedBox(width: 8),
                                     Text(
                                       dueTime != null
@@ -629,24 +523,14 @@ class _ProductivityViewState extends State<ProductivityView>
                                         color: dueTime != null
                                             ? AppColors.textPrimary(context)
                                             : AppColors.textDisabled(context),
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
+                                        fontSize: 14)),
+                                  ])))),
                         ],
-                      ],
-                    ),
-                  ),
-                ),
+                      ]))),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(ctx),
-                    child: Text(t('cancel')),
-                  ),
+                    child: Text(t('cancel'))),
                   TextButton(
                     onPressed: () async {
                       final title = titleCtrl.text.trim();
@@ -659,8 +543,7 @@ class _ProductivityViewState extends State<ProductivityView>
                           dueDate!.month,
                           dueDate!.day,
                           dueTime?.hour ?? 0,
-                          dueTime?.minute ?? 0,
-                        );
+                          dueTime?.minute ?? 0);
                       }
                       final item = NoteItem(
                         id: 'note_${now.millisecondsSinceEpoch}',
@@ -669,22 +552,16 @@ class _ProductivityViewState extends State<ProductivityView>
                         type: type,
                         dueDate: finalDueDate,
                         createdAt: now,
-                        updatedAt: now,
-                      );
-                      await widget.provider.addItem(item);
+                        updatedAt: now);
+                      await getIt<NoteCubit>().addItem(item);
                       if (ctx.mounted) Navigator.pop(ctx);
                     },
                     child: Text(
                       t('create'),
-                      style: TextStyle(color: AppColors.acc(context)),
-                    ),
-                  ),
-                ],
-              );
-            },
-          );
-        },
-      );
+                      style: TextStyle(color: AppColors.acc(context)))),
+                ]);
+            });
+        });
     } finally {
       titleCtrl.dispose();
       contentCtrl.dispose();
@@ -696,22 +573,19 @@ class _ProductivityViewState extends State<ProductivityView>
     final contentCtrl = TextEditingController(text: note.content);
 
     try {
-      showDialog(
+      showDialog<void>(
         context: context,
         builder: (ctx) {
           return AlertDialog(
             backgroundColor: AppColors.sf(context),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
+              borderRadius: BorderRadius.circular(16)),
             title: Text(
               t('edit_note'),
               style: TextStyle(
                 color: AppColors.textPrimary(context),
                 fontSize: 17,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+                fontWeight: FontWeight.w600)),
             content: SizedBox(
               width: MediaQuery.of(context).size.width * 0.85,
               child: Column(
@@ -723,26 +597,20 @@ class _ProductivityViewState extends State<ProductivityView>
                     maxLength: 200,
                     style: TextStyle(
                       color: AppColors.textPrimary(context),
-                      fontSize: 15,
-                    ),
+                      fontSize: 15),
                     decoration: InputDecoration(
                       labelText: t('title_hint'),
                       hintStyle: TextStyle(
                         color: AppColors.textDisabled(context),
-                        fontSize: 14,
-                      ),
+                        fontSize: 14),
                       filled: true,
                       fillColor: AppColors.sfAlt(context),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide.none,
-                      ),
+                        borderSide: BorderSide.none),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 12,
-                        vertical: 10,
-                      ),
-                    ),
-                  ),
+                        vertical: 10))),
                   const SizedBox(height: 12),
                   TextField(
                     controller: contentCtrl,
@@ -750,54 +618,40 @@ class _ProductivityViewState extends State<ProductivityView>
                     maxLines: 4,
                     style: TextStyle(
                       color: AppColors.textPrimary(context),
-                      fontSize: 15,
-                    ),
+                      fontSize: 15),
                     decoration: InputDecoration(
                       labelText: t('content_hint'),
                       hintStyle: TextStyle(
                         color: AppColors.textDisabled(context),
-                        fontSize: 14,
-                      ),
+                        fontSize: 14),
                       filled: true,
                       fillColor: AppColors.sfAlt(context),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide.none,
-                      ),
+                        borderSide: BorderSide.none),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 12,
-                        vertical: 10,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+                        vertical: 10))),
+                ])),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(ctx),
-                child: Text(t('cancel')),
-              ),
+                child: Text(t('cancel'))),
               TextButton(
                 onPressed: () async {
                   final title = titleCtrl.text.trim();
                   if (title.isEmpty) return;
                   final updated = note.copyWith(
                     title: title,
-                    content: contentCtrl.text.trim(),
-                  );
-                  await widget.provider.updateItem(updated);
+                    content: contentCtrl.text.trim());
+                  await getIt<NoteCubit>().updateItem(updated);
                   if (ctx.mounted) Navigator.pop(ctx);
                 },
                 child: Text(
                   t('save'),
-                  style: TextStyle(color: AppColors.acc(context)),
-                ),
-              ),
-            ],
-          );
-        },
-      );
+                  style: TextStyle(color: AppColors.acc(context)))),
+            ]);
+        });
     } finally {
       titleCtrl.dispose();
       contentCtrl.dispose();
@@ -807,41 +661,33 @@ class _ProductivityViewState extends State<ProductivityView>
   void _showEditTodoDialog(NoteItem todo) {
     final titleCtrl = TextEditingController(text: todo.title);
     try {
-      showDialog(
+      showDialog<void>(
         context: context,
         builder: (_) => AlertDialog(
           backgroundColor: AppColors.sf(context),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
+            borderRadius: BorderRadius.circular(16)),
           title: Text(
             localeProvider.t('edit'),
-            style: TextStyle(color: AppColors.textPrimary(context)),
-          ),
+            style: TextStyle(color: AppColors.textPrimary(context))),
           content: TextField(
             controller: titleCtrl,
             maxLength: 200,
             autofocus: true,
             style: TextStyle(color: AppColors.textPrimary(context)),
-            decoration: InputDecoration(hintText: localeProvider.t('title')),
-          ),
+            decoration: InputDecoration(hintText: localeProvider.t('title'))),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text(localeProvider.t('cancel')),
-            ),
+              child: Text(localeProvider.t('cancel'))),
             FilledButton(
               onPressed: () {
-                widget.provider.updateItem(
-                  todo.copyWith(title: titleCtrl.text),
-                );
+                getIt<NoteCubit>().updateItem(
+                  todo.copyWith(title: titleCtrl.text));
                 Navigator.pop(context);
               },
-              child: Text(localeProvider.t('save')),
-            ),
-          ],
-        ),
-      );
+              child: Text(localeProvider.t('save'))),
+          ]));
     } finally {
       titleCtrl.dispose();
     }
@@ -851,18 +697,16 @@ class _ProductivityViewState extends State<ProductivityView>
     final titleCtrl = TextEditingController(text: schedule.title);
     DateTime? newDate = schedule.dueDate;
     try {
-      showDialog(
+      showDialog<void>(
         context: context,
         builder: (_) => StatefulBuilder(
           builder: (ctx, setDialogState) => AlertDialog(
             backgroundColor: AppColors.sf(ctx),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
+              borderRadius: BorderRadius.circular(16)),
             title: Text(
               localeProvider.t('edit'),
-              style: TextStyle(color: AppColors.textPrimary(ctx)),
-            ),
+              style: TextStyle(color: AppColors.textPrimary(ctx))),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -872,9 +716,7 @@ class _ProductivityViewState extends State<ProductivityView>
                   autofocus: true,
                   style: TextStyle(color: AppColors.textPrimary(ctx)),
                   decoration: InputDecoration(
-                    hintText: localeProvider.t('title'),
-                  ),
-                ),
+                    hintText: localeProvider.t('title'))),
                 const SizedBox(height: 12),
                 GestureDetector(
                   onTap: () async {
@@ -882,37 +724,27 @@ class _ProductivityViewState extends State<ProductivityView>
                       context: ctx,
                       initialDate: newDate ?? DateTime.now(),
                       firstDate: DateTime(2024),
-                      lastDate: DateTime(2030),
-                    );
+                      lastDate: DateTime(2030));
                     if (d != null) setDialogState(() => newDate = d);
                   },
                   child: Text(
                     newDate != null
                         ? _formatDateTime(newDate!)
                         : localeProvider.t('select_date'),
-                    style: TextStyle(color: AppColors.acc(ctx)),
-                  ),
-                ),
-              ],
-            ),
+                    style: TextStyle(color: AppColors.acc(ctx)))),
+              ]),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(ctx),
-                child: Text(localeProvider.t('cancel')),
-              ),
+                child: Text(localeProvider.t('cancel'))),
               FilledButton(
                 onPressed: () {
-                  widget.provider.updateItem(
-                    schedule.copyWith(title: titleCtrl.text, dueDate: newDate),
-                  );
+                  getIt<NoteCubit>().updateItem(
+                    schedule.copyWith(title: titleCtrl.text, dueDate: newDate));
                   Navigator.pop(ctx);
                 },
-                child: Text(localeProvider.t('save')),
-              ),
-            ],
-          ),
-        ),
-      );
+                child: Text(localeProvider.t('save'))),
+            ])));
     } finally {
       titleCtrl.dispose();
     }

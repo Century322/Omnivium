@@ -1,56 +1,29 @@
-enum NodeRole { primary, edge, mobile, worker }
+import 'package:freezed_annotation/freezed_annotation.dart';
 
+part 'node_descriptor.freezed.dart';
+
+enum NodeRole { primary, edge, mobile, worker }
 enum NodeState { joining, alive, suspect, dead, left }
 
-class NodeDescriptor {
-  final String nodeId;
-  final String address;
-  final int port;
-  final NodeRole role;
-  final NodeState state;
-  final int incarnation;
-  final int joinedAt;
-  final int lastHeartbeatAt;
-  final Map<String, String> metadata;
+@freezed
+class NodeDescriptor with _$NodeDescriptor {
+  const NodeDescriptor._();
 
-  const NodeDescriptor({
-    required this.nodeId,
-    required this.address,
-    this.port = 0,
-    this.role = NodeRole.worker,
-    this.state = NodeState.joining,
-    this.incarnation = 0,
-    this.joinedAt = 0,
-    this.lastHeartbeatAt = 0,
-    this.metadata = const {},
-  });
-
-  NodeDescriptor copyWith({
-    String? nodeId,
-    String? address,
-    int? port,
-    NodeRole? role,
-    NodeState? state,
-    int? incarnation,
-    int? joinedAt,
-    int? lastHeartbeatAt,
-    Map<String, String>? metadata,
-  }) => NodeDescriptor(
-    nodeId: nodeId ?? this.nodeId,
-    address: address ?? this.address,
-    port: port ?? this.port,
-    role: role ?? this.role,
-    state: state ?? this.state,
-    incarnation: incarnation ?? this.incarnation,
-    joinedAt: joinedAt ?? this.joinedAt,
-    lastHeartbeatAt: lastHeartbeatAt ?? this.lastHeartbeatAt,
-    metadata: metadata ?? this.metadata,
-  );
+  const factory NodeDescriptor({
+    required String nodeId,
+    required String address,
+    @Default(0) int port,
+    @Default(NodeRole.worker) NodeRole role,
+    @Default(NodeState.joining) NodeState state,
+    @Default(0) int incarnation,
+    @Default(0) int joinedAt,
+    @Default(0) int lastHeartbeatAt,
+    @Default(<String, String>{}) Map<String, String> metadata,
+  }) = _NodeDescriptor;
 
   bool get isAlive => state == NodeState.alive;
   bool get isSuspect => state == NodeState.suspect;
   bool get isDead => state == NodeState.dead || state == NodeState.left;
-
   String get addressKey => '$address:$port';
 
   Map<String, dynamic> toJson() => {
@@ -71,17 +44,14 @@ class NodeDescriptor {
     port: json['port'] as int? ?? 0,
     role: NodeRole.values.firstWhere(
       (r) => r.name == json['role'],
-      orElse: () => NodeRole.worker,
-    ),
+      orElse: () => NodeRole.worker),
     state: NodeState.values.firstWhere(
       (s) => s.name == json['state'],
-      orElse: () => NodeState.joining,
-    ),
+      orElse: () => NodeState.joining),
     incarnation: json['incarnation'] as int? ?? 0,
     joinedAt: json['joinedAt'] as int? ?? 0,
     lastHeartbeatAt: json['lastHeartbeatAt'] as int? ?? 0,
     metadata:
         (json['metadata'] as Map<String, dynamic>?)?.cast<String, String>() ??
-        {},
-  );
+        {});
 }

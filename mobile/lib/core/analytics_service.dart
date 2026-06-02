@@ -97,6 +97,5 @@ class AnalyticsService {
     required bool value,
   }) => logEvent(
     name: 'toggle_setting',
-    parameters: {'setting': setting, 'value': value},
-  );
+    parameters: {'setting': setting, 'value': value});
 }

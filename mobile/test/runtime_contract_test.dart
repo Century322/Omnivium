@@ -303,7 +303,7 @@ void main() {
         'key': 'value',
       }, source: RuntimeIdentity.forPlugin('test-source'));
 
-      await Future.delayed(const Duration(milliseconds: 50));
+      await Future<void>.delayed(const Duration(milliseconds: 50));
       expect(received.length, 1);
       expect(received.first.payload, {'key': 'value'});
     });
@@ -319,7 +319,7 @@ void main() {
         'first',
         source: RuntimeIdentity.forPlugin('test-source'),
       );
-      await Future.delayed(const Duration(milliseconds: 50));
+      await Future<void>.delayed(const Duration(milliseconds: 50));
 
       sub.cancel();
 
@@ -328,7 +328,7 @@ void main() {
         'second',
         source: RuntimeIdentity.forPlugin('test-source'),
       );
-      await Future.delayed(const Duration(milliseconds: 50));
+      await Future<void>.delayed(const Duration(milliseconds: 50));
 
       expect(received.length, 1);
       expect(received.first.payload, 'first');
@@ -352,7 +352,7 @@ void main() {
         null,
         source: RuntimeIdentity.forPlugin('test-source'),
       );
-      await Future.delayed(const Duration(milliseconds: 50));
+      await Future<void>.delayed(const Duration(milliseconds: 50));
 
       expect(order, ['high', 'low']);
     });
@@ -390,11 +390,11 @@ void main() {
       );
 
       final future = container.scheduler.schedule(task, (token) async {
-        await Future.delayed(const Duration(seconds: 10));
+        await Future<void>.delayed(const Duration(seconds: 10));
         return 'should not reach';
       });
 
-      await Future.delayed(const Duration(milliseconds: 10));
+      await Future<void>.delayed(const Duration(milliseconds: 10));
       final cancelled = container.scheduler.cancel('task-cancel');
       expect(cancelled, isTrue);
       expect(container.scheduler.cancelledCount, 1);
@@ -415,7 +415,7 @@ void main() {
 
       try {
         await container.scheduler.schedule(task, (token) async {
-          await Future.delayed(const Duration(seconds: 10));
+          await Future<void>.delayed(const Duration(seconds: 10));
           return 'should not reach';
         });
         fail('Should have thrown');
@@ -441,7 +441,7 @@ void main() {
     test('monotonic time advances', () async {
       final container = await RuntimeContainer.boot();
       final t1 = container.clock.monotonicMs();
-      await Future.delayed(const Duration(milliseconds: 10));
+      await Future<void>.delayed(const Duration(milliseconds: 10));
       final t2 = container.clock.monotonicMs();
       expect(t2, greaterThanOrEqualTo(t1));
     });

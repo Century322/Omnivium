@@ -1715,7 +1715,7 @@ class SJa extends S {
   String get allow => '許可';
 
   @override
-  String get delete_message_pair => 'メッセージペアを削除';
+  String get delete_message_pair => 'メッセージを削除';
 
   @override
   String get report_not_helpful => '役に立たない';

@@ -56,8 +56,7 @@ class ConnectivityService {
     } catch (e) {
       AppLogger.instance.warning(
         'Initial connectivity check failed, assuming offline',
-        error: e,
-      );
+        error: e);
       _isOnline = false;
       _initialized = true;
     }
@@ -80,8 +79,7 @@ class ConnectivityService {
         }
         _controller.add(online);
         AppLogger.instance.info(
-          'Connectivity changed: ${online ? 'online' : 'offline'}',
-        );
+          'Connectivity changed: ${online ? 'online' : 'offline'}');
       }
 
       if (newQuality != _quality) {

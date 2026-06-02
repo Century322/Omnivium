@@ -8,6 +8,7 @@ import '../vocabulary/runtime_stream.dart';
 import '../vocabulary/runtime_route.dart';
 import '../vocabulary/runtime_metadata.dart';
 import '../vocabulary/capability_context.dart';
+import '../vocabulary/capability_params.dart';
 
 class ChaosAgentPlugin implements PluginHandler {
   static final _random = Random();
@@ -15,28 +16,25 @@ class ChaosAgentPlugin implements PluginHandler {
   @override
   Future<HandlerResult> handleMessage(
     RuntimeMessage message,
-    CapabilityContext context,
-  ) async {
+    CapabilityContext context) async {
     return HandlerResult.ok();
   }
 
   @override
   Future<HandlerResult> handleEvent(
     RuntimeEvent event,
-    CapabilityContext context,
-  ) async {
+    CapabilityContext context) async {
     return HandlerResult.ok();
   }
 
   @override
   Future<CapabilityResult> invokeCapability(
     String capabilityId,
-    dynamic params,
-    CapabilityContext context,
-  ) async {
+    CapabilityParams params,
+    CapabilityContext context) async {
     switch (capabilityId) {
       case 'chaos.timeout':
-        await Future.delayed(const Duration(hours: 1));
+        await Future<void>.delayed(const Duration(hours: 1));
         return CapabilityResult.ok('should not reach');
       case 'chaos.malformed_stream':
         return _malformedStream(context);
@@ -60,9 +58,7 @@ class ChaosAgentPlugin implements PluginHandler {
         return CapabilityResult.fail(
           RuntimeError(
             code: 'UNKNOWN_CAPABILITY',
-            message: 'Unknown: $capabilityId',
-          ),
-        );
+            message: 'Unknown: $capabilityId'));
     }
   }
 
@@ -72,9 +68,7 @@ class ChaosAgentPlugin implements PluginHandler {
       type: 'chaos.malformed_stream',
       source: RuntimeRoute(
         capability: 'chaos.malformed_stream',
-        pluginId: 'chaos-agent',
-      ),
-    );
+        pluginId: 'chaos-agent'));
 
     () async {
       controller.add(
@@ -82,37 +76,31 @@ class ChaosAgentPlugin implements PluginHandler {
           index: 0,
           data: 'valid chunk',
           metadata: RuntimeMetadata(traceId: 'chaos', spanId: '0'),
-          isFinal: false,
-        ),
-      );
-      await Future.delayed(const Duration(milliseconds: 10));
+          isFinal: false));
+      await Future<void>.delayed(const Duration(milliseconds: 10));
       controller.addError(StateError('Malformed stream chunk'));
       controller.add(
         StreamChunk(
           index: 1,
           data: null,
           metadata: RuntimeMetadata(traceId: 'chaos', spanId: '1'),
-          isFinal: false,
-        ),
-      );
-      await Future.delayed(const Duration(milliseconds: 10));
+          isFinal: false));
+      await Future<void>.delayed(const Duration(milliseconds: 10));
       controller.add(
         StreamChunk(
           index: 3,
           data: 'skipped index 2',
           metadata: RuntimeMetadata(traceId: 'chaos', spanId: '3'),
-          isFinal: true,
-        ),
-      );
+          isFinal: true));
       await controller.close();
     }();
 
     return CapabilityResult.streaming(stream);
   }
 
-  CapabilityResult _partialFailure(dynamic params) {
-    final failRate = params is Map
-        ? (params['failRate'] as num?)?.toDouble() ?? 0.5
+  CapabilityResult _partialFailure(CapabilityParams params) {
+    final failRate = params.isNotEmpty
+        ? params.doubleOr('failRate', 0.5)
         : 0.5;
     final shouldFail = _random.nextDouble() < failRate;
     if (shouldFail) {
@@ -120,9 +108,7 @@ class ChaosAgentPlugin implements PluginHandler {
         const RuntimeError(
           code: 'CHAOS_PARTIAL',
           message: 'Random partial failure',
-          recoverable: true,
-        ),
-      );
+          recoverable: true));
     }
     return CapabilityResult.ok({'result': 'survived', 'failRate': failRate});
   }
@@ -133,9 +119,7 @@ class ChaosAgentPlugin implements PluginHandler {
       type: 'chaos.infinite_stream',
       source: RuntimeRoute(
         capability: 'chaos.infinite_stream',
-        pluginId: 'chaos-agent',
-      ),
-    );
+        pluginId: 'chaos-agent'));
 
     () async {
       var index = 0;
@@ -145,41 +129,35 @@ class ChaosAgentPlugin implements PluginHandler {
             index: index,
             data: 'chunk_$index',
             metadata: RuntimeMetadata(traceId: 'chaos', spanId: '$index'),
-            isFinal: false,
-          ),
-        );
+            isFinal: false));
         index++;
-        await Future.delayed(const Duration(milliseconds: 10));
+        await Future<void>.delayed(const Duration(milliseconds: 10));
       }
       controller.add(
         StreamChunk(
           index: index,
           data: '[ABORTED]',
           metadata: RuntimeMetadata(traceId: 'chaos', spanId: '$index'),
-          isFinal: true,
-        ),
-      );
+          isFinal: true));
       await controller.close();
     }();
 
     return CapabilityResult.streaming(stream);
   }
 
-  Future<CapabilityResult> _retryStorm(dynamic params) async {
-    final maxRetries = params is Map
-        ? (params['maxRetries'] as int?) ?? 100
+  Future<CapabilityResult> _retryStorm(CapabilityParams params) async {
+    final maxRetries = params.isNotEmpty
+        ? params.intOr('', )
         : 100;
     return CapabilityResult.fail(
       RuntimeError(
         code: 'CHAOS_RETRY_STORM',
         message: 'Always fails to trigger retry storm (maxRetries=$maxRetries)',
-        recoverable: true,
-      ),
-    );
+        recoverable: true));
   }
 
-  CapabilityResult _eventFlood(dynamic params, CapabilityContext context) {
-    final count = params is Map ? (params['count'] as int?) ?? 1000 : 1000;
+  CapabilityResult _eventFlood(CapabilityParams params, CapabilityContext context) {
+    final count = params.isNotEmpty ? params.intOr('', ) : 1000;
     return CapabilityResult.ok({
       'eventsToEmit': count,
       'instruction': 'Use EventBus.publish in loop from test harness',
@@ -187,10 +165,9 @@ class ChaosAgentPlugin implements PluginHandler {
   }
 
   Future<CapabilityResult> _recursiveTool(
-    dynamic params,
-    CapabilityContext context,
-  ) async {
-    final depth = params is Map ? (params['depth'] as int?) ?? 5 : 5;
+    CapabilityParams params,
+    CapabilityContext context) async {
+    final depth = params.isNotEmpty ? params.intOr('', ) : 5;
     if (depth <= 0) {
       return CapabilityResult.ok({'result': 'bottom'});
     }
@@ -201,8 +178,8 @@ class ChaosAgentPlugin implements PluginHandler {
     });
   }
 
-  CapabilityResult _memoryPressure(dynamic params) {
-    final sizeKb = params is Map ? (params['sizeKb'] as int?) ?? 1024 : 1024;
+  CapabilityResult _memoryPressure(CapabilityParams params) {
+    final sizeKb = params.isNotEmpty ? params.intOr('', ) : 1024;
     final data = List.filled(sizeKb * 1024, 0);
     return CapabilityResult.ok({
       'allocated': '${sizeKb}KB',
@@ -214,16 +191,14 @@ class ChaosAgentPlugin implements PluginHandler {
     final steps = <String>[];
     steps.add('started');
 
-    await Future.delayed(const Duration(milliseconds: 50));
+    await Future<void>.delayed(const Duration(milliseconds: 50));
     if (context.shouldAbort) {
       steps.add('aborted_after_delay');
       return CapabilityResult.fail(
         const RuntimeError(
           code: 'CANCELLED',
           message: 'Operation cancelled',
-          recoverable: false,
-        ),
-      );
+          recoverable: false));
     }
     steps.add('completed');
     return CapabilityResult.ok({'steps': steps});
@@ -242,67 +217,56 @@ class ChaosAgentPlugin implements PluginHandler {
         description: 'Never returns (triggers timeout)',
         permission: 'auto',
         timeoutMs: 100,
-        maxRetries: 0,
-      ),
+        maxRetries: 0),
       CapabilityDeclaration(
         id: 'chaos.malformed_stream',
         name: 'Malformed Stream',
         description: 'Stream with errors, null data, skipped indices',
         permission: 'auto',
-        timeoutMs: 5000,
-      ),
+        timeoutMs: 5000),
       CapabilityDeclaration(
         id: 'chaos.partial_failure',
         name: 'Partial Failure',
         description: 'Randomly fails based on failRate param',
         permission: 'auto',
-        maxRetries: 5,
-      ),
+        maxRetries: 5),
       CapabilityDeclaration(
         id: 'chaos.infinite_stream',
         name: 'Infinite Stream',
         description: 'Streams forever until cancelled',
         permission: 'auto',
-        timeoutMs: 30000,
-      ),
+        timeoutMs: 30000),
       CapabilityDeclaration(
         id: 'chaos.retry_storm',
         name: 'Retry Storm',
         description: 'Always fails to trigger retry loops',
         permission: 'auto',
-        maxRetries: 3,
-      ),
+        maxRetries: 3),
       CapabilityDeclaration(
         id: 'chaos.event_flood',
         name: 'Event Flood',
         description: 'Returns instruction for mass event emission',
-        permission: 'auto',
-      ),
+        permission: 'auto'),
       CapabilityDeclaration(
         id: 'chaos.recursive_tool',
         name: 'Recursive Tool',
         description: 'Simulates recursive tool calls',
-        permission: 'auto',
-      ),
+        permission: 'auto'),
       CapabilityDeclaration(
         id: 'chaos.crash',
         name: 'Crash',
         description: 'Throws unhandled exception',
-        permission: 'auto',
-      ),
+        permission: 'auto'),
       CapabilityDeclaration(
         id: 'chaos.memory_pressure',
         name: 'Memory Pressure',
         description: 'Allocates large memory blocks',
-        permission: 'confirm',
-      ),
+        permission: 'confirm'),
       CapabilityDeclaration(
         id: 'chaos.cancel_test',
         name: 'Cancel Test',
         description: 'Long operation that respects cancellation',
         permission: 'auto',
-        timeoutMs: 5000,
-      ),
-    ],
-  );
+        timeoutMs: 5000),
+    ]);
 }

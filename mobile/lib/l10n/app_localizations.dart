@@ -3488,7 +3488,7 @@ abstract class S {
   /// No description provided for @delete_message_pair.
   ///
   /// In zh, this message translates to:
-  /// **'删除消息对'**
+  /// **'删除消息'**
   String get delete_message_pair;
 
   /// No description provided for @report_not_helpful.

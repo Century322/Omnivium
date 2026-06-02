@@ -30,8 +30,7 @@ class DistributedSessionLease {
     state: state ?? this.state,
     acquiredAt: acquiredAt ?? this.acquiredAt,
     expiresAt: expiresAt ?? this.expiresAt,
-    renewalCount: renewalCount ?? this.renewalCount,
-  );
+    renewalCount: renewalCount ?? this.renewalCount);
 
   bool get isActive => state == LeaseState.active;
   bool get isExpired => state == LeaseState.expired;
@@ -56,10 +55,8 @@ class DistributedSessionLease {
         ownerNodeId: json['ownerNodeId'] as String,
         state: LeaseState.values.firstWhere(
           (s) => s.name == json['state'],
-          orElse: () => LeaseState.expired,
-        ),
+          orElse: () => LeaseState.expired),
         acquiredAt: json['acquiredAt'] as int,
         expiresAt: json['expiresAt'] as int,
-        renewalCount: json['renewalCount'] as int? ?? 0,
-      );
+        renewalCount: json['renewalCount'] as int? ?? 0);
 }

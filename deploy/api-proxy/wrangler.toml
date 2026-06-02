@@ -2,6 +2,9 @@ name = "omnivium-api-proxy"
 main = "worker.js"
 compatibility_date = "2024-01-01"
 
+[triggers]
+crons = ["* * * * *"]
+
 [[kv_namespaces]]
 binding = "KV"
 id = "71d7587d4fb245a5a5e0f5f1ee5591d1"

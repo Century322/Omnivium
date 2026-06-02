@@ -43,8 +43,7 @@ class SessionLeaseManager {
         return existing;
       }
       throw StateError(
-        'Session $sessionId is owned by node ${existing.ownerNodeId}',
-      );
+        'Session $sessionId is owned by node ${existing.ownerNodeId}');
     }
 
     final now = _clock.tick();
@@ -53,8 +52,7 @@ class SessionLeaseManager {
       ownerNodeId: _localNodeId,
       state: LeaseState.active,
       acquiredAt: now.physicalTime,
-      expiresAt: now.physicalTime + _config.defaultTtl.inMilliseconds,
-    );
+      expiresAt: now.physicalTime + _config.defaultTtl.inMilliseconds);
 
     _leases[sessionId] = lease;
     return lease;
@@ -78,8 +76,7 @@ class SessionLeaseManager {
     final now = _clock.tick();
     _leases[sessionId] = lease.copyWith(
       expiresAt: now.physicalTime + _config.defaultTtl.inMilliseconds,
-      renewalCount: lease.renewalCount + 1,
-    );
+      renewalCount: lease.renewalCount + 1);
     return true;
   }
 
@@ -129,8 +126,7 @@ class SessionLeaseManager {
 
     final expiredSessions = _leases.entries
         .where(
-          (e) => e.value.isExpired && now - e.value.expiresAt > gracePeriodMs,
-        )
+          (e) => e.value.isExpired && now - e.value.expiresAt > gracePeriodMs)
         .map((e) => e.key)
         .toList();
 

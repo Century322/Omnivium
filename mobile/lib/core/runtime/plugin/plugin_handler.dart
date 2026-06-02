@@ -1,7 +1,8 @@
-import '../vocabulary/runtime_message.dart';
+﻿import '../vocabulary/runtime_message.dart';
 import '../vocabulary/runtime_event.dart';
 import '../vocabulary/runtime_stream.dart';
 import '../vocabulary/capability_context.dart';
+import '../vocabulary/capability_params.dart';
 
 enum HandlerStatus { success, failure, deferred }
 
@@ -12,7 +13,7 @@ class RuntimeError {
   final String message;
   final bool recoverable;
   final int? retryAfterMs;
-  final dynamic details;
+  final Object? details;
 
   const RuntimeError({
     required this.code,
@@ -25,42 +26,37 @@ class RuntimeError {
   factory RuntimeError.timeout({String? message}) => RuntimeError(
     code: 'TIMEOUT',
     message: message ?? 'Operation timed out',
-    recoverable: true,
-  );
+    recoverable: true);
 
   factory RuntimeError.cancelled({String? message}) => RuntimeError(
     code: 'CANCELLED',
     message: message ?? 'Operation cancelled',
-    recoverable: false,
-  );
+    recoverable: false);
 
   factory RuntimeError.permissionDenied({String? message}) => RuntimeError(
     code: 'PERMISSION_DENIED',
     message: message ?? 'Permission denied',
-    recoverable: false,
-  );
+    recoverable: false);
 
   factory RuntimeError.notFound({String? message}) => RuntimeError(
     code: 'NOT_FOUND',
     message: message ?? 'Capability not found',
-    recoverable: true,
-  );
+    recoverable: true);
 
   factory RuntimeError.unavailable({String? message}) => RuntimeError(
     code: 'UNAVAILABLE',
     message: message ?? 'Service unavailable',
-    recoverable: true,
-  );
+    recoverable: true);
 }
 
 class HandlerResult {
   final HandlerStatus status;
-  final dynamic payload;
+  final Object? payload;
   final RuntimeError? error;
 
   const HandlerResult({required this.status, this.payload, this.error});
 
-  factory HandlerResult.ok([dynamic payload]) =>
+  factory HandlerResult.ok([Object? payload]) =>
       HandlerResult(status: HandlerStatus.success, payload: payload);
 
   factory HandlerResult.fail(RuntimeError error) =>
@@ -72,7 +68,7 @@ class HandlerResult {
 
 class CapabilityResult {
   final CapabilityStatus status;
-  final dynamic data;
+  final Object? data;
   final RuntimeStream? stream;
   final RuntimeError? error;
 
@@ -83,7 +79,7 @@ class CapabilityResult {
     this.error,
   });
 
-  factory CapabilityResult.ok([dynamic data]) =>
+  factory CapabilityResult.ok([Object? data]) =>
       CapabilityResult(status: CapabilityStatus.success, data: data);
 
   factory CapabilityResult.fail(RuntimeError error) =>
@@ -92,22 +88,19 @@ class CapabilityResult {
   factory CapabilityResult.streaming(RuntimeStream stream) =>
       CapabilityResult(status: CapabilityStatus.streaming, stream: stream);
 
-  factory CapabilityResult.partial(dynamic data) =>
+  factory CapabilityResult.partial(Object? data) =>
       CapabilityResult(status: CapabilityStatus.partial, data: data);
 }
 
 abstract class PluginHandler {
   Future<HandlerResult> handleMessage(
     RuntimeMessage message,
-    CapabilityContext context,
-  );
+    CapabilityContext context);
   Future<HandlerResult> handleEvent(
     RuntimeEvent event,
-    CapabilityContext context,
-  );
+    CapabilityContext context);
   Future<CapabilityResult> invokeCapability(
     String capabilityId,
-    dynamic params,
-    CapabilityContext context,
-  );
+    CapabilityParams params,
+    CapabilityContext context);
 }

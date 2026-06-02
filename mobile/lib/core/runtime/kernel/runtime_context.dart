@@ -17,8 +17,7 @@ abstract class RuntimeContext {
   RuntimeSession currentSession();
   Future<bool> registerPlugin(
     PluginDescriptor descriptor,
-    PluginHandler handler,
-  );
+    PluginHandler handler);
   Future<bool> activatePlugin(String pluginId);
   Future<bool> suspendPlugin(String pluginId);
   Future<bool> unloadPlugin(String pluginId);

@@ -1,37 +1,21 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'runtime_session.freezed.dart';
+
 enum SessionState { active, suspended, closed }
 
-class RuntimeSession {
-  final String id;
-  final String userId;
-  final int createdAt;
-  final int lastActiveAt;
-  final SessionState state;
-  final Map<String, dynamic> metadata;
+@freezed
+class RuntimeSession with _$RuntimeSession {
+  const RuntimeSession._();
 
-  const RuntimeSession({
-    required this.id,
-    required this.userId,
-    required this.createdAt,
-    required this.lastActiveAt,
-    this.state = SessionState.active,
-    this.metadata = const {},
-  });
-
-  RuntimeSession copyWith({
-    String? id,
-    String? userId,
-    int? createdAt,
-    int? lastActiveAt,
-    SessionState? state,
-    Map<String, dynamic>? metadata,
-  }) => RuntimeSession(
-    id: id ?? this.id,
-    userId: userId ?? this.userId,
-    createdAt: createdAt ?? this.createdAt,
-    lastActiveAt: lastActiveAt ?? this.lastActiveAt,
-    state: state ?? this.state,
-    metadata: metadata ?? this.metadata,
-  );
+  const factory RuntimeSession({
+    required String id,
+    required String userId,
+    required int createdAt,
+    required int lastActiveAt,
+    @Default(SessionState.active) SessionState state,
+    @Default(<String, dynamic>{}) Map<String, dynamic> metadata,
+  }) = _RuntimeSession;
 
   bool get isActive => state == SessionState.active;
 }

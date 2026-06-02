@@ -1,11 +1,15 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'di/app_di.dart';
 import 'app_logger.dart';
 import 'dart:convert';
 import 'database_service.dart';
 import 'supabase_sync_service.dart';
 
+part 'note_service.freezed.dart';
+
 enum NoteType { text, todo, schedule }
 
-NoteType _parseNoteType(dynamic value) {
+NoteType _parseNoteType(Object? value) {
   if (value is String) {
     return NoteType.values.where((e) => e.name == value).firstOrNull ??
         NoteType.text;
@@ -16,26 +20,20 @@ NoteType _parseNoteType(dynamic value) {
   return NoteType.text;
 }
 
-class NoteItem {
-  final String id;
-  final String title;
-  final String content;
-  final NoteType type;
-  final bool isDone;
-  final DateTime? dueDate;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+@freezed
+class NoteItem with _$NoteItem {
+  const NoteItem._();
 
-  const NoteItem({
-    required this.id,
-    required this.title,
-    required this.content,
-    this.type = NoteType.text,
-    this.isDone = false,
-    this.dueDate,
-    required this.createdAt,
-    required this.updatedAt,
-  });
+  const factory NoteItem({
+    required String id,
+    required String title,
+    required String content,
+    @Default(NoteType.text) NoteType type,
+    @Default(false) bool isDone,
+    DateTime? dueDate,
+    required DateTime createdAt,
+    required DateTime updatedAt,
+  }) = _NoteItem;
 
   Map<String, dynamic> toJson() => {
     'id': id,
@@ -58,27 +56,21 @@ class NoteItem {
         ? DateTime.parse(json['dueDate'] as String)
         : null,
     createdAt: DateTime.parse(json['createdAt'] as String),
-    updatedAt: DateTime.parse(json['updatedAt'] as String),
-  );
+    updatedAt: DateTime.parse(json['updatedAt'] as String));
 
-  NoteItem copyWith({
+  NoteItem copyWithFields({
     String? title,
     String? content,
     NoteType? type,
     bool? isDone,
     DateTime? dueDate,
-  }) {
-    return NoteItem(
-      id: id,
-      title: title ?? this.title,
-      content: content ?? this.content,
-      type: type ?? this.type,
-      isDone: isDone ?? this.isDone,
-      dueDate: dueDate ?? this.dueDate,
-      createdAt: createdAt,
-      updatedAt: DateTime.now(),
-    );
-  }
+  }) => copyWith(
+    title: title ?? this.title,
+    content: content ?? this.content,
+    type: type ?? this.type,
+    isDone: isDone ?? this.isDone,
+    dueDate: dueDate ?? this.dueDate,
+    updatedAt: DateTime.now());
 }
 
 class NoteService {
@@ -100,13 +92,13 @@ class NoteService {
 
   Future<void> init() async {
     if (_initialized) return;
-    final db = DatabaseService.instance;
+    final db = getIt<DatabaseService>();
     if (!db.isInitialized) return;
 
     final raw = db.data.get(_boxKey);
     if (raw != null) {
       try {
-        final list = jsonDecode(raw) as List;
+        final list = jsonDecode(raw) as List<dynamic>;
         _items = list
             .map((item) => NoteItem.fromJson(item as Map<String, dynamic>))
             .toList();
@@ -114,8 +106,7 @@ class NoteService {
         AppLogger.instance.warning(
           'Notes load failed',
           error: e,
-          stackTrace: stackTrace,
-        );
+          stackTrace: stackTrace);
         _items = [];
       }
     }
@@ -124,11 +115,11 @@ class NoteService {
   }
 
   Future<void> _mergeCloudNotes() async {
-    final sync = SupabaseSyncService.instance;
+    final sync = getIt<SupabaseSyncService>();
     if (!sync.isAvailable) return;
     try {
       final cloudNotes = await sync.fetchNotes();
-      final db = DatabaseService.instance;
+      final db = getIt<DatabaseService>();
       for (final cloud in cloudNotes) {
         final id = cloud['id'] as String?;
         if (id == null) continue;
@@ -149,34 +140,31 @@ class NoteService {
             } catch (e) {
               AppLogger.instance.warning(
                 'Update note from cloud failed',
-                error: e,
-              );
+                error: e);
             }
           }
         }
       }
       await db.data.put(
         _boxKey,
-        jsonEncode(_items.map((n) => n.toJson()).toList()),
-      );
+        jsonEncode(_items.map((n) => n.toJson()).toList()));
     } catch (e) {
       AppLogger.instance.info('Cloud notes merge failed: $e');
     }
   }
 
   Future<void> _save({NoteItem? changedItem}) async {
-    final db = DatabaseService.instance;
+    final db = getIt<DatabaseService>();
     await db.data.put(
       _boxKey,
-      jsonEncode(_items.map((n) => n.toJson()).toList()),
-    );
+      jsonEncode(_items.map((n) => n.toJson()).toList()));
     if (changedItem != null) {
       _syncItemToCloud(changedItem);
     }
   }
 
   void _syncItemToCloud(NoteItem item) {
-    final sync = SupabaseSyncService.instance;
+    final sync = getIt<SupabaseSyncService>();
     if (!sync.isAvailable) return;
     sync.upsertNote({
       'id': item.id,
@@ -211,7 +199,7 @@ class NoteService {
   Future<void> toggleDone(String id) async {
     final idx = _items.indexWhere((n) => n.id == id);
     if (idx != -1) {
-      _items[idx] = _items[idx].copyWith(isDone: !_items[idx].isDone);
+      _items[idx] = _items[idx].copyWithFields(isDone: !_items[idx].isDone);
       await _save(changedItem: _items[idx]);
     }
   }

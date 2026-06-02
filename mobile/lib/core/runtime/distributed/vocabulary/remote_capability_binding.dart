@@ -38,8 +38,7 @@ class RemoteCapabilityBinding {
     discoveredAt: discoveredAt ?? this.discoveredAt,
     lastVerifiedAt: lastVerifiedAt ?? this.lastVerifiedAt,
     version: version ?? this.version,
-    metadata: metadata ?? this.metadata,
-  );
+    metadata: metadata ?? this.metadata);
 
   bool get isAvailable => state == BindingState.available;
 
@@ -63,14 +62,12 @@ class RemoteCapabilityBinding {
         providerPluginId: json['providerPluginId'] as String,
         state: BindingState.values.firstWhere(
           (s) => s.name == json['state'],
-          orElse: () => BindingState.unreachable,
-        ),
+          orElse: () => BindingState.unreachable),
         discoveredAt: json['discoveredAt'] as int,
         lastVerifiedAt: json['lastVerifiedAt'] as int,
         version: json['version'] as int? ?? 1,
         metadata:
             (json['metadata'] as Map<String, dynamic>?)
                 ?.cast<String, String>() ??
-            {},
-      );
+            {});
 }

@@ -1,3 +1,5 @@
+﻿
+import 'di/app_di.dart';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -25,8 +27,7 @@ class NetworkSecurityService {
 
   static const _dartDefinePins = String.fromEnvironment(
     'SSL_PINS',
-    defaultValue: '',
-  );
+    defaultValue: '');
 
   static const _remotePinsCacheKey = 'remote_ssl_pins';
 
@@ -38,7 +39,7 @@ class NetworkSecurityService {
       final result = <String, List<String>>{};
       for (final entry in decoded.entries) {
         if (entry.value is List) {
-          result[entry.key] = (entry.value as List)
+          result[entry.key] = (entry.value as List<dynamic>)
               .whereType<String>()
               .toList();
         }
@@ -102,7 +103,7 @@ class NetworkSecurityService {
 
   Future<void> _loadCachedRemotePins() async {
     try {
-      final db = DatabaseService.instance;
+      final db = getIt<DatabaseService>();
       if (!db.isInitialized) return;
       final raw = db.getCache(_remotePinsCacheKey);
       if (raw == null) return;
@@ -124,7 +125,7 @@ class NetworkSecurityService {
 
   Future<void> _fetchRemotePins() async {
     try {
-      final proxy = ApiProxyService.instance;
+      final proxy = getIt<ApiProxyService>();
       if (!proxy.isConfigured) return;
       final uri = Uri.parse('${proxy.backendUrl}/config/ssl-pins');
       final response = await http.Client()
@@ -156,7 +157,7 @@ class NetworkSecurityService {
       final result = <String, List<String>>{};
       for (final entry in decoded.entries) {
         if (entry.value is List) {
-          result[entry.key] = (entry.value as List)
+          result[entry.key] = (entry.value as List<dynamic>)
               .whereType<String>()
               .toList();
         }
@@ -170,7 +171,7 @@ class NetworkSecurityService {
 
   Future<void> _saveCachedRemotePins(Map<String, List<String>> pins) async {
     try {
-      final db = DatabaseService.instance;
+      final db = getIt<DatabaseService>();
       if (!db.isInitialized) return;
       await db.putCache(_remotePinsCacheKey, jsonEncode(pins));
     } catch (e) {

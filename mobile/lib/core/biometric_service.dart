@@ -1,3 +1,5 @@
+
+import 'di/app_di.dart';
 import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
 import 'app_lock_service.dart';
@@ -23,8 +25,7 @@ class BiometricService {
         _biometricTypes = await _localAuth.getAvailableBiometrics();
       }
       AppLogger.instance.info(
-        'Biometric: available=$_isAvailable, types=$_biometricTypes',
-      );
+        'Biometric: available=$_isAvailable, types=$_biometricTypes');
     } on PlatformException catch (e) {
       AppLogger.instance.info('Biometric init failed: $e');
       _isAvailable = false;
@@ -40,12 +41,10 @@ class BiometricService {
         localizedReason: reason,
         options: const AuthenticationOptions(
           stickyAuth: true,
-          biometricOnly: false,
-        ),
-      );
+          biometricOnly: false));
 
       if (result) {
-        AppLockService.instance.recordUnlock();
+        getIt<AppLockService>().recordUnlock();
       }
       return result;
     } on PlatformException catch (e) {
@@ -55,6 +54,6 @@ class BiometricService {
   }
 
   Future<bool> shouldShowBiometric() async {
-    return _isAvailable && AppLockService.instance.isEnabled;
+    return _isAvailable && getIt<AppLockService>().isEnabled;
   }
 }

@@ -34,8 +34,7 @@ class WasmSandboxService {
       maxMemoryMb: maxMemoryMb,
       maxExecutionTimeMs: BigInt.from(maxExecutionTimeMs),
       maxStackDepth: maxStackDepth,
-      allowedCapabilities: allowedCapabilities,
-    );
+      allowedCapabilities: allowedCapabilities);
 
     final bridgeParams = params
         .map((p) => bridge.SandboxParam(kind: p.kind, value: p.value))
@@ -45,16 +44,14 @@ class WasmSandboxService {
       wasmBytes: wasmBytes,
       functionName: functionName,
       params: bridgeParams,
-      config: config,
-    );
+      config: config);
 
     return WasmExecutionResult(
       success: result.success,
       output: result.output,
       executionTimeMs: result.executionTimeMs.toInt(),
       memoryUsedBytes: result.memoryUsedBytes.toInt(),
-      error: result.error,
-    );
+      error: result.error);
   }
 
   Future<bool> validate(List<int> wasmBytes) async {

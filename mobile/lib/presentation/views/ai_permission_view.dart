@@ -5,7 +5,7 @@ import '../../core/runtime/sdk/omnivium_sdk.dart';
 import '../../core/runtime/capability_router.dart';
 import '../../core/runtime/governance/policy_engine.dart';
 import '../theme/app_colors.dart';
-import '../theme/locale_provider.dart';
+import '../theme/locale_cubit.dart';
 
 class AiPermissionView extends StatefulWidget {
   const AiPermissionView({super.key});
@@ -109,9 +109,7 @@ class _AiPermissionViewState extends State<AiPermissionView> {
           effect: PolicyEffect.deny,
           callerPattern: 'agent.*',
           targetPattern: '*',
-          priority: 300,
-        ),
-      );
+          priority: 300));
     } else if (mode == 'auto') {
       engine.addRule(
         PolicyRule(
@@ -120,9 +118,7 @@ class _AiPermissionViewState extends State<AiPermissionView> {
           effect: PolicyEffect.allow,
           callerPattern: 'agent.*',
           targetPattern: '*',
-          priority: 300,
-        ),
-      );
+          priority: 300));
     }
   }
 
@@ -140,9 +136,7 @@ class _AiPermissionViewState extends State<AiPermissionView> {
           effect: PolicyEffect.deny,
           callerPattern: 'agent.*',
           targetPattern: capId,
-          priority: 350,
-        ),
-      );
+          priority: 350));
     } else if (mode == 'auto') {
       engine.addRule(
         PolicyRule(
@@ -151,9 +145,7 @@ class _AiPermissionViewState extends State<AiPermissionView> {
           effect: PolicyEffect.allow,
           callerPattern: 'agent.*',
           targetPattern: capId,
-          priority: 350,
-        ),
-      );
+          priority: 350));
     }
   }
 
@@ -169,28 +161,21 @@ class _AiPermissionViewState extends State<AiPermissionView> {
           tooltip: t('back'),
           icon: Icon(
             LucideIcons.chevronLeft,
-            color: AppColors.textPrimary(context),
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
+            color: AppColors.textPrimary(context)),
+          onPressed: () => Navigator.pop(context)),
         title: Text(
           t('ai_permission_management'),
           style: TextStyle(
             color: AppColors.textPrimary(context),
             fontSize: 17,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
+            fontWeight: FontWeight.w600))),
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 8),
         children: [
           _buildGlobalModeSection(context),
           const SizedBox(height: 16),
           if (_bindings.isNotEmpty) _buildCapabilityList(context),
-        ],
-      ),
-    );
+        ]));
   }
 
   Widget _buildGlobalModeSection(BuildContext context) {
@@ -200,8 +185,7 @@ class _AiPermissionViewState extends State<AiPermissionView> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.sf(context),
-        borderRadius: BorderRadius.circular(12),
-      ),
+        borderRadius: BorderRadius.circular(12)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -214,19 +198,14 @@ class _AiPermissionViewState extends State<AiPermissionView> {
                 style: TextStyle(
                   color: AppColors.textPrimary(context),
                   fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
+                  fontWeight: FontWeight.w600)),
+            ]),
           const SizedBox(height: 4),
           Text(
             t('global_permission_desc'),
             style: TextStyle(
               color: AppColors.textTertiary(context),
-              fontSize: 12,
-            ),
-          ),
+              fontSize: 12)),
           const SizedBox(height: 12),
           Row(
             children: [
@@ -235,40 +214,30 @@ class _AiPermissionViewState extends State<AiPermissionView> {
                   context,
                   'auto',
                   LucideIcons.zap,
-                  AppColors.ok(context),
-                ),
-              ),
+                  AppColors.ok(context))),
               const SizedBox(width: 8),
               Expanded(
                 child: _buildModeChip(
                   context,
                   'confirm',
                   LucideIcons.shieldQuestion,
-                  AppColors.warn(context),
-                ),
-              ),
+                  AppColors.warn(context))),
               const SizedBox(width: 8),
               Expanded(
                 child: _buildModeChip(
                   context,
                   'deny',
                   LucideIcons.shieldOff,
-                  AppColors.dng(context),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
+                  AppColors.dng(context))),
+            ]),
+        ]));
   }
 
   Widget _buildModeChip(
     BuildContext context,
     String mode,
     IconData icon,
-    Color color,
-  ) {
+    Color color) {
     final selected = _globalMode == mode;
     final t = localeProvider.t;
     return GestureDetector(
@@ -282,28 +251,21 @@ class _AiPermissionViewState extends State<AiPermissionView> {
           borderRadius: BorderRadius.circular(10),
           border: selected
               ? Border.all(color: color.withValues(alpha: 0.4))
-              : null,
-        ),
+              : null),
         child: Column(
           children: [
             Icon(
               icon,
               size: 20,
-              color: selected ? color : AppColors.iconGray(context),
-            ),
+              color: selected ? color : AppColors.iconGray(context)),
             const SizedBox(height: 4),
             Text(
               t('permission_$mode'),
               style: TextStyle(
                 color: selected ? color : AppColors.textSecondary(context),
                 fontSize: 12,
-                fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+                fontWeight: selected ? FontWeight.w600 : FontWeight.normal)),
+          ])));
   }
 
   Widget _buildCapabilityList(BuildContext context) {
@@ -327,8 +289,7 @@ class _AiPermissionViewState extends State<AiPermissionView> {
             LucideIcons.zap,
             t('auto_execute'),
             AppColors.ok(context),
-            autoCaps.length,
-          ),
+            autoCaps.length),
           ...autoCaps.map((b) => _buildCapabilityTile(context, b)),
         ],
         if (confirmCaps.isNotEmpty) ...[
@@ -338,8 +299,7 @@ class _AiPermissionViewState extends State<AiPermissionView> {
             LucideIcons.shieldQuestion,
             t('need_confirm'),
             AppColors.warn(context),
-            confirmCaps.length,
-          ),
+            confirmCaps.length),
           ...confirmCaps.map((b) => _buildCapabilityTile(context, b)),
         ],
         if (denyCaps.isNotEmpty) ...[
@@ -349,12 +309,10 @@ class _AiPermissionViewState extends State<AiPermissionView> {
             LucideIcons.shieldOff,
             t('always_deny'),
             AppColors.dng(context),
-            denyCaps.length,
-          ),
+            denyCaps.length),
           ...denyCaps.map((b) => _buildCapabilityTile(context, b)),
         ],
-      ],
-    );
+      ]);
   }
 
   Widget _buildSectionHeader(
@@ -362,8 +320,7 @@ class _AiPermissionViewState extends State<AiPermissionView> {
     IconData icon,
     String title,
     Color color,
-    int count,
-  ) {
+    int count) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
       child: Row(
@@ -375,28 +332,20 @@ class _AiPermissionViewState extends State<AiPermissionView> {
             style: TextStyle(
               color: color,
               fontSize: 13,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+              fontWeight: FontWeight.w600)),
           const SizedBox(width: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
+              borderRadius: BorderRadius.circular(8)),
             child: Text(
               '$count',
               style: TextStyle(
                 color: color,
                 fontSize: 11,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+                fontWeight: FontWeight.w600))),
+        ]));
   }
 
   Widget _buildCapabilityTile(BuildContext context, CapabilityBinding binding) {
@@ -410,8 +359,7 @@ class _AiPermissionViewState extends State<AiPermissionView> {
         borderRadius: BorderRadius.circular(10),
         border: isOverridden
             ? Border.all(color: AppColors.acc(context).withValues(alpha: 0.3))
-            : null,
-      ),
+            : null),
       child: ListTile(
         dense: true,
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
@@ -420,8 +368,7 @@ class _AiPermissionViewState extends State<AiPermissionView> {
           size: 18,
           color: dec.isDestructive
               ? AppColors.dng(context)
-              : AppColors.iconGray(context),
-        ),
+              : AppColors.iconGray(context)),
         title: Row(
           children: [
             Expanded(
@@ -430,70 +377,53 @@ class _AiPermissionViewState extends State<AiPermissionView> {
                 style: TextStyle(
                   color: AppColors.textPrimary(context),
                   fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                ),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
+                  fontWeight: FontWeight.w500),
+                overflow: TextOverflow.ellipsis)),
             if (isOverridden)
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
                 decoration: BoxDecoration(
                   color: AppColors.acc(context).withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(4),
-                ),
+                  borderRadius: BorderRadius.circular(4)),
                 child: Text(
                   localeProvider.t('custom'),
                   style: TextStyle(
                     color: AppColors.acc(context),
                     fontSize: 9,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-          ],
-        ),
+                    fontWeight: FontWeight.w600))),
+          ]),
         subtitle: Text(
           binding.pluginId,
           style: TextStyle(
             color: AppColors.textTertiary(context),
-            fontSize: 11,
-          ),
-        ),
-        trailing: _buildPermissionToggle(context, binding),
-      ),
-    );
+            fontSize: 11)),
+        trailing: _buildPermissionToggle(context, binding)));
   }
 
   Widget _buildPermissionToggle(
     BuildContext context,
-    CapabilityBinding binding,
-  ) {
+    CapabilityBinding binding) {
     // ignore: unused_local_variable
     final effective = _getEffectivePermission(binding);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 4),
       decoration: BoxDecoration(
         color: AppColors.sfAlt(context),
-        borderRadius: BorderRadius.circular(6),
-      ),
+        borderRadius: BorderRadius.circular(6)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           _buildToggleBtn(context, binding, 'auto', effective == 'auto'),
           _buildToggleBtn(context, binding, 'confirm', effective == 'confirm'),
           _buildToggleBtn(context, binding, 'deny', effective == 'deny'),
-        ],
-      ),
-    );
+        ]));
   }
 
   Widget _buildToggleBtn(
     BuildContext context,
     CapabilityBinding binding,
     String mode,
-    bool active,
-  ) {
+    bool active) {
     Color color;
     IconData icon;
     switch (mode) {
@@ -516,14 +446,10 @@ class _AiPermissionViewState extends State<AiPermissionView> {
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
           color: active ? color.withValues(alpha: 0.15) : Colors.transparent,
-          borderRadius: BorderRadius.circular(4),
-        ),
+          borderRadius: BorderRadius.circular(4)),
         child: Icon(
           icon,
           size: 12,
-          color: active ? color : AppColors.textDisabled(context),
-        ),
-      ),
-    );
+          color: active ? color : AppColors.textDisabled(context))));
   }
 }

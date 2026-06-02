@@ -8,8 +8,7 @@ class SkillRegistry {
   void register(Skill skill) {
     if (_skills.containsKey(skill.id)) {
       AppLogger.instance.warning(
-        'Skill "${skill.id}" re-registered, overwriting previous registration',
-      );
+        'Skill "${skill.id}" re-registered, overwriting previous registration');
     }
     _skills[skill.id] = skill;
   }

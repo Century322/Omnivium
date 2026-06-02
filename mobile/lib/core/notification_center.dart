@@ -84,8 +84,7 @@ class NotificationCenter {
       sdk.container.eventBus.publish(
         'app.${event.name}',
         data ?? {},
-        source: RuntimeIdentity.forPlugin('NotificationCenter'),
-      );
+        source: RuntimeIdentity.forPlugin('NotificationCenter'));
     } catch (e) {
       AppLogger.instance.debug('EventBus forward failed', error: e);
     }

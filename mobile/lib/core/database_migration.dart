@@ -1,3 +1,5 @@
+
+import 'di/app_di.dart';
 import 'app_logger.dart';
 import 'database_service.dart';
 
@@ -13,13 +15,12 @@ class DatabaseMigration {
 
   void registerMigration(
     int version,
-    Future<void> Function(DatabaseService) migration,
-  ) {
+    Future<void> Function(DatabaseService) migration) {
     _migrations[version] = migration;
   }
 
   Future<void> run() async {
-    final db = DatabaseService.instance;
+    final db = getIt<DatabaseService>();
     if (!db.isInitialized) return;
 
     final currentVersion = db.getCache(_versionKey) as int? ?? 0;
@@ -27,8 +28,7 @@ class DatabaseMigration {
     if (currentVersion >= _currentVersion) return;
 
     AppLogger.instance.info(
-      'DB migration: $currentVersion -> $_currentVersion',
-    );
+      'DB migration: $currentVersion -> $_currentVersion');
 
     for (var v = currentVersion + 1; v <= _currentVersion; v++) {
       final migration = _migrations[v];
@@ -40,8 +40,7 @@ class DatabaseMigration {
           AppLogger.instance.error(
             'DB migration v$v failed',
             error: e,
-            stackTrace: stackTrace,
-          );
+            stackTrace: stackTrace);
           rethrow;
         }
       }
@@ -50,13 +49,12 @@ class DatabaseMigration {
   }
 
   Future<bool> integrityCheck() async {
-    final db = DatabaseService.instance;
+    final db = getIt<DatabaseService>();
     if (!db.isInitialized) return false;
     try {
       final sessions = db.getAllSessions();
       AppLogger.instance.info(
-        'DB integrity: ${sessions.length} sessions readable',
-      );
+        'DB integrity: ${sessions.length} sessions readable');
       return true;
     } catch (e) {
       AppLogger.instance.error('DB integrity check failed', error: e);
@@ -65,7 +63,7 @@ class DatabaseMigration {
   }
 
   Future<void> recoverFromCorruption() async {
-    final db = DatabaseService.instance;
+    final db = getIt<DatabaseService>();
     AppLogger.instance.info('Attempting DB recovery...');
     try {
       await db.cache.clear();

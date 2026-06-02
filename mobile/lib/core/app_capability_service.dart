@@ -26,17 +26,14 @@ class AppCapabilityService {
       final result = await sdk.invokeCapability(
         capabilityId,
         params: params,
-        timeoutMs: timeoutMs,
-      );
+        timeoutMs: timeoutMs);
       return result;
     } catch (e) {
       AppLogger.instance.warning(
         'AppCapability: $capabilityId failed',
-        error: e,
-      );
+        error: e);
       return CapabilityResult.fail(
-        RuntimeError(code: 'CAPABILITY_ERROR', message: e.toString()),
-      );
+        RuntimeError(code: 'CAPABILITY_ERROR', message: e.toString()));
     }
   }
 
@@ -58,11 +55,9 @@ class AppCapabilityService {
 
   Map<String, dynamic> _fallback(
     String capabilityId,
-    Map<String, dynamic>? params,
-  ) {
+    Map<String, dynamic>? params) {
     AppLogger.instance.info(
-      'AppCapability: fallback for $capabilityId (SDK not available)',
-    );
+      'AppCapability: fallback for $capabilityId (SDK not available)');
     return {'capabilityId': capabilityId, 'fallback': true, ...?params};
   }
 }

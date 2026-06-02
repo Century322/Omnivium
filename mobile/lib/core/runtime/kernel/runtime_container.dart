@@ -58,8 +58,7 @@ class RuntimeContainer implements RuntimeContext {
     capabilityRouter = CapabilityRouter(
       registry: pluginRegistry,
       clock: clock,
-      config: config,
-    );
+      config: config);
     eventBus = EventBus(clock: clock, config: config);
     scheduler = rt.Scheduler(config: config);
     traceService = TraceService();
@@ -75,8 +74,7 @@ class RuntimeContainer implements RuntimeContext {
     final inst = _instance;
     if (inst == null) {
       throw StateError(
-        'RuntimeContainer not initialized. Call RuntimeContainer.boot() first.',
-      );
+        'RuntimeContainer not initialized. Call RuntimeContainer.boot() first.');
     }
     return inst;
   }
@@ -96,16 +94,14 @@ class RuntimeContainer implements RuntimeContext {
     final effectiveConfig = config ?? const RuntimeConfig();
     final container = RuntimeContainer._(
       clock: RuntimeClock(),
-      config: effectiveConfig,
-    );
+      config: effectiveConfig);
 
     _instance = container;
     container._status = RuntimeStatus.running;
 
     container.metricsService.gauge(
       'runtime.boot_time_ms',
-      container.clock.now(),
-    );
+      container.clock.now());
     container.metricsService.increment('runtime.boot');
     container.eventJournal.append('runtime.boot', {
       'nodeId': effectiveConfig.nodeId,
@@ -113,8 +109,7 @@ class RuntimeContainer implements RuntimeContext {
     });
 
     AppLogger.instance.info(
-      'RuntimeContainer booted: nodeId=${effectiveConfig.nodeId}, version=${effectiveConfig.runtimeVersion}',
-    );
+      'RuntimeContainer booted: nodeId=${effectiveConfig.nodeId}, version=${effectiveConfig.runtimeVersion}');
 
     return container;
   }
@@ -138,17 +133,16 @@ class RuntimeContainer implements RuntimeContext {
         message.target.capability,
         message.payload,
         caller: RuntimeIdentity.forPlugin(message.source.pluginId),
-        callerPermission: RuntimePermission(),
-      );
+        callerPermission: RuntimePermission());
     }
 
     if (message.type == 'event.emit') {
+      final payload = message.payload as Map<String, dynamic>;
       eventBus.publish(
-        message.payload['eventType'] ?? message.type,
-        message.payload,
+        payload['eventType'] ?? message.type,
+        payload,
         source: RuntimeIdentity.forPlugin(message.source.pluginId),
-        scope: PropagationScope.local,
-      );
+        scope: PropagationScope.local);
       return null;
     }
 
@@ -166,14 +160,12 @@ class RuntimeContainer implements RuntimeContext {
     inst.snapshotService.take(
       status: RuntimeStatus.shuttingDown,
       pluginStates: inst.pluginRegistry.pluginStates.map(
-        (k, v) => MapEntry(k, v),
-      ),
+        (k, v) => MapEntry(k, v)),
       sessions: inst._sessions,
       capabilityCache: inst.pluginRegistry.loadedDescriptors
           .expand((d) => d.capabilityIds)
           .toList(),
-      resourceUsage: inst.resourceController.usage,
-    );
+      resourceUsage: inst.resourceController.usage);
 
     inst.eventJournal.append('runtime.shutdown', {
       'snapshotId': inst.snapshotService.latest?.snapshotId,
@@ -204,8 +196,7 @@ class RuntimeContainer implements RuntimeContext {
     activePluginCount: pluginRegistry.activeCount,
     capabilityCount: pluginRegistry.capabilityCount,
     bootTimeMs: clock.bootTimeMs,
-    uptimeMs: clock.uptimeMs,
-  );
+    uptimeMs: clock.uptimeMs);
 
   @override
   RuntimeSession currentSession() {
@@ -216,8 +207,7 @@ class RuntimeContainer implements RuntimeContext {
       id: 'session_${clock.now()}',
       userId: 'default',
       createdAt: clock.now(),
-      lastActiveAt: clock.now(),
-    );
+      lastActiveAt: clock.now());
     _sessions[session.id] = session;
     return session;
   }
@@ -225,22 +215,19 @@ class RuntimeContainer implements RuntimeContext {
   @override
   Future<bool> registerPlugin(
     PluginDescriptor descriptor,
-    PluginHandler handler,
-  ) async {
+    PluginHandler handler) async {
     final trace = traceService.startTrace();
     final span = traceService.startSpan(
       traceId: trace.traceId,
       operation: 'plugin.register',
-      pluginId: descriptor.id,
-    );
+      pluginId: descriptor.id);
 
     final result = await pluginRegistry.register(descriptor, handler);
 
     span.finish(status: result ? 'ok' : 'error');
     metricsService.increment(
       'plugin.register',
-      labels: {'pluginId': descriptor.id, 'result': result ? 'ok' : 'error'},
-    );
+      labels: {'pluginId': descriptor.id, 'result': result ? 'ok' : 'error'});
 
     if (result) {
       eventJournal.appendPluginTransition(descriptor.id, 'unloaded', 'active');
@@ -248,8 +235,7 @@ class RuntimeContainer implements RuntimeContext {
         descriptor.id,
         'register',
         from: 'unloaded',
-        to: 'active',
-      );
+        to: 'active');
     }
 
     return result;

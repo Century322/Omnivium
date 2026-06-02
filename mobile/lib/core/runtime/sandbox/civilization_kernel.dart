@@ -115,13 +115,11 @@ class CivilizationKernel {
         consensus: sharedConsensus,
         traceGraph: sharedTraceGraph,
         reputationEconomy: sharedReputationEconomy,
-        judiciary: sharedJudiciary,
-      ),
+        judiciary: sharedJudiciary),
       transport: CivilizationTransport(localNodeId: nodeId),
       economy: ResourceEconomy(federationId: nodeId),
       network: enableNetwork ? CivilizationNetwork(localNodeId: nodeId) : null,
-      identity: SovereignIdentity.generate(nodeId: nodeId),
-    );
+      identity: SovereignIdentity.generate(nodeId: nodeId));
   }
 
   ConstitutionalTraceGraph get traceGraph => _traceGraph;
@@ -145,8 +143,7 @@ class CivilizationKernel {
       entryType: 'kernel.syscall',
       sandboxId: nodeId,
       data: {'call': call.name, 'params': params},
-      timestamp: _enforcer.clock.tick().physicalTime,
-    );
+      timestamp: _enforcer.clock.tick().physicalTime);
 
     switch (call) {
       case KernelCall.lawEnforce:
@@ -202,13 +199,11 @@ class CivilizationKernel {
     final result = _enforcer.enforceCapabilityRouting(
       sandboxId,
       capabilityId,
-      routed,
-    );
+      routed);
     if (!result.compliant) {
       _reputationEconomy.recordViolation(
         sandboxId,
-        _enforcer.clock.tick().physicalTime,
-      );
+        _enforcer.clock.tick().physicalTime);
       return KernelResult.ok({
         'compliant': false,
         'violation': result.violation,
@@ -219,13 +214,11 @@ class CivilizationKernel {
     final trustResult = _enforcer.enforceTrustLevel(
       sandboxId,
       requiredLevel,
-      callerLevel,
-    );
+      callerLevel);
     if (!trustResult.compliant) {
       _reputationEconomy.recordViolation(
         sandboxId,
-        _enforcer.clock.tick().physicalTime,
-      );
+        _enforcer.clock.tick().physicalTime);
       return KernelResult.ok({
         'compliant': false,
         'violation': trustResult.violation,
@@ -244,8 +237,7 @@ class CivilizationKernel {
 
     _reputationEconomy.recordCompliance(
       sandboxId,
-      _enforcer.clock.tick().physicalTime,
-    );
+      _enforcer.clock.tick().physicalTime);
     return KernelResult.ok({'compliant': true, 'capability': capabilityId});
   }
 
@@ -270,8 +262,7 @@ class CivilizationKernel {
       sandboxId: sandboxId,
       type: SanctionType.restriction,
       reason: violationType,
-      timestamp: _enforcer.clock.tick().physicalTime,
-    );
+      timestamp: _enforcer.clock.tick().physicalTime);
     return KernelResult.ok({
       'sandboxId': sandboxId,
       'sanctionType': sanction.type.name,
@@ -286,8 +277,7 @@ class CivilizationKernel {
     final msg = _transport.sendConstitutionSync(
       targetId,
       manifest,
-      _enforcer.clock.tick().physicalTime,
-    );
+      _enforcer.clock.tick().physicalTime);
     return KernelResult.ok({
       'messageId': msg.epoch,
       'target': targetId,
@@ -305,15 +295,13 @@ class CivilizationKernel {
     }
     final lawId = RuntimeLawId.values.firstWhere(
       (l) => l.name == targetLaw,
-      orElse: () => RuntimeLawId.noBypassCapabilityRouter,
-    );
+      orElse: () => RuntimeLawId.noBypassCapabilityRouter);
     final proposal = _legislature.propose(
       description: description,
       targetLaw: lawId,
       proposedChange: proposedChange ?? '',
       rationale: rationale ?? '',
-      timestamp: _enforcer.clock.tick().physicalTime,
-    );
+      timestamp: _enforcer.clock.tick().physicalTime);
     return KernelResult.ok({
       'proposalId': proposal.proposalId,
       'stage': proposal.stage.name,
@@ -375,8 +363,7 @@ class CivilizationKernel {
       amendmentId: amendmentId,
       support: support,
       reason: reason,
-      timestamp: _enforcer.clock.tick().physicalTime,
-    );
+      timestamp: _enforcer.clock.tick().physicalTime);
     return KernelResult.ok({
       'voter': vote.voterId,
       'amendment': vote.amendmentId,
@@ -394,8 +381,7 @@ class CivilizationKernel {
       sandboxId: sandboxId,
       type: SanctionType.restriction,
       reason: violationType,
-      timestamp: _enforcer.clock.tick().physicalTime,
-    );
+      timestamp: _enforcer.clock.tick().physicalTime);
     return KernelResult.ok({
       'sandboxId': sanction.sandboxId,
       'type': sanction.type.name,
@@ -434,8 +420,7 @@ class CivilizationKernel {
     final msg = _transport.sendFederationAccept(
       federationId,
       federationId,
-      _enforcer.clock.tick().physicalTime,
-    );
+      _enforcer.clock.tick().physicalTime);
     return KernelResult.ok({'federationId': federationId, 'accepted': true});
   }
 
@@ -468,8 +453,7 @@ class CivilizationKernel {
     _network.byzantine.reportInconsistentMessage(
       accusedId,
       'kernel_report',
-      _enforcer.clock.tick().physicalTime,
-    );
+      _enforcer.clock.tick().physicalTime);
     return KernelResult.ok({
       'accusedId': accusedId,
       'reported': true,
@@ -484,8 +468,7 @@ class CivilizationKernel {
     _network.sendHeartbeat(
       targetId,
       _consensus.localManifest.epoch,
-      _enforcer.clock.tick().physicalTime,
-    );
+      _enforcer.clock.tick().physicalTime);
     return KernelResult.ok({
       'target': targetId,
       'epoch': _consensus.localManifest.epoch,
@@ -502,7 +485,6 @@ class CivilizationKernel {
     if (name == null) return TrustLevel.verified;
     return TrustLevel.values.firstWhere(
       (t) => t.name == name,
-      orElse: () => TrustLevel.verified,
-    );
+      orElse: () => TrustLevel.verified);
   }
 }

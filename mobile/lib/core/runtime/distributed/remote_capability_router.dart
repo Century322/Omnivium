@@ -1,4 +1,4 @@
-import 'vocabulary/remote_capability_binding.dart';
+﻿import 'vocabulary/remote_capability_binding.dart';
 import 'hybrid_logical_clock.dart';
 import 'transport/runtime_transport.dart';
 
@@ -28,11 +28,10 @@ class CapabilityAdvertisement {
   factory CapabilityAdvertisement.fromJson(Map<String, dynamic> json) =>
       CapabilityAdvertisement(
         nodeId: json['nodeId'] as String,
-        capabilityIds: (json['capabilityIds'] as List).cast<String>(),
+        capabilityIds: (json['capabilityIds'] as List<dynamic>).cast<String>(),
         pluginId: json['pluginId'] as String,
         version: json['version'] as int? ?? 1,
-        timestamp: json['timestamp'] as int,
-      );
+        timestamp: json['timestamp'] as int);
 }
 
 enum RouteDecision { local, remote, fallback, unavailable }
@@ -109,8 +108,7 @@ class RemoteCapabilityRouter {
           providerPluginId: ad.pluginId,
           discoveredAt: existing?.discoveredAt ?? now.physicalTime,
           lastVerifiedAt: now.physicalTime,
-          version: ad.version,
-        );
+          version: ad.version);
       }
     }
   }
@@ -118,8 +116,7 @@ class RemoteCapabilityRouter {
   void withdrawNodeCapabilities(String nodeId) {
     _advertisements.remove(nodeId);
     _remoteCapabilities.removeWhere(
-      (_, binding) => binding.providerNodeId == nodeId,
-    );
+      (_, binding) => binding.providerNodeId == nodeId);
   }
 
   void markCapabilityUnreachable(String capabilityId) {
@@ -127,8 +124,7 @@ class RemoteCapabilityRouter {
     if (binding == null) return;
 
     _remoteCapabilities[capabilityId] = binding.copyWith(
-      state: BindingState.unreachable,
-    );
+      state: BindingState.unreachable);
   }
 
   RouteResult route(String capabilityId) {
@@ -136,8 +132,7 @@ class RemoteCapabilityRouter {
       return RouteResult(
         decision: RouteDecision.local,
         capabilityId: capabilityId,
-        reason: 'Available locally',
-      );
+        reason: 'Available locally');
     }
 
     final remote = _remoteCapabilities[capabilityId];
@@ -147,21 +142,18 @@ class RemoteCapabilityRouter {
         targetNodeId: remote.providerNodeId,
         capabilityId: capabilityId,
         pluginId: remote.providerPluginId,
-        reason: 'Available on node ${remote.providerNodeId}',
-      );
+        reason: 'Available on node ${remote.providerNodeId}');
     }
 
     return RouteResult(
       decision: RouteDecision.unavailable,
       capabilityId: capabilityId,
-      reason: 'No provider found for $capabilityId',
-    );
+      reason: 'No provider found for $capabilityId');
   }
 
   RouteResult routeWithFallback(
     String capabilityId,
-    List<String> fallbackCapabilityIds,
-  ) {
+    List<String> fallbackCapabilityIds) {
     final primary = route(capabilityId);
     if (primary.isAvailable) return primary;
 
@@ -173,8 +165,7 @@ class RemoteCapabilityRouter {
           targetNodeId: fallback.targetNodeId,
           capabilityId: fallbackId,
           pluginId: fallback.pluginId,
-          reason: 'Fallback from $capabilityId to $fallbackId',
-        );
+          reason: 'Fallback from $capabilityId to $fallbackId');
       }
     }
 
@@ -183,15 +174,13 @@ class RemoteCapabilityRouter {
 
   CapabilityAdvertisement createAdvertisement(
     String pluginId,
-    List<String> capabilityIds,
-  ) {
+    List<String> capabilityIds) {
     final now = _clock.tick();
     return CapabilityAdvertisement(
       nodeId: _localNodeId,
       capabilityIds: capabilityIds,
       pluginId: pluginId,
-      timestamp: now.physicalTime,
-    );
+      timestamp: now.physicalTime);
   }
 
   void clear() {

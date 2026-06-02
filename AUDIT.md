@@ -1,6 +1,6 @@
 # Omnivium 项目状态报告
 
-> 最后更新：2026-05-25 | 版本：14.0 | 本文档是项目唯一进度追踪源
+> 最后更新：2026-06-01 | 版本：15.0 | 本文档是项目唯一进度追踪源
 > 合并自：AUDIT.md v7 + PROJECT_INVENTORY.md + ROADMAP.md
 
 ---
@@ -15,10 +15,10 @@
 | 包名 | com.omnivium.mobile |
 | 规划页面 | 40+ 页面 |
 | 已实现页面 | 26 个视图 |
-| 整体完成度 | ~82%（按上架标准） |
+| 整体完成度 | ~85%（按上架标准） |
 | flutter analyze | ✅ 0 Error / 0 Warning / 0 Info |
 | flutter test | ✅ 1321+ 通过 / 0 失败 / 73 个测试文件 |
-| 国际化 | ✅ ARB/l10n 官方方案，681 key，4 语言（中/英/日/韩） |
+| 国际化 | ✅ ARB/l10n 官方方案，695+ key，4 语言（中/英/日/韩） |
 | 主题 | 深色/浅色/跟随系统 + 8 种强调色预设 |
 | 总文件数 | 153+ |
 | 总代码行数 | ~42,000+ |
@@ -61,6 +61,18 @@
 - 429 限流友好处理（RateLimitException + 用户提示）
 - Firebase Analytics（analytics_service.dart 关键操作埋点）
 - CI/CD（GitHub Actions：Lint → Test → Build Android/iOS + Dart 混淆）
+- Capability System（能力注册/发现/路由/执行，24+ ActionHandler → Skill 桥接）
+- World State Engine（全局状态快照 + 变更通知）
+- Capability Graph（能力依赖图 + 拓扑排序）
+- Cross-App Action Engine（跨应用工作流引擎 + CHAIN 格式）
+- Workspace Graph（工作空间实体关系图）
+- Event Sourcing（事件溯源 + 时间旅行回放）
+- Knowledge Layer（知识提取/存储/检索 + 自动偏好识别）
+- Agent Society 2.0（多 Agent 协作 + 团队/群组调度）
+- 自然语言时间解析（中英文相对/绝对/循环时间）
+- @AI 触发机制（聊天中 @AI/@omni 直接触发 AI 响应）
+- 提醒系统（ReminderService + 管理页 + 推送通知）
+- 互通性（ShareToFriendSheet + AI 消息分析 + 聊天总结）
 
 ---
 

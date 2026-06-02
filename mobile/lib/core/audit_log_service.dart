@@ -65,9 +65,7 @@ class AuditLogService {
             timestamp: (e.timestamp is DateTime
                 ? (e.timestamp as DateTime).millisecondsSinceEpoch
                 : e.timestamp),
-            details: e.data,
-          ),
-        )
+            details: e.data))
         .take(limit)
         .toList();
   }
@@ -97,8 +95,7 @@ class AuditLogService {
               'totalDurationMs': t.totalDurationMs,
               'spanCount': t.spans.length,
               'rootOperation': t.rootSpan?.operation ?? '',
-            },
-          )
+            })
           .toList(),
     };
   }
@@ -111,8 +108,7 @@ class AuditLogService {
     return journal.entries
         .where(
           (e) =>
-              e.type == 'capability.invoked' || e.type == 'capability.denied',
-        )
+              e.type == 'capability.invoked' || e.type == 'capability.denied')
         .map(
           (e) => AuditLogEntry(
             id: e.sequence.toRadixString(16),
@@ -124,9 +120,7 @@ class AuditLogService {
             timestamp: (e.timestamp is DateTime
                 ? (e.timestamp as DateTime).millisecondsSinceEpoch
                 : e.timestamp),
-            details: e.data,
-          ),
-        )
+            details: e.data))
         .take(limit)
         .toList();
   }

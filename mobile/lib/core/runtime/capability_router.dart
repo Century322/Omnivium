@@ -12,6 +12,7 @@ import 'vocabulary/failure_policy.dart';
 import 'kernel/runtime_clock.dart';
 import 'kernel/runtime_config.dart';
 import '../app_logger.dart';
+import 'vocabulary/capability_params.dart';
 
 class CapabilityBinding {
   final String capabilityId;
@@ -88,7 +89,7 @@ class CapabilityRouter {
 
   Future<CapabilityResult> invoke(
     String capabilityId,
-    dynamic params, {
+    CapabilityParams params, {
     required RuntimeIdentity caller,
     required RuntimePermission callerPermission,
     RuntimeSession? session,
@@ -98,9 +99,7 @@ class CapabilityRouter {
       return CapabilityResult.fail(
         const RuntimeError(
           code: 'UNAVAILABLE',
-          message: 'Circuit breaker open',
-        ),
-      );
+          message: 'Circuit breaker open'));
     }
 
     final binding = await discover(capabilityId);
@@ -110,9 +109,7 @@ class CapabilityRouter {
         RuntimeError(
           code: 'PERMISSION_DENIED',
           message:
-              'Caller "${caller.identity}" lacks permission for "$capabilityId"',
-        ),
-      );
+              'Caller "${caller.identity}" lacks permission for "$capabilityId"'));
     }
 
     final effectiveSession =
@@ -121,16 +118,14 @@ class CapabilityRouter {
           id: 'session_${_clock.now()}',
           userId: caller.identity,
           createdAt: _clock.now(),
-          lastActiveAt: _clock.now(),
-        );
+          lastActiveAt: _clock.now());
 
     final context = CapabilityContext.create(
       caller: caller,
       permission: callerPermission,
       session: effectiveSession,
       route: binding.route,
-      timeoutMs: binding.timeoutMs,
-    );
+      timeoutMs: binding.timeoutMs);
 
     try {
       _routedInvocations.add('${caller.identity}:$capabilityId');
@@ -139,9 +134,7 @@ class CapabilityRouter {
           .timeout(
             Duration(milliseconds: binding.timeoutMs),
             onTimeout: () => throw TimeoutException(
-              'Capability $capabilityId timed out after ${binding.timeoutMs}ms',
-            ),
-          );
+              'Capability $capabilityId timed out after ${binding.timeoutMs}ms'));
       _resetCircuitBreaker(capabilityId);
       return result;
     } catch (e) {
@@ -152,54 +145,46 @@ class CapabilityRouter {
           params,
           binding,
           context,
-          binding.maxRetries,
-        );
+          binding.maxRetries);
       }
       return CapabilityResult.fail(
-        RuntimeError(code: 'INVOKE_FAILED', message: e.toString()),
-      );
+        RuntimeError(code: 'INVOKE_FAILED', message: e.toString()));
     }
   }
 
   Future<CapabilityResult> _retryInvoke(
     String capabilityId,
-    dynamic params,
+    CapabilityParams params,
     CapabilityBinding binding,
     CapabilityContext context,
-    int remainingRetries,
-  ) async {
+    int remainingRetries) async {
     if (remainingRetries <= 0 || context.shouldAbort) {
       return CapabilityResult.fail(
         const RuntimeError(
           code: 'RETRY_EXHAUSTED',
-          message: 'Max retries exhausted',
-        ),
-      );
+          message: 'Max retries exhausted'));
     }
 
     final policy = const FailurePolicy();
     final delay = policy.retry.delayForAttempt(
-      binding.maxRetries - remainingRetries,
-    );
-    await Future.delayed(delay);
+      binding.maxRetries - remainingRetries);
+    await Future<void>.delayed(delay);
 
     try {
       final result = await binding.handler.invokeCapability(
         capabilityId,
         params,
-        context,
-      );
+        context);
       _resetCircuitBreaker(capabilityId);
       return result;
-    } catch (e) {
+    } catch (_) {
       _recordCircuitBreakerFailure(capabilityId);
       return _retryInvoke(
         capabilityId,
         params,
         binding,
         context,
-        remainingRetries - 1,
-      );
+        remainingRetries - 1);
     }
   }
 
@@ -216,8 +201,7 @@ class CapabilityRouter {
     if (pluginId == null) {
       throw const RuntimeError(
         code: 'NOT_FOUND',
-        message: 'No plugin provides this capability',
-      );
+        message: 'No plugin provides this capability');
     }
 
     final descriptor = _registry.descriptor(pluginId);
@@ -234,8 +218,7 @@ class CapabilityRouter {
     if (declaration == null) {
       throw const RuntimeError(
         code: 'NOT_FOUND',
-        message: 'Capability not declared',
-      );
+        message: 'Capability not declared');
     }
 
     return CapabilityBinding(
@@ -245,14 +228,12 @@ class CapabilityRouter {
       declaration: declaration,
       route: RuntimeRoute.local(capability: capabilityId, pluginId: pluginId),
       isolation: descriptor.isolation,
-      discoveredAt: _clock.now(),
-    );
+      discoveredAt: _clock.now());
   }
 
   bool _checkPermission(
     CapabilityBinding binding,
-    RuntimePermission callerPermission,
-  ) {
+    RuntimePermission callerPermission) {
     if (binding.permission == 'auto') return true;
     if (binding.permission == 'deny') return false;
     if (binding.permission == 'confirm')
@@ -276,11 +257,9 @@ class CapabilityRouter {
     final failures = _circuitBreakerFailures[capabilityId]!;
     if (failures >= 5) {
       _circuitBreakerOpenUntil[capabilityId] = DateTime.now().add(
-        const Duration(seconds: 30),
-      );
+        const Duration(seconds: 30));
       AppLogger.instance.warning(
-        'Circuit breaker opened for "$capabilityId" after $failures failures',
-      );
+        'Circuit breaker opened for "$capabilityId" after $failures failures');
     }
   }
 

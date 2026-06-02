@@ -1715,7 +1715,7 @@ class SKo extends S {
   String get allow => '허용';
 
   @override
-  String get delete_message_pair => '메시지 쌍 삭제';
+  String get delete_message_pair => '메시지 삭제';
 
   @override
   String get report_not_helpful => '도움이 되지 않음';

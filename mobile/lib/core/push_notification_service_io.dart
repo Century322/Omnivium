@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
 import 'app_logger.dart';
 import 'push_notification_service.dart';
 import 'notification_queue.dart';
@@ -19,8 +18,7 @@ Future<void> initFirebaseMessaging(PushNotificationService service) async {
   } catch (e) {
     AppLogger.instance.warning(
       'Firebase init failed (google-services.json may be missing)',
-      error: e,
-    );
+      error: e);
     return;
   }
 
@@ -36,15 +34,13 @@ Future<void> initFirebaseMessaging(PushNotificationService service) async {
       announcement: false,
       carPlay: false,
       criticalAlert: false,
-      provisional: false,
-    );
+      provisional: false);
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
       await messaging.setForegroundNotificationPresentationOptions(
         alert: true,
         badge: true,
-        sound: true,
-      );
+        sound: true);
 
       final token = await messaging.getToken();
       if (token != null) {
@@ -56,8 +52,7 @@ Future<void> initFirebaseMessaging(PushNotificationService service) async {
       _firebaseSubs.add(
         messaging.onTokenRefresh.listen((newToken) {
           service.setFcmToken(newToken);
-        }),
-      );
+        }));
 
       _firebaseSubs.add(
         FirebaseMessaging.onMessage.listen((RemoteMessage message) {
@@ -68,17 +63,14 @@ Future<void> initFirebaseMessaging(PushNotificationService service) async {
               dialogId: dialogId,
               sender: notification.title ?? 'Omnivium',
               message: notification.body ?? '',
-              data: message.data,
-            );
+              data: message.data);
           }
-        }),
-      );
+        }));
 
       _firebaseSubs.add(
         FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
           service.handleMessageOpened(message.data);
-        }),
-      );
+        }));
 
       final initialMessage = await messaging.getInitialMessage();
       if (initialMessage != null) {
@@ -86,15 +78,13 @@ Future<void> initFirebaseMessaging(PushNotificationService service) async {
       }
     } else {
       AppLogger.instance.info(
-        'Push notification permission denied: ${settings.authorizationStatus}',
-      );
+        'Push notification permission denied: ${settings.authorizationStatus}');
     }
   } catch (e, stackTrace) {
     AppLogger.instance.warning(
       'Firebase messaging setup failed',
       error: e,
-      stackTrace: stackTrace,
-    );
+      stackTrace: stackTrace);
   }
 }
 

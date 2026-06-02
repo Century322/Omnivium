@@ -1,3 +1,5 @@
+
+import 'di/app_di.dart';
 import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
@@ -16,7 +18,7 @@ class EncryptionService {
   bool get isReady => _key != null;
 
   Future<void> init() async {
-    final storage = SecureStorageService.instance;
+    final storage = getIt<SecureStorageService>();
     var keyBase64 = await storage.read(_keyKey);
     if (keyBase64 == null) {
       final random = Random.secure();
@@ -27,8 +29,7 @@ class EncryptionService {
       } catch (e) {
         AppLogger.instance.error(
           'EncryptionService: failed to persist key, key is memory-only',
-          error: e,
-        );
+          error: e);
       }
     }
     _key = Key.fromBase64(keyBase64);

@@ -1,3 +1,5 @@
+
+import 'di/app_di.dart';
 import 'app_logger.dart';
 import 'runtime/sdk/omnivium_sdk.dart';
 import 'runtime/plugins/persistence_backend.dart';
@@ -47,7 +49,7 @@ class AppDataGateway {
     _auditClear(prefix);
   }
 
-  DatabaseService get db => DatabaseService.instance;
+  DatabaseService get db => getIt<DatabaseService>();
 
   void _auditWrite(String key, Map<String, dynamic> value) {
     final sdk = OmniviumSDK.instance;

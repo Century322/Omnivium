@@ -1,0 +1,77 @@
+﻿00:00 +0: loading C:/Users/19468/Desktop/Omnivium/mobile/test/notification_cubit_test.dart
+00:00 +0: NotificationCubit initial state has empty notifications and zero unread
+00:00 +1: NotificationCubit shortcut getters match state
+00:00 +2: NotificationCubit markAsRead marks notification as read
+00:00 +2 -1: NotificationCubit markAsRead marks notification as read [E]
+  Bad state: GetIt: Object/factory with type DatabaseService is not registered inside GetIt. 
+  (Did you accidentally do GetIt sl=GetIt.instance(); instead of GetIt sl=GetIt.instance;
+  Did you forget to register it?)
+  package:get_it/get_it_impl.dart 14:19                             throwIfNot
+  package:get_it/get_it_impl.dart 618:5                             _GetItImplementation._findRegistrationByNameAndType
+  package:get_it/get_it_impl.dart 676:11                            _GetItImplementation._get
+  package:get_it/get_it_impl.dart 643:12                            _GetItImplementation.get
+  package:get_it/get_it_impl.dart 765:12                            _GetItImplementation.call
+  package:omnivium/core/notification/notification_cubit.dart 86:21  NotificationCubit._persist
+  package:omnivium/core/notification/notification_cubit.dart 176:7  NotificationCubit.markAsRead
+  test\notification_cubit_test.dart 38:13                           main.<fn>.<fn>
+  ===== asynchronous gap ===========================
+  dart:async                                                        Future._asyncCompleteError
+  package:omnivium/core/notification/notification_cubit.dart 176:7  NotificationCubit.markAsRead
+  test\notification_cubit_test.dart 38:13                           main.<fn>.<fn>
+  
+00:00 +2 -1: NotificationCubit markAllAsRead marks all as read
+00:00 +2 -2: NotificationCubit markAllAsRead marks all as read [E]
+  Bad state: GetIt: Object/factory with type DatabaseService is not registered inside GetIt. 
+  (Did you accidentally do GetIt sl=GetIt.instance(); instead of GetIt sl=GetIt.instance;
+  Did you forget to register it?)
+  package:get_it/get_it_impl.dart 14:19                             throwIfNot
+  package:get_it/get_it_impl.dart 618:5                             _GetItImplementation._findRegistrationByNameAndType
+  package:get_it/get_it_impl.dart 676:11                            _GetItImplementation._get
+  package:get_it/get_it_impl.dart 643:12                            _GetItImplementation.get
+  package:get_it/get_it_impl.dart 765:12                            _GetItImplementation.call
+  package:omnivium/core/notification/notification_cubit.dart 86:21  NotificationCubit._persist
+  package:omnivium/core/notification/notification_cubit.dart 188:5  NotificationCubit.markAllAsRead
+  test\notification_cubit_test.dart 63:13                           main.<fn>.<fn>
+  ===== asynchronous gap ===========================
+  dart:async                                                        Future._asyncCompleteError
+  package:omnivium/core/notification/notification_cubit.dart 188:5  NotificationCubit.markAllAsRead
+  test\notification_cubit_test.dart 63:13                           main.<fn>.<fn>
+  
+00:00 +2 -2: NotificationCubit remove removes notification
+00:00 +2 -3: NotificationCubit remove removes notification [E]
+  Bad state: GetIt: Object/factory with type DatabaseService is not registered inside GetIt. 
+  (Did you accidentally do GetIt sl=GetIt.instance(); instead of GetIt sl=GetIt.instance;
+  Did you forget to register it?)
+  package:get_it/get_it_impl.dart 14:19                             throwIfNot
+  package:get_it/get_it_impl.dart 618:5                             _GetItImplementation._findRegistrationByNameAndType
+  package:get_it/get_it_impl.dart 676:11                            _GetItImplementation._get
+  package:get_it/get_it_impl.dart 643:12                            _GetItImplementation.get
+  package:get_it/get_it_impl.dart 765:12                            _GetItImplementation.call
+  package:omnivium/core/notification/notification_cubit.dart 86:21  NotificationCubit._persist
+  package:omnivium/core/notification/notification_cubit.dart 195:5  NotificationCubit.remove
+  test\notification_cubit_test.dart 79:13                           main.<fn>.<fn>
+  ===== asynchronous gap ===========================
+  dart:async                                                        Future._asyncCompleteError
+  package:omnivium/core/notification/notification_cubit.dart 195:5  NotificationCubit.remove
+  test\notification_cubit_test.dart 79:13                           main.<fn>.<fn>
+  
+00:00 +2 -3: NotificationCubit clear removes all notifications
+00:00 +2 -4: NotificationCubit clear removes all notifications [E]
+  Bad state: GetIt: Object/factory with type DatabaseService is not registered inside GetIt. 
+  (Did you accidentally do GetIt sl=GetIt.instance(); instead of GetIt sl=GetIt.instance;
+  Did you forget to register it?)
+  package:get_it/get_it_impl.dart 14:19                             throwIfNot
+  package:get_it/get_it_impl.dart 618:5                             _GetItImplementation._findRegistrationByNameAndType
+  package:get_it/get_it_impl.dart 676:11                            _GetItImplementation._get
+  package:get_it/get_it_impl.dart 643:12                            _GetItImplementation.get
+  package:get_it/get_it_impl.dart 765:12                            _GetItImplementation.call
+  package:omnivium/core/notification/notification_cubit.dart 86:21  NotificationCubit._persist
+  package:omnivium/core/notification/notification_cubit.dart 200:5  NotificationCubit.clear
+  test\notification_cubit_test.dart 103:13                          main.<fn>.<fn>
+  ===== asynchronous gap ===========================
+  dart:async                                                        Future._asyncCompleteError
+  package:omnivium/core/notification/notification_cubit.dart 200:5  NotificationCubit.clear
+  test\notification_cubit_test.dart 103:13                          main.<fn>.<fn>
+  
+00:00 +2 -4: NotificationCubit unreadCount only counts unread
+00:00 +3 -4: Some tests failed.

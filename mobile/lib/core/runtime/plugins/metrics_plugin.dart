@@ -3,6 +3,7 @@ import '../plugin/plugin_handler.dart';
 import '../vocabulary/runtime_message.dart';
 import '../vocabulary/runtime_event.dart';
 import '../vocabulary/capability_context.dart';
+import '../vocabulary/capability_params.dart';
 
 class MetricsPlugin implements PluginHandler {
   final Map<String, int> _counters = {};
@@ -12,43 +13,38 @@ class MetricsPlugin implements PluginHandler {
   @override
   Future<HandlerResult> handleMessage(
     RuntimeMessage message,
-    CapabilityContext context,
-  ) async {
+    CapabilityContext context) async {
     return HandlerResult.ok();
   }
 
   @override
   Future<HandlerResult> handleEvent(
     RuntimeEvent event,
-    CapabilityContext context,
-  ) async {
+    CapabilityContext context) async {
     return HandlerResult.ok();
   }
 
   @override
   Future<CapabilityResult> invokeCapability(
     String capabilityId,
-    dynamic params,
-    CapabilityContext context,
-  ) async {
+    CapabilityParams params,
+    CapabilityContext context) async {
     switch (capabilityId) {
       case 'metrics.counter':
-        if (params is Map) {
-          final name = params['name'] as String;
-          final delta = params['delta'] as int? ?? 1;
+        if (params.isNotEmpty) {
+          final name = params.string('')!;
+          final delta = params.intOr('', );
           _counters[name] = (_counters[name] ?? 0) + delta;
           return CapabilityResult.ok(_counters[name]);
         }
         return CapabilityResult.fail(
           const RuntimeError(
             code: 'INVALID_PARAMS',
-            message: 'Expected {name, delta}',
-          ),
-        );
+            message: 'Expected {name, delta}'));
       case 'metrics.histogram':
-        if (params is Map) {
-          final name = params['name'] as String;
-          final value = params['value'] as num;
+        if (params.isNotEmpty) {
+          final name = params.string('')!;
+          final value = params.raw['value'] as num;
           _histograms.putIfAbsent(name, () => []);
           _histograms[name]!.add(value);
           return CapabilityResult.ok(_histograms[name]!.length);
@@ -56,9 +52,7 @@ class MetricsPlugin implements PluginHandler {
         return CapabilityResult.fail(
           const RuntimeError(
             code: 'INVALID_PARAMS',
-            message: 'Expected {name, value}',
-          ),
-        );
+            message: 'Expected {name, value}'));
       case 'metrics.trace':
         return CapabilityResult.ok({
           'counters': Map<String, int>.from(_counters),
@@ -78,9 +72,7 @@ class MetricsPlugin implements PluginHandler {
         return CapabilityResult.fail(
           RuntimeError(
             code: 'UNKNOWN_CAPABILITY',
-            message: 'Unknown capability: $capabilityId',
-          ),
-        );
+            message: 'Unknown capability: $capabilityId'));
     }
   }
 
@@ -94,20 +86,16 @@ class MetricsPlugin implements PluginHandler {
         id: 'metrics.counter',
         name: 'Counter',
         description: 'Increment a counter metric',
-        permission: 'auto',
-      ),
+        permission: 'auto'),
       CapabilityDeclaration(
         id: 'metrics.histogram',
         name: 'Histogram',
         description: 'Record a histogram observation',
-        permission: 'auto',
-      ),
+        permission: 'auto'),
       CapabilityDeclaration(
         id: 'metrics.trace',
         name: 'Trace',
         description: 'Get all metrics snapshot',
-        permission: 'auto',
-      ),
-    ],
-  );
+        permission: 'auto'),
+    ]);
 }

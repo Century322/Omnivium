@@ -1711,7 +1711,7 @@ class SZh extends S {
   String get allow => '允许';
 
   @override
-  String get delete_message_pair => '删除消息对';
+  String get delete_message_pair => '删除消息';
 
   @override
   String get report_not_helpful => '没有帮助';

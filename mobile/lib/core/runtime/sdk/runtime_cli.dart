@@ -48,8 +48,7 @@ class RuntimeCLI {
       AppLogger.instance.warning(
         'CLI command failed: $command',
         error: e,
-        stackTrace: stackTrace,
-      );
+        stackTrace: stackTrace);
       return 'Error: $e';
     }
   }
@@ -84,8 +83,7 @@ Runtime Inspect
     for (final d in descriptors) {
       final state = c.pluginRegistry.pluginStates[d.id]?.name ?? 'unknown';
       buffer.writeln(
-        '  ${d.id.padRight(20)} ${d.version.padRight(8)} [$state] ${d.name}',
-      );
+        '  ${d.id.padRight(20)} ${d.version.padRight(8)} [$state] ${d.name}');
     }
     return buffer.toString();
   }
@@ -124,8 +122,7 @@ Plugin: ${d.name}
     for (final d in descriptors) {
       for (final cap in d.capabilities) {
         buffer.writeln(
-          '  ${cap.id.padRight(25)} [${cap.channel.padRight(6)}] ${cap.name} (${d.id})',
-        );
+          '  ${cap.id.padRight(25)} [${cap.channel.padRight(6)}] ${cap.name} (${d.id})');
       }
     }
     return buffer.toString();
@@ -142,12 +139,10 @@ Plugin: ${d.name}
         : entries;
 
     final buffer = StringBuffer(
-      'Event Journal (last $limit)\n════════════════════════\n',
-    );
+      'Event Journal (last $limit)\n════════════════════════\n');
     for (final e in limited) {
       buffer.writeln(
-        '  #${e.sequence.toString().padRight(6)} ${e.type.padRight(25)} @${e.timestamp}',
-      );
+        '  #${e.sequence.toString().padRight(6)} ${e.type.padRight(25)} @${e.timestamp}');
     }
     return buffer.toString();
   }
@@ -164,8 +159,7 @@ Plugin: ${d.name}
     final buffer = StringBuffer('Traces (last $limit)\n════════════════════\n');
     for (final t in traces) {
       buffer.writeln(
-        '  ${t.traceId.padRight(20)} spans:${t.spans.length.toString().padRight(4)} dur:${t.totalDurationMs}ms',
-      );
+        '  ${t.traceId.padRight(20)} spans:${t.spans.length.toString().padRight(4)} dur:${t.totalDurationMs}ms');
     }
     return buffer.toString();
   }
@@ -181,8 +175,7 @@ Plugin: ${d.name}
     for (final n in nodes) {
       final marker = n.nodeId == dist.nodeId ? ' (self)' : '';
       buffer.writeln(
-        '  ${n.nodeId.padRight(20)} ${n.role.name.padRight(8)} [${n.state.name.padRight(7)}] ${n.addressKey}$marker',
-      );
+        '  ${n.nodeId.padRight(20)} ${n.role.name.padRight(8)} [${n.state.name.padRight(7)}] ${n.addressKey}$marker');
     }
     return buffer.toString();
   }
@@ -255,8 +248,7 @@ Session: ${session.id}
     for (final r in rules) {
       final effect = r.effect.name.toUpperCase().padRight(4);
       buffer.writeln(
-        '  $effect ${r.callerPattern.padRight(15)} → ${r.targetPattern.padRight(20)} (priority: ${r.priority})',
-      );
+        '  $effect ${r.callerPattern.padRight(15)} → ${r.targetPattern.padRight(20)} (priority: ${r.priority})');
     }
     return buffer.toString();
   }

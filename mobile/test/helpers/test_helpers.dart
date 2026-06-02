@@ -16,21 +16,21 @@ void mockSecureStorage() {
       .setMockMethodCallHandler(
         const MethodChannel('plugins.it_nomads.com/flutter_secure_storage'),
         (MethodCall methodCall) async {
+          final args = methodCall.arguments as Map<String, dynamic>;
           switch (methodCall.method) {
             case 'read':
-              return store[methodCall.arguments['key']];
+              return store[args['key']];
             case 'write':
-              store[methodCall.arguments['key']] =
-                  methodCall.arguments['value'] as String;
+              store[args['key']] = args['value'] as String;
               return null;
             case 'delete':
-              store.remove(methodCall.arguments['key']);
+              store.remove(args['key']);
               return null;
             case 'deleteAll':
               store.clear();
               return null;
             case 'containsKey':
-              return store.containsKey(methodCall.arguments['key']);
+              return store.containsKey(args['key']);
             case 'readAll':
               return store;
             default:

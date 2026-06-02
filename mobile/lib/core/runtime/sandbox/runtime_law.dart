@@ -34,75 +34,65 @@ class RuntimeConstitution {
           'All capability invocations must go through CapabilityRouter. '
           'No direct plugin-to-plugin calls.',
       enforcement:
-          'CapabilityAccessResult.denied for any invocation not routed through CapabilityRouter.',
-    ),
+          'CapabilityAccessResult.denied for any invocation not routed through CapabilityRouter.'),
     RuntimeLaw(
       id: RuntimeLawId.noBypassScheduler,
       description:
           'All task scheduling must go through Scheduler. '
           'No direct thread or async spawn outside Budget control.',
       enforcement:
-          'SandboxViolation.taskLimitExceeded for any task not registered with Scheduler.',
-    ),
+          'SandboxViolation.taskLimitExceeded for any task not registered with Scheduler.'),
     RuntimeLaw(
       id: RuntimeLawId.noGlobalStateSharing,
       description:
           'No sharing of mutable global state between sandboxes. '
           'All state communication must go through Event Bus or Capability invocation.',
       enforcement:
-          'SandboxViolation.bypassAttempt for any detected global state access.',
-    ),
+          'SandboxViolation.bypassAttempt for any detected global state access.'),
     RuntimeLaw(
       id: RuntimeLawId.noSideChannels,
       description:
           'No side-channel communication between execution units. '
           'All communication must be through Runtime Wire Protocol.',
       enforcement:
-          'SandboxViolation.bypassAttempt for any detected side channel.',
-    ),
+          'SandboxViolation.bypassAttempt for any detected side channel.'),
     RuntimeLaw(
       id: RuntimeLawId.noUntracedOperations,
       description:
           'All operations must be traced. No operation may execute without a trace span.',
-      enforcement: 'Audit entry created for any untraced operation detection.',
-    ),
+      enforcement: 'Audit entry created for any untraced operation detection.'),
     RuntimeLaw(
       id: RuntimeLawId.noBudgetBypass,
       description:
           'All resource consumption must be accounted for in Budget. '
           'No resource may be consumed without Budget approval.',
       enforcement:
-          'SandboxViolation.budgetExceeded for any unaccounted resource consumption.',
-    ),
+          'SandboxViolation.budgetExceeded for any unaccounted resource consumption.'),
     RuntimeLaw(
       id: RuntimeLawId.noDirectThreadCreation,
       description:
           'No direct thread or isolate creation. All concurrency must go through Scheduler.',
       enforcement:
-          'SandboxViolation.bypassAttempt for any direct thread creation.',
-    ),
+          'SandboxViolation.bypassAttempt for any direct thread creation.'),
     RuntimeLaw(
       id: RuntimeLawId.allOpsMustBeJournaled,
       description:
           'All state mutations must be recorded in Event Journal. '
           'No state change may occur without a journal entry.',
-      enforcement: 'Audit entry for any unjournaled state change.',
-    ),
+      enforcement: 'Audit entry for any unjournaled state change.'),
     RuntimeLaw(
       id: RuntimeLawId.allOpsMustBeTraced,
       description:
           'All distributed operations must propagate trace context. '
           'No remote call may be made without trace propagation headers.',
-      enforcement: 'Audit entry for any untraced remote call.',
-    ),
+      enforcement: 'Audit entry for any untraced remote call.'),
     RuntimeLaw(
       id: RuntimeLawId.trustLevelMustBeRespected,
       description:
           'Trust level hierarchy must be respected. '
           'No lower-trust entity may access higher-trust resources.',
       enforcement:
-          'SandboxViolation.trustInsufficient for any trust level violation.',
-    ),
+          'SandboxViolation.trustInsufficient for any trust level violation.'),
   ];
 
   static bool addAmendment(RuntimeLaw law) {
@@ -150,16 +140,14 @@ class RuntimeLawEnforcer {
   LawEnforcementResult enforceCapabilityRouting(
     String sandboxId,
     String capabilityId,
-    bool wasRoutedThroughRouter,
-  ) {
+    bool wasRoutedThroughRouter) {
     final result = LawEnforcementResult(
       lawId: RuntimeLawId.noBypassCapabilityRouter,
       compliant: wasRoutedThroughRouter,
       violation: wasRoutedThroughRouter
           ? null
           : 'Capability $capabilityId invoked without CapabilityRouter',
-      sandboxId: sandboxId,
-    );
+      sandboxId: sandboxId);
 
     _enforcementLog.add(result);
     if (!result.compliant) {
@@ -170,24 +158,21 @@ class RuntimeLawEnforcer {
           'law': RuntimeLawId.noBypassCapabilityRouter.name,
           'capability': capabilityId,
         },
-        success: false,
-      );
+        success: false);
     }
     return result;
   }
 
   LawEnforcementResult enforceSchedulerUsage(
     String sandboxId,
-    bool wasScheduledThroughScheduler,
-  ) {
+    bool wasScheduledThroughScheduler) {
     final result = LawEnforcementResult(
       lawId: RuntimeLawId.noBypassScheduler,
       compliant: wasScheduledThroughScheduler,
       violation: wasScheduledThroughScheduler
           ? null
           : 'Task created without Scheduler',
-      sandboxId: sandboxId,
-    );
+      sandboxId: sandboxId);
 
     _enforcementLog.add(result);
     if (!result.compliant) {
@@ -195,22 +180,19 @@ class RuntimeLawEnforcer {
         'law.violation',
         sandboxId,
         context: {'law': RuntimeLawId.noBypassScheduler.name},
-        success: false,
-      );
+        success: false);
     }
     return result;
   }
 
   LawEnforcementResult enforceNoGlobalState(
     String sandboxId,
-    bool accessedGlobalState,
-  ) {
+    bool accessedGlobalState) {
     final result = LawEnforcementResult(
       lawId: RuntimeLawId.noGlobalStateSharing,
       compliant: !accessedGlobalState,
       violation: accessedGlobalState ? 'Global state access detected' : null,
-      sandboxId: sandboxId,
-    );
+      sandboxId: sandboxId);
 
     _enforcementLog.add(result);
     if (!result.compliant) {
@@ -218,22 +200,19 @@ class RuntimeLawEnforcer {
         'law.violation',
         sandboxId,
         context: {'law': RuntimeLawId.noGlobalStateSharing.name},
-        success: false,
-      );
+        success: false);
     }
     return result;
   }
 
   LawEnforcementResult enforceNoSideChannels(
     String sandboxId,
-    bool usedSideChannel,
-  ) {
+    bool usedSideChannel) {
     final result = LawEnforcementResult(
       lawId: RuntimeLawId.noSideChannels,
       compliant: !usedSideChannel,
       violation: usedSideChannel ? 'Side channel communication detected' : null,
-      sandboxId: sandboxId,
-    );
+      sandboxId: sandboxId);
 
     _enforcementLog.add(result);
     if (!result.compliant) {
@@ -241,8 +220,7 @@ class RuntimeLawEnforcer {
         'law.violation',
         sandboxId,
         context: {'law': RuntimeLawId.noSideChannels.name},
-        success: false,
-      );
+        success: false);
     }
     return result;
   }
@@ -252,8 +230,7 @@ class RuntimeLawEnforcer {
       lawId: RuntimeLawId.allOpsMustBeTraced,
       compliant: hasTraceSpan,
       violation: hasTraceSpan ? null : 'Operation executed without trace span',
-      sandboxId: sandboxId,
-    );
+      sandboxId: sandboxId);
 
     _enforcementLog.add(result);
     if (!result.compliant) {
@@ -261,8 +238,7 @@ class RuntimeLawEnforcer {
         'law.violation',
         sandboxId,
         context: {'law': RuntimeLawId.allOpsMustBeTraced.name},
-        success: false,
-      );
+        success: false);
     }
     return result;
   }
@@ -274,8 +250,7 @@ class RuntimeLawEnforcer {
       violation: wasBudgetApproved
           ? null
           : 'Resource consumed without Budget approval',
-      sandboxId: sandboxId,
-    );
+      sandboxId: sandboxId);
 
     _enforcementLog.add(result);
     if (!result.compliant) {
@@ -283,8 +258,7 @@ class RuntimeLawEnforcer {
         'law.violation',
         sandboxId,
         context: {'law': RuntimeLawId.noBudgetBypass.name},
-        success: false,
-      );
+        success: false);
     }
     return result;
   }
@@ -292,8 +266,7 @@ class RuntimeLawEnforcer {
   LawEnforcementResult enforceTrustLevel(
     String sandboxId,
     TrustLevel requiredLevel,
-    TrustLevel actualLevel,
-  ) {
+    TrustLevel actualLevel) {
     final compliant = actualLevel.index <= requiredLevel.index;
     final result = LawEnforcementResult(
       lawId: RuntimeLawId.trustLevelMustBeRespected,
@@ -301,8 +274,7 @@ class RuntimeLawEnforcer {
       violation: compliant
           ? null
           : 'Trust level ${actualLevel.name} insufficient for ${requiredLevel.name}',
-      sandboxId: sandboxId,
-    );
+      sandboxId: sandboxId);
 
     _enforcementLog.add(result);
     return result;

@@ -1,9 +1,12 @@
+
+import '../di/app_di.dart';
 import '../app_logger.dart';
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:matrix/matrix.dart';
+import 'package:matrix/matrix.dart' hide Event;
 import 'package:sqflite/sqflite.dart';
-import '../auth_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../notification_center.dart' show NotificationCenter, Event;
 import '../vodozemac_init.dart';
 import '../secure_storage_service.dart';
 import '../note_service.dart';
@@ -38,7 +41,7 @@ class MatrixService {
   static const _deviceIdKey = 'omnivium_matrix_device_id';
   static const _deviceNameKey = 'omnivium_matrix_device_name';
 
-  final _secure = SecureStorageService.instance;
+  final _secure = getIt<SecureStorageService>();
 
   NativeImplementations _getNativeImplementations() {
     if (kIsWeb) {
@@ -82,8 +85,7 @@ class MatrixService {
       final client = Client(
         'Omnivium',
         database: await _getDatabase(),
-        nativeImplementations: _getNativeImplementations(),
-      );
+        nativeImplementations: _getNativeImplementations());
       await client.checkHomeserver(Uri.parse(homeserverUrl));
       _client = client;
       return client;
@@ -93,17 +95,18 @@ class MatrixService {
   Future<void> login(
     String username,
     String password,
-    String homeserverUrl,
-  ) async {
+    String homeserverUrl) async {
     final client = await _createClient(homeserverUrl);
     await client.login(
       LoginType.mLoginPassword,
       password: password,
-      identifier: AuthenticationUserIdentifier(user: username),
-    );
+      identifier: AuthenticationUserIdentifier(user: username));
     await _saveCredentials(client);
     client.backgroundSync = true;
-    await IdentityBridge.instance.onMatrixLinked(client.userID ?? '');
+    await getIt<IdentityBridge>().onMatrixLinked(client.userID ?? '');
+    NotificationCenter.post(
+      Event.loginSuccess,
+      data: {'matrix_user_id': client.userID});
   }
 
   Future<void> loginWithToken(String token, String homeserverUrl) async {
@@ -111,33 +114,51 @@ class MatrixService {
     await client.login(LoginType.mLoginToken, token: token);
     await _saveCredentials(client);
     client.backgroundSync = true;
-    await IdentityBridge.instance.onMatrixLinked(client.userID ?? '');
+    await getIt<IdentityBridge>().onMatrixLinked(client.userID ?? '');
+    NotificationCenter.post(
+      Event.loginSuccess,
+      data: {'matrix_user_id': client.userID});
   }
 
   Future<void> register(
     String username,
     String password,
-    String homeserverUrl,
-  ) async {
+    String homeserverUrl) async {
     final client = await _createClient(homeserverUrl);
     await client.register(username: username, password: password);
     await _saveCredentials(client);
     client.backgroundSync = true;
     final matrixId = client.userID ?? '';
-    await IdentityBridge.instance.onRegistration(
+    await getIt<IdentityBridge>().onRegistration(
       username,
-      matrixId: matrixId.isNotEmpty ? matrixId : null,
-    );
-    await IdentityBridge.instance.onMatrixLinked(matrixId);
+      matrixId: matrixId.isNotEmpty ? matrixId : null);
+    await getIt<IdentityBridge>().onMatrixLinked(matrixId);
   }
 
   Future<bool> tryRestoreSession() async {
-    final token = await _secure.read(_tokenKey);
-    final userId = await _secure.read(_userIdKey);
-    final homeserver = await _secure.read(_homeserverKey);
-    final deviceId = await _secure.read(_deviceIdKey);
-    final deviceName = await _secure.read(_deviceNameKey);
-    if (token == null || userId == null || homeserver == null) return false;
+    var token = await _secure.read(_tokenKey);
+    var userId = await _secure.read(_userIdKey);
+    var homeserver = await _secure.read(_homeserverKey);
+    var deviceId = await _secure.read(_deviceIdKey);
+    var deviceName = await _secure.read(_deviceNameKey);
+
+    if (token == null || userId == null || homeserver == null) {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        token ??= prefs.getString(_tokenKey);
+        userId ??= prefs.getString(_userIdKey);
+        homeserver ??= prefs.getString(_homeserverKey);
+        deviceId ??= prefs.getString(_deviceIdKey);
+        deviceName ??= prefs.getString(_deviceNameKey);
+      } catch (e) {
+        AppLogger.instance.warning('Fallback credentials read failed', error: e);
+      }
+    }
+
+    if (token == null || userId == null || homeserver == null) {
+      AppLogger.instance.warning('Session restore skipped: missing credentials (token=${token != null}, userId=${userId != null}, hs=${homeserver != null})');
+      return false;
+    }
 
     return await _lock.synchronized(() async {
       try {
@@ -150,35 +171,30 @@ class MatrixService {
         final client = Client(
           'Omnivium',
           database: await _getDatabase(),
-          nativeImplementations: _getNativeImplementations(),
-        );
+          nativeImplementations: _getNativeImplementations());
         try {
-          await client.checkHomeserver(Uri.parse(homeserver));
+          await client.checkHomeserver(Uri.parse(homeserver!));
           await client.init(
-            newToken: token,
-            newUserID: userId,
+            newToken: token!,
+            newUserID: userId!,
             newHomeserver: Uri.parse(homeserver),
             newDeviceName: deviceName ?? 'Omnivium',
-            newDeviceID: deviceId ?? '',
-          );
+            newDeviceID: deviceId ?? '');
         } catch (e) {
           AppLogger.instance.warning(
             'Session restore network failed, trying offline',
-            error: e,
-          );
+            error: e);
           try {
             await client.init(
-              newToken: token,
-              newUserID: userId,
-              newHomeserver: Uri.parse(homeserver),
+              newToken: token!,
+              newUserID: userId!,
+              newHomeserver: Uri.parse(homeserver!),
               newDeviceName: deviceName ?? 'Omnivium',
-              newDeviceID: deviceId ?? '',
-            );
+              newDeviceID: deviceId ?? '');
           } catch (e2) {
             AppLogger.instance.warning(
               'Offline session restore also failed',
-              error: e2,
-            );
+              error: e2);
             client.dispose();
             await _closeDatabase();
             return false;
@@ -188,15 +204,17 @@ class MatrixService {
         client.backgroundSync = true;
         final restoredUserId = client.userID ?? '';
         if (restoredUserId.isNotEmpty) {
-          await IdentityBridge.instance.onMatrixLinked(restoredUserId);
+          await getIt<IdentityBridge>().onMatrixLinked(restoredUserId);
+          NotificationCenter.post(
+            Event.loginSuccess,
+            data: {'matrix_user_id': restoredUserId});
         }
         return true;
       } catch (e, stackTrace) {
         AppLogger.instance.warning(
           'Session restore failed',
           error: e,
-          stackTrace: stackTrace,
-        );
+          stackTrace: stackTrace);
         await _closeDatabase();
         return false;
       }
@@ -204,17 +222,16 @@ class MatrixService {
   }
 
   Future<void> logout() async {
-    AuthService.instance.onMatrixLogout();
-    NoteService.instance.reset();
-    EncryptionService.instance.reset();
+    NotificationCenter.post(Event.logout);
+    getIt<NoteService>().reset();
+    getIt<EncryptionService>().reset();
     try {
       await _client?.logout();
     } catch (e, stackTrace) {
       AppLogger.instance.error(
         'Logout failed',
         error: e,
-        stackTrace: stackTrace,
-      );
+        stackTrace: stackTrace);
     }
     _client?.dispose();
     _client = null;
@@ -224,18 +241,45 @@ class MatrixService {
     await _secure.delete(_homeserverKey);
     await _secure.delete(_deviceIdKey);
     await _secure.delete(_deviceNameKey);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_tokenKey);
+      await prefs.remove(_userIdKey);
+      await prefs.remove(_homeserverKey);
+      await prefs.remove(_deviceIdKey);
+      await prefs.remove(_deviceNameKey);
+    } catch (e) {
+      AppLogger.instance.warning('Clear backup credentials failed', error: e);
+    }
   }
 
   Future<void> _saveCredentials(Client client) async {
     final token = client.accessToken;
-    if (token != null) await _secure.write(_tokenKey, token);
     final uid = client.userID;
-    if (uid != null) await _secure.write(_userIdKey, uid);
     final hs = client.homeserver;
-    if (hs != null) await _secure.write(_homeserverKey, hs.toString());
     final did = client.deviceID;
-    if (did != null) await _secure.write(_deviceIdKey, did);
-    await _secure.write(_deviceNameKey, client.clientName);
+    final dname = client.clientName;
+
+    try {
+      if (token != null) await _secure.write(_tokenKey, token);
+      if (uid != null) await _secure.write(_userIdKey, uid);
+      if (hs != null) await _secure.write(_homeserverKey, hs.toString());
+      if (did != null) await _secure.write(_deviceIdKey, did);
+      await _secure.write(_deviceNameKey, dname);
+    } catch (e) {
+      AppLogger.instance.warning('SecureStorage write failed', error: e);
+    }
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (token != null) await prefs.setString(_tokenKey, token);
+      if (uid != null) await prefs.setString(_userIdKey, uid);
+      if (hs != null) await prefs.setString(_homeserverKey, hs.toString());
+      if (did != null) await prefs.setString(_deviceIdKey, did);
+      await prefs.setString(_deviceNameKey, dname);
+    } catch (e) {
+      AppLogger.instance.warning('Backup credentials to SharedPreferences failed', error: e);
+    }
   }
 
   Future<DatabaseApi> _getDatabase() async {
@@ -282,10 +326,8 @@ class MatrixService {
         StateEvent(
           type: 'm.room.encryption',
           stateKey: '',
-          content: {'algorithm': 'm.megolm.v1.aes-sha2'},
-        ),
-      ],
-    );
+          content: {'algorithm': 'm.megolm.v1.aes-sha2'}),
+      ]);
     try {
       final room = requireClient.getRoomById(roomId);
       if (room != null && !room.encrypted) {
@@ -294,8 +336,7 @@ class MatrixService {
     } catch (e) {
       AppLogger.instance.warning(
         'Failed to enable encryption for group',
-        error: e,
-      );
+        error: e);
     }
     return roomId;
   }
@@ -315,8 +356,7 @@ class MatrixService {
       AppLogger.instance.warning(
         'Search users failed',
         error: e,
-        stackTrace: stackTrace,
-      );
+        stackTrace: stackTrace);
       return [];
     }
   }
@@ -329,8 +369,7 @@ class MatrixService {
       AppLogger.instance.warning(
         'Get user profile failed',
         error: e,
-        stackTrace: stackTrace,
-      );
+        stackTrace: stackTrace);
       return null;
     }
   }

@@ -2,7 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../theme/app_colors.dart';
-import '../theme/locale_provider.dart';
+import '../theme/locale_cubit.dart';
 
 class ChatInputArea extends StatelessWidget {
   final TextEditingController textController;
@@ -58,8 +58,7 @@ class ChatInputArea extends StatelessWidget {
         16,
         0,
         16,
-        viewBottom > 0 ? viewBottom : max(24, safeBottom),
-      ),
+        viewBottom > 0 ? viewBottom : max(24, safeBottom)),
       child: Center(
         child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: maxWidth - 32),
@@ -80,15 +79,13 @@ class ChatInputArea extends StatelessWidget {
                       : Color.lerp(
                           AppColors.divider(context),
                           AppColors.acc(context).withValues(alpha: 0.4),
-                          g,
-                        )!;
+                          g)!;
                   return Container(
                     decoration: BoxDecoration(
                       color: AppColors.sf(context),
                       borderRadius: BorderRadius.circular(28),
                       border: Border.all(color: borderColor),
-                      boxShadow: glowShadows,
-                    ),
+                      boxShadow: glowShadows),
                     padding: const EdgeInsets.all(8),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -98,19 +95,16 @@ class ChatInputArea extends StatelessWidget {
                             margin: const EdgeInsets.only(bottom: 4),
                             padding: const EdgeInsets.symmetric(
                               horizontal: 12,
-                              vertical: 6,
-                            ),
+                              vertical: 6),
                             decoration: BoxDecoration(
                               color: AppColors.sfAlt(context),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
+                              borderRadius: BorderRadius.circular(12)),
                             child: Row(
                               children: [
                                 Icon(
                                   LucideIcons.pencil,
                                   size: 13,
-                                  color: AppColors.sec(context),
-                                ),
+                                  color: AppColors.sec(context)),
                                 const SizedBox(width: 6),
                                 Expanded(
                                   child: Text(
@@ -118,22 +112,15 @@ class ChatInputArea extends StatelessWidget {
                                     style: TextStyle(
                                       color: AppColors.sec(context),
                                       fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ),
+                                      fontWeight: FontWeight.w500))),
                                 GestureDetector(
                                   behavior: HitTestBehavior.opaque,
                                   onTap: onCancelEdit,
                                   child: Icon(
                                     LucideIcons.x,
                                     size: 14,
-                                    color: AppColors.textHint(context),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                                    color: AppColors.textHint(context))),
+                              ])),
                         ConstrainedBox(
                           constraints: const BoxConstraints(maxHeight: 120),
                           child: TextField(
@@ -143,8 +130,7 @@ class ChatInputArea extends StatelessWidget {
                             style: TextStyle(
                               color: AppColors.textPrimary(context),
                               fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
+                              fontWeight: FontWeight.w500),
                             onSubmitted: (_) => onSend(),
                             onChanged: (_) => onChanged(),
                             decoration: InputDecoration(
@@ -153,30 +139,18 @@ class ChatInputArea extends StatelessWidget {
                                   : t('ask_anything'),
                               hintStyle: TextStyle(
                                 color: AppColors.textHint(context),
-                                fontWeight: FontWeight.w500,
-                              ),
+                                fontWeight: FontWeight.w500),
                               border: InputBorder.none,
                               focusedBorder: InputBorder.none,
                               enabledBorder: InputBorder.none,
                               contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 12,
-                                vertical: 12,
-                              ),
-                            ),
-                            maxLines: null,
-                          ),
-                        ),
+                                vertical: 12)),
+                            maxLines: null)),
                         _buildInputButtons(context, hasText),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+                      ]));
+                }),
+            ]))));
   }
 
   List<BoxShadow> _buildGlowShadows(double g, BuildContext context) {
@@ -185,12 +159,10 @@ class ChatInputArea extends StatelessWidget {
         BoxShadow(
           color: AppColors.acc(context).withValues(alpha: 0.5 * g),
           blurRadius: 24,
-          offset: Offset.zero,
-        ),
+          offset: Offset.zero),
         BoxShadow(
           color: AppColors.acc(context).withValues(alpha: 0.3 * g),
-          blurRadius: 8,
-        ),
+          blurRadius: 8),
       ];
     }
     return [];
@@ -208,8 +180,7 @@ class ChatInputArea extends StatelessWidget {
               sizeFactor: anim,
               axis: Axis.horizontal,
               axisAlignment: -1,
-              child: FadeTransition(opacity: anim, child: child),
-            ),
+              child: FadeTransition(opacity: anim, child: child)),
             child: isListening
                 ? SizedBox(
                     key: const ValueKey('listening-left'),
@@ -221,32 +192,24 @@ class ChatInputArea extends StatelessWidget {
                         height: 12,
                         decoration: BoxDecoration(
                           color: AppColors.textPrimary(context),
-                          borderRadius: BorderRadius.circular(2),
-                        ),
-                      ),
-                    ),
-                  )
+                          borderRadius: BorderRadius.circular(2)))))
                 : Row(
                     key: const ValueKey('normal-left'),
                     children: [
                       _circleBtn(
                         context,
                         LucideIcons.plus,
-                        onTap: onShowOptions,
-                      ),
+                        onTap: onShowOptions),
                       const SizedBox(width: 8),
                       _pillBtn(context, t('model'), onTap: onShowModels),
-                    ],
-                  ),
-          ),
+                    ])),
           AnimatedSwitcher(
             duration: const Duration(milliseconds: 250),
             transitionBuilder: (child, anim) => SizeTransition(
               sizeFactor: anim,
               axis: Axis.horizontal,
               axisAlignment: 1,
-              child: FadeTransition(opacity: anim, child: child),
-            ),
+              child: FadeTransition(opacity: anim, child: child)),
             child: isListening
                 ? Row(
                     key: const ValueKey('listening-right'),
@@ -260,17 +223,12 @@ class ChatInputArea extends StatelessWidget {
                           height: 34,
                           decoration: BoxDecoration(
                             color: AppColors.acc(context),
-                            borderRadius: BorderRadius.circular(17),
-                          ),
+                            borderRadius: BorderRadius.circular(17)),
                           child: Icon(
                             LucideIcons.check,
                             size: 18,
-                            color: AppColors.textPrimary(context),
-                          ),
-                        ),
-                      ),
-                    ],
-                  )
+                            color: AppColors.textPrimary(context)))),
+                    ])
                 : Row(
                     key: const ValueKey('normal-right'),
                     mainAxisSize: MainAxisSize.min,
@@ -286,17 +244,13 @@ class ChatInputArea extends StatelessWidget {
                             color: isIncognito
                                 ? AppColors.accBg(context)
                                 : Colors.transparent,
-                            borderRadius: BorderRadius.circular(17),
-                          ),
+                            borderRadius: BorderRadius.circular(17)),
                           child: Icon(
                             LucideIcons.glasses,
                             size: 20,
                             color: isIncognito
                                 ? AppColors.acc(context)
-                                : AppColors.sec(context),
-                          ),
-                        ),
-                      ),
+                                : AppColors.sec(context)))),
                       const SizedBox(width: 6),
                       GestureDetector(
                         behavior: HitTestBehavior.opaque,
@@ -309,8 +263,7 @@ class ChatInputArea extends StatelessWidget {
                           height: 34,
                           decoration: BoxDecoration(
                             color: AppColors.acc(context),
-                            borderRadius: BorderRadius.circular(17),
-                          ),
+                            borderRadius: BorderRadius.circular(17)),
                           child: AnimatedSwitcher(
                             duration: const Duration(milliseconds: 150),
                             child: isGenerating
@@ -318,30 +271,20 @@ class ChatInputArea extends StatelessWidget {
                                     LucideIcons.square,
                                     size: 16,
                                     color: AppColors.textPrimary(context),
-                                    key: const ValueKey('stop'),
-                                  )
+                                    key: const ValueKey('stop'))
                                 : hasText
                                 ? Icon(
                                     LucideIcons.arrowUp,
                                     size: 18,
                                     color: AppColors.textPrimary(context),
-                                    key: const ValueKey('send'),
-                                  )
+                                    key: const ValueKey('send'))
                                 : Icon(
                                     LucideIcons.mic,
                                     size: 18,
                                     color: AppColors.textPrimary(context),
-                                    key: const ValueKey('mic'),
-                                  ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-          ),
-        ],
-      ),
-    );
+                                    key: const ValueKey('mic'))))),
+                    ])),
+        ]));
   }
 
   Widget _circleBtn(
@@ -357,11 +300,8 @@ class ChatInputArea extends StatelessWidget {
         height: 32,
         decoration: BoxDecoration(
           color: AppColors.sfHover(context),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Icon(icon, size: 18, color: AppColors.sec(context)),
-      ),
-    );
+          borderRadius: BorderRadius.circular(16)),
+        child: Icon(icon, size: 18, color: AppColors.sec(context))));
   }
 
   Widget _pillBtn(BuildContext context, String text, {VoidCallback? onTap}) {
@@ -373,19 +313,13 @@ class ChatInputArea extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14),
         decoration: BoxDecoration(
           color: AppColors.sfHover(context),
-          borderRadius: BorderRadius.circular(16),
-        ),
+          borderRadius: BorderRadius.circular(16)),
         child: Center(
           child: Text(
             text,
             style: TextStyle(
               color: AppColors.sec(context),
               fontSize: 13,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
-      ),
-    );
+              fontWeight: FontWeight.w500)))));
   }
 }

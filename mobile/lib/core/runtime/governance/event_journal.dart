@@ -47,8 +47,7 @@ class EventJournal {
       sequence: _sequence++,
       timestamp: _clock.now(),
       type: type,
-      data: data,
-    );
+      data: data);
     _entries.add(entry);
     _persistEntry(entry);
 
@@ -144,8 +143,7 @@ class EventJournal {
         'compactedFrom': snapshot.sequence - keep,
         'compactedTo': snapshot.sequence,
         'entriesRemoved': _compactionThreshold - keep,
-      },
-    );
+      });
     _entries.insert(0, compactEntry);
   }
 

@@ -4,7 +4,7 @@ import '../../core/audit_log_service.dart';
 import '../../core/runtime/sdk/omnivium_sdk.dart';
 import '../../core/runtime/event_bus.dart';
 import '../theme/app_colors.dart';
-import '../theme/locale_provider.dart';
+import '../theme/locale_cubit.dart';
 
 class AiOperationLogView extends StatefulWidget {
   const AiOperationLogView({super.key});
@@ -63,8 +63,7 @@ class _AiOperationLogViewState extends State<AiOperationLogView>
             .where(
               (e) =>
                   e.type == 'capability.invoked' ||
-                  e.type == 'capability.denied',
-            )
+                  e.type == 'capability.denied')
             .toList();
       case 2:
         return _entries.where((e) => !e.allowed).toList();
@@ -85,18 +84,14 @@ class _AiOperationLogViewState extends State<AiOperationLogView>
           tooltip: t('back'),
           icon: Icon(
             LucideIcons.chevronLeft,
-            color: AppColors.textPrimary(context),
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
+            color: AppColors.textPrimary(context)),
+          onPressed: () => Navigator.pop(context)),
         title: Text(
           t('ai_operation_log'),
           style: TextStyle(
             color: AppColors.textPrimary(context),
             fontSize: 17,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+            fontWeight: FontWeight.w600)),
         bottom: TabBar(
           controller: _tabController,
           onTap: (_) => setState(() {}),
@@ -107,9 +102,7 @@ class _AiOperationLogViewState extends State<AiOperationLogView>
             Tab(text: t('all')),
             Tab(text: t('permissions')),
             Tab(text: t('violations')),
-          ],
-        ),
-      ),
+          ])),
       body: Column(
         children: [
           _buildSummaryCards(context),
@@ -121,12 +114,8 @@ class _AiOperationLogViewState extends State<AiOperationLogView>
                     itemCount: _filteredEntries.length,
                     itemBuilder: (context, index) {
                       return _buildLogCard(context, _filteredEntries[index]);
-                    },
-                  ),
-          ),
-        ],
-      ),
-    );
+                    })),
+        ]));
   }
 
   Widget _buildSummaryCards(BuildContext context) {
@@ -146,27 +135,22 @@ class _AiOperationLogViewState extends State<AiOperationLogView>
             t('total_ops'),
             total,
             LucideIcons.activity,
-            AppColors.acc(context),
-          ),
+            AppColors.acc(context)),
           const SizedBox(width: 8),
           _buildStatCard(
             context,
             t('allowed'),
             allowed,
             LucideIcons.checkCircle2,
-            AppColors.ok(context),
-          ),
+            AppColors.ok(context)),
           const SizedBox(width: 8),
           _buildStatCard(
             context,
             t('denied'),
             denied,
             LucideIcons.shieldAlert,
-            AppColors.dng(context),
-          ),
-        ],
-      ),
-    );
+            AppColors.dng(context)),
+        ]));
   }
 
   Widget _buildStatCard(
@@ -174,16 +158,14 @@ class _AiOperationLogViewState extends State<AiOperationLogView>
     String label,
     int value,
     IconData icon,
-    Color color,
-  ) {
+    Color color) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
           color: AppColors.sf(context),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withValues(alpha: 0.15)),
-        ),
+          border: Border.all(color: color.withValues(alpha: 0.15))),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -195,24 +177,16 @@ class _AiOperationLogViewState extends State<AiOperationLogView>
                   label,
                   style: TextStyle(
                     color: AppColors.textTertiary(context),
-                    fontSize: 11,
-                  ),
-                ),
-              ],
-            ),
+                    fontSize: 11)),
+              ]),
             const SizedBox(height: 4),
             Text(
               '$value',
               style: TextStyle(
                 color: color,
                 fontSize: 20,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+                fontWeight: FontWeight.w700)),
+          ])));
   }
 
   Widget _buildEmpty(BuildContext context) {
@@ -223,19 +197,14 @@ class _AiOperationLogViewState extends State<AiOperationLogView>
           Icon(
             LucideIcons.shieldCheck,
             size: 48,
-            color: AppColors.iconGray(context),
-          ),
+            color: AppColors.iconGray(context)),
           const SizedBox(height: 12),
           Text(
             localeProvider.t('no_operation_logs'),
             style: TextStyle(
               color: AppColors.textSecondary(context),
-              fontSize: 15,
-            ),
-          ),
-        ],
-      ),
-    );
+              fontSize: 15)),
+        ]));
   }
 
   Widget _buildLogCard(BuildContext context, AuditLogEntry entry) {
@@ -252,12 +221,10 @@ class _AiOperationLogViewState extends State<AiOperationLogView>
       decoration: BoxDecoration(
         color: AppColors.sf(context),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: statusColor.withValues(alpha: 0.2), width: 1),
-      ),
+        border: Border.all(color: statusColor.withValues(alpha: 0.2), width: 1)),
       child: Theme(
         data: Theme.of(context).copyWith(
-          dividerTheme: const DividerThemeData(color: Colors.transparent),
-        ),
+          dividerTheme: const DividerThemeData(color: Colors.transparent)),
         child: ExpansionTile(
           tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
@@ -266,60 +233,48 @@ class _AiOperationLogViewState extends State<AiOperationLogView>
             height: 36,
             decoration: BoxDecoration(
               color: statusColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(statusIcon, size: 18, color: statusColor),
-          ),
+              borderRadius: BorderRadius.circular(10)),
+            child: Icon(statusIcon, size: 18, color: statusColor)),
           title: Text(
             entry.operation,
             style: TextStyle(
               color: AppColors.textPrimary(context),
               fontSize: 14,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+              fontWeight: FontWeight.w600)),
           subtitle: Row(
             children: [
               Text(
                 entry.actor,
                 style: TextStyle(
                   color: AppColors.textTertiary(context),
-                  fontSize: 11,
-                ),
-              ),
+                  fontSize: 11)),
               const SizedBox(width: 8),
               Text(
                 _formatTimestamp(entry.timestamp),
                 style: TextStyle(
                   color: AppColors.textDisabled(context),
-                  fontSize: 11,
-                ),
-              ),
-            ],
-          ),
+                  fontSize: 11)),
+            ]),
           children: [
             _buildDetailRow(
               context,
               localeProvider.t('type'),
               entry.type,
               LucideIcons.tag,
-              AppColors.acc(context),
-            ),
+              AppColors.acc(context)),
             _buildDetailRow(
               context,
               localeProvider.t('actor'),
               entry.actor,
               LucideIcons.user,
-              AppColors.acc(context),
-            ),
+              AppColors.acc(context)),
             if (entry.target.isNotEmpty)
               _buildDetailRow(
                 context,
                 localeProvider.t('target'),
                 entry.target,
                 LucideIcons.target,
-                AppColors.sec(context),
-              ),
+                AppColors.sec(context)),
             _buildDetailRow(
               context,
               localeProvider.t('status'),
@@ -327,8 +282,7 @@ class _AiOperationLogViewState extends State<AiOperationLogView>
                   ? localeProvider.t('allowed')
                   : localeProvider.t('denied'),
               isAllowed ? LucideIcons.check : LucideIcons.ban,
-              statusColor,
-            ),
+              statusColor),
             if (entry.details.isNotEmpty) ...[
               const SizedBox(height: 8),
               Row(
@@ -336,41 +290,30 @@ class _AiOperationLogViewState extends State<AiOperationLogView>
                   Icon(
                     LucideIcons.fileText,
                     size: 12,
-                    color: AppColors.textTertiary(context),
-                  ),
+                    color: AppColors.textTertiary(context)),
                   const SizedBox(width: 4),
                   Text(
                     localeProvider.t('details'),
                     style: TextStyle(
                       color: AppColors.textTertiary(context),
                       fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
+                      fontWeight: FontWeight.w600)),
+                ]),
               const SizedBox(height: 4),
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: AppColors.sfAlt(context),
-                  borderRadius: BorderRadius.circular(8),
-                ),
+                  borderRadius: BorderRadius.circular(8)),
                 child: SelectableText(
                   _formatDetails(entry.details),
                   style: TextStyle(
                     color: AppColors.textSecondary(context),
                     fontSize: 12,
-                    fontFamily: 'monospace',
-                  ),
-                ),
-              ),
+                    fontFamily: 'monospace'))),
             ],
-          ],
-        ),
-      ),
-    );
+          ])));
   }
 
   Widget _buildDetailRow(
@@ -378,8 +321,7 @@ class _AiOperationLogViewState extends State<AiOperationLogView>
     String label,
     String value,
     IconData icon,
-    Color color,
-  ) {
+    Color color) {
     return Padding(
       padding: const EdgeInsets.only(top: 6),
       child: Row(
@@ -391,23 +333,16 @@ class _AiOperationLogViewState extends State<AiOperationLogView>
             style: TextStyle(
               color: color,
               fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+              fontWeight: FontWeight.w600)),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               value,
               style: TextStyle(
                 color: AppColors.textSecondary(context),
-                fontSize: 12,
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
-      ),
-    );
+                fontSize: 12),
+              overflow: TextOverflow.ellipsis)),
+        ]));
   }
 
   String _formatTimestamp(int ms) {

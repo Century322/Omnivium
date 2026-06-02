@@ -59,8 +59,7 @@ mixin HomeScrollMixin<T extends StatefulWidget> on State<T> {
         .animateTo(
           target,
           duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        )
+          curve: Curves.easeOut)
         .then((_) {
           if (mounted) {
             _isAutoScrolling = false;

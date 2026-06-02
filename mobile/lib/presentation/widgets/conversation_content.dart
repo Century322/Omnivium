@@ -56,8 +56,7 @@ class ConversationContent extends StatelessWidget {
                 physics: const BouncingScrollPhysics(),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 20,
-                  vertical: 8,
-                ),
+                  vertical: 8),
                 itemCount: items.length + 1,
                 itemBuilder: (_, index) {
                   if (index == items.length) {
@@ -65,13 +64,9 @@ class ConversationContent extends StatelessWidget {
                   }
                   return Padding(
                     padding: EdgeInsets.only(
-                      bottom: items[index].bottomPadding,
-                    ),
-                    child: items[index].widget,
-                  );
-                },
-              ),
-            ),
+                      bottom: items[index].bottomPadding),
+                    child: items[index].widget);
+                })),
             if (showScrollBtn)
               Positioned(
                 right: 20,
@@ -89,22 +84,14 @@ class ConversationContent extends StatelessWidget {
                       boxShadow: [
                         BoxShadow(
                           color: AppColors.bg(context).withValues(alpha: 0.3),
-                          blurRadius: 8,
-                        ),
-                      ],
-                    ),
+                          blurRadius: 8),
+                      ]),
                     child: Icon(
                       LucideIcons.chevronDown,
                       size: 18,
-                      color: AppColors.sec(context),
-                    ),
-                  ),
-                ),
-              ),
-          ],
-        );
-      },
-    );
+                      color: AppColors.sec(context))))),
+          ]);
+      });
   }
 
   List<ListItemData> _buildItems(BuildContext context) {
@@ -117,11 +104,8 @@ class ConversationContent extends StatelessWidget {
           ListItemData(
             UserBubble(
               content: msg.content,
-              onLongPress: longPress != null ? () => longPress(i) : null,
-            ),
-            12,
-          ),
-        );
+              onLongPress: longPress != null ? () => longPress(i) : null),
+            12));
       } else {
         if (msg.thoughts.isNotEmpty) {
           items.add(
@@ -129,22 +113,16 @@ class ConversationContent extends StatelessWidget {
               ThoughtChainPanel(
                 thoughts: msg.thoughts,
                 isExpanded: expandedThoughts.contains(i),
-                onToggle: () => onToggleThought(i),
-              ),
-              4,
-            ),
-          );
+                onToggle: () => onToggleThought(i)),
+              4));
         }
         items.add(
           ListItemData(
             AiTextBubble(
               content: msg.content,
               isStreaming: msg.isStreaming,
-              onLongPress: longPress != null ? () => longPress(i) : null,
-            ),
-            12,
-          ),
-        );
+              onLongPress: longPress != null ? () => longPress(i) : null),
+            12));
         final isLastAi = i == messages.length - 1 && !msg.isStreaming;
         if (isLastAi) {
           items.add(
@@ -156,11 +134,8 @@ class ConversationContent extends StatelessWidget {
                 onCopy: () => onCopy(msg.content),
                 onSpeak: onSpeak,
                 onShare: () => onShare(msg.content),
-                onMore: () => onMore(msg.content, i),
-              ),
-              36,
-            ),
-          );
+                onMore: () => onMore(msg.content, i)),
+              36));
           final logs = orchestrator.executionLogs;
           if (logs.isNotEmpty) {
             items.add(ListItemData(ExecutionLogBubble(log: logs.last), 8));
@@ -172,9 +147,7 @@ class ConversationContent extends StatelessWidget {
             items.add(
               ListItemData(
                 ThoughtChainPanel(thoughts: currentThoughts, isExpanded: true),
-                4,
-              ),
-            );
+                4));
           }
           if (orchestrator.isThinking || orchestrator.isReflecting) {
             items.add(const ListItemData(ThinkingIndicator(), 4));

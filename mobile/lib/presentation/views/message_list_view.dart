@@ -1,16 +1,17 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:matrix/matrix.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../theme/app_colors.dart';
-import '../theme/locale_provider.dart';
-import '../../core/app_provider.dart';
+import '../theme/locale_cubit.dart';
+
 import '../../core/app_navigator.dart';
+import '../../core/di/app_di.dart';
+import '../../core/matrix/matrix_cubit.dart';
+import '../../core/matrix/matrix_dtos.dart';
+import '../../core/session_cubit.dart';
 import 'friend_profile_view.dart';
 
-class MessageListView extends StatefulWidget {
-  final AppProvider provider;
-  const MessageListView({super.key, required this.provider});
+class MessageListView extends StatefulWidget { const MessageListView({super.key});
 
   @override
   State<MessageListView> createState() => _MessageListViewState();
@@ -19,12 +20,12 @@ class MessageListView extends StatefulWidget {
 class _MessageListViewState extends State<MessageListView> {
   String _searchQuery = '';
 
-  List<Room> get _filteredRooms {
-    final rooms = widget.provider.matrix.rooms;
+  List<RoomInfo> get _filteredRooms {
+    final rooms = getIt<MatrixCubit>().getAllRooms();
     if (_searchQuery.isEmpty) return rooms;
     return rooms.where((room) {
-      final name = room.getLocalizedDisplayname().toLowerCase();
-      final lastMsg = room.lastEvent?.plaintextBody.toLowerCase() ?? '';
+      final name = room.displayName.toLowerCase();
+      final lastMsg = room.lastEvent?.plaintextBody?.toLowerCase() ?? room.lastEvent?.body.toLowerCase() ?? '';
       return name.contains(_searchQuery.toLowerCase()) ||
           lastMsg.contains(_searchQuery.toLowerCase());
     }).toList();
@@ -41,36 +42,29 @@ class _MessageListViewState extends State<MessageListView> {
           tooltip: localeProvider.t('back'),
           icon: Icon(
             LucideIcons.arrowLeft,
-            color: AppColors.textSecondary(context),
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
+            color: AppColors.textSecondary(context)),
+          onPressed: () => Navigator.pop(context)),
         title: Text(
           localeProvider.t('messages'),
           style: TextStyle(
             color: AppColors.textPrimary(context),
             fontSize: 17,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+            fontWeight: FontWeight.w600)),
         actions: [
           IconButton(
             tooltip: localeProvider.t('new_chat'),
             icon: Icon(
               LucideIcons.edit,
               color: AppColors.acc(context),
-              size: 20,
-            ),
-            onPressed: () => _showNewChatOptions(context),
-          ),
-        ],
-      ),
+              size: 20),
+            onPressed: () => _showNewChatOptions(context)),
+        ]),
       body: Column(
         children: [
           _buildSearchBar(context),
           Expanded(
-            child: ListenableBuilder(
-              listenable: widget.provider.matrix,
+            child: StreamBuilder<MatrixCubitState>(
+              stream: getIt<MatrixCubit>().stream,
               builder: (context, _) {
                 final rooms = _filteredRooms;
                 if (rooms.isEmpty) {
@@ -79,21 +73,14 @@ class _MessageListViewState extends State<MessageListView> {
                 return ListView.builder(
                   itemCount: rooms.length,
                   itemBuilder: (context, index) => RepaintBoundary(
-                    child: _buildChatTile(context, rooms[index]),
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
+                    child: _buildChatTile(context, rooms[index])));
+              })),
+        ]),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showNewChatOptions(context),
         backgroundColor: AppColors.acc(context),
         foregroundColor: AppColors.bg(context),
-        child: const Icon(LucideIcons.messageSquarePlus, size: 22),
-      ),
-    );
+        child: const Icon(LucideIcons.messageSquarePlus, size: 22)));
   }
 
   Widget _buildSearchBar(BuildContext context) {
@@ -104,61 +91,49 @@ class _MessageListViewState extends State<MessageListView> {
         height: 40,
         decoration: BoxDecoration(
           color: AppColors.bg(context),
-          borderRadius: BorderRadius.circular(20),
-        ),
+          borderRadius: BorderRadius.circular(20)),
         padding: const EdgeInsets.symmetric(horizontal: 14),
         child: Row(
           children: [
             Icon(
               LucideIcons.search,
               size: 16,
-              color: AppColors.textHint(context),
-            ),
+              color: AppColors.textHint(context)),
             const SizedBox(width: 10),
             Expanded(
               child: TextField(
                 maxLength: 128,
                 style: TextStyle(
                   color: AppColors.textPrimary(context),
-                  fontSize: 14,
-                ),
+                  fontSize: 14),
                 decoration: InputDecoration(
                   labelText: localeProvider.t('search_messages'),
                   hintStyle: TextStyle(
                     color: AppColors.textDisabled(context),
-                    fontSize: 14,
-                  ),
+                    fontSize: 14),
                   border: InputBorder.none,
                   focusedBorder: InputBorder.none,
-                  enabledBorder: InputBorder.none,
-                ),
-                onChanged: (v) => setState(() => _searchQuery = v),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+                  enabledBorder: InputBorder.none),
+                onChanged: (v) => setState(() => _searchQuery = v))),
+          ])));
   }
 
-  Widget _buildChatTile(BuildContext context, Room room) {
-    final displayName = room.getLocalizedDisplayname();
+  Widget _buildChatTile(BuildContext context, RoomInfo room) {
+    final displayName = room.displayName;
     final initial = displayName.isNotEmpty ? displayName[0].toUpperCase() : '?';
     final isDirect = room.isDirectChat;
     final lastEvent = room.lastEvent;
-    final lastMessage = lastEvent?.plaintextBody ?? '';
-    final time = lastEvent?.originServerTs;
+    final lastMessage = lastEvent?.plaintextBody ?? lastEvent?.body ?? '';
+    final time = lastEvent?.timestamp;
     final timeStr = time != null ? _formatTime(time) : '';
     final unreadCount = room.notificationCount;
-    final isEncrypted = room.encrypted;
+    final isEncrypted = room.isEncrypted;
 
     return Container(
       decoration: BoxDecoration(
         color: AppColors.sf(context),
         border: Border(
-          bottom: BorderSide(color: AppColors.divider(context), width: 0.5),
-        ),
-      ),
+          bottom: BorderSide(color: AppColors.divider(context), width: 0.5))),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         leading: Stack(
@@ -172,17 +147,12 @@ class _MessageListViewState extends State<MessageListView> {
                   padding: const EdgeInsets.all(2),
                   decoration: BoxDecoration(
                     color: AppColors.sf(context),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
+                    borderRadius: BorderRadius.circular(6)),
                   child: Icon(
                     LucideIcons.shieldCheck,
                     size: 10,
-                    color: AppColors.acc(context),
-                  ),
-                ),
-              ),
-          ],
-        ),
+                    color: AppColors.acc(context)))),
+          ]),
         title: Row(
           children: [
             Expanded(
@@ -191,12 +161,9 @@ class _MessageListViewState extends State<MessageListView> {
                 style: TextStyle(
                   color: AppColors.textPrimary(context),
                   fontWeight: FontWeight.w500,
-                  fontSize: 15,
-                ),
+                  fontSize: 15),
                 maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
+                overflow: TextOverflow.ellipsis)),
             if (timeStr.isNotEmpty)
               Text(
                 timeStr,
@@ -204,89 +171,62 @@ class _MessageListViewState extends State<MessageListView> {
                   color: unreadCount > 0
                       ? AppColors.acc(context)
                       : AppColors.textDisabled(context),
-                  fontSize: 11,
-                ),
-              ),
-          ],
-        ),
+                  fontSize: 11)),
+          ]),
         subtitle: Row(
           children: [
-            if (room.pushRuleState == PushRuleState.dontNotify)
+            if (room.isMuted)
               Padding(
                 padding: const EdgeInsets.only(right: 4),
                 child: Icon(
                   LucideIcons.bellOff,
                   size: 12,
-                  color: AppColors.textDisabled(context),
-                ),
-              ),
+                  color: AppColors.textDisabled(context))),
             Expanded(
-              child: room.typingUsers.isNotEmpty
+              child: getIt<MatrixCubit>().getTypingUserIds(room.id).isNotEmpty
                   ? Text(
                       localeProvider.t('typing'),
                       style: TextStyle(
                         color: AppColors.acc(context),
                         fontSize: 13,
-                        fontStyle: FontStyle.italic,
-                      ),
+                        fontStyle: FontStyle.italic),
                       maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    )
+                      overflow: TextOverflow.ellipsis)
                   : Text(
                       lastMessage,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: AppColors.mut(context),
-                        fontSize: 13,
-                      ),
-                    ),
-            ),
+                        fontSize: 13))),
             if (room.isFavourite)
               Padding(
                 padding: const EdgeInsets.only(left: 4),
                 child: Icon(
                   LucideIcons.pin,
                   size: 12,
-                  color: AppColors.textDisabled(context),
-                ),
-              ),
+                  color: AppColors.textDisabled(context))),
             if (unreadCount > 0)
               Flexible(
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 6,
-                    vertical: 2,
-                  ),
+                    vertical: 2),
                   decoration: BoxDecoration(
                     color: AppColors.acc(context),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
+                    borderRadius: BorderRadius.circular(10)),
                   child: Text(
                     unreadCount > 999 ? '999+' : '$unreadCount',
                     style: TextStyle(
                       color: AppColors.bg(context),
                       fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ),
-          ],
-        ),
+                      fontWeight: FontWeight.w700)))),
+          ]),
         onTap: () {
-          widget.provider.matrix.setActiveRoom(room.id);
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) =>
-                  FriendProfileView(provider: widget.provider, roomId: room.id),
-            ),
-          );
+          getIt<MatrixCubit>().setActiveRoom(room.id);
+          AppNavigator.push<void>(context, '/chat', args: {'roomId': room.id});
         },
-        onLongPress: () => _showChatOptions(context, room),
-      ),
-    );
+        onLongPress: () => _showChatOptions(context, room)));
   }
 
   Widget _buildEmptyState(BuildContext context) {
@@ -297,25 +237,20 @@ class _MessageListViewState extends State<MessageListView> {
           Icon(
             LucideIcons.messageSquare,
             size: 56,
-            color: AppColors.textDisabled(context),
-          ),
+            color: AppColors.textDisabled(context)),
           const SizedBox(height: 16),
           Text(
             localeProvider.t('no_chats'),
             style: TextStyle(
               color: AppColors.textHint(context),
               fontWeight: FontWeight.w500,
-              fontSize: 16,
-            ),
-          ),
+              fontSize: 16)),
           const SizedBox(height: 4),
           Text(
             localeProvider.t('start_new_chat_hint'),
             style: TextStyle(
               color: AppColors.textDisabled(context),
-              fontSize: 13,
-            ),
-          ),
+              fontSize: 13)),
           const SizedBox(height: 24),
           FilledButton(
             onPressed: () => _showNewChatOptions(context),
@@ -323,26 +258,19 @@ class _MessageListViewState extends State<MessageListView> {
               backgroundColor: AppColors.acc(context),
               foregroundColor: AppColors.bg(context),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
+                borderRadius: BorderRadius.circular(12))),
             child: Text(
               localeProvider.t('new_chat'),
-              style: const TextStyle(fontWeight: FontWeight.w600),
-            ),
-          ),
-        ],
-      ),
-    );
+              style: const TextStyle(fontWeight: FontWeight.w600))),
+        ]));
   }
 
   void _showNewChatOptions(BuildContext context) {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       backgroundColor: AppColors.sf(context),
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (ctx) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -354,63 +282,48 @@ class _MessageListViewState extends State<MessageListView> {
                 height: 4,
                 decoration: BoxDecoration(
                   color: AppColors.divider(context),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
+                  borderRadius: BorderRadius.circular(2)))),
             ListTile(
               leading: CircleAvatar(
                 backgroundColor: AppColors.accBg(context),
                 child: Icon(
                   LucideIcons.userPlus,
                   color: AppColors.acc(context),
-                  size: 20,
-                ),
-              ),
+                  size: 20)),
               title: Text(
                 localeProvider.t('add_contact'),
-                style: TextStyle(color: AppColors.textPrimary(context)),
-              ),
+                style: TextStyle(color: AppColors.textPrimary(context))),
               onTap: () {
                 Navigator.pop(ctx);
-                AppNavigator.go(context, '/add-friend');
-              },
-            ),
+                AppNavigator.go<void>(context, '/add-friend');
+              }),
             ListTile(
               leading: CircleAvatar(
                 backgroundColor: AppColors.accBg(context),
                 child: Icon(
                   LucideIcons.users,
                   color: AppColors.acc(context),
-                  size: 20,
-                ),
-              ),
+                  size: 20)),
               title: Text(
                 localeProvider.t('new_group'),
-                style: TextStyle(color: AppColors.textPrimary(context)),
-              ),
+                style: TextStyle(color: AppColors.textPrimary(context))),
               onTap: () {
                 Navigator.pop(ctx);
                 _showCreateGroup(context);
-              },
-            ),
+              }),
             const SizedBox(height: 16),
-          ],
-        ),
-      ),
-    );
+          ])));
   }
 
   void _showCreateGroup(BuildContext context) {
     final nameController = TextEditingController();
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.sf(context),
         title: Text(
           localeProvider.t('new_group'),
-          style: TextStyle(color: AppColors.textPrimary(context)),
-        ),
+          style: TextStyle(color: AppColors.textPrimary(context))),
         content: TextField(
           controller: nameController,
           maxLength: 100,
@@ -419,14 +332,10 @@ class _MessageListViewState extends State<MessageListView> {
             labelText: localeProvider.t('group_name'),
             hintStyle: TextStyle(color: AppColors.textDisabled(context)),
             enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: AppColors.divider(context)),
-            ),
+              borderSide: BorderSide(color: AppColors.divider(context))),
             focusedBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: AppColors.acc(context)),
-            ),
-          ),
-          autofocus: true,
-        ),
+              borderSide: BorderSide(color: AppColors.acc(context)))),
+          autofocus: true),
         actions: [
           TextButton(
             onPressed: () {
@@ -435,9 +344,7 @@ class _MessageListViewState extends State<MessageListView> {
             },
             child: Text(
               localeProvider.t('cancel'),
-              style: TextStyle(color: AppColors.mut(context)),
-            ),
-          ),
+              style: TextStyle(color: AppColors.mut(context)))),
           FilledButton(
             onPressed: () async {
               final name = nameController.text.trim();
@@ -445,42 +352,33 @@ class _MessageListViewState extends State<MessageListView> {
               Navigator.pop(ctx);
               nameController.dispose();
               try {
-                final roomId = await widget.provider.matrix.createGroupChat(
-                  name,
-                );
+                final roomId = await getIt<MatrixCubit>().createGroupChat(
+                  name);
                 if (!mounted) return;
-                widget.provider.matrix.setActiveRoom(roomId);
+                getIt<MatrixCubit>().setActiveRoom(roomId);
               } catch (e) {
                 if (mounted && context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
-                        '$e'.isEmpty ? localeProvider.t('error') : '$e',
-                      ),
-                      backgroundColor: AppColors.dng(context),
-                    ),
-                  );
+                        '$e'.isEmpty ? localeProvider.t('error') : '$e'),
+                      backgroundColor: AppColors.dng(context)));
                 }
               }
             },
             style: FilledButton.styleFrom(
               backgroundColor: AppColors.acc(context),
-              foregroundColor: AppColors.bg(context),
-            ),
-            child: Text(localeProvider.t('create')),
-          ),
-        ],
-      ),
-    );
+              foregroundColor: AppColors.bg(context)),
+            child: Text(localeProvider.t('create'))),
+        ]));
   }
 
-  void _showChatOptions(BuildContext context, Room room) {
-    showModalBottomSheet(
+  void _showChatOptions(BuildContext context, RoomInfo room) {
+    showModalBottomSheet<void>(
       context: context,
       backgroundColor: AppColors.sf(context),
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (ctx) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -492,135 +390,97 @@ class _MessageListViewState extends State<MessageListView> {
                 height: 4,
                 decoration: BoxDecoration(
                   color: AppColors.divider(context),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
+                  borderRadius: BorderRadius.circular(2)))),
             ListTile(
               leading: Icon(
                 LucideIcons.pin,
-                color: AppColors.textSecondary(context),
-              ),
+                color: AppColors.textSecondary(context)),
               title: Text(
                 localeProvider.t('pin_chat'),
-                style: TextStyle(color: AppColors.textPrimary(context)),
-              ),
+                style: TextStyle(color: AppColors.textPrimary(context))),
               onTap: () {
                 Navigator.pop(ctx);
-                widget.provider.session.togglePinSession(
-                  widget.provider.session.activeSessionId ?? '',
-                );
-              },
-            ),
+                getIt<SessionCubit>().togglePinSession(
+                  getIt<SessionCubit>().activeSessionId ?? '');
+              }),
             ListTile(
               leading: Icon(
                 LucideIcons.bellOff,
-                color: AppColors.textSecondary(context),
-              ),
+                color: AppColors.textSecondary(context)),
               title: Text(
                 localeProvider.t('mute'),
-                style: TextStyle(color: AppColors.textPrimary(context)),
-              ),
+                style: TextStyle(color: AppColors.textPrimary(context))),
               onTap: () {
                 Navigator.pop(ctx);
-                widget.provider.session.toggleMuteSession(
-                  widget.provider.session.activeSessionId ?? '',
-                );
-              },
-            ),
+                getIt<SessionCubit>().toggleMuteSession(
+                  getIt<SessionCubit>().activeSessionId ?? '');
+              }),
             ListTile(
               leading: Icon(
                 LucideIcons.archive,
-                color: AppColors.textSecondary(context),
-              ),
+                color: AppColors.textSecondary(context)),
               title: Text(
                 localeProvider.t('archive'),
-                style: TextStyle(color: AppColors.textPrimary(context)),
-              ),
-              onTap: () => Navigator.pop(ctx),
-            ),
+                style: TextStyle(color: AppColors.textPrimary(context))),
+              onTap: () => Navigator.pop(ctx)),
             ListTile(
               leading: Icon(LucideIcons.trash2, color: AppColors.dng(context)),
               title: Text(
                 localeProvider.t('delete_chat'),
-                style: TextStyle(color: AppColors.dng(context)),
-              ),
+                style: TextStyle(color: AppColors.dng(context))),
               onTap: () {
                 Navigator.pop(ctx);
-                showDialog(
+                showDialog<void>(
                   context: context,
                   builder: (_) => AlertDialog(
                     backgroundColor: AppColors.sf(context),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
+                      borderRadius: BorderRadius.circular(16)),
                     title: Text(
                       localeProvider.t('delete_chat'),
-                      style: TextStyle(color: AppColors.textPrimary(context)),
-                    ),
+                      style: TextStyle(color: AppColors.textPrimary(context))),
                     content: Text(
                       localeProvider.t('delete_chat_confirm'),
-                      style: TextStyle(color: AppColors.textSecondary(context)),
-                    ),
+                      style: TextStyle(color: AppColors.textSecondary(context))),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(context),
-                        child: Text(localeProvider.t('cancel')),
-                      ),
+                        child: Text(localeProvider.t('cancel'))),
                       FilledButton(
                         style: FilledButton.styleFrom(
-                          backgroundColor: AppColors.dng(context),
-                        ),
+                          backgroundColor: AppColors.dng(context)),
                         onPressed: () {
                           Navigator.pop(context);
-                          room.leave();
+                          getIt<MatrixCubit>().leaveRoom(room.id);
                         },
-                        child: Text(localeProvider.t('delete')),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
+                        child: Text(localeProvider.t('delete'))),
+                    ]));
+              }),
             const SizedBox(height: 16),
-          ],
-        ),
-      ),
-    );
+          ])));
   }
 
-  Widget _buildAvatar(Room room, String initial, bool isDirect) {
-    final avatarUrl = room.avatar;
+  Widget _buildAvatar(RoomInfo room, String initial, bool isDirect) {
+    final avatarUrl = room.avatarUrl;
     if (avatarUrl != null) {
-      final client = widget.provider.matrix.client;
-      if (client != null) {
-        final httpUrl = avatarUrl.getDownloadUri(client);
+      final httpUrl = getIt<MatrixCubit>().getMediaUrl(avatarUrl);
+      if (httpUrl != null) {
         return CircleAvatar(
           radius: 24,
           backgroundColor: AppColors.accBg(context),
           child: CachedNetworkImage(
-            imageUrl: httpUrl.toString(),
-            httpHeaders: client.accessToken != null
-                ? {'authorization': 'Bearer ${client.accessToken}'}
-                : null,
+            imageUrl: httpUrl,
             imageBuilder: (_, imageProvider) => Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
-              ),
-            ),
+                image: DecorationImage(image: imageProvider, fit: BoxFit.cover))),
             errorWidget: (_, _, _) => Center(
               child: Text(
                 initial.toUpperCase(),
                 style: TextStyle(
                   color: AppColors.acc(context),
                   fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-        );
+                  fontWeight: FontWeight.w600)))));
       }
     }
     return CircleAvatar(
@@ -634,15 +494,11 @@ class _MessageListViewState extends State<MessageListView> {
               style: TextStyle(
                 color: AppColors.acc(context),
                 fontWeight: FontWeight.w600,
-                fontSize: 18,
-              ),
-            )
+                fontSize: 18))
           : Icon(
               LucideIcons.users,
               size: 20,
-              color: AppColors.textSecondary(context),
-            ),
-    );
+              color: AppColors.textSecondary(context)));
   }
 
   String _formatTime(DateTime dt) {

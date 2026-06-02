@@ -1,44 +1,42 @@
-include: package:flutter_lints/flutter.yaml
+include: package:very_good_analysis/analysis_options.yaml
 
 analyzer:
   exclude:
     - build/**
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
   errors:
-    avoid_print: warning
-    avoid_empty_else: error
-    avoid_relative_lib_imports: warning
-    prefer_single_quotes: ignore
-    always_declare_return_types: warning
-    require_trailing_commas: ignore
-    unnecessary_string_escapes: warning
-    unnecessary_const: warning
-    unnecessary_new: warning
-    unnecessary_null_in_if_null_operators: warning
-    prefer_const_constructors: ignore
-    prefer_const_declarations: ignore
-    prefer_final_locals: ignore
-    curly_braces_in_flow_control_structures: ignore
+    avoid_dynamic_calls: error
+    strict_raw_types: error
+    invalid_annotation_target: ignore
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
 
 linter:
   rules:
-    avoid_print: true
+    avoid_dynamic_calls: true
+    strict_raw_types: true
     prefer_single_quotes: true
     always_declare_return_types: true
-    require_trailing_commas: true
-    avoid_empty_else: true
-    avoid_relative_lib_imports: true
-    unnecessary_const: true
-    unnecessary_new: true
-    unnecessary_null_in_if_null_operators: true
-    unnecessary_string_escapes: true
+    avoid_unused_constructor_parameters: true
+    cancel_subscriptions: true
+    close_sinks: true
     prefer_const_constructors: true
     prefer_const_declarations: true
     prefer_final_fields: true
     prefer_final_locals: true
-    prefer_is_empty: true
-    prefer_is_not_empty: true
-    prefer_is_not_operator: true
-    type_init_formals: true
+    require_trailing_commas: true
     use_key_in_widget_constructors: true
-    sized_box_for_whitespace: true
-    use_full_hex_values_for_flutter_colors: true
+    avoid_print: true
+    avoid_empty_else: true
+    empty_catches: true
+    unnecessary_import: true
+    unused_import: true
+    unused_local_variable: true
+    unused_field: true
+    public_member_api_docs: false
+    lines_longer_than_80_chars: false
+    one_member_abstracts: false
+    avoid_relative_lib_imports: true

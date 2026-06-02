@@ -1,7 +1,9 @@
+
+import 'di/app_di.dart';
 import 'package:flutter/material.dart';
 import 'secure_storage_service.dart';
 import '../presentation/theme/app_colors.dart';
-import '../presentation/theme/locale_provider.dart';
+import '../presentation/theme/locale_cubit.dart';
 
 class PrivacyConsentService {
   static const _consentKey = 'omnivium_privacy_consented';
@@ -9,7 +11,7 @@ class PrivacyConsentService {
   static const _currentVersion = 1;
 
   Future<bool> hasConsented() async {
-    final storage = SecureStorageService.instance;
+    final storage = getIt<SecureStorageService>();
     final consented = await storage.read(_consentKey);
     final version =
         int.tryParse(await storage.read(_consentVersionKey) ?? '0') ?? 0;
@@ -17,13 +19,13 @@ class PrivacyConsentService {
   }
 
   Future<void> grantConsent() async {
-    final storage = SecureStorageService.instance;
+    final storage = getIt<SecureStorageService>();
     await storage.write(_consentKey, 'true');
     await storage.write(_consentVersionKey, _currentVersion.toString());
   }
 
   Future<void> revokeConsent() async {
-    final storage = SecureStorageService.instance;
+    final storage = getIt<SecureStorageService>();
     await storage.write(_consentKey, 'false');
     await storage.write(_consentVersionKey, '0');
   }
@@ -42,15 +44,12 @@ class PrivacyConsentDialog {
             Icon(
               Icons.shield_outlined,
               color: AppColors.acc(context),
-              size: 24,
-            ),
+              size: 24),
             const SizedBox(width: 8),
             Text(
               t('privacy_policy'),
-              style: TextStyle(color: AppColors.sec(context), fontSize: 18),
-            ),
-          ],
-        ),
+              style: TextStyle(color: AppColors.sec(context), fontSize: 18)),
+          ]),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -58,63 +57,49 @@ class PrivacyConsentDialog {
             children: [
               Text(
                 t('privacy_welcome'),
-                style: TextStyle(color: AppColors.sec(context), fontSize: 14),
-              ),
+                style: TextStyle(color: AppColors.sec(context), fontSize: 14)),
               const SizedBox(height: 12),
               _buildItem(
                 ctx,
                 '🔒',
                 t('privacy_e2e_title'),
-                t('privacy_e2e_desc'),
-              ),
+                t('privacy_e2e_desc')),
               const SizedBox(height: 8),
               _buildItem(
                 ctx,
                 '🔑',
                 t('privacy_key_title'),
-                t('privacy_key_desc'),
-              ),
+                t('privacy_key_desc')),
               const SizedBox(height: 8),
               _buildItem(
                 ctx,
                 '📊',
                 t('privacy_no_collect_title'),
-                t('privacy_no_collect_desc'),
-              ),
+                t('privacy_no_collect_desc')),
               const SizedBox(height: 8),
               _buildItem(
                 ctx,
                 '🤖',
                 t('privacy_ai_title'),
-                t('privacy_ai_desc'),
-              ),
+                t('privacy_ai_desc')),
               const SizedBox(height: 16),
               Text(
                 t('privacy_agree_notice'),
-                style: TextStyle(color: AppColors.mut(context), fontSize: 12),
-              ),
-            ],
-          ),
-        ),
+                style: TextStyle(color: AppColors.mut(context), fontSize: 12)),
+            ])),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
             child: Text(
               t('exit'),
-              style: TextStyle(color: AppColors.mut(context)),
-            ),
-          ),
+              style: TextStyle(color: AppColors.mut(context)))),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: FilledButton.styleFrom(
               backgroundColor: AppColors.acc(context),
-              foregroundColor: Colors.black,
-            ),
-            child: Text(t('agree_continue')),
-          ),
-        ],
-      ),
-    );
+              foregroundColor: Colors.black),
+            child: Text(t('agree_continue'))),
+        ]));
     return result ?? false;
   }
 
@@ -122,8 +107,7 @@ class PrivacyConsentDialog {
     BuildContext context,
     String emoji,
     String title,
-    String desc,
-  ) {
+    String desc) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -138,21 +122,14 @@ class PrivacyConsentDialog {
                 style: TextStyle(
                   color: AppColors.sec(context),
                   fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+                  fontWeight: FontWeight.w600)),
               Text(
                 desc,
                 style: TextStyle(
                   color: AppColors.mut(context),
                   fontSize: 12,
-                  height: 1.4,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
+                  height: 1.4)),
+            ])),
+      ]);
   }
 }

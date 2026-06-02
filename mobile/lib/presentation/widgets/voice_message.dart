@@ -1,16 +1,15 @@
 import '../../core/app_logger.dart';
-import '../../core/app_provider.dart';
+import '../../core/di/app_di.dart';
+import '../../core/matrix/matrix_cubit.dart';
 import 'dart:async';
 import 'dart:io' if (dart.library.html) '';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:record/record.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:path_provider/path_provider.dart';
 import '../theme/app_colors.dart';
-import '../theme/locale_provider.dart';
-import '../../core/matrix/matrix_provider.dart';
+import '../theme/locale_cubit.dart';
 
 class VoiceRecorderButton extends StatefulWidget {
   final void Function(String path, Duration duration) onSend;
@@ -25,7 +24,6 @@ class _VoiceRecorderButtonState extends State<VoiceRecorderButton> {
   bool _isRecording = false;
   Duration _duration = Duration.zero;
   Timer? _timer;
-  String? _recordPath;
 
   @override
   void dispose() {
@@ -40,11 +38,9 @@ class _VoiceRecorderButtonState extends State<VoiceRecorderButton> {
       final dir = await getTemporaryDirectory();
       final recordPath =
           '${dir.path}/voice_${DateTime.now().millisecondsSinceEpoch}.m4a';
-      _recordPath = recordPath;
       await _recorder.start(
         const RecordConfig(encoder: AudioEncoder.aacLc),
-        path: recordPath,
-      );
+        path: recordPath);
       if (!mounted) return;
       setState(() {
         _isRecording = true;
@@ -74,7 +70,6 @@ class _VoiceRecorderButtonState extends State<VoiceRecorderButton> {
       setState(() {
         _isRecording = false;
         _duration = Duration.zero;
-        _recordPath = null;
       });
     }
   }
@@ -93,8 +88,7 @@ class _VoiceRecorderButtonState extends State<VoiceRecorderButton> {
         padding: const EdgeInsets.symmetric(horizontal: 8),
         decoration: BoxDecoration(
           color: AppColors.acc(context).withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(22),
-        ),
+          borderRadius: BorderRadius.circular(22)),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -108,25 +102,18 @@ class _VoiceRecorderButtonState extends State<VoiceRecorderButton> {
                   height: 32,
                   decoration: BoxDecoration(
                     color: AppColors.dng(context).withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
+                    borderRadius: BorderRadius.circular(16)),
                   child: Icon(
                     LucideIcons.x,
                     size: 16,
-                    color: AppColors.dng(context),
-                  ),
-                ),
-              ),
-            ),
+                    color: AppColors.dng(context))))),
             const SizedBox(width: 10),
             Container(
               width: 8,
               height: 8,
               decoration: BoxDecoration(
                 color: AppColors.dng(context),
-                borderRadius: BorderRadius.circular(4),
-              ),
-            ),
+                borderRadius: BorderRadius.circular(4))),
             const SizedBox(width: 8),
             Text(
               _formatDuration(_duration),
@@ -134,9 +121,7 @@ class _VoiceRecorderButtonState extends State<VoiceRecorderButton> {
                 color: AppColors.textPrimary(context),
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                fontFeatures: [FontFeature.tabularFigures()],
-              ),
-            ),
+                fontFeatures: [FontFeature.tabularFigures()])),
             const SizedBox(width: 10),
             Semantics(
               label: localeProvider.t('send_recording'),
@@ -148,19 +133,12 @@ class _VoiceRecorderButtonState extends State<VoiceRecorderButton> {
                   height: 32,
                   decoration: BoxDecoration(
                     color: AppColors.acc(context),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
+                    borderRadius: BorderRadius.circular(16)),
                   child: Icon(
                     LucideIcons.send,
                     size: 14,
-                    color: AppColors.textPrimary(context),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
+                    color: AppColors.textPrimary(context))))),
+          ]));
     }
 
     return Semantics(
@@ -173,12 +151,8 @@ class _VoiceRecorderButtonState extends State<VoiceRecorderButton> {
           height: 36,
           decoration: BoxDecoration(
             color: AppColors.sfAlt(context),
-            borderRadius: BorderRadius.circular(18),
-          ),
-          child: Icon(LucideIcons.mic, size: 18, color: AppColors.sec(context)),
-        ),
-      ),
-    );
+            borderRadius: BorderRadius.circular(18)),
+          child: Icon(LucideIcons.mic, size: 18, color: AppColors.sec(context)))));
   }
 }
 
@@ -204,13 +178,11 @@ class _VoiceMessagePlayerState extends State<VoiceMessagePlayer> {
     _subs.add(
       _player.onDurationChanged.listen((d) {
         if (mounted) setState(() => _duration = d);
-      }),
-    );
+      }));
     _subs.add(
       _player.onPositionChanged.listen((p) {
         if (mounted) setState(() => _position = p);
-      }),
-    );
+      }));
     _subs.add(
       _player.onPlayerStateChanged.listen((s) {
         if (mounted) {
@@ -218,8 +190,7 @@ class _VoiceMessagePlayerState extends State<VoiceMessagePlayer> {
             _isPlaying = s == PlayerState.playing;
           });
         }
-      }),
-    );
+      }));
     _subs.add(
       _player.onPlayerComplete.listen((_) {
         if (mounted) {
@@ -228,8 +199,7 @@ class _VoiceMessagePlayerState extends State<VoiceMessagePlayer> {
             _isPlaying = false;
           });
         }
-      }),
-    );
+      }));
   }
 
   @override
@@ -247,9 +217,8 @@ class _VoiceMessagePlayerState extends State<VoiceMessagePlayer> {
     } else {
       String playUrl = widget.url;
       if (playUrl.startsWith('mxc://')) {
-        final mp = AppProvider.instance;
-        if (mp == null) return;
-        final converted = mp.matrix.getMediaUrl(playUrl);
+      final mp = getIt<MatrixCubit>();
+      final converted = mp.getMediaUrl(playUrl);
         if (converted != null) {
           playUrl = converted;
         } else {
@@ -284,8 +253,7 @@ class _VoiceMessagePlayerState extends State<VoiceMessagePlayer> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(16),
-      ),
+        borderRadius: BorderRadius.circular(16)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -301,16 +269,11 @@ class _VoiceMessagePlayerState extends State<VoiceMessagePlayer> {
                 height: 32,
                 decoration: BoxDecoration(
                   color: iconColor,
-                  borderRadius: BorderRadius.circular(16),
-                ),
+                  borderRadius: BorderRadius.circular(16)),
                 child: Icon(
                   _isPlaying ? LucideIcons.pause : LucideIcons.play,
                   size: 16,
-                  color: AppColors.textPrimary(context),
-                ),
-              ),
-            ),
-          ),
+                  color: AppColors.textPrimary(context))))),
           const SizedBox(width: 8),
           SizedBox(
             width: 100,
@@ -321,26 +284,18 @@ class _VoiceMessagePlayerState extends State<VoiceMessagePlayer> {
                   value: progress,
                   backgroundColor: AppColors.divider(context),
                   valueColor: AlwaysStoppedAnimation(iconColor),
-                  borderRadius: BorderRadius.circular(2),
-                ),
+                  borderRadius: BorderRadius.circular(2)),
                 const SizedBox(height: 4),
                 Text(
                   _formatDuration(
                     _isPlaying || _position > Duration.zero
                         ? _position
-                        : _duration,
-                  ),
+                        : _duration),
                   style: TextStyle(
                     color: AppColors.textTertiary(context),
                     fontSize: 11,
-                    fontFeatures: [FontFeature.tabularFigures()],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+                    fontFeatures: [FontFeature.tabularFigures()])),
+              ])),
+        ]));
   }
 }

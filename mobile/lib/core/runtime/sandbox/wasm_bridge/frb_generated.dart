@@ -30,8 +30,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
       api: api,
       handler: handler,
       externalLibrary: externalLibrary,
-      forceSameCodegenVersion: forceSameCodegenVersion,
-    );
+      forceSameCodegenVersion: forceSameCodegenVersion);
   }
 
   /// Initialize flutter_rust_bridge in mock mode.
@@ -71,8 +70,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
       ExternalLibraryLoaderConfig(
         stem: 'rust_sandbox',
         ioDirectory: '../rust_sandbox/target/release/',
-        webPrefix: 'pkg/',
-      );
+        webPrefix: 'pkg/');
 }
 
 abstract class RustLibApi extends BaseApi {
@@ -117,24 +115,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             generalizedFrbRustBinding,
             serializer,
             funcId: 1,
-            port: port_,
-          );
+            port: port_);
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_sandbox_result,
-          decodeErrorData: null,
-        ),
+          decodeErrorData: null),
         constMeta: kCrateApiSandboxExecuteConstMeta,
         argValues: [wasmBytes, functionName, params, config],
-        apiImpl: this,
-      ),
-    );
+        apiImpl: this));
   }
 
   TaskConstMeta get kCrateApiSandboxExecuteConstMeta => const TaskConstMeta(
     debugName: "sandbox_execute",
-    argNames: ["wasmBytes", "functionName", "params", "config"],
-  );
+    argNames: ["wasmBytes", "functionName", "params", "config"]);
 
   @override
   Future<List<SandboxExport>> crateApiSandboxListExports({
@@ -149,24 +142,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             generalizedFrbRustBinding,
             serializer,
             funcId: 2,
-            port: port_,
-          );
+            port: port_);
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_list_sandbox_export,
-          decodeErrorData: null,
-        ),
+          decodeErrorData: null),
         constMeta: kCrateApiSandboxListExportsConstMeta,
         argValues: [wasmBytes],
-        apiImpl: this,
-      ),
-    );
+        apiImpl: this));
   }
 
   TaskConstMeta get kCrateApiSandboxListExportsConstMeta => const TaskConstMeta(
     debugName: "sandbox_list_exports",
-    argNames: ["wasmBytes"],
-  );
+    argNames: ["wasmBytes"]);
 
   @override
   Future<bool> crateApiSandboxValidate({required List<int> wasmBytes}) {
@@ -179,24 +167,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             generalizedFrbRustBinding,
             serializer,
             funcId: 3,
-            port: port_,
-          );
+            port: port_);
         },
         codec: SseCodec(
           decodeSuccessData: sse_decode_bool,
-          decodeErrorData: null,
-        ),
+          decodeErrorData: null),
         constMeta: kCrateApiSandboxValidateConstMeta,
         argValues: [wasmBytes],
-        apiImpl: this,
-      ),
-    );
+        apiImpl: this));
   }
 
   TaskConstMeta get kCrateApiSandboxValidateConstMeta => const TaskConstMeta(
     debugName: "sandbox_validate",
-    argNames: ["wasmBytes"],
-  );
+    argNames: ["wasmBytes"]);
 
   @protected
   String dco_decode_String(dynamic raw) {
@@ -268,8 +251,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       maxMemoryMb: dco_decode_u_32(arr[0]),
       maxExecutionTimeMs: dco_decode_u_64(arr[1]),
       maxStackDepth: dco_decode_u_32(arr[2]),
-      allowedCapabilities: dco_decode_list_String(arr[3]),
-    );
+      allowedCapabilities: dco_decode_list_String(arr[3]));
   }
 
   @protected
@@ -280,8 +262,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
     return SandboxExport(
       name: dco_decode_String(arr[0]),
-      kind: dco_decode_String(arr[1]),
-    );
+      kind: dco_decode_String(arr[1]));
   }
 
   @protected
@@ -292,8 +273,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
     return SandboxParam(
       kind: dco_decode_String(arr[0]),
-      value: dco_decode_String(arr[1]),
-    );
+      value: dco_decode_String(arr[1]));
   }
 
   @protected
@@ -307,8 +287,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       output: dco_decode_String(arr[1]),
       executionTimeMs: dco_decode_u_64(arr[2]),
       memoryUsedBytes: dco_decode_u_64(arr[3]),
-      error: dco_decode_opt_String(arr[4]),
-    );
+      error: dco_decode_opt_String(arr[4]));
   }
 
   @protected
@@ -350,8 +329,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   SandboxConfig sse_decode_box_autoadd_sandbox_config(
-    SseDeserializer deserializer,
-  ) {
+    SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_sandbox_config(deserializer));
   }
@@ -384,8 +362,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<SandboxExport> sse_decode_list_sandbox_export(
-    SseDeserializer deserializer,
-  ) {
+    SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var len_ = sse_decode_i_32(deserializer);
@@ -398,8 +375,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   List<SandboxParam> sse_decode_list_sandbox_param(
-    SseDeserializer deserializer,
-  ) {
+    SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     var len_ = sse_decode_i_32(deserializer);
@@ -423,8 +399,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   SandboxConfig? sse_decode_opt_box_autoadd_sandbox_config(
-    SseDeserializer deserializer,
-  ) {
+    SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     if (sse_decode_bool(deserializer)) {
@@ -445,8 +420,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       maxMemoryMb: var_maxMemoryMb,
       maxExecutionTimeMs: var_maxExecutionTimeMs,
       maxStackDepth: var_maxStackDepth,
-      allowedCapabilities: var_allowedCapabilities,
-    );
+      allowedCapabilities: var_allowedCapabilities);
   }
 
   @protected
@@ -478,8 +452,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       output: var_output,
       executionTimeMs: var_executionTimeMs,
       memoryUsedBytes: var_memoryUsedBytes,
-      error: var_error,
-    );
+      error: var_error);
   }
 
   @protected
@@ -526,8 +499,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   void sse_encode_box_autoadd_sandbox_config(
     SandboxConfig self,
-    SseSerializer serializer,
-  ) {
+    SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_sandbox_config(self, serializer);
   }
@@ -544,20 +516,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   void sse_encode_list_prim_u_8_loose(
     List<int> self,
-    SseSerializer serializer,
-  ) {
+    SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     serializer.buffer.putUint8List(
-      self is Uint8List ? self : Uint8List.fromList(self),
-    );
+      self is Uint8List ? self : Uint8List.fromList(self));
   }
 
   @protected
   void sse_encode_list_prim_u_8_strict(
     Uint8List self,
-    SseSerializer serializer,
-  ) {
+    SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     serializer.buffer.putUint8List(self);
@@ -566,8 +535,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   void sse_encode_list_sandbox_export(
     List<SandboxExport> self,
-    SseSerializer serializer,
-  ) {
+    SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
@@ -578,8 +546,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   void sse_encode_list_sandbox_param(
     List<SandboxParam> self,
-    SseSerializer serializer,
-  ) {
+    SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
@@ -600,8 +567,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @protected
   void sse_encode_opt_box_autoadd_sandbox_config(
     SandboxConfig? self,
-    SseSerializer serializer,
-  ) {
+    SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     sse_encode_bool(self != null, serializer);

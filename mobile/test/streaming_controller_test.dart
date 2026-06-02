@@ -50,7 +50,7 @@ void main() {
       final chunks = <StreamChunk>[];
       controller.stream.listen(chunks.add);
       controller.addChunk('test');
-      await Future.delayed(Duration.zero);
+      await Future<void>.delayed(Duration.zero);
       expect(chunks.length, 1);
       expect(chunks.first.content, 'test');
       expect(chunks.first.isDone, isFalse);
@@ -67,7 +67,7 @@ void main() {
       controller.stream.listen(chunks.add);
       controller.addChunk('data');
       controller.complete();
-      await Future.delayed(Duration.zero);
+      await Future<void>.delayed(Duration.zero);
       expect(chunks.last.isDone, isTrue);
     });
 
@@ -81,7 +81,7 @@ void main() {
       final chunks = <StreamChunk>[];
       controller.stream.listen(chunks.add);
       controller.addError('Network error');
-      await Future.delayed(Duration.zero);
+      await Future<void>.delayed(Duration.zero);
       expect(chunks.last.error, 'Network error');
       expect(chunks.last.isDone, isTrue);
     });
@@ -99,7 +99,7 @@ void main() {
       controller.addChunk('Hello');
       controller.addChunk(' World');
       controller.complete();
-      await Future.delayed(Duration.zero);
+      await Future<void>.delayed(Duration.zero);
       expect(chunks.length, 3);
       expect(controller.buffer, 'Hello World');
       expect(controller.isStreaming, isFalse);

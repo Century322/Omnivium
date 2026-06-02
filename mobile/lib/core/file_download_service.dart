@@ -1,3 +1,5 @@
+
+import 'di/app_di.dart';
 import 'app_logger.dart';
 import 'dart:io' if (dart.library.html) '';
 import 'package:flutter/foundation.dart';
@@ -34,8 +36,7 @@ class FileDownloadService {
       for (final seg in segments) {
         if (seg.isEmpty || seg == '.' || seg == '..') {
           AppLogger.instance.warning(
-            'Invalid subfolder segment rejected: $subfolder',
-          );
+            'Invalid subfolder segment rejected: $subfolder');
           return null;
         }
       }
@@ -74,7 +75,7 @@ class FileDownloadService {
       _progress[url] = 0;
 
       final request = http.Request('GET', Uri.parse(url));
-      final response = await ApiProxyService.instance.secureClient
+      final response = await getIt<ApiProxyService>().secureClient
           .send(request)
           .timeout(const Duration(seconds: 60));
 
@@ -97,7 +98,7 @@ class FileDownloadService {
               return chunk;
             })
             .pipe(sink);
-      } catch (e) {
+      } catch (_) {
         await sink.close();
         if (await file.exists()) await file.delete();
         rethrow;
@@ -121,8 +122,7 @@ class FileDownloadService {
     return downloadFile(
       url: httpUrl.toString(),
       fileName: fileName,
-      subfolder: 'Omnivium',
-    );
+      subfolder: 'Omnivium');
   }
 
   Future<Directory?> _getDownloadDirectory() async {
@@ -130,8 +130,7 @@ class FileDownloadService {
     try {
       if (Platform.isAndroid) {
         final dirs = await getExternalStorageDirectories(
-          type: StorageDirectory.downloads,
-        );
+          type: StorageDirectory.downloads);
         if (dirs != null && dirs.isNotEmpty) return dirs.first;
         return await getApplicationDocumentsDirectory();
       } else if (Platform.isIOS) {

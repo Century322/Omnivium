@@ -1,3 +1,5 @@
+
+import 'di/app_di.dart';
 import 'app_logger.dart';
 import 'dart:convert';
 import 'api_proxy_service.dart';
@@ -65,7 +67,7 @@ class RemoteConfigService {
   }
 
   Future<void> fetch() async {
-    final proxy = ApiProxyService.instance;
+    final proxy = getIt<ApiProxyService>();
     if (!proxy.isConfigured) return;
 
     try {
@@ -76,8 +78,7 @@ class RemoteConfigService {
             headers: {
               ...proxy.buildAuthHeaders(),
               ...proxy.buildDeviceHeaders(),
-            },
-          )
+            })
           .timeout(const Duration(seconds: 5));
 
       if (response.statusCode == 200) {
@@ -98,16 +99,14 @@ class RemoteConfigService {
             headers: {
               ...proxy.buildAuthHeaders(),
               ...proxy.buildDeviceHeaders(),
-            },
-          )
+            })
           .timeout(const Duration(seconds: 5));
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body) as Map<String, dynamic>;
         final schemas = body['schemas'] as Map<String, dynamic>? ?? {};
         _uiSchemas = schemas.map(
-          (k, v) => MapEntry(k, v as Map<String, dynamic>),
-        );
+          (k, v) => MapEntry(k, v as Map<String, dynamic>));
         await _saveSchemasToCache();
       }
     } catch (e, stackTrace) {
@@ -116,7 +115,7 @@ class RemoteConfigService {
   }
 
   Future<void> _loadFromCache() async {
-    final db = DatabaseService.instance;
+    final db = getIt<DatabaseService>();
     final raw = db.getCache(_cacheKey);
     if (raw != null) {
       try {
@@ -125,8 +124,7 @@ class RemoteConfigService {
         final schemasRaw = data['schemas'] as Map<String, dynamic>?;
         if (schemasRaw != null) {
           _uiSchemas = schemasRaw.map(
-            (k, v) => MapEntry(k, v as Map<String, dynamic>),
-          );
+            (k, v) => MapEntry(k, v as Map<String, dynamic>));
         }
       } catch (e, stackTrace) {
         AppLogger.instance.error('App error', error: e, stackTrace: stackTrace);
@@ -145,19 +143,18 @@ class RemoteConfigService {
   }
 
   Future<void> _saveToCache() async {
-    final db = DatabaseService.instance;
+    final db = getIt<DatabaseService>();
     await db.putCache(
       _cacheKey,
       jsonEncode({
         'config': _config,
         'schemas': _uiSchemas,
         'lastFetch': _lastFetch?.toIso8601String(),
-      }),
-    );
+      }));
   }
 
   Future<void> _saveSchemasToCache() async {
-    final db = DatabaseService.instance;
+    final db = getIt<DatabaseService>();
     await db.putCache(_uiSchemaKey, jsonEncode(_uiSchemas));
   }
 

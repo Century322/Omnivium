@@ -34,8 +34,7 @@ class LawManifest {
       nodeId: nodeId,
       epoch: epoch,
       lawVersions: versions,
-      hash: hash,
-    );
+      hash: hash);
   }
 
   LawManifest bumpVersion(RuntimeLawId lawId) {
@@ -50,8 +49,7 @@ class LawManifest {
       nodeId: nodeId,
       epoch: epoch + 1,
       lawVersions: newVersions,
-      hash: hash,
-    );
+      hash: hash);
   }
 
   bool isCompatibleWith(LawManifest other) {
@@ -217,8 +215,7 @@ class ConstitutionalConsensus {
       localManifest: _localManifest,
       remoteManifest: remoteManifest,
       resolution: resolution,
-      detectedAt: DateTime.now().millisecondsSinceEpoch,
-    );
+      detectedAt: DateTime.now().millisecondsSinceEpoch);
 
     if (resolution != LawForkResolution.merge) {
       _forks.add(fork);
@@ -239,8 +236,7 @@ class ConstitutionalConsensus {
       amendmentId: amendmentId,
       support: support,
       reason: reason,
-      timestamp: timestamp,
-    );
+      timestamp: timestamp);
     _votes.add(vote);
     return vote;
   }
@@ -262,8 +258,7 @@ class ConstitutionalConsensus {
       opposeVotes: oppose,
       supportRatio: ratio,
       passed: passed,
-      decidedAt: timestamp,
-    );
+      decidedAt: timestamp);
 
     _results[amendmentId] = result;
     return result;
@@ -317,15 +312,13 @@ class TrustPassport {
   factory TrustPassport.fromReputation(
     ReputationScore score,
     String issuingRuntime,
-    int ttl,
-  ) {
+    int ttl) {
     final now = DateTime.now().millisecondsSinceEpoch;
     final sig = _computeSignature(
       score.entityId,
       issuingRuntime,
       score.score,
-      now,
-    );
+      now);
     return TrustPassport(
       entityId: score.entityId,
       issuingRuntime: issuingRuntime,
@@ -335,19 +328,16 @@ class TrustPassport {
       complianceRatio: score.complianceRatio,
       issuedAt: now,
       expiresAt: now + ttl,
-      signature: sig,
-    );
+      signature: sig);
   }
 
   static String _computeSignature(
     String entityId,
     String issuer,
     double score,
-    int issuedAt,
-  ) {
+    int issuedAt) {
     final input = utf8.encode(
-      '$entityId|$issuer|${score.toStringAsFixed(2)}|$issuedAt',
-    );
+      '$entityId|$issuer|${score.toStringAsFixed(2)}|$issuedAt');
     final digest = sha256.convert(input);
     return 'passport_${digest.toString().substring(0, 32)}';
   }
@@ -379,8 +369,7 @@ class FederatedReputation {
       passport.entityId,
       passport.issuingRuntime,
       passport.reputationScore,
-      passport.issuedAt,
-    );
+      passport.issuedAt);
     return passport.signature == expectedSig && passport.isValid;
   }
 
@@ -493,8 +482,7 @@ class LegislativeProposal {
     simulationResult: simulationResult ?? this.simulationResult,
     impactAnalysis: impactAnalysis ?? this.impactAnalysis,
     judiciaryReview: judiciaryReview ?? this.judiciaryReview,
-    consensusResult: consensusResult ?? this.consensusResult,
-  );
+    consensusResult: consensusResult ?? this.consensusResult);
 
   Map<String, dynamic> toJson() => {
     'id': proposalId,
@@ -548,8 +536,7 @@ class AutonomousLegislature {
       proposedChange: proposedChange,
       stage: LegislativeStage.proposed,
       rationale: rationale,
-      proposedAt: timestamp,
-    );
+      proposedAt: timestamp);
     _proposals.add(proposal);
     activeProposal = proposal;
     return proposal;
@@ -584,8 +571,7 @@ class AutonomousLegislature {
 
     final updated = proposal.copyWith(
       stage: LegislativeStage.simulating,
-      simulationResult: simulationResult,
-    );
+      simulationResult: simulationResult);
     _updateProposal(updated);
     return updated;
   }
@@ -597,8 +583,7 @@ class AutonomousLegislature {
     final sim = proposal.simulationResult;
     final constitutionalScore = _reputationEconomy.constitutionalScore();
     final lowestEntities = _reputationEconomy.lowestReputationEntities(
-      limit: 3,
-    );
+      limit: 3);
 
     final impactAnalysis = {
       'constitutionalHealthScore': constitutionalScore.toStringAsFixed(2),
@@ -610,8 +595,7 @@ class AutonomousLegislature {
 
     final updated = proposal.copyWith(
       stage: LegislativeStage.impactAnalysis,
-      impactAnalysis: impactAnalysis,
-    );
+      impactAnalysis: impactAnalysis);
     _updateProposal(updated);
     return updated;
   }
@@ -627,8 +611,7 @@ class AutonomousLegislature {
         currentViolations > 0 || proposal.proposedChange.isNotEmpty;
     final conflictsWithExisting = _detectLawConflict(
       targetLaw,
-      proposal.proposedChange,
-    );
+      proposal.proposedChange);
 
     final recommendation = isConstitutional && !conflictsWithExisting
         ? 'proceed'
@@ -646,16 +629,14 @@ class AutonomousLegislature {
 
     final updated = proposal.copyWith(
       stage: LegislativeStage.judiciaryReview,
-      judiciaryReview: review,
-    );
+      judiciaryReview: review);
     _updateProposal(updated);
     return updated;
   }
 
   bool _detectLawConflict(RuntimeLawId targetLaw, String proposedChange) {
     final existingProposals = _proposals.where(
-      (p) => p.targetLaw == targetLaw && p.stage != LegislativeStage.rejected,
-    );
+      (p) => p.targetLaw == targetLaw && p.stage != LegislativeStage.rejected);
     final currentId = activeProposal?.proposalId;
     for (final p in existingProposals) {
       if (p.proposedChange == proposedChange && p.proposalId != currentId) {
@@ -678,8 +659,7 @@ class AutonomousLegislature {
     }
     if (recommendation == 'review') {
       final updated = proposal.copyWith(
-        stage: LegislativeStage.consensusVoting,
-      );
+        stage: LegislativeStage.consensusVoting);
       _updateProposal(updated);
       return updated;
     }
@@ -699,16 +679,14 @@ class AutonomousLegislature {
       final enacted = proposal.copyWith(
         stage: LegislativeStage.enacted,
         enactedAt: timestamp,
-        consensusResult: result,
-      );
+        consensusResult: result);
       _updateProposal(enacted);
       activeProposal = null;
       return enacted;
     } else {
       final rejected = proposal.copyWith(
         stage: LegislativeStage.rejected,
-        consensusResult: result,
-      );
+        consensusResult: result);
       _updateProposal(rejected);
       activeProposal = null;
       return rejected;
@@ -725,8 +703,7 @@ class AutonomousLegislature {
 
   void _updateProposal(LegislativeProposal updated) {
     final idx = _proposals.indexWhere(
-      (p) => p.proposalId == updated.proposalId,
-    );
+      (p) => p.proposalId == updated.proposalId);
     if (idx >= 0) {
       _proposals[idx] = updated;
       activeProposal = updated;

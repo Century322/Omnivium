@@ -69,8 +69,7 @@ abstract class RuntimeTransport {
   });
 
   void onStateChange(
-    void Function(TransportState previous, TransportState current) callback,
-  );
+    void Function(TransportState previous, TransportState current) callback);
 
   Future<bool> healthCheck();
 }
@@ -133,8 +132,7 @@ class LocalTransport implements RuntimeTransport {
       sourceNodeId: message.targetNodeId,
       targetNodeId: message.sourceNodeId,
       payload: {'requestId': message.id},
-      timestamp: message.timestamp,
-    );
+      timestamp: message.timestamp);
 
     try {
       return response;
@@ -145,8 +143,7 @@ class LocalTransport implements RuntimeTransport {
 
   @override
   void onStateChange(
-    void Function(TransportState previous, TransportState current) callback,
-  ) {
+    void Function(TransportState previous, TransportState current) callback) {
     _stateCallbacks.add(callback);
   }
 

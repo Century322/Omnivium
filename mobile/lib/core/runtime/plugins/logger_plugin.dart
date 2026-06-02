@@ -4,36 +4,32 @@ import '../vocabulary/runtime_message.dart';
 import '../vocabulary/runtime_event.dart';
 import '../vocabulary/capability_context.dart';
 import '../../app_logger.dart';
+import '../vocabulary/capability_params.dart';
 
 class LoggerPlugin implements PluginHandler {
   @override
   Future<HandlerResult> handleMessage(
     RuntimeMessage message,
-    CapabilityContext context,
-  ) async {
+    CapabilityContext context) async {
     AppLogger.instance.info(
-      '[LoggerPlugin] message: ${message.type} from ${message.source.pluginId}',
-    );
+      '[LoggerPlugin] message: ${message.type} from ${message.source.pluginId}');
     return HandlerResult.ok();
   }
 
   @override
   Future<HandlerResult> handleEvent(
     RuntimeEvent event,
-    CapabilityContext context,
-  ) async {
+    CapabilityContext context) async {
     AppLogger.instance.info(
-      '[LoggerPlugin] event: ${event.type} phase=${event.phase.name}',
-    );
+      '[LoggerPlugin] event: ${event.type} phase=${event.phase.name}');
     return HandlerResult.ok();
   }
 
   @override
   Future<CapabilityResult> invokeCapability(
     String capabilityId,
-    dynamic params,
-    CapabilityContext context,
-  ) async {
+    CapabilityParams params,
+    CapabilityContext context) async {
     switch (capabilityId) {
       case 'runtime.info':
         return CapabilityResult.ok({
@@ -50,9 +46,7 @@ class LoggerPlugin implements PluginHandler {
         return CapabilityResult.fail(
           RuntimeError(
             code: 'UNKNOWN_CAPABILITY',
-            message: 'Unknown capability: $capabilityId',
-          ),
-        );
+            message: 'Unknown capability: $capabilityId'));
     }
   }
 
@@ -66,14 +60,11 @@ class LoggerPlugin implements PluginHandler {
         id: 'runtime.info',
         name: 'Runtime Info',
         description: 'Get runtime information',
-        permission: 'auto',
-      ),
+        permission: 'auto'),
       CapabilityDeclaration(
         id: 'runtime.health',
         name: 'Health Check',
         description: 'Check runtime health',
-        permission: 'auto',
-      ),
-    ],
-  );
+        permission: 'auto'),
+    ]);
 }

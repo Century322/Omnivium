@@ -1,14 +1,16 @@
+﻿
+import '../../core/di/app_di.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:share_plus/share_plus.dart';
-import '../../core/app_provider.dart';
-import '../../core/model_provider.dart';
+
+import '../../core/model_cubit.dart';
 import '../../core/providers/ai_provider.dart';
 import '../../core/remote_config_service.dart';
 import '../theme/app_colors.dart';
-import '../theme/locale_provider.dart';
+import '../theme/locale_cubit.dart';
 
 class AIWorkbenchTemplate {
   final String id;
@@ -35,69 +37,75 @@ class AIWorkbenchTemplate {
       remoteUserPrompt ?? localeProvider.t(userPromptKey);
 }
 
+class _ChatEntry {
+  final String userInput;
+  final String templateEmoji;
+  final String templateNameKey;
+  String aiContent;
+  bool isGenerating;
+
+  _ChatEntry({
+    required this.userInput,
+    required this.templateEmoji,
+    required this.templateNameKey,
+    this.isGenerating = false,
+  }) : aiContent = '';
+}
+
 const _localTemplates = [
   AIWorkbenchTemplate(
     id: 'write',
     nameKey: 'template_write',
-    emoji: '??',
+    emoji: '✍️',
     systemPromptKey: 'tpl_write_system',
-    userPromptKey: 'tpl_write_user',
-  ),
+    userPromptKey: 'tpl_write_user'),
   AIWorkbenchTemplate(
     id: 'translate',
     nameKey: 'template_translate',
-    emoji: '??',
+    emoji: '🌐',
     systemPromptKey: 'tpl_translate_system',
-    userPromptKey: 'tpl_translate_user',
-  ),
+    userPromptKey: 'tpl_translate_user'),
   AIWorkbenchTemplate(
     id: 'summarize',
     nameKey: 'template_summarize',
-    emoji: '??',
+    emoji: '📋',
     systemPromptKey: 'tpl_summarize_system',
-    userPromptKey: 'tpl_summarize_user',
-  ),
+    userPromptKey: 'tpl_summarize_user'),
   AIWorkbenchTemplate(
     id: 'code',
     nameKey: 'template_code',
-    emoji: '??',
+    emoji: '💻',
     systemPromptKey: 'tpl_code_system',
-    userPromptKey: 'tpl_code_user',
-  ),
+    userPromptKey: 'tpl_code_user'),
   AIWorkbenchTemplate(
     id: 'explain',
     nameKey: 'template_explain',
-    emoji: '??',
+    emoji: '💡',
     systemPromptKey: 'tpl_explain_system',
-    userPromptKey: 'tpl_explain_user',
-  ),
+    userPromptKey: 'tpl_explain_user'),
   AIWorkbenchTemplate(
     id: 'polish',
     nameKey: 'template_polish',
-    emoji: '?',
+    emoji: '✨',
     systemPromptKey: 'tpl_polish_system',
-    userPromptKey: 'tpl_polish_user',
-  ),
+    userPromptKey: 'tpl_polish_user'),
   AIWorkbenchTemplate(
     id: 'email',
     nameKey: 'template_email',
-    emoji: '??',
+    emoji: '📧',
     systemPromptKey: 'tpl_email_system',
-    userPromptKey: 'tpl_email_user',
-  ),
+    userPromptKey: 'tpl_email_user'),
   AIWorkbenchTemplate(
     id: 'brainstorm',
     nameKey: 'template_brainstorm',
-    emoji: '??',
+    emoji: '🧠',
     systemPromptKey: 'tpl_brainstorm_system',
-    userPromptKey: 'tpl_brainstorm_user',
-  ),
+    userPromptKey: 'tpl_brainstorm_user'),
 ];
 
 List<AIWorkbenchTemplate> get templates {
-  final remoteTemplates = RemoteConfigService.instance.getValue<List<dynamic>>(
-    'workbench_templates',
-  );
+  final remoteTemplates = getIt<RemoteConfigService>().getValue<List<dynamic>>(
+    'workbench_templates');
   if (remoteTemplates == null || remoteTemplates.isEmpty)
     return _localTemplates;
   final result = <AIWorkbenchTemplate>[];
@@ -109,20 +117,16 @@ List<AIWorkbenchTemplate> get templates {
       AIWorkbenchTemplate(
         id: id,
         nameKey: local?.nameKey ?? m['name_key'] as String? ?? id,
-        emoji: m['emoji'] as String? ?? local?.emoji ?? '??',
+        emoji: m['emoji'] as String? ?? local?.emoji ?? '🤖',
         systemPromptKey: local?.systemPromptKey ?? '',
         userPromptKey: local?.userPromptKey ?? '',
         remoteSystemPrompt: m['system_prompt'] as String?,
-        remoteUserPrompt: m['user_prompt'] as String?,
-      ),
-    );
+        remoteUserPrompt: m['user_prompt'] as String?));
   }
   return result.isNotEmpty ? result : _localTemplates;
 }
 
-class AIWorkbenchView extends StatefulWidget {
-  final AppProvider provider;
-  const AIWorkbenchView({super.key, required this.provider});
+class AIWorkbenchView extends StatefulWidget { const AIWorkbenchView({super.key});
 
   @override
   State<AIWorkbenchView> createState() => _AIWorkbenchViewState();
@@ -139,9 +143,9 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView>
   final TextEditingController _inputController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
-  String _generatedContent = '';
-  bool _isGenerating = false;
+  final List<_ChatEntry> _history = [];
   StreamSubscription? _streamSub;
+  StreamSubscription? _modelStateSub;
   ModelConfig? _selectedModel;
 
   @override
@@ -149,23 +153,34 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView>
     super.initState();
     _slideController = AnimationController(
       duration: const Duration(milliseconds: 400),
-      vsync: this,
-    );
+      vsync: this);
     _slideAnimation = Tween<Offset>(begin: const Offset(1, 0), end: Offset.zero)
         .animate(
-          CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
-        );
+          CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic));
     _slideController.forward();
-    _selectedModel = widget.provider.model.activeModel;
+    _selectedModel = getIt<ModelCubit>().activeModel;
+    _modelStateSub = getIt<ModelCubit>().stream.listen((_) => _onModelChanged());
+    if (getIt<ModelCubit>().models.isEmpty) {
+      getIt<ModelCubit>().loadModels().catchError((_) {});
+    }
   }
 
   @override
   void dispose() {
+    _modelStateSub?.cancel();
     _streamSub?.cancel();
     _slideController.dispose();
     _inputController.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  void _onModelChanged() {
+    if (mounted) {
+      setState(() {
+        _selectedModel = getIt<ModelCubit>().activeModel;
+      });
+    }
   }
 
   Future<void> _generate() async {
@@ -177,63 +192,65 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(t('no_model_configured')),
-          backgroundColor: AppColors.dng(context),
-        ),
-      );
+          backgroundColor: AppColors.dng(context)));
       return;
     }
 
-    setState(() {
-      _isGenerating = true;
-      _generatedContent = '';
-    });
+    final entry = _ChatEntry(
+      userInput: input,
+      templateEmoji: selectedTemplate.emoji,
+      templateNameKey: selectedTemplate.nameKey,
+      isGenerating: true);
 
-    ChatService.instance.setModel(selectedModel.name);
+    setState(() {
+      _history.add(entry);
+      _inputController.clear();
+    });
+    _scrollToTop();
+
+    getIt<ChatService>().setModel(selectedModel.name);
 
     final messages = [
       ChatMessage(role: 'system', content: selectedTemplate.systemPrompt),
       ChatMessage(
         role: 'user',
-        content: selectedTemplate.userPromptTemplate + input,
-      ),
+        content: selectedTemplate.userPromptTemplate + input),
     ];
 
     try {
       _streamSub?.cancel();
-      final stream = await ChatService.instance.chat(
+      final stream = await getIt<ChatService>().chat(
         messages,
         temperature: 0.7,
-        maxTokens: 4096,
-      );
+        maxTokens: 4096);
 
       _streamSub = stream.listen(
         (chunk) {
           if (mounted) {
             setState(() {
-              _generatedContent += chunk;
+              entry.aiContent += chunk;
             });
-            _scrollToBottom();
+            _scrollToTop();
           }
         },
         onDone: () {
           if (mounted) {
-            setState(() => _isGenerating = false);
+            setState(() => entry.isGenerating = false);
           }
         },
-        onError: (e) {
+        onError: (Object e) {
           if (mounted) {
             setState(() {
-              _isGenerating = false;
-              _generatedContent += '\n\n${t('generation_error')}: $e';
+              entry.isGenerating = false;
+              entry.aiContent += '\n\n${t('generation_error')}: $e';
             });
           }
-        },
-      );
+        });
     } catch (e) {
       if (mounted) {
         setState(() {
-          _isGenerating = false;
-          _generatedContent = '${t('generation_error')}: $e';
+          entry.isGenerating = false;
+          entry.aiContent = '${t('generation_error')}: $e';
         });
       }
     }
@@ -241,17 +258,18 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView>
 
   void _stopGeneration() {
     _streamSub?.cancel();
-    setState(() => _isGenerating = false);
+    if (_history.isNotEmpty) {
+      setState(() => _history.last.isGenerating = false);
+    }
   }
 
-  void _scrollToBottom() {
+  void _scrollToTop() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
+          _scrollController.position.minScrollExtent,
           duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOut,
-        );
+          curve: Curves.easeOut);
       }
     });
   }
@@ -260,6 +278,7 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.bg(context),
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         backgroundColor: AppColors.bg(context),
         surfaceTintColor: Colors.transparent,
@@ -267,19 +286,14 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView>
           tooltip: localeProvider.t('back'),
           icon: Icon(
             LucideIcons.chevronLeft,
-            color: AppColors.textPrimary(context),
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
+            color: AppColors.textPrimary(context)),
+          onPressed: () => Navigator.pop(context)),
         title: Text(
           t('ai_workbench'),
           style: TextStyle(
             color: AppColors.textPrimary(context),
             fontSize: 17,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
+            fontWeight: FontWeight.w600))),
       body: SlideTransition(
         position: _slideAnimation,
         child: Column(
@@ -288,42 +302,32 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView>
             _buildTemplateGrid(),
             Expanded(child: _buildContentArea()),
             _buildInputArea(),
-          ],
-        ),
-      ),
-    );
+          ])));
   }
 
   Widget _buildModelSelector() {
-    final models = widget.provider.model.models;
+    final models = getIt<ModelCubit>().models;
     if (models.isEmpty) {
       return Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: AppColors.sf(context),
-          borderRadius: BorderRadius.circular(10),
-        ),
+          borderRadius: BorderRadius.circular(10)),
         child: Row(
           children: [
             Icon(
               LucideIcons.alertCircle,
               size: 16,
-              color: AppColors.warn(context),
-            ),
+              color: AppColors.warn(context)),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
                 t('no_model_configured'),
                 style: TextStyle(
                   color: AppColors.textSecondary(context),
-                  fontSize: 13,
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
+                  fontSize: 13))),
+          ]));
     }
 
     return Container(
@@ -331,8 +335,7 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView>
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         color: AppColors.sf(context),
-        borderRadius: BorderRadius.circular(10),
-      ),
+        borderRadius: BorderRadius.circular(10)),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<ModelConfig>(
           value: _selectedModel,
@@ -340,8 +343,7 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView>
           icon: Icon(
             LucideIcons.chevronDown,
             size: 16,
-            color: AppColors.textSecondary(context),
-          ),
+            color: AppColors.textSecondary(context)),
           style: TextStyle(color: AppColors.textPrimary(context), fontSize: 14),
           dropdownColor: AppColors.sf(context),
           items: models.map((m) {
@@ -354,9 +356,7 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView>
                     height: 8,
                     decoration: BoxDecoration(
                       color: AppColors.acc(context),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
+                      shape: BoxShape.circle)),
                   const SizedBox(width: 8),
                   Text(m.name, style: TextStyle(fontSize: 14)),
                   const SizedBox(width: 6),
@@ -364,19 +364,12 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView>
                     '(${m.provider})',
                     style: TextStyle(
                       color: AppColors.textSecondary(context),
-                      fontSize: 11,
-                    ),
-                  ),
-                ],
-              ),
-            );
+                      fontSize: 11)),
+                ]));
           }).toList(),
           onChanged: (m) {
             if (m != null) setState(() => _selectedModel = m);
-          },
-        ),
-      ),
-    );
+          })));
   }
 
   Widget _buildTemplateGrid() {
@@ -409,8 +402,7 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView>
                   borderRadius: BorderRadius.circular(12),
                   border: isSelected
                       ? Border.all(color: AppColors.acc(context), width: 1.5)
-                      : null,
-                ),
+                      : null),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -425,24 +417,16 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView>
                         fontSize: 11,
                         fontWeight: isSelected
                             ? FontWeight.w600
-                            : FontWeight.normal,
-                      ),
+                            : FontWeight.normal),
                       textAlign: TextAlign.center,
                       maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
+                      overflow: TextOverflow.ellipsis),
+                  ]))));
+        }));
   }
 
   Widget _buildContentArea() {
-    if (_generatedContent.isEmpty && !_isGenerating) {
+    if (_history.isEmpty) {
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -450,136 +434,117 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView>
             Icon(
               LucideIcons.sparkles,
               size: 48,
-              color: AppColors.iconGray(context),
-            ),
+              color: AppColors.iconGray(context)),
             const SizedBox(height: 12),
             Text(
               t('workbench_empty'),
               style: TextStyle(
                 color: AppColors.textSecondary(context),
-                fontSize: 15,
-              ),
-            ),
+                fontSize: 15)),
             const SizedBox(height: 4),
             Text(
               t('workbench_empty_hint'),
               style: TextStyle(
                 color: AppColors.textDisabled(context),
-                fontSize: 13,
-              ),
-            ),
-          ],
-        ),
-      );
+                fontSize: 13)),
+          ]));
     }
 
+    return SingleChildScrollView(
+      controller: _scrollController,
+      physics: const ClampingScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: List.generate(_history.length, (index) {
+          final reversedIndex = _history.length - 1 - index;
+          return _buildChatCard(_history[reversedIndex], reversedIndex);
+        })));
+  }
+
+  Widget _buildChatCard(_ChatEntry entry, int index) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
+      margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.sf(context),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: SingleChildScrollView(
-        controller: _scrollController,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (_selectedTemplate case final selTemplate?) ...[
-              Row(
-                children: [
-                  Text(selTemplate.emoji, style: const TextStyle(fontSize: 16)),
-                  const SizedBox(width: 6),
-                  Text(
-                    t(selTemplate.nameKey),
-                    style: TextStyle(
-                      color: AppColors.acc(context),
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const Spacer(),
-                  if (!_isGenerating && _generatedContent.isNotEmpty) ...[
-                    Semantics(
-                      label: localeProvider.t('copy'),
-                      child: GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: () {
-                          Clipboard.setData(
-                            ClipboardData(text: _generatedContent),
-                          );
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(t('copied')),
-                              backgroundColor: AppColors.acc(context),
-                              duration: const Duration(milliseconds: 1500),
-                            ),
-                          );
-                        },
-                        child: Icon(
-                          LucideIcons.copy,
-                          size: 16,
-                          color: AppColors.textSecondary(context),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Semantics(
-                      label: localeProvider.t('share'),
-                      child: GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: () => SharePlus.instance.share(
-                          ShareParams(text: _generatedContent),
-                        ),
-                        child: Icon(
-                          LucideIcons.share2,
-                          size: 16,
-                          color: AppColors.textSecondary(context),
-                        ),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ],
-            const SizedBox(height: 12),
-            Divider(color: AppColors.divider(context), height: 1),
-            const SizedBox(height: 12),
+        borderRadius: BorderRadius.circular(12)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(entry.templateEmoji, style: const TextStyle(fontSize: 16)),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  entry.userInput,
+                  style: TextStyle(
+                    color: AppColors.textPrimary(context),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis)),
+              if (!entry.isGenerating && entry.aiContent.isNotEmpty) ...[
+                Semantics(
+                  label: localeProvider.t('copy'),
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () {
+                      Clipboard.setData(
+                        ClipboardData(text: entry.aiContent));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(t('copied')),
+                          backgroundColor: AppColors.acc(context),
+                          duration: const Duration(milliseconds: 1500)));
+                    },
+                    child: Icon(
+                      LucideIcons.copy,
+                      size: 16,
+                      color: AppColors.textSecondary(context)))),
+                const SizedBox(width: 12),
+                Semantics(
+                  label: localeProvider.t('share'),
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => SharePlus.instance.share(
+                      ShareParams(text: entry.aiContent)),
+                    child: Icon(
+                      LucideIcons.share2,
+                      size: 16,
+                      color: AppColors.textSecondary(context)))),
+              ],
+            ]),
+          const SizedBox(height: 12),
+          Divider(color: AppColors.divider(context), height: 1),
+          const SizedBox(height: 12),
+          if (entry.aiContent.isNotEmpty)
             SelectableText(
-              _generatedContent + (_isGenerating ? '��' : ''),
+              entry.aiContent + (entry.isGenerating ? '▊' : ''),
               style: TextStyle(
                 color: AppColors.textPrimary(context),
                 fontSize: 15,
-                height: 1.6,
-              ),
-            ),
-            if (_isGenerating) ...[
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  SizedBox(
-                    width: 14,
-                    height: 14,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: AppColors.acc(context),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    t('generating'),
-                    style: TextStyle(
-                      color: AppColors.textSecondary(context),
-                      fontSize: 13,
-                    ),
-                  ),
-                ],
-              ),
-            ],
+                height: 1.6)),
+          if (entry.isGenerating) ...[
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                SizedBox(
+                  width: 14,
+                  height: 14,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: AppColors.acc(context))),
+                const SizedBox(width: 8),
+                Text(
+                  t('generating'),
+                  style: TextStyle(
+                    color: AppColors.textSecondary(context),
+                    fontSize: 13)),
+              ]),
           ],
-        ),
-      ),
-    );
+        ]));
   }
 
   Widget _buildInputArea() {
@@ -588,9 +553,7 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView>
       decoration: BoxDecoration(
         color: AppColors.bg(context),
         border: Border(
-          top: BorderSide(color: AppColors.divider(context), width: 0.5),
-        ),
-      ),
+          top: BorderSide(color: AppColors.divider(context), width: 0.5))),
       child: SafeArea(
         top: false,
         child: Row(
@@ -606,40 +569,30 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView>
                   keyboardType: TextInputType.multiline,
                   style: TextStyle(
                     color: AppColors.textPrimary(context),
-                    fontSize: 15,
-                  ),
+                    fontSize: 15),
                   decoration: InputDecoration(
                     labelText: _selectedTemplate != null
                         ? t('workbench_input_hint')
                         : t('workbench_select_template'),
                     hintStyle: TextStyle(
                       color: AppColors.textDisabled(context),
-                      fontSize: 14,
-                    ),
+                      fontSize: 14),
                     filled: true,
                     fillColor: AppColors.sf(context),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
+                      borderSide: BorderSide.none),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
+                      borderSide: BorderSide.none),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
+                      borderSide: BorderSide.none),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 14,
-                      vertical: 10,
-                    ),
-                  ),
-                ),
-              ),
-            ),
+                      vertical: 10))))),
             const SizedBox(width: 8),
-            if (_isGenerating)
+            if (_history.isNotEmpty && _history.last.isGenerating)
               Semantics(
                 label: localeProvider.t('stop_generating'),
                 child: GestureDetector(
@@ -650,16 +603,11 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView>
                     height: 44,
                     decoration: BoxDecoration(
                       color: AppColors.dng(context).withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                      borderRadius: BorderRadius.circular(12)),
                     child: Icon(
                       LucideIcons.square,
                       color: AppColors.dng(context),
-                      size: 18,
-                    ),
-                  ),
-                ),
-              )
+                      size: 18))))
             else
               Semantics(
                 label: localeProvider.t('send'),
@@ -675,19 +623,11 @@ class _AIWorkbenchViewState extends State<AIWorkbenchView>
                               _inputController.text.trim().isNotEmpty
                           ? AppColors.acc(context)
                           : AppColors.acc(context).withValues(alpha: 0.4),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                      borderRadius: BorderRadius.circular(12)),
                     child: Icon(
                       LucideIcons.sparkles,
                       color: AppColors.textPrimary(context),
-                      size: 20,
-                    ),
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
+                      size: 20)))),
+          ])));
   }
 }

@@ -60,12 +60,11 @@ class WebSocketTransport implements RuntimeTransport {
       _subscription = channel.stream.listen(
         _onData,
         onError: _onError,
-        onDone: _onDone,
-      );
+        onDone: _onDone);
 
       _reconnectAttempts = 0;
       _setState(TransportState.connected);
-    } catch (e) {
+    } catch (_) {
       _setState(TransportState.error);
       _scheduleReconnect();
     }
@@ -111,8 +110,7 @@ class WebSocketTransport implements RuntimeTransport {
         timeout,
         onTimeout: () {
           throw TimeoutException('Request ${message.id} timed out');
-        },
-      );
+        });
       return response;
     } catch (e) {
       AppLogger.instance.debug('WS handshake failed', error: e);
@@ -124,8 +122,7 @@ class WebSocketTransport implements RuntimeTransport {
 
   @override
   void onStateChange(
-    void Function(TransportState previous, TransportState current) callback,
-  ) {
+    void Function(TransportState previous, TransportState current) callback) {
     _stateCallbacks.add(callback);
   }
 
@@ -140,13 +137,10 @@ class WebSocketTransport implements RuntimeTransport {
         targetNodeId: 'server',
         timestamp: HybridTimestampLike(
           physicalTime: DateTime.now().millisecondsSinceEpoch,
-          nodeId: _localNodeId,
-        ),
-      );
+          nodeId: _localNodeId));
       final response = await requestResponse(
         ping,
-        timeout: const Duration(seconds: 5),
-      );
+        timeout: const Duration(seconds: 5));
       return response != null;
     } catch (e) {
       AppLogger.instance.debug('WS send failed', error: e);
@@ -181,14 +175,11 @@ class WebSocketTransport implements RuntimeTransport {
       timestamp: HybridTimestampLike(
         physicalTime: tsJson['pt'] as int? ?? 0,
         logicalTime: tsJson['lt'] as int? ?? 0,
-        nodeId: tsJson['node'] as String? ?? '',
-      ),
+        nodeId: tsJson['node'] as String? ?? ''),
       headers:
           (json['headers'] as Map<String, dynamic>?)?.map(
-            (k, v) => MapEntry(k, v.toString()),
-          ) ??
-          {},
-    );
+            (k, v) => MapEntry(k, v.toString())) ??
+          {});
   }
 
   void _onError(dynamic error) {
@@ -211,8 +202,7 @@ class WebSocketTransport implements RuntimeTransport {
     final delay = Duration(
       milliseconds:
           _reconnectInterval.inMilliseconds *
-          (1 << _reconnectAttempts.clamp(0, 5)),
-    );
+          (1 << _reconnectAttempts.clamp(0, 5)));
     final maxDelay = const Duration(seconds: 30);
     final actualDelay = delay < maxDelay ? delay : maxDelay;
     _reconnectTimer = Timer(actualDelay, () {

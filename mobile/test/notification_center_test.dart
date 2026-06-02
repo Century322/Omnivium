@@ -93,7 +93,7 @@ void main() {
       );
       NotificationCenter.post(Event.localeChanged);
       expect(count, 0);
-      await Future.delayed(const Duration(milliseconds: 100));
+      await Future<void>.delayed(const Duration(milliseconds: 100));
       expect(count, 1);
     });
   });

@@ -31,8 +31,7 @@ Future<Map<String, bool>> performSecurityCheck() async {
         AppLogger.instance.warning(
           'Root check path access failed',
           error: e,
-          stackTrace: stackTrace,
-        );
+          stackTrace: stackTrace);
       }
     }
 
@@ -70,8 +69,7 @@ Future<Map<String, bool>> performSecurityCheck() async {
         AppLogger.instance.warning(
           'Jailbreak check path access failed',
           error: e,
-          stackTrace: stackTrace,
-        );
+          stackTrace: stackTrace);
       }
     }
 

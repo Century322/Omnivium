@@ -45,6 +45,7 @@ void main() {
   final lightSplash = renderIconHQ(src, binary, 1024, lightBg, darkLogo);
   File('assets/icon/app_icon_light_splash.png').writeAsBytesSync(encodePng(lightSplash));
 
+  // ignore: avoid_print
   print('All icons generated with HQ rendering!');
 }
 

@@ -1,3 +1,5 @@
+
+import 'di/app_di.dart';
 import 'dart:convert';
 import 'dart:math';
 import 'package:crypto/crypto.dart';
@@ -59,7 +61,7 @@ class AppLockService {
   }
 
   Future<void> init() async {
-    final storage = SecureStorageService.instance;
+    final storage = getIt<SecureStorageService>();
     _hash = await storage.read(_hashKey);
     _salt = await storage.read(_saltKey);
     final iterationsStr = await storage.read(_iterationsKey);
@@ -95,7 +97,7 @@ class AppLockService {
 
     _hash = _computeHash(passcode, saltBytes, _iterations);
 
-    final storage = SecureStorageService.instance;
+    final storage = getIt<SecureStorageService>();
     final hash = _hash;
     final salt = _salt;
     if (hash != null) await storage.write(_hashKey, hash);
@@ -103,8 +105,7 @@ class AppLockService {
     await storage.write(_iterationsKey, _iterations.toString());
     await storage.write(
       _typeKey,
-      type == PasscodeType.pin ? 'pin' : 'password',
-    );
+      type == PasscodeType.pin ? 'pin' : 'password');
     _failedAttempts = 0;
     await storage.write(_attemptsKey, '0');
     await storage.delete(_lockUntilKey);
@@ -121,7 +122,7 @@ class AppLockService {
   }
 
   Future<void> removePasscode() async {
-    final storage = SecureStorageService.instance;
+    final storage = getIt<SecureStorageService>();
     await storage.delete(_hashKey);
     await storage.delete(_saltKey);
     await storage.delete(_typeKey);
@@ -146,7 +147,7 @@ class AppLockService {
     final saltDecoded = salt != null ? base64Decode(salt) : <int>[];
     final computedHash = _computeHash(passcode, saltDecoded, _iterations);
 
-    final storage = SecureStorageService.instance;
+    final storage = getIt<SecureStorageService>();
 
     if (computedHash == _hash) {
       _failedAttempts = 0;
@@ -182,13 +183,13 @@ class AppLockService {
 
   Future<void> setAutoLock(int minutes) async {
     _autoLockMinutes = minutes;
-    final storage = SecureStorageService.instance;
+    final storage = getIt<SecureStorageService>();
     await storage.write(_autoLockKey, minutes.toString());
   }
 
   Future<void> setBlockScreenshot(bool block) async {
     _blockScreenshot = block;
-    final storage = SecureStorageService.instance;
+    final storage = getIt<SecureStorageService>();
     await storage.write(_screenshotKey, block ? 'true' : 'false');
   }
 
@@ -196,10 +197,9 @@ class AppLockService {
     _lastUnlockTime = DateTime.now();
     final unlockTime = _lastUnlockTime;
     if (unlockTime != null) {
-      SecureStorageService.instance.write(
+      getIt<SecureStorageService>().write(
         _lastUnlockKey,
-        unlockTime.toIso8601String(),
-      );
+        unlockTime.toIso8601String());
     }
   }
 }

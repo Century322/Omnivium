@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
-import '../theme/locale_provider.dart';
+import '../theme/locale_cubit.dart';
 
 class AppErrorHandler {
   static void init() {
@@ -34,35 +34,26 @@ class _GlobalErrorWidget extends StatelessWidget {
               Icon(
                 Icons.error_outline,
                 size: 48,
-                color: AppColors.dng(context),
-              ),
+                color: AppColors.dng(context)),
               const SizedBox(height: 12),
               Text(
                 t('something_went_wrong'),
                 style: TextStyle(
                   color: AppColors.textPrimary(context),
                   fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-                textAlign: TextAlign.center,
-              ),
+                  fontWeight: FontWeight.w600),
+                textAlign: TextAlign.center),
               const SizedBox(height: 8),
               if (kDebugMode)
                 Text(
                   details.exceptionAsString(),
                   style: TextStyle(
                     color: AppColors.textSecondary(context),
-                    fontSize: 12,
-                  ),
+                    fontSize: 12),
                   textAlign: TextAlign.center,
                   maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
+                  overflow: TextOverflow.ellipsis),
+            ]))));
   }
 }
 
@@ -90,8 +81,7 @@ class _AppErrorBoundaryState extends State<AppErrorBoundary> {
             _stackTrace = null;
             _key++;
           });
-        },
-      );
+        });
     }
     return _ErrorCatcher(
       key: ValueKey(_key),
@@ -103,8 +93,7 @@ class _AppErrorBoundaryState extends State<AppErrorBoundary> {
           });
         }
       },
-      child: widget.child,
-    );
+      child: widget.child);
   }
 }
 
@@ -162,28 +151,20 @@ class _ErrorRecoveryView extends StatelessWidget {
               style: TextStyle(
                 color: AppColors.textPrimary(context),
                 fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
-              textAlign: TextAlign.center,
-            ),
+                fontWeight: FontWeight.w600),
+              textAlign: TextAlign.center),
             const SizedBox(height: 8),
             Text(
               t('error_boundary_desc'),
               style: TextStyle(
                 color: AppColors.textSecondary(context),
-                fontSize: 14,
-              ),
-              textAlign: TextAlign.center,
-            ),
+                fontSize: 14),
+              textAlign: TextAlign.center),
             const SizedBox(height: 24),
             FilledButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh),
-              label: Text(t('retry')),
-            ),
-          ],
-        ),
-      ),
-    );
+              label: Text(t('retry'))),
+          ])));
   }
 }

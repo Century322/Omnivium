@@ -1,16 +1,24 @@
+﻿
+import '../../core/di/app_di.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import '../theme/app_colors.dart';
-import '../../core/app_provider.dart';
+
+import '../../core/di/app_di.dart';
 import '../../core/analytics_service.dart';
-import '../../core/navigation_provider.dart';
+import '../../core/navigation_cubit.dart';
 import '../../core/runtime/card_runtime.dart';
 import '../../core/voice_service.dart';
+import '../../core/agent/agent_orchestrator.dart' show AgentOrchestrator, OrchestratorState;
+import '../../core/matrix/matrix_cubit.dart';
+import '../../core/model_cubit.dart';
+import '../../core/session_cubit.dart';
 import '../utils/responsive.dart';
-import '../theme/locale_provider.dart';
+import '../theme/locale_cubit.dart';
 import '../../core/notification_center.dart' as nc;
 import '../../core/app_navigator.dart' as nav;
 import '../widgets/home_components.dart';
+import '../widgets/library_panel.dart';
 import '../widgets/model_sheets.dart';
 import '../widgets/home_header.dart';
 import '../widgets/conversation_content.dart';
@@ -18,16 +26,14 @@ import '../widgets/chat_input_area.dart';
 import '../widgets/home_dialogs.dart';
 import '../../core/haptic_service.dart';
 import '../widgets/app_drawer.dart';
-import '../widgets/library_panel.dart';
 import '../widgets/friend_chat_panel.dart';
+
 import '../widgets/user_avatar.dart';
 import '../widgets/home_scroll_mixin.dart';
 import '../widgets/home_message_actions_mixin.dart';
 import '../widgets/home_conversation_menu_mixin.dart';
 
-class HomeView extends StatefulWidget {
-  final AppProvider provider;
-  const HomeView({super.key, required this.provider});
+class HomeView extends StatefulWidget { const HomeView({super.key});
 
   @override
   State<HomeView> createState() => _HomeViewState();
@@ -43,6 +49,8 @@ class _HomeViewState extends State<HomeView>
   bool _isListening = false;
   StreamSubscription? _voiceStateSub;
   StreamSubscription? _voiceResultSub;
+  StreamSubscription? _matrixSub;
+  StreamSubscription? _orchestratorSub;
   bool _isLeftDrawerOpen = false;
   bool _hasSentMessage = false;
   int _editingIndex = -1;
@@ -68,10 +76,7 @@ class _HomeViewState extends State<HomeView>
 
   bool _permissionDialogShown = false;
 
-  @override
-  AppProvider get provider => widget.provider;
-
-  @override
+  @override @override
   List<ChatMessageData> get messages => _messages;
 
   @override
@@ -96,23 +101,23 @@ class _HomeViewState extends State<HomeView>
   void initState() {
     super.initState();
     initScrollListener();
-    widget.provider.orchestrator.addListener(_onOrchestratorChanged);
-    widget.provider.matrix.addListener(_onMatrixChanged);
+    _orchestratorSub = getIt<AgentOrchestrator>().stream.listen((_) => _onOrchestratorChanged());
+    _matrixSub = getIt<MatrixCubit>().stream.listen((_) => _onMatrixChanged());
     _listeningGlow = AnimationController(
       duration: const Duration(milliseconds: 1200),
-      vsync: this,
-    );
-    _voiceStateSub = VoiceService.instance.onListeningStateChanged.listen((
-      isListening,
-    ) {
+      vsync: this);
+    _voiceStateSub = getIt<VoiceService>().onListeningStateChanged.listen((
+      isListening) {
       if (!mounted) return;
-      if (!isListening) {
+      setState(() => _isListening = isListening);
+      if (isListening) {
+        _listeningGlow.repeat(reverse: true);
+      } else {
         _listeningGlow.stop();
         _listeningGlow.reverse();
-        setState(() => _isListening = false);
       }
     });
-    _voiceResultSub = VoiceService.instance.onFinalResult.listen((result) {
+    _voiceResultSub = getIt<VoiceService>().onFinalResult.listen((result) {
       if (!mounted || result.isEmpty) return;
       final current = _textController.text;
       final separator = current.isNotEmpty ? ' ' : '';
@@ -121,22 +126,21 @@ class _HomeViewState extends State<HomeView>
     });
     _headerSwitch = AnimationController(
       duration: const Duration(milliseconds: 250),
-      vsync: this,
-    );
+      vsync: this);
     _tabSwitch = AnimationController(
       duration: const Duration(milliseconds: 250),
-      vsync: this,
-    );
+      vsync: this);
     nc.NotificationCenter.observe(
       nc.Event.capabilityConfirm,
-      _onCapabilityConfirm,
-    );
+      _onCapabilityConfirm);
   }
 
   @override
   void dispose() {
     _voiceStateSub?.cancel();
+    _matrixSub?.cancel();
     _voiceResultSub?.cancel();
+    _orchestratorSub?.cancel();
     _textController.dispose();
     _focusNode.dispose();
     _listeningGlow.dispose();
@@ -144,26 +148,15 @@ class _HomeViewState extends State<HomeView>
     _tabSwitch.dispose();
     _searchController.dispose();
     disposeScrollListener();
-    widget.provider.orchestrator.removeListener(_onOrchestratorChanged);
-    widget.provider.matrix.removeListener(_onMatrixChanged);
     nc.NotificationCenter.removeObserver(
       nc.Event.capabilityConfirm,
-      callback: _onCapabilityConfirm,
-    );
+      callback: _onCapabilityConfirm);
     super.dispose();
   }
 
   @override
   void didUpdateWidget(covariant HomeView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.provider.orchestrator != widget.provider.orchestrator) {
-      oldWidget.provider.orchestrator.removeListener(_onOrchestratorChanged);
-      widget.provider.orchestrator.addListener(_onOrchestratorChanged);
-    }
-    if (oldWidget.provider.matrix != widget.provider.matrix) {
-      oldWidget.provider.matrix.removeListener(_onMatrixChanged);
-      widget.provider.matrix.addListener(_onMatrixChanged);
-    }
   }
 
   void _onCapabilityConfirm(Map<String, dynamic>? data) {
@@ -178,26 +171,21 @@ class _HomeViewState extends State<HomeView>
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: Text(localeProvider.t('deny')),
-            ),
+              child: Text(localeProvider.t('deny'))),
             FilledButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: Text(localeProvider.t('allow')),
-            ),
-          ],
-        ),
-      ).then((granted) {
+              child: Text(localeProvider.t('allow'))),
+          ])).then((granted) {
         nc.NotificationCenter.post(
           nc.Event.capabilityConfirm,
-          data: {'granted': granted ?? false},
-        );
+          data: {'granted': granted ?? false});
       });
     }
   }
 
   void _onOrchestratorChanged() {
     if (!mounted) return;
-    final orchestrator = widget.provider.orchestrator;
+    final orchestrator = getIt<AgentOrchestrator>();
     final orchMessages = orchestrator.messages;
 
     _messages.clear();
@@ -207,9 +195,7 @@ class _HomeViewState extends State<HomeView>
           role: msg.role,
           content: msg.content,
           isStreaming: msg.isStreaming,
-          thoughts: msg.thoughts,
-        ),
-      );
+          thoughts: msg.thoughts));
     }
 
     final cards = orchestrator.cardRuntime.cards;
@@ -217,17 +203,14 @@ class _HomeViewState extends State<HomeView>
       if (card.lifecycle == CardLifecycle.created ||
           card.lifecycle == CardLifecycle.streaming) {
         final exists = _messages.any(
-          (m) => m.cardType != null && m.cardData?['cardId'] == card.id,
-        );
+          (m) => m.cardType != null && m.cardData?['cardId'] == card.id);
         if (!exists) {
           _messages.add(
             ChatMessageData(
               role: 'assistant',
               content: '',
               cardType: card.type,
-              cardData: {...card.data, 'cardId': card.id},
-            ),
-          );
+              cardData: {...card.data, 'cardId': card.id}));
         }
       }
     }
@@ -273,12 +256,12 @@ class _HomeViewState extends State<HomeView>
   }
 
   void _openSettingsFromDrawer() {
-    widget.provider.navigation.openSettingsFromDrawer();
+    getIt<NavigationCubit>().openSettingsFromDrawer();
     _closeDrawer();
   }
 
   void _toggleListening() async {
-    final voice = VoiceService.instance;
+    final voice = getIt<VoiceService>();
     if (_isListening) {
       await voice.stopListening();
       if (!mounted) return;
@@ -286,20 +269,18 @@ class _HomeViewState extends State<HomeView>
       _listeningGlow.reverse();
       setState(() => _isListening = false);
     } else {
-      final available = await VoiceService.instance.isAvailable();
+      final available = await getIt<VoiceService>().isAvailable();
       if (!available) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(localeProvider.t('voice_not_available')),
-              backgroundColor: AppColors.warn(context),
-            ),
-          );
+              backgroundColor: AppColors.warn(context)));
         }
         return;
       }
-      await voice.startListening();
-      if (!mounted) return;
+      final ok = await voice.startListening();
+      if (!ok || !mounted) return;
       setState(() => _isListening = true);
       _listeningGlow.repeat(reverse: true);
     }
@@ -312,9 +293,7 @@ class _HomeViewState extends State<HomeView>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(localeProvider.t('message_too_long')),
-          backgroundColor: AppColors.warn(context),
-        ),
-      );
+          backgroundColor: AppColors.warn(context)));
       return;
     }
     HapticService.sendMessage();
@@ -332,22 +311,21 @@ class _HomeViewState extends State<HomeView>
       });
     }
 
-    if (widget.provider.session.activeSessionId == null) {
-      widget.provider.session.createSession();
+    if (getIt<SessionCubit>().activeSessionId == null) {
+      getIt<SessionCubit>().createSession();
     }
 
     _textController.clear();
     _focusNode.unfocus();
 
-    final orchestrator = widget.provider.orchestrator;
+    final orchestrator = getIt<AgentOrchestrator>();
     if (orchestrator.isIdle) {
       orchestrator.sendMessage(text);
-      AnalyticsService.instance.logAiQuery(
-        model: widget.provider.model.activeModelId ?? 'unknown',
-      );
+      getIt<AnalyticsService>().logAiQuery(
+        model: getIt<ModelCubit>().activeModelId ?? 'unknown');
     }
 
-    widget.provider.session.saveCurrentSession();
+    getIt<SessionCubit>().saveCurrentSession();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!scrollController.hasClients) return;
@@ -358,7 +336,7 @@ class _HomeViewState extends State<HomeView>
   void _closeConversation() {
     _headerSwitch.reverse().then((_) {
       if (mounted) {
-        widget.provider.session.closeActiveSession();
+        getIt<SessionCubit>().closeActiveSession();
         setState(() {
           _hasSentMessage = false;
           _messages.clear();
@@ -375,16 +353,13 @@ class _HomeViewState extends State<HomeView>
     final isDesktop = Responsive.isDesktop(context);
     final contentWidth = Responsive.contentMaxWidth(context);
 
-    return ListenableBuilder(
-      listenable: Listenable.merge([
-        widget.provider.navigation,
-        widget.provider.orchestrator,
-        widget.provider.session,
-      ]),
+    return StreamBuilder<OrchestratorState>(
+      stream: getIt<AgentOrchestrator>().stream,
+      initialData: getIt<AgentOrchestrator>().state,
       builder: (context, _) {
-        if (!widget.provider.navigation.isSettingsOpen &&
-            widget.provider.navigation.shouldShowDrawerAfterSettings) {
-          widget.provider.navigation.clearDrawerFlag();
+        if (!getIt<NavigationCubit>().isSettingsOpen &&
+            getIt<NavigationCubit>().shouldShowDrawerAfterSettings) {
+          getIt<NavigationCubit>().clearDrawerFlag();
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) _openDrawer();
           });
@@ -399,7 +374,7 @@ class _HomeViewState extends State<HomeView>
             } else if (dx < -50 && _isLeftDrawerOpen) {
               _closeDrawer();
             } else if (dx < -50 && !_isLeftDrawerOpen && !isDesktop) {
-              widget.provider.navigation.setCurrentView(ViewState.discover);
+              getIt<NavigationCubit>().setCurrentView(ViewState.discover);
             }
           },
           child: Scaffold(
@@ -413,20 +388,17 @@ class _HomeViewState extends State<HomeView>
                         if (_isFriendChat)
                           Expanded(
                             child: FriendChatPanel(
-                              provider: widget.provider,
                               chatTargetId: _chatTargetId,
                               chatTargetName: _chatTargetName,
                               onClose: _closeFriendChat,
-                              maxWidth: contentWidth,
-                            ),
-                          )
+                              maxWidth: contentWidth))
                         else ...[
                           HomeHeader(
                             hasSentMessage: _hasSentMessage,
                             headerSwitch: _headerSwitch,
                             tabSwitch: _tabSwitch,
                             isLibraryMode: _isLibraryMode,
-                            isIncognito: widget.provider.navigation.isIncognito,
+                            isIncognito: getIt<NavigationCubit>().isIncognito,
                             onCloseConversation: _closeConversation,
                             onShowConversationMenu: () =>
                                 showConversationMenu(context),
@@ -447,16 +419,13 @@ class _HomeViewState extends State<HomeView>
                               });
                             },
                             onToggleSearch: () => setState(
-                              () => _showSearchBar = !_showSearchBar,
-                            ),
-                            onOpenDiscover: () => widget.provider.navigation
+                              () => _showSearchBar = !_showSearchBar),
+                            onOpenDiscover: () => getIt<NavigationCubit>()
                                 .setCurrentView(ViewState.discover),
                             userAvatar: UserAvatar(
-                              userId: widget.provider.matrix.userId ?? '',
+                              userId: getIt<MatrixCubit>().userId ?? '',
                               size: 30,
-                              radius: 15,
-                            ),
-                          ),
+                              radius: 15)),
                           Expanded(child: _buildCenterContent()),
                           if (!_isLibraryMode)
                             ChatInputArea(
@@ -467,54 +436,41 @@ class _HomeViewState extends State<HomeView>
                               isListening: _isListening,
                               isEditing: _editingIndex >= 0,
                               isIncognito:
-                                  widget.provider.navigation.isIncognito,
+                                  getIt<NavigationCubit>().isIncognito,
                               isFriendChat: _isFriendChat,
                               isGenerating:
-                                  !widget.provider.orchestrator.isIdle,
+                                  !getIt<AgentOrchestrator>().isIdle,
                               maxWidth: contentWidth,
                               onSend: _sendMessage,
                               onToggleListening: _toggleListening,
                               onCancelEdit: _cancelEdit,
                               onToggleIncognito: () =>
-                                  widget.provider.navigation.setIsIncognito(
-                                    !widget.provider.navigation.isIncognito,
-                                  ),
+                                  getIt<NavigationCubit>().setIsIncognito(
+                                    !getIt<NavigationCubit>().isIncognito),
                               onShowOptions: _showOptionsSheet,
                               onShowModels: _showModelsSheet,
                               onChanged: () => setState(() {}),
                               onStopGeneration: () =>
-                                  widget.provider.orchestrator.interrupt(),
-                            ),
+                                  getIt<AgentOrchestrator>().interrupt()),
                         ],
-                      ],
-                    ),
-                  ),
-                ),
+                      ]))),
                 if (_isLeftDrawerOpen)
                   AppDrawer(
                     key: _drawerKey,
-                    provider: widget.provider,
                     onClose: () => setState(() => _isLeftDrawerOpen = false),
                     onOpenNotifications: _openNotifications,
-                    onOpenSettings: _openSettingsFromDrawer,
-                  ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
+                    onOpenSettings: _openSettingsFromDrawer),
+              ])));
+      });
   }
 
   Widget _buildCenterContent() {
     if (_isLibraryMode) {
       return LibraryPanel(
-        provider: widget.provider,
-        onCreateGroupChat: _showCreateGroupChat,
         showSearchBar: _showSearchBar,
         onToggleSearch: () => setState(() => _showSearchBar = !_showSearchBar),
-        onOpenFriendChat: _openFriendChat,
-      );
+        onCreateGroupChat: _showCreateGroupChat,
+        onOpenFriendChat: (id, name) => _openFriendChat(id, name));
     }
     if (_hasSentMessage) {
       return ConversationContent(
@@ -523,7 +479,7 @@ class _HomeViewState extends State<HomeView>
         scrollController: scrollController,
         lastUserBubbleKey: lastUserBubbleKey,
         showScrollBtn: showScrollBtn,
-        orchestrator: widget.provider.orchestrator,
+        orchestrator: getIt<AgentOrchestrator>(),
         onScrollToLatest: scrollToLatest,
         onToggleThought: (i) => setState(() {
           _expandedThoughts.contains(i)
@@ -540,19 +496,16 @@ class _HomeViewState extends State<HomeView>
           index,
           onEdit: () => editQuery(index),
           onDelete: () => deleteMessagePair(index),
-          onReport: () => reportNotHelpful(index),
-        ),
+          onReport: () => reportNotHelpful(index)),
         onMessageLongPress: (index) => HomeDialogs.showMoreMenu(
           context,
           _messages[index].content,
           index,
           onEdit: () => editQuery(index),
           onDelete: () => deleteMessagePair(index),
-          onReport: () => reportNotHelpful(index),
-        ),
-      );
+          onReport: () => reportNotHelpful(index)));
     }
-    if (widget.provider.navigation.isIncognito) {
+    if (getIt<NavigationCubit>().isIncognito) {
       return Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -564,23 +517,16 @@ class _HomeViewState extends State<HomeView>
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w500,
-                  color: AppColors.textPrimary(context),
-                ),
-              ),
+                  color: AppColors.textPrimary(context))),
               const SizedBox(height: 16),
               Text(
                 localeProvider.t('incognito_notice'),
                 style: TextStyle(
                   fontSize: 15,
                   color: AppColors.mut(context),
-                  height: 1.6,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
-      );
+                  height: 1.6),
+                textAlign: TextAlign.center),
+            ])));
     }
     return Center(
       child: Text(
@@ -588,10 +534,7 @@ class _HomeViewState extends State<HomeView>
         style: TextStyle(
           fontSize: 36,
           color: AppColors.textPrimary(context),
-          fontFamily: 'serif',
-        ),
-      ),
-    );
+          fontFamily: 'serif')));
   }
 
   void _openFriendChat(String id, String name) => setState(() {
@@ -611,7 +554,7 @@ class _HomeViewState extends State<HomeView>
   void _showPermissionDialog() {
     if (_permissionDialogShown) return;
     _permissionDialogShown = true;
-    final orchestrator = widget.provider.orchestrator;
+    final orchestrator = getIt<AgentOrchestrator>();
     final skillName =
         orchestrator.pendingSkillName ?? localeProvider.t('unknown_action');
     HomeDialogs.showPermissionDialog(
@@ -624,44 +567,35 @@ class _HomeViewState extends State<HomeView>
       onDeny: () {
         _permissionDialogShown = false;
         orchestrator.denyPermission();
-      },
-    );
+      });
   }
 
   void _openNotifications() {
     _closeDrawer();
-    nav.AppNavigator.go(context, '/notifications');
+    nav.AppNavigator.go<void>(context, '/notifications');
   }
 
   void _showCreateGroupChat() {
-    nav.AppNavigator.go(context, '/create-group');
+    nav.AppNavigator.go<void>(context, '/create-group');
   }
 
   void _showOptionsSheet() {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (context) => SlidingSheet(
         child: OptionsContent(
-          onClose: () => Navigator.pop(context),
-          provider: widget.provider,
-        ),
-      ),
-    );
+          onClose: () => Navigator.pop(context))));
   }
 
   void _showModelsSheet() {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (context) => SlidingSheet(
         child: ModelsContent(
-          onClose: () => Navigator.pop(context),
-          provider: widget.provider,
-        ),
-      ),
-    );
+          onClose: () => Navigator.pop(context))));
   }
 }

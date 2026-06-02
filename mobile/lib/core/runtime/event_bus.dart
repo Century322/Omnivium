@@ -86,8 +86,7 @@ class EventBus {
       requiredPermission: permission,
       maxScope: maxScope,
       handler: handler,
-      priority: priority,
-    );
+      priority: priority);
 
     _subscriptions.putIfAbsent(eventType, () => []);
     _subscriptions[eventType]!.add(sub);
@@ -120,24 +119,20 @@ class EventBus {
       type: eventType,
       source: RuntimeRoute.local(
         capability: eventType,
-        pluginId: source.identity,
-      ),
+        pluginId: source.identity),
       phase: phase,
       payload: payload,
       metadata: RuntimeMetadata(
         traceId: traceId ?? 'trace_${_clock.now()}',
-        spanId: 'span_${_clock.monotonicMs()}',
-      ),
+        spanId: 'span_${_clock.monotonicMs()}'),
       permission: permission,
       scope: scope,
-      timestamp: _clock.now(),
-    );
+      timestamp: _clock.now());
 
     if (_eventQueue.length >= _config.maxEventBusCapacity) {
       _eventsDropped++;
       AppLogger.instance.warning(
-        'EventBus capacity reached, dropping event "$eventType"',
-      );
+        'EventBus capacity reached, dropping event "$eventType"');
       _addToDeadLetter(event, 'capacity_exceeded');
       return;
     }
@@ -158,8 +153,7 @@ class EventBus {
 
   void _addToDeadLetter(RuntimeEvent event, String reason) {
     _deadLetters.add(
-      DeadLetterEntry(event: event, reason: reason, timestamp: _clock.now()),
-    );
+      DeadLetterEntry(event: event, reason: reason, timestamp: _clock.now()));
     _deadLetterCount++;
   }
 
@@ -203,15 +197,12 @@ class EventBus {
               const Duration(seconds: 10),
               onTimeout: () {
                 AppLogger.instance.warning(
-                  'EventBus handler timed out for "${event.type}"',
-                );
+                  'EventBus handler timed out for "${event.type}"');
                 _addToDeadLetter(event, 'handler_timeout');
-              },
-            );
+              });
       } catch (e) {
         AppLogger.instance.error(
-          'EventBus handler error for "${event.type}": $e',
-        );
+          'EventBus handler error for "${event.type}": $e');
         _addToDeadLetter(event, 'handler_error: $e');
       }
     }
@@ -223,8 +214,7 @@ class EventBus {
 
   bool _permissionAllows(
     EventPermission subPermission,
-    EventPermission eventPermission,
-  ) {
+    EventPermission eventPermission) {
     if (subPermission == EventPermission.mutate) return true;
     if (subPermission == EventPermission.intercept &&
         eventPermission != EventPermission.mutate)

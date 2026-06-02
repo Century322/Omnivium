@@ -1,18 +1,18 @@
+
+import '../../core/di/app_di.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../theme/app_colors.dart';
-import '../theme/locale_provider.dart';
+import '../theme/locale_cubit.dart';
 import '../../core/analytics_service.dart';
 import '../../core/app_logger.dart';
-import '../../core/app_provider.dart';
+
 import '../../core/auth_service.dart';
 import '../../core/totp_service.dart';
 import '../../core/password_key_service.dart';
 
-class MatrixLoginView extends StatefulWidget {
-  final AppProvider provider;
-  final VoidCallback? onLoginSuccess;
+class MatrixLoginView extends StatefulWidget { final VoidCallback? onLoginSuccess;
   const MatrixLoginView({
     super.key,
     required this.provider,
@@ -27,8 +27,7 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
   final _usernameCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
   final _homeserverCtrl = TextEditingController(
-    text: 'https://matrix.omnivium.app',
-  );
+    text: 'https://matrix.omnivium.app');
   final _apiUrlCtrl = TextEditingController();
   final _usernameFocus = FocusNode();
   final _passwordFocus = FocusNode();
@@ -72,7 +71,7 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
         setState(() => _error = t('invalid_code'));
         return;
       }
-      if (!TotpService.instance.verify(code)) {
+      if (!getIt<TotpService>().verify(code)) {
         setState(() => _error = t('invalid_code'));
         return;
       }
@@ -111,34 +110,33 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
       }
 
       if (_isRegister) {
-        await widget.provider.matrix.register(username, password, homeserver);
-        await PasswordKeyService.instance.deriveKey(password);
-        AnalyticsService.instance.logSignUp(method: 'matrix');
+        await getIt<MatrixCubit>().register(username, password, homeserver);
+        await getIt<PasswordKeyService>().deriveKey(password);
+        getIt<AnalyticsService>().logSignUp(method: 'matrix');
       } else {
-        await widget.provider.matrix.login(username, password, homeserver);
-        await PasswordKeyService.instance.deriveKey(password);
-        AnalyticsService.instance.logLogin(method: 'matrix');
+        await getIt<MatrixCubit>().login(username, password, homeserver);
+        await getIt<PasswordKeyService>().deriveKey(password);
+        getIt<AnalyticsService>().logLogin(method: 'matrix');
       }
-      if (mounted && widget.provider.matrix.isLoggedIn) {
+      if (mounted && getIt<MatrixCubit>().isLoggedIn) {
         try {
-          AuthService.instance.onMatrixLogin();
+          getIt<AuthService>().onMatrixLogin();
         } catch (e) {
           AppLogger.instance.warning('Post-login callback failed', error: e);
         }
-        if (TotpService.instance.isEnabled) {
+        if (getIt<TotpService>().isEnabled) {
           setState(() {
             _showTotp = true;
             _isLoading = false;
           });
-          Future.delayed(
+          Future<void>.delayed(
             const Duration(milliseconds: 100),
-            () => _totpFocus.requestFocus(),
-          );
+            () => _totpFocus.requestFocus());
         } else {
           widget.onLoginSuccess?.call();
         }
-      } else if (mounted && widget.provider.matrix.error != null) {
-        setState(() => _error = widget.provider.matrix.error);
+      } else if (mounted && getIt<MatrixCubit>().error != null) {
+        setState(() => _error = getIt<MatrixCubit>().error);
       }
     } catch (e) {
       if (!mounted) return;
@@ -159,8 +157,7 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
               32,
               40,
               32,
-              MediaQuery.of(context).viewInsets.bottom + 40,
-            ),
+              MediaQuery.of(context).viewInsets.bottom + 40),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -177,17 +174,14 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
                           AppColors.accentPurple,
                         ],
                         begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
+                        end: Alignment.bottomRight),
                       borderRadius: BorderRadius.circular(24),
                       boxShadow: [
                         BoxShadow(
                           color: AppColors.acc(context).withValues(alpha: 0.3),
                           blurRadius: 24,
-                          offset: const Offset(0, 8),
-                        ),
-                      ],
-                    ),
+                          offset: const Offset(0, 8)),
+                      ]),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(24),
                       child: Image.asset(
@@ -198,59 +192,43 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
                         errorBuilder: (_, _, _) => Icon(
                           LucideIcons.messageCircle,
                           size: 40,
-                          color: AppColors.textPrimary(context),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+                          color: AppColors.textPrimary(context)))))),
                 const SizedBox(height: 12),
                 if (_showAdvanced && !_showTotp)
                   Container(
                     decoration: BoxDecoration(
                       color: AppColors.sf(context),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
+                      borderRadius: BorderRadius.circular(16)),
                     child: TextField(
                       controller: _apiUrlCtrl,
                       maxLength: 256,
                       style: TextStyle(
                         color: AppColors.textPrimary(context),
-                        fontSize: 14,
-                      ),
+                        fontSize: 14),
                       decoration: InputDecoration(
                         labelText: t('api_server_address'),
                         hintText: 'https://api.omnivium.app',
                         hintStyle: TextStyle(
                           color: AppColors.iconGray(context),
-                          fontSize: 14,
-                        ),
+                          fontSize: 14),
                         prefixIcon: Icon(
                           LucideIcons.cloud,
                           color: AppColors.iconGray(context),
-                          size: 18,
-                        ),
+                          size: 18),
                         filled: true,
                         fillColor: AppColors.sf(context),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide.none,
-                        ),
+                          borderSide: BorderSide.none),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide.none,
-                        ),
+                          borderSide: BorderSide.none),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide.none,
-                        ),
+                          borderSide: BorderSide.none),
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16,
-                          vertical: 12,
-                        ),
-                      ),
-                    ),
-                  ),
+                          vertical: 12)))),
                 const SizedBox(height: 24),
                 Center(
                   child: Text(
@@ -259,26 +237,19 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
                       color: AppColors.textPrimary(context),
                       fontSize: 28,
                       fontWeight: FontWeight.w800,
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                ),
+                      letterSpacing: -0.5))),
                 const SizedBox(height: 4),
                 Center(
                   child: Text(
                     t('e2e_encrypted'),
                     style: TextStyle(
                       color: AppColors.textHint(context),
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
+                      fontSize: 14))),
                 const SizedBox(height: 48),
                 Container(
                   decoration: BoxDecoration(
                     color: AppColors.sf(context),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
+                    borderRadius: BorderRadius.circular(16)),
                   child: Column(
                     children: [
                       TextField(
@@ -287,40 +258,31 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
                         maxLength: 128,
                         style: TextStyle(
                           color: AppColors.textPrimary(context),
-                          fontSize: 16,
-                        ),
+                          fontSize: 16),
                         decoration: InputDecoration(
                           labelText: t('username'),
                           hintText: t('username'),
                           hintStyle: TextStyle(
                             color: AppColors.iconGray(context),
-                            fontSize: 16,
-                          ),
+                            fontSize: 16),
                           prefixIcon: Icon(
                             LucideIcons.user,
                             color: AppColors.iconGray(context),
-                            size: 20,
-                          ),
+                            size: 20),
                           filled: true,
                           fillColor: AppColors.sf(context),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide.none,
-                          ),
+                            borderSide: BorderSide.none),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide.none,
-                          ),
+                            borderSide: BorderSide.none),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide.none,
-                          ),
+                            borderSide: BorderSide.none),
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 16,
-                            vertical: 14,
-                          ),
-                        ),
-                      ),
+                            vertical: 14))),
                       Divider(height: 1, color: AppColors.divider(context)),
                       TextField(
                         controller: _passwordCtrl,
@@ -329,66 +291,50 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
                         maxLength: 256,
                         style: TextStyle(
                           color: AppColors.textPrimary(context),
-                          fontSize: 16,
-                        ),
+                          fontSize: 16),
                         onSubmitted: (_) => _submit(),
                         decoration: InputDecoration(
                           labelText: t('password'),
                           hintText: t('password'),
                           hintStyle: TextStyle(
                             color: AppColors.iconGray(context),
-                            fontSize: 16,
-                          ),
+                            fontSize: 16),
                           prefixIcon: Icon(
                             LucideIcons.lock,
                             color: AppColors.iconGray(context),
-                            size: 20,
-                          ),
+                            size: 20),
                           suffixIcon: Semantics(
                             label: localeProvider.t('toggle_password'),
                             child: GestureDetector(
                               onTap: () => setState(
-                                () => _obscurePassword = !_obscurePassword,
-                              ),
+                                () => _obscurePassword = !_obscurePassword),
                               child: Icon(
                                 _obscurePassword
                                     ? LucideIcons.eye
                                     : LucideIcons.eyeOff,
                                 color: AppColors.iconGray(context),
-                                size: 20,
-                              ),
-                            ),
-                          ),
+                                size: 20))),
                           filled: true,
                           fillColor: AppColors.sf(context),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide.none,
-                          ),
+                            borderSide: BorderSide.none),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide.none,
-                          ),
+                            borderSide: BorderSide.none),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
-                            borderSide: BorderSide.none,
-                          ),
+                            borderSide: BorderSide.none),
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 16,
-                            vertical: 14,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                            vertical: 14))),
+                    ])),
                 if (_showTotp) ...[
                   const SizedBox(height: 12),
                   Container(
                     decoration: BoxDecoration(
                       color: AppColors.sf(context),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
+                      borderRadius: BorderRadius.circular(16)),
                     child: TextField(
                       controller: _totpCtrl,
                       focusNode: _totpFocus,
@@ -398,87 +344,67 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
                         color: AppColors.textPrimary(context),
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
-                        letterSpacing: 8,
-                      ),
+                        letterSpacing: 8),
                       textAlign: TextAlign.center,
                       decoration: InputDecoration(
                         counterText: '',
                         labelText: t('verification_code'),
                         hintStyle: TextStyle(
                           color: AppColors.iconGray(context),
-                          fontSize: 14,
-                        ),
+                          fontSize: 14),
                         filled: true,
                         fillColor: AppColors.sf(context),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide.none,
-                        ),
+                          borderSide: BorderSide.none),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide.none,
-                        ),
+                          borderSide: BorderSide.none),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide.none,
-                        ),
+                          borderSide: BorderSide.none),
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16,
-                          vertical: 14,
-                        ),
-                      ),
-                      onSubmitted: (_) => _submit(),
-                    ),
-                  ),
+                          vertical: 14)),
+                      onSubmitted: (_) => _submit())),
                 ],
                 if (_showAdvanced && !_showTotp) ...[
                   const SizedBox(height: 12),
                   Container(
                     decoration: BoxDecoration(
                       color: AppColors.sf(context),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
+                      borderRadius: BorderRadius.circular(16)),
                     child: TextField(
                       controller: _homeserverCtrl,
                       maxLength: 256,
                       focusNode: _homeserverFocus,
                       style: TextStyle(
                         color: AppColors.textPrimary(context),
-                        fontSize: 14,
-                      ),
+                        fontSize: 14),
                       decoration: InputDecoration(
                         labelText: t('server_address'),
                         hintText: t('server_address'),
                         hintStyle: TextStyle(
                           color: AppColors.iconGray(context),
-                          fontSize: 14,
-                        ),
+                          fontSize: 14),
                         prefixIcon: Icon(
                           LucideIcons.server,
                           color: AppColors.iconGray(context),
-                          size: 18,
-                        ),
+                          size: 18),
                         filled: true,
                         fillColor: AppColors.sf(context),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide.none,
-                        ),
+                          borderSide: BorderSide.none),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide.none,
-                        ),
+                          borderSide: BorderSide.none),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide.none,
-                        ),
+                          borderSide: BorderSide.none),
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16,
-                          vertical: 12,
-                        ),
-                      ),
-                    ),
-                  ),
+                          vertical: 12)))),
                 ],
                 const SizedBox(height: 8),
                 Semantics(
@@ -493,28 +419,19 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
                             : t('advanced_options'),
                         style: TextStyle(
                           color: AppColors.textTertiary(context),
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+                          fontSize: 12))))),
                 if (_error != null) ...[
                   const SizedBox(height: 12),
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: AppColors.dng(context).withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                      borderRadius: BorderRadius.circular(10)),
                     child: Text(
                       _error ?? '',
                       style: TextStyle(
                         color: AppColors.dng(context),
-                        fontSize: 13,
-                      ),
-                    ),
-                  ),
+                        fontSize: 13))),
                 ],
                 const SizedBox(height: 24),
                 ElevatedButton(
@@ -523,10 +440,8 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
                     foregroundColor: AppColors.textPrimary(context),
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    elevation: 0,
-                  ),
+                      borderRadius: BorderRadius.circular(16)),
+                    elevation: 0),
                   onPressed: _isLoading ? null : _submit,
                   child: _isLoading
                       ? SizedBox(
@@ -534,17 +449,12 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
                           height: 22,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: AppColors.textPrimary(context),
-                          ),
-                        )
+                            color: AppColors.textPrimary(context)))
                       : Text(
                           _isRegister ? t('create_account') : t('login'),
                           style: TextStyle(
                             fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                ),
+                            fontWeight: FontWeight.w700))),
                 const SizedBox(height: 20),
                 Center(
                   child: Semantics(
@@ -561,18 +471,8 @@ class _MatrixLoginViewState extends State<MatrixLoginView> {
                         style: TextStyle(
                           color: AppColors.acc(context),
                           fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+                          fontWeight: FontWeight.w500))))),
                 const SizedBox(height: 40),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
+              ])))));
   }
 }

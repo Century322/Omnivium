@@ -1,3 +1,5 @@
+
+import '../../core/di/app_di.dart';
 import '../../core/app_logger.dart';
 import 'dart:io' if (dart.library.html) '';
 import 'package:flutter/foundation.dart';
@@ -6,25 +8,22 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import '../theme/app_colors.dart';
-import '../theme/locale_provider.dart';
-import '../../core/app_provider.dart';
+import '../theme/locale_cubit.dart';
+
 import '../../core/permission_service.dart';
 
 class MediaPicker {
   static final _imagePicker = ImagePicker();
-  static final _perm = PermissionService.instance;
+  static final _perm = getIt<PermissionService>();
 
   static Future<void> showPicker(
     BuildContext context,
-    AppProvider provider,
-    String roomId,
-  ) {
-    return showModalBottomSheet(
+    String roomId) {
+    return showModalBottomSheet<void>(
       context: context,
       backgroundColor: AppColors.sf(context),
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (ctx) => SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
@@ -38,10 +37,7 @@ class MediaPicker {
                   height: 4,
                   decoration: BoxDecoration(
                     color: AppColors.divider(context),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
+                    borderRadius: BorderRadius.circular(2)))),
               _buildOption(
                 ctx,
                 LucideIcons.camera,
@@ -49,8 +45,7 @@ class MediaPicker {
                 () async {
                   Navigator.pop(ctx);
                   await _pickFromCamera(context, provider, roomId);
-                },
-              ),
+                }),
               _buildOption(
                 ctx,
                 LucideIcons.image,
@@ -58,8 +53,7 @@ class MediaPicker {
                 () async {
                   Navigator.pop(ctx);
                   await _pickFromGallery(context, provider, roomId);
-                },
-              ),
+                }),
               _buildOption(
                 ctx,
                 LucideIcons.video,
@@ -67,8 +61,7 @@ class MediaPicker {
                 () async {
                   Navigator.pop(ctx);
                   await _pickVideo(context, provider, roomId);
-                },
-              ),
+                }),
               _buildOption(
                 ctx,
                 LucideIcons.file,
@@ -76,43 +69,31 @@ class MediaPicker {
                 () async {
                   Navigator.pop(ctx);
                   await _pickFile(context, provider, roomId);
-                },
-              ),
+                }),
               const SizedBox(height: 8),
-            ],
-          ),
-        ),
-      ),
-    );
+            ]))));
   }
 
   static Widget _buildOption(
     BuildContext context,
     IconData icon,
     String label,
-    VoidCallback onTap,
-  ) {
+    VoidCallback onTap) {
     return ListTile(
       leading: CircleAvatar(
         backgroundColor: AppColors.accBg(context),
-        child: Icon(icon, color: AppColors.acc(context), size: 20),
-      ),
+        child: Icon(icon, color: AppColors.acc(context), size: 20)),
       title: Text(
         label,
         style: TextStyle(
           color: AppColors.textPrimary(context),
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-      onTap: onTap,
-    );
+          fontWeight: FontWeight.w500)),
+      onTap: onTap);
   }
 
   static Future<void> _pickFromCamera(
     BuildContext context,
-    AppProvider provider,
-    String roomId,
-  ) async {
+    String roomId) async {
     final granted = await _perm.requestCamera();
     if (!granted) {
       if (context.mounted) {
@@ -124,16 +105,14 @@ class MediaPicker {
       final xFile = await _imagePicker.pickImage(
         source: ImageSource.camera,
         maxWidth: 1920,
-        imageQuality: 85,
-      );
+        imageQuality: 85);
       if (xFile == null) return;
       await _sendMediaMessage(
         provider,
         roomId,
         xFile.path,
         xFile.name,
-        isImage: true,
-      );
+        isImage: true);
     } catch (e) {
       if (context.mounted) _showError(context, e.toString());
     }
@@ -141,9 +120,7 @@ class MediaPicker {
 
   static Future<void> _pickFromGallery(
     BuildContext context,
-    AppProvider provider,
-    String roomId,
-  ) async {
+    String roomId) async {
     final granted = await _perm.requestPhotos();
     if (!granted) {
       if (context.mounted) {
@@ -155,16 +132,14 @@ class MediaPicker {
       final xFile = await _imagePicker.pickImage(
         source: ImageSource.gallery,
         maxWidth: 1920,
-        imageQuality: 85,
-      );
+        imageQuality: 85);
       if (xFile == null) return;
       await _sendMediaMessage(
         provider,
         roomId,
         xFile.path,
         xFile.name,
-        isImage: true,
-      );
+        isImage: true);
     } catch (e) {
       if (context.mounted) _showError(context, e.toString());
     }
@@ -172,9 +147,7 @@ class MediaPicker {
 
   static Future<void> _pickVideo(
     BuildContext context,
-    AppProvider provider,
-    String roomId,
-  ) async {
+    String roomId) async {
     final granted = await _perm.requestPhotos();
     if (!granted) {
       if (context.mounted) {
@@ -185,16 +158,14 @@ class MediaPicker {
     try {
       final xFile = await _imagePicker.pickVideo(
         source: ImageSource.gallery,
-        maxDuration: const Duration(minutes: 5),
-      );
+        maxDuration: const Duration(minutes: 5));
       if (xFile == null) return;
       await _sendMediaMessage(
         provider,
         roomId,
         xFile.path,
         xFile.name,
-        isImage: false,
-      );
+        isImage: false);
     } catch (e) {
       if (context.mounted) _showError(context, e.toString());
     }
@@ -202,14 +173,11 @@ class MediaPicker {
 
   static Future<void> _pickFile(
     BuildContext context,
-    AppProvider provider,
-    String roomId,
-  ) async {
+    String roomId) async {
     try {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.any,
-        allowMultiple: false,
-      );
+        allowMultiple: false);
       if (result == null || result.files.isEmpty) return;
       final file = result.files.first;
       if (file.path == null) return;
@@ -218,15 +186,13 @@ class MediaPicker {
         roomId,
         file.path ?? '',
         file.name,
-        isImage: false,
-      );
+        isImage: false);
     } catch (e) {
       if (context.mounted) _showError(context, e.toString());
     }
   }
 
   static Future<void> _sendMediaMessage(
-    AppProvider provider,
     String roomId,
     String filePath,
     String fileName, {
@@ -234,9 +200,9 @@ class MediaPicker {
   }) async {
     try {
       if (isImage) {
-        await provider.matrix.sendImage(roomId, filePath, fileName);
+        await getIt<MatrixCubit>().sendImage(roomId, filePath, fileName);
       } else {
-        await provider.matrix.sendFile(roomId, filePath, fileName);
+        await getIt<MatrixCubit>().sendFile(roomId, filePath, fileName);
       }
     } catch (e) {
       AppLogger.instance.info('Failed to send media: $e');
@@ -247,15 +213,12 @@ class MediaPicker {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: AppColors.warn(context),
-      ),
-    );
+        backgroundColor: AppColors.warn(context)));
   }
 
   static void _showError(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: AppColors.dng(context)),
-    );
+      SnackBar(content: Text(message), backgroundColor: AppColors.dng(context)));
   }
 }
 
@@ -289,8 +252,7 @@ class MediaThumbnail extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppColors.sf(context),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: AppColors.divider(context)),
-            ),
+              border: Border.all(color: AppColors.divider(context))),
             child: isImage
                 ? ClipRRect(
                     borderRadius: BorderRadius.circular(8),
@@ -298,8 +260,7 @@ class MediaThumbnail extends StatelessWidget {
                         ? Icon(
                             LucideIcons.image,
                             size: 32,
-                            color: AppColors.iconGray(context),
-                          )
+                            color: AppColors.iconGray(context))
                         : Image.file(
                             File(filePath),
                             semanticLabel: localeProvider.t('selected_image'),
@@ -307,12 +268,8 @@ class MediaThumbnail extends StatelessWidget {
                             width: 80,
                             height: 80,
                             errorBuilder: (_, _, _) =>
-                                _buildFilePlaceholder(context),
-                          ),
-                  )
-                : _buildFilePlaceholder(context),
-          ),
-        ),
+                                _buildFilePlaceholder(context)))
+                : _buildFilePlaceholder(context))),
         if (onRemove != null)
           Positioned(
             right: 4,
@@ -325,18 +282,12 @@ class MediaThumbnail extends StatelessWidget {
                 height: 20,
                 decoration: BoxDecoration(
                   color: AppColors.bg(context).withValues(alpha: 0.5),
-                  shape: BoxShape.circle,
-                ),
+                  shape: BoxShape.circle),
                 child: Icon(
                   LucideIcons.x,
                   size: 12,
-                  color: AppColors.textPrimary(context),
-                ),
-              ),
-            ),
-          ),
-      ],
-    );
+                  color: AppColors.textPrimary(context))))),
+      ]);
   }
 
   Widget _buildFilePlaceholder(BuildContext context) {
@@ -352,11 +303,7 @@ class MediaThumbnail extends StatelessWidget {
               fileName,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 8, color: AppColors.mut(context)),
-            ),
-          ),
-        ],
-      ),
-    );
+              style: TextStyle(fontSize: 8, color: AppColors.mut(context)))),
+        ]));
   }
 }

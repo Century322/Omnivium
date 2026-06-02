@@ -1,16 +1,16 @@
-import 'dart:io' if (dart.library.html) '';
-import 'package:flutter/foundation.dart';
+﻿import 'dart:io' if (dart.library.html) '';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:matrix/matrix.dart';
 import 'package:image_picker/image_picker.dart';
 import '../theme/app_colors.dart';
-import '../theme/locale_provider.dart';
-import '../../core/app_provider.dart';
+import '../theme/locale_cubit.dart';
+import '../../core/di/app_di.dart';
+import '../../core/matrix/matrix_cubit.dart';
+import '../../core/matrix/matrix_dtos.dart';
+import '../../core/app_logger.dart';
 
-class CreateGroupView extends StatefulWidget {
-  final AppProvider provider;
-  const CreateGroupView({super.key, required this.provider});
+
+class CreateGroupView extends StatefulWidget { const CreateGroupView({super.key});
 
   @override
   State<CreateGroupView> createState() => _CreateGroupViewState();
@@ -32,23 +32,18 @@ class _CreateGroupViewState extends State<CreateGroupView> {
     super.dispose();
   }
 
-  List<Room> get _directChats {
-    final client = widget.provider.matrix.client;
-    if (client == null) return [];
-    final rooms = client.rooms.where((r) => r.isDirectChat).toList();
-    rooms.sort((a, b) => a.name.compareTo(b.name));
-    return rooms;
+  List<RoomInfo> get _directChats {
+    return getIt<MatrixCubit>().getDirectChats();
   }
 
-  List<Room> get _filteredChats {
+  List<RoomInfo> get _filteredChats {
     if (_searchQuery.isEmpty) return _directChats;
     final q = _searchQuery.toLowerCase();
     return _directChats
         .where(
           (r) =>
-              r.name.toLowerCase().contains(q) ||
-              (r.directChatMatrixID?.toLowerCase().contains(q) ?? false),
-        )
+              r.displayName.toLowerCase().contains(q) ||
+              (r.directChatMatrixId?.toLowerCase().contains(q) ?? false))
         .toList();
   }
 
@@ -62,16 +57,13 @@ class _CreateGroupViewState extends State<CreateGroupView> {
         elevation: 0,
         leading: IconButton(
           icon: Icon(LucideIcons.arrowLeft, color: AppColors.sec(context)),
-          onPressed: () => Navigator.pop(context),
-        ),
+          onPressed: () => Navigator.pop(context)),
         title: Text(
           t('new_group'),
           style: TextStyle(
             color: AppColors.textPrimary(context),
             fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+            fontWeight: FontWeight.w600)),
         actions: [
           TextButton(
             onPressed:
@@ -87,12 +79,8 @@ class _CreateGroupViewState extends State<CreateGroupView> {
                     ? AppColors.acc(context)
                     : AppColors.textDisabled(context),
                 fontSize: 15,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      ),
+                fontWeight: FontWeight.w600))),
+        ]),
       body: Column(
         children: [
           Expanded(
@@ -100,8 +88,7 @@ class _CreateGroupViewState extends State<CreateGroupView> {
               padding: EdgeInsets.only(
                 left: 24,
                 right: 24,
-                bottom: MediaQuery.of(context).padding.bottom + 40,
-              ),
+                bottom: MediaQuery.of(context).padding.bottom + 40),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -116,13 +103,8 @@ class _CreateGroupViewState extends State<CreateGroupView> {
                   const SizedBox(height: 12),
                   _buildMemberList(context, chats),
                   const SizedBox(height: 40),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+                ]))),
+        ]));
   }
 
   Widget _buildGroupInfoSection(BuildContext context) {
@@ -138,8 +120,7 @@ class _CreateGroupViewState extends State<CreateGroupView> {
                 final image = await picker.pickImage(
                   source: ImageSource.gallery,
                   maxWidth: 512,
-                  maxHeight: 512,
-                );
+                  maxHeight: 512);
                 if (image != null && mounted) {
                   setState(() {
                     _avatarPath = image.path;
@@ -155,19 +136,14 @@ class _CreateGroupViewState extends State<CreateGroupView> {
                   image: _avatarPath != null
                       ? DecorationImage(
                           image: FileImage(File(_avatarPath!)),
-                          fit: BoxFit.cover,
-                        )
-                      : null,
-                ),
+                          fit: BoxFit.cover)
+                      : null),
                 child: _avatarPath == null
                     ? Icon(
                         LucideIcons.camera,
                         size: 24,
-                        color: AppColors.iconGray(context),
-                      )
-                    : null,
-              ),
-            ),
+                        color: AppColors.iconGray(context))
+                    : null)),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
@@ -178,31 +154,25 @@ class _CreateGroupViewState extends State<CreateGroupView> {
                     style: TextStyle(
                       color: AppColors.textPrimary(context),
                       fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
+                      fontWeight: FontWeight.w500),
                     decoration: InputDecoration(
                       labelText: t('group_name'),
                       filled: true,
                       fillColor: AppColors.sf(context),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
+                        borderSide: BorderSide.none),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 14,
-                        vertical: 12,
-                      ),
-                    ),
-                    onChanged: (_) => setState(() {}),
-                  ),
+                        vertical: 12)),
+                    onChanged: (_) => setState(() {})),
                   const SizedBox(height: 8),
                   TextField(
                     controller: _descCtrl,
                     maxLength: 512,
                     style: TextStyle(
                       color: AppColors.textSecondary(context),
-                      fontSize: 14,
-                    ),
+                      fontSize: 14),
                     maxLines: 2,
                     minLines: 1,
                     decoration: InputDecoration(
@@ -211,21 +181,13 @@ class _CreateGroupViewState extends State<CreateGroupView> {
                       fillColor: AppColors.sf(context),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
+                        borderSide: BorderSide.none),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 14,
-                        vertical: 10,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
+                        vertical: 10))),
+                ])),
+          ]),
+      ]);
   }
 
   Widget _buildSelectedMembersSection(BuildContext context) {
@@ -244,12 +206,10 @@ class _CreateGroupViewState extends State<CreateGroupView> {
               return Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10,
-                  vertical: 4,
-                ),
+                  vertical: 4),
                 decoration: BoxDecoration(
                   color: AppColors.acc(context).withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(20),
-                ),
+                  borderRadius: BorderRadius.circular(20)),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -258,9 +218,7 @@ class _CreateGroupViewState extends State<CreateGroupView> {
                       style: TextStyle(
                         color: AppColors.acc(context),
                         fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
+                        fontWeight: FontWeight.w500)),
                     const SizedBox(width: 4),
                     GestureDetector(
                       onTap: () {
@@ -269,25 +227,17 @@ class _CreateGroupViewState extends State<CreateGroupView> {
                       child: Icon(
                         LucideIcons.x,
                         size: 14,
-                        color: AppColors.acc(context),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ),
-      ],
-    );
+                        color: AppColors.acc(context))),
+                  ]));
+            })),
+      ]);
   }
 
   Widget _buildSearchField(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.sf(context),
-        borderRadius: BorderRadius.circular(12),
-      ),
+        borderRadius: BorderRadius.circular(12)),
       child: TextField(
         controller: _searchCtrl,
         maxLength: 128,
@@ -297,25 +247,19 @@ class _CreateGroupViewState extends State<CreateGroupView> {
           prefixIcon: Icon(
             LucideIcons.search,
             size: 18,
-            color: AppColors.iconGray(context),
-          ),
+            color: AppColors.iconGray(context)),
           filled: true,
           fillColor: AppColors.sf(context),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none,
-          ),
+            borderSide: BorderSide.none),
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 14,
-            vertical: 10,
-          ),
-        ),
-        onChanged: (v) => setState(() => _searchQuery = v.trim()),
-      ),
-    );
+            vertical: 10)),
+        onChanged: (v) => setState(() => _searchQuery = v.trim())));
   }
 
-  Widget _buildMemberList(BuildContext context, List<Room> chats) {
+  Widget _buildMemberList(BuildContext context, List<RoomInfo> chats) {
     if (chats.isEmpty) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 32),
@@ -324,11 +268,7 @@ class _CreateGroupViewState extends State<CreateGroupView> {
             localeProvider.t('no_friends'),
             style: TextStyle(
               color: AppColors.textTertiary(context),
-              fontSize: 14,
-            ),
-          ),
-        ),
-      );
+              fontSize: 14))));
     }
 
     return Column(
@@ -339,15 +279,13 @@ class _CreateGroupViewState extends State<CreateGroupView> {
           style: TextStyle(
             color: AppColors.textHint(context),
             fontSize: 12,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+            fontWeight: FontWeight.w600)),
         const SizedBox(height: 8),
         ...chats.map((room) {
-          final userId = room.directChatMatrixID ?? '';
+          final userId = room.directChatMatrixId ?? '';
           if (userId.isEmpty) return const SizedBox.shrink();
           final isSelected = _selectedMembers.contains(userId);
-          final name = room.name;
+          final name = room.displayName;
           final initial = name.isNotEmpty ? name[0].toUpperCase() : '?';
 
           return GestureDetector(
@@ -367,10 +305,7 @@ class _CreateGroupViewState extends State<CreateGroupView> {
                 border: Border(
                   bottom: BorderSide(
                     color: AppColors.divider(context),
-                    width: 0.5,
-                  ),
-                ),
-              ),
+                    width: 0.5))),
               child: Row(
                 children: [
                   Container(
@@ -380,25 +315,19 @@ class _CreateGroupViewState extends State<CreateGroupView> {
                       color: isSelected
                           ? AppColors.acc(context).withValues(alpha: 0.15)
                           : AppColors.sfAlt(context),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
+                      borderRadius: BorderRadius.circular(20)),
                     child: Center(
                       child: isSelected
                           ? Icon(
                               LucideIcons.check,
                               size: 20,
-                              color: AppColors.acc(context),
-                            )
+                              color: AppColors.acc(context))
                           : Text(
                               initial,
                               style: TextStyle(
                                 color: AppColors.sec(context),
                                 fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                    ),
-                  ),
+                                fontWeight: FontWeight.w600)))),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
@@ -409,46 +338,41 @@ class _CreateGroupViewState extends State<CreateGroupView> {
                           style: TextStyle(
                             color: AppColors.textPrimary(context),
                             fontSize: 15,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
+                            fontWeight: FontWeight.w500)),
                         Text(
                           userId,
                           style: TextStyle(
                             color: AppColors.textTertiary(context),
-                            fontSize: 12,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
+                            fontSize: 12),
+                          overflow: TextOverflow.ellipsis),
+                      ])),
                   if (isSelected)
                     Icon(
                       LucideIcons.checkCircle2,
                       size: 20,
-                      color: AppColors.acc(context),
-                    ),
-                ],
-              ),
-            ),
-          );
+                      color: AppColors.acc(context)),
+                ])));
         }),
-      ],
-    );
+      ]);
   }
 
   Future<void> _createGroup() async {
     final name = _nameCtrl.text.trim();
     if (name.isEmpty || _selectedMembers.isEmpty) return;
 
-    final matrix = widget.provider.matrix;
+    final matrix = getIt<MatrixCubit>();
     try {
       final roomId = await matrix.createGroupChat(
         name,
         userIds: _selectedMembers.toList(),
-        topic: _descCtrl.text.trim().isEmpty ? null : _descCtrl.text.trim(),
-      );
+        topic: _descCtrl.text.trim().isEmpty ? null : _descCtrl.text.trim());
+      if (_avatarPath != null && roomId != null) {
+        try {
+          await getIt<MatrixCubit>().setRoomAvatar(roomId, _avatarPath!);
+        } catch (e) {
+          AppLogger.instance.warning('Failed to upload group avatar', error: e);
+        }
+      }
       if (mounted) {
         Navigator.pop(context, roomId);
       }
@@ -457,9 +381,7 @@ class _CreateGroupViewState extends State<CreateGroupView> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(e.toString().replaceAll('Exception: ', '')),
-            backgroundColor: AppColors.dng(context),
-          ),
-        );
+            backgroundColor: AppColors.dng(context)));
       }
     }
   }

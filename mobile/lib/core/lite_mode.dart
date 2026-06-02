@@ -95,8 +95,7 @@ class LiteMode {
     _flags = _presetFlags[_preset];
 
     AppLogger.instance.info(
-      'LiteMode: preset=$_preset, score=$performanceScore, cores=$processors',
-    );
+      'LiteMode: preset=$_preset, score=$performanceScore, cores=$processors');
   }
 
   void setFlag(int flag, bool enabled) {

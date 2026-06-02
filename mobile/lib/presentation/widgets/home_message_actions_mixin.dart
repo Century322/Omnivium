@@ -1,15 +1,17 @@
+
+import '../../core/di/app_di.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
-import '../../core/app_provider.dart';
+
 import '../../core/voice_service.dart';
 import '../theme/app_colors.dart';
-import '../theme/locale_provider.dart';
+import '../theme/locale_cubit.dart';
 import '../widgets/home_components.dart';
+import '../../core/agent/agent_orchestrator.dart';
+import '../../core/session_cubit.dart';
 
-mixin HomeMessageActionsMixin<T extends StatefulWidget> on State<T> {
-  AppProvider get provider;
-  List<ChatMessageData> get messages;
+mixin HomeMessageActionsMixin<T extends StatefulWidget> on State<T> { List<ChatMessageData> get messages;
   TextEditingController get textController;
   FocusNode get focusNode;
   int get editingIndex;
@@ -27,24 +29,22 @@ mixin HomeMessageActionsMixin<T extends StatefulWidget> on State<T> {
 
   void deleteMessagePair(int index) {
     if (index <= 0 || index >= messages.length) return;
-    provider.orchestrator.deleteMessagePair(index);
+    getIt<AgentOrchestrator>().deleteMessagePair(index);
     setState(() {
       editingIndex = -1;
     });
-    provider.session.saveCurrentSession();
+    getIt<SessionCubit>().saveCurrentSession();
   }
 
   void reportNotHelpful(int index) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(localeProvider.t('feedback_recorded')),
-        duration: const Duration(seconds: 2),
-      ),
-    );
+        duration: const Duration(seconds: 2)));
   }
 
   void regenerateResponse() {
-    final orchestrator = provider.orchestrator;
+    final orchestrator = getIt<AgentOrchestrator>();
     if (!orchestrator.isIdle) return;
     final orchMsgs = orchestrator.messages;
     if (orchMsgs.isEmpty) return;
@@ -68,18 +68,16 @@ mixin HomeMessageActionsMixin<T extends StatefulWidget> on State<T> {
       SnackBar(
         content: Text(localeProvider.t('copied')),
         backgroundColor: AppColors.acc(context),
-        duration: const Duration(milliseconds: 1500),
-      ),
-    );
+        duration: const Duration(milliseconds: 1500)));
   }
 
   void speakLastResponse() {
-    final orch = provider.orchestrator;
+    final orch = getIt<AgentOrchestrator>();
     final msgs = orch.messages;
     if (msgs.isEmpty) return;
     final last = msgs.last;
     if (last.role == 'assistant' && last.content.isNotEmpty) {
-      VoiceService.instance.speak(last.content);
+      getIt<VoiceService>().speak(last.content);
     }
   }
 

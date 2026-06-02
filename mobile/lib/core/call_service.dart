@@ -142,8 +142,7 @@ class VoIPCall {
   Future<void> addIceCandidate(
     String candidate,
     String? sdpMid,
-    int? sdpMLineIndex,
-  ) async {
+    int? sdpMLineIndex) async {
     final rtcCandidate = RTCIceCandidate(candidate, sdpMid, sdpMLineIndex);
     final pc = _peerConnection;
     if (pc != null) {
@@ -199,8 +198,7 @@ class CallService {
     _eventSubscription?.cancel();
     _matrixClient = client;
     _eventSubscription = client.onTimelineEvent.stream.listen(
-      _handleTimelineEvent,
-    );
+      _handleTimelineEvent);
     AppLogger.instance.info('CallService initialized');
   }
 
@@ -252,8 +250,7 @@ class CallService {
       roomId: roomId,
       remoteUserId: remoteUserId,
       isOutgoing: true,
-      isVideo: isVideo,
-    );
+      isVideo: isVideo);
 
     call.onIceCandidate = (c, candidate) {
       _sendCallEvent(roomId, 'm.call.candidates', {
@@ -303,8 +300,7 @@ class CallService {
     String callId,
     String roomId,
     Map<String, dynamic> content,
-    String senderId,
-  ) {
+    String senderId) {
     final current = _currentCall;
     if (current != null && current.isActive) {
       _sendCallEvent(roomId, 'm.call.hangup', {
@@ -323,8 +319,7 @@ class CallService {
       roomId: roomId,
       remoteUserId: senderId,
       isOutgoing: false,
-      state: CallState.ringing,
-    );
+      state: CallState.ringing);
 
     call.onIceCandidate = (c, candidate) {
       _sendCallEvent(roomId, 'm.call.candidates', {
@@ -378,8 +373,7 @@ class CallService {
     } catch (e) {
       AppLogger.instance.error(
         'Failed to get timeline for call invite',
-        error: e,
-      );
+        error: e);
     }
 
     if (offerSdp == null) {
@@ -412,8 +406,7 @@ class CallService {
       call.addIceCandidate(
         candidate['candidate'] as String? ?? '',
         candidate['sdpMid'] as String?,
-        candidate['sdpMLineIndex'] as int?,
-      );
+        candidate['sdpMLineIndex'] as int?);
     }
   }
 
@@ -473,8 +466,7 @@ class CallService {
   Future<void> _sendCallEvent(
     String roomId,
     String type,
-    Map<String, dynamic> content,
-  ) async {
+    Map<String, dynamic> content) async {
     final client = _matrixClient;
     if (client == null) return;
 

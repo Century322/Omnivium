@@ -98,8 +98,7 @@ class NodeDiscovery {
     _members[nodeId] = node.copyWith(
       state: NodeState.alive,
       incarnation: node.incarnation + 1,
-      lastHeartbeatAt: now.physicalTime,
-    );
+      lastHeartbeatAt: now.physicalTime);
     _emitEvent(ClusterEventType.nodeAlive, nodeId, {
       'incarnation': node.incarnation + 1,
     });
@@ -136,8 +135,7 @@ class NodeDiscovery {
     _members[_localNodeId] = self.copyWith(
       state: NodeState.alive,
       lastHeartbeatAt: now.physicalTime,
-      incarnation: self.incarnation + 1,
-    );
+      incarnation: self.incarnation + 1);
   }
 
   List<NodeDescriptor> selectGossipTargets() {
@@ -160,9 +158,7 @@ class NodeDiscovery {
       _clock.receive(
         HybridTimestamp(
           physicalTime: event.hlcTime,
-          nodeId: event.sourceNodeId,
-        ),
-      );
+          nodeId: event.sourceNodeId));
 
       switch (event.type) {
         case ClusterEventType.nodeJoined:
@@ -175,14 +171,11 @@ class NodeDiscovery {
                 address: event.payload['address'] as String? ?? '',
                 role: NodeRole.values.firstWhere(
                   (r) => r.name == event.payload['role'],
-                  orElse: () => NodeRole.worker,
-                ),
+                  orElse: () => NodeRole.worker),
                 state: NodeState.alive,
                 incarnation: event.payload['incarnation'] as int? ?? 0,
                 joinedAt: event.timestamp,
-                lastHeartbeatAt: event.timestamp,
-              ),
-            );
+                lastHeartbeatAt: event.timestamp));
           }
           break;
         case ClusterEventType.nodeLeft:
@@ -241,8 +234,7 @@ class NodeDiscovery {
   void _emitEvent(
     ClusterEventType type,
     String targetNodeId,
-    Map<String, dynamic> extra,
-  ) {
+    Map<String, dynamic> extra) {
     final now = _clock.tick();
     final event = ClusterEvent(
       id: 'ce_${_eventSeq++}',
@@ -250,8 +242,7 @@ class NodeDiscovery {
       sourceNodeId: _localNodeId,
       timestamp: now.physicalTime,
       hlcTime: now.physicalTime,
-      payload: {'nodeId': targetNodeId, ...extra},
-    );
+      payload: {'nodeId': targetNodeId, ...extra});
 
     _eventQueue.add(event);
     if (!_eventController.isClosed) {
@@ -261,8 +252,7 @@ class NodeDiscovery {
     if (_eventQueue.length > _config.maxPiggybackEvents * 2) {
       _eventQueue.removeRange(
         0,
-        _eventQueue.length - _config.maxPiggybackEvents,
-      );
+        _eventQueue.length - _config.maxPiggybackEvents);
     }
   }
 

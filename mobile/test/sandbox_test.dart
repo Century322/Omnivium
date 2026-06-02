@@ -229,7 +229,7 @@ void main() {
       sandbox.start();
       expect(sandbox.checkExecutionTime(), isTrue);
 
-      Future.delayed(const Duration(milliseconds: 100), () {
+      Future<void>.delayed(const Duration(milliseconds: 100), () {
         expect(sandbox.checkExecutionTime(), isFalse);
         expect(sandbox.state, SandboxState.terminated);
       });

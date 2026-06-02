@@ -54,7 +54,7 @@ void main() {
       );
       expect(result.status, CapabilityStatus.success);
       expect(result.data, isA<Map>());
-      expect(result.data['version'], '1.0.0');
+      expect((result.data as Map<String, dynamic>)['version'], '1.0.0');
     });
 
     test('runtime.health returns healthy', () async {
@@ -68,7 +68,7 @@ void main() {
         callerPermission: const RuntimePermission(),
       );
       expect(result.status, CapabilityStatus.success);
-      expect(result.data['status'], 'healthy');
+      expect((result.data as Map<String, dynamic>)['status'], 'healthy');
     });
   });
 
@@ -192,7 +192,7 @@ void main() {
         callerPermission: const RuntimePermission(),
       );
       expect(result.status, CapabilityStatus.success);
-      expect(result.data['counters']['requests'], 6);
+      expect(((result.data as Map<String, dynamic>)['counters'] as Map<String, dynamic>)['requests'], 6);
     });
   });
 
@@ -208,8 +208,8 @@ void main() {
         callerPermission: const RuntimePermission(),
       );
       expect(result.status, CapabilityStatus.success);
-      expect(result.data['response'], contains('Hello'));
-      expect(result.data['model'], 'fake-agent-v1');
+      expect((result.data as Map<String, dynamic>)['response'], contains('Hello'));
+      expect((result.data as Map<String, dynamic>)['model'], 'fake-agent-v1');
     });
 
     test('agent.execute with parallel tasks', () async {
@@ -224,7 +224,7 @@ void main() {
         callerPermission: perm,
       );
       expect(result.status, CapabilityStatus.success);
-      expect(result.data['results'], hasLength(3));
+      expect((result.data as Map<String, dynamic>)['results'], hasLength(3));
     });
 
     test('agent.execute with fail tool returns error', () async {
@@ -252,7 +252,7 @@ void main() {
         callerPermission: const RuntimePermission(),
       );
       expect(result.status, CapabilityStatus.success);
-      expect(result.data['cancelled'], true);
+      expect((result.data as Map<String, dynamic>)['cancelled'], true);
     });
   });
 
@@ -275,9 +275,9 @@ void main() {
         callerPermission: perm,
       );
       expect(writeResult.status, CapabilityStatus.success);
-      expect(writeResult.data['created'], true);
+      expect((writeResult.data as Map<String, dynamic>)['created'], true);
 
-      final memId = writeResult.data['id'] as String;
+      final memId = (writeResult.data as Map<String, dynamic>)['id'] as String;
 
       final readResult = await container.capabilityRouter.invoke(
         'memory.read',
@@ -286,7 +286,7 @@ void main() {
         callerPermission: perm,
       );
       expect(readResult.status, CapabilityStatus.success);
-      expect(readResult.data['content'], contains('Omnivium'));
+      expect((readResult.data as Map<String, dynamic>)['content'], contains('Omnivium'));
 
       final searchResult = await container.capabilityRouter.invoke(
         'memory.search',
@@ -295,7 +295,7 @@ void main() {
         callerPermission: perm,
       );
       expect(searchResult.status, CapabilityStatus.success);
-      expect(searchResult.data['count'], greaterThan(0));
+      expect((searchResult.data as Map<String, dynamic>)['count'], greaterThan(0));
     });
 
     test('embed returns vector', () async {
@@ -311,7 +311,7 @@ void main() {
         caller: RuntimeIdentity.forPlugin('test'),
         callerPermission: perm,
       );
-      final memId = writeResult.data['id'] as String;
+      final memId = (writeResult.data as Map<String, dynamic>)['id'] as String;
 
       final embedResult = await container.capabilityRouter.invoke(
         'memory.embed',
@@ -320,8 +320,8 @@ void main() {
         callerPermission: perm,
       );
       expect(embedResult.status, CapabilityStatus.success);
-      expect(embedResult.data['dimensions'], 8);
-      expect(embedResult.data['embedding'], isA<List>());
+      expect((embedResult.data as Map<String, dynamic>)['dimensions'], 8);
+      expect((embedResult.data as Map<String, dynamic>)['embedding'], isA<List>());
     });
   });
 
@@ -335,7 +335,7 @@ void main() {
         pluginId: 'test-plugin',
       );
 
-      await Future.delayed(const Duration(milliseconds: 10));
+      await Future<void>.delayed(const Duration(milliseconds: 10));
       container.traceService.finishSpan(span);
 
       expect(span.endTimeMs, isNotNull);

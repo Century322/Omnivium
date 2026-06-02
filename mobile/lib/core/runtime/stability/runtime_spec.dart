@@ -54,8 +54,7 @@ class RuntimeSpecRegistry {
       _rfcs.values.where((r) => r.status == RfcStatus.frozen).toList();
   List<RuntimeRfc> get activeRfcs => _rfcs.values
       .where(
-        (r) => r.status == RfcStatus.accepted || r.status == RfcStatus.frozen,
-      )
+        (r) => r.status == RfcStatus.accepted || r.status == RfcStatus.frozen)
       .toList();
 
   RuntimeRfc? getRfc(String id) => _rfcs[id];
@@ -85,9 +84,7 @@ class RuntimeSpecRegistry {
             '2. RuntimeContainer.shutdown() transitions: running → shutting → stopped.\n'
             '3. No capability invocation is allowed before running state.\n'
             '4. All plugins must be unloaded before shutdown completes.\n'
-            '5. Event journal records boot and shutdown as immutable entries.',
-      ),
-    );
+            '5. Event journal records boot and shutdown as immutable entries.'));
 
     register(
       const RuntimeRfc(
@@ -109,9 +106,7 @@ class RuntimeSpecRegistry {
             '2. CapabilityRouter.discover() returns a Route with pluginId and capability metadata.\n'
             '3. PolicyEngine.evaluate() must return ALLOW before invocation proceeds.\n'
             '4. ResourceController.tryAcquireTokens() must succeed before invocation.\n'
-            '5. Capability invocation returns CapabilityResult with status: success/failure/unavailable.',
-      ),
-    );
+            '5. Capability invocation returns CapabilityResult with status: success/failure/unavailable.'));
 
     register(
       const RuntimeRfc(
@@ -134,9 +129,7 @@ class RuntimeSpecRegistry {
             '3. Data frames require AckFrame response within ackTimeout.\n'
             '4. HeartbeatFrame sent every heartbeatInterval.\n'
             '5. Large messages are chunked into WireEnvelope with correlationId.\n'
-            '6. Protocol version negotiation happens during handshake.',
-      ),
-    );
+            '6. Protocol version negotiation happens during handshake.'));
 
     register(
       const RuntimeRfc(
@@ -160,9 +153,7 @@ class RuntimeSpecRegistry {
             '3. Single Writer Principle: only the lease owner can write.\n'
             '4. Lease expiry is detected by tickExpiry().\n'
             '5. Expired leases are reclaimed after grace period.\n'
-            '6. Remote lease state is synchronized via receiveLeaseState().',
-      ),
-    );
+            '6. Remote lease state is synchronized via receiveLeaseState().'));
 
     register(
       const RuntimeRfc(
@@ -187,9 +178,7 @@ class RuntimeSpecRegistry {
             '4. Capability Consistency: Eventually Consistent via Gossip.\n'
             '5. Time Authority: Hybrid Logical Clock for all ordering.\n'
             '6. Failure Domain: Node failure is isolated. No cascading.\n'
-            '7. Network: Always hostile. Design for latency, loss, partition.',
-      ),
-    );
+            '7. Network: Always hostile. Design for latency, loss, partition.'));
 
     register(
       const RuntimeRfc(
@@ -212,9 +201,7 @@ class RuntimeSpecRegistry {
             '3. Checkpoint marks a known-good LSN for recovery.\n'
             '4. Compaction removes entries before last checkpoint.\n'
             '5. Replay from any LSN reconstructs state.\n'
-            '6. Integrity validation via checksum on each entry.',
-      ),
-    );
+            '6. Integrity validation via checksum on each entry.'));
 
     register(
       const RuntimeRfc(
@@ -237,9 +224,7 @@ class RuntimeSpecRegistry {
             '3. Capability auth: each capability defines required trust level and allowed callers.\n'
             '4. Secret store: secrets are scoped, time-limited, and access-logged.\n'
             '5. Trust boundaries: define capability/node/resource restrictions per boundary.\n'
-            '6. Audit log: all capability invocations and policy decisions are recorded.',
-      ),
-    );
+            '6. Audit log: all capability invocations and policy decisions are recorded.'));
 
     register(
       const RuntimeRfc(
@@ -272,8 +257,6 @@ class RuntimeSpecRegistry {
             'None. Sandbox is additive. Existing plugins continue to work in the default trust boundary.',
         migrationGuide:
             'Existing plugins automatically run in the "default" trust boundary with verified trust level. '
-            'No migration needed. New untrusted plugins opt into sandbox isolation.',
-      ),
-    );
+            'No migration needed. New untrusted plugins opt into sandbox isolation.'));
   }
 }

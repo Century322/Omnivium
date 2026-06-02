@@ -425,7 +425,7 @@ void main() {
       observatory.notifyCapabilityInvoke('storage.read', 'storage', 'ok');
       observatory.notifyPolicyDecision('agent.main', 'storage.delete', false);
 
-      await Future.delayed(const Duration(milliseconds: 50));
+      await Future<void>.delayed(const Duration(milliseconds: 50));
 
       expect(events.length, 3);
       expect(events[0].type, ObservatoryEventType.pluginStateChange);

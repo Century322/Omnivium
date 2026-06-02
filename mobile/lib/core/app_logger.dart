@@ -45,8 +45,7 @@ class AppLogger {
     FileLog.instance.writeError(
       '[WARN${_fmtTag(tag)}] $message',
       error,
-      stackTrace,
-    );
+      stackTrace);
     if (sentryEnabled) {
       Sentry.captureMessage(message, level: SentryLevel.warning);
     }
@@ -63,13 +62,11 @@ class AppLogger {
     FileLog.instance.writeError(
       '[ERROR${_fmtTag(tag)}] $message',
       error,
-      stackTrace,
-    );
+      stackTrace);
     if (sentryEnabled) {
       Sentry.captureException(
         error ?? Exception(message),
-        stackTrace: stackTrace,
-      );
+        stackTrace: stackTrace);
     }
   }
 
@@ -83,14 +80,12 @@ class AppLogger {
     FileLog.instance.writeError(
       '[FATAL${_fmtTag(tag)}] $message',
       error,
-      stackTrace,
-    );
+      stackTrace);
     if (sentryEnabled) {
       Sentry.captureException(
         error ?? Exception(message),
         stackTrace: stackTrace,
-        hint: Hint.withMap({'fatal': true}),
-      );
+        hint: Hint.withMap({'fatal': true}));
     }
   }
 

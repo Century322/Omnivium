@@ -1,3 +1,5 @@
+
+import 'di/app_di.dart';
 import 'package:flutter/services.dart';
 import 'app_lock_service.dart';
 import 'app_logger.dart';
@@ -11,7 +13,7 @@ class SecureFlagService {
   bool _currentFlag = false;
 
   Future<void> init() async {
-    final shouldBlock = AppLockService.instance.blockScreenshot;
+    final shouldBlock = getIt<AppLockService>().blockScreenshot;
     if (shouldBlock) {
       await setSecureFlag(true);
     }
@@ -25,15 +27,14 @@ class SecureFlagService {
     } on PlatformException catch (e) {
       AppLogger.instance.warning(
         'SecureFlag: failed to set secure flag',
-        error: e,
-      );
+        error: e);
     } on MissingPluginException {
       AppLogger.instance.info('SecureFlag: platform not supported');
     }
   }
 
   Future<void> onAppLockEnabled() async {
-    if (AppLockService.instance.blockScreenshot) {
+    if (getIt<AppLockService>().blockScreenshot) {
       await setSecureFlag(true);
     }
   }

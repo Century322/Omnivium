@@ -46,8 +46,7 @@ class SandboxResources {
     trustBoundary: trustBoundary ?? this.trustBoundary,
     maxExecutionTime: maxExecutionTime ?? this.maxExecutionTime,
     maxMemoryBytes: maxMemoryBytes ?? this.maxMemoryBytes,
-    maxConcurrentTasks: maxConcurrentTasks ?? this.maxConcurrentTasks,
-  );
+    maxConcurrentTasks: maxConcurrentTasks ?? this.maxConcurrentTasks);
 
   bool isCapabilityAllowed(String capabilityId) {
     if (deniedCapabilities.contains(capabilityId)) return false;
@@ -118,8 +117,7 @@ class SandboxIsolate {
   void start() {
     if (_state != SandboxState.created) {
       throw StateError(
-        'Sandbox can only start from created state, current: $_state',
-      );
+        'Sandbox can only start from created state, current: $_state');
     }
     _state = SandboxState.running;
     _startedAt = clock.tick().physicalTime;
@@ -156,13 +154,11 @@ class SandboxIsolate {
         wasScheduledThroughScheduler: true,
         budgetApproved:
             resources.usage.tokensUsed + count <= resources.budget.maxTokens,
-        hasTraceSpan: hasTraceSpan,
-      );
+        hasTraceSpan: hasTraceSpan);
       if (!guardResult.allowed) {
         _recordViolation(
           SandboxViolationType.budgetExceeded,
-          guardResult.reason ?? 'Constitutional guard denied token acquisition',
-        );
+          guardResult.reason ?? 'Constitutional guard denied token acquisition');
         _checkGuardTermination();
         return false;
       }
@@ -171,8 +167,7 @@ class SandboxIsolate {
     if (resources.usage.tokensUsed + count > resources.budget.maxTokens) {
       _recordViolation(
         SandboxViolationType.budgetExceeded,
-        'Token budget exceeded',
-      );
+        'Token budget exceeded');
       return false;
     }
     resources.usage.tokensUsed += count;
@@ -192,13 +187,11 @@ class SandboxIsolate {
         wasScheduledThroughScheduler: wasScheduledThroughScheduler,
         budgetApproved:
             resources.usage.activeTasks < resources.maxConcurrentTasks,
-        hasTraceSpan: hasTraceSpan,
-      );
+        hasTraceSpan: hasTraceSpan);
       if (!guardResult.allowed) {
         _recordViolation(
           SandboxViolationType.bypassAttempt,
-          guardResult.reason ?? 'Constitutional guard denied task creation',
-        );
+          guardResult.reason ?? 'Constitutional guard denied task creation');
         _checkGuardTermination();
         return false;
       }
@@ -207,8 +200,7 @@ class SandboxIsolate {
     if (resources.usage.activeTasks >= resources.maxConcurrentTasks) {
       _recordViolation(
         SandboxViolationType.taskLimitExceeded,
-        'Task limit exceeded',
-      );
+        'Task limit exceeded');
       return false;
     }
     resources.usage.activeTasks++;
@@ -225,13 +217,11 @@ class SandboxIsolate {
         wasScheduledThroughScheduler: true,
         budgetApproved:
             resources.usage.activeStreams < resources.budget.maxStreams,
-        hasTraceSpan: hasTraceSpan,
-      );
+        hasTraceSpan: hasTraceSpan);
       if (!guardResult.allowed) {
         _recordViolation(
           SandboxViolationType.streamLimitExceeded,
-          guardResult.reason ?? 'Constitutional guard denied stream',
-        );
+          guardResult.reason ?? 'Constitutional guard denied stream');
         _checkGuardTermination();
         return false;
       }
@@ -240,8 +230,7 @@ class SandboxIsolate {
     if (resources.usage.activeStreams >= resources.budget.maxStreams) {
       _recordViolation(
         SandboxViolationType.streamLimitExceeded,
-        'Stream limit exceeded',
-      );
+        'Stream limit exceeded');
       return false;
     }
     resources.usage.activeStreams++;
@@ -266,61 +255,50 @@ class SandboxIsolate {
         callerTrust: identity.trustLevel,
         requiredTrust: securityManager.policy.minimumPluginTrustLevel,
         wasRoutedThroughRouter: wasRoutedThroughRouter,
-        hasTraceSpan: hasTraceSpan,
-      );
+        hasTraceSpan: hasTraceSpan);
 
       if (!guardResult.allowed) {
         _recordViolation(
           SandboxViolationType.bypassAttempt,
-          guardResult.reason ?? 'Constitutional guard denied',
-        );
+          guardResult.reason ?? 'Constitutional guard denied');
         return CapabilityAccessResult.denied(
-          guardResult.reason ?? 'Constitutional guard denied',
-        );
+          guardResult.reason ?? 'Constitutional guard denied');
       }
 
       if (guard.shouldTerminate(identity.sandboxId)) {
         terminate('constitutional_violation_escalation');
         return CapabilityAccessResult.denied(
-          'Sandbox terminated by constitutional guard',
-        );
+          'Sandbox terminated by constitutional guard');
       }
     }
 
     if (!resources.isCapabilityAllowed(capabilityId)) {
       _recordViolation(
         SandboxViolationType.capabilityDenied,
-        'Capability denied: $capabilityId',
-      );
+        'Capability denied: $capabilityId');
       return CapabilityAccessResult.denied(
-        'Capability not allowed: $capabilityId',
-      );
+        'Capability not allowed: $capabilityId');
     }
 
     final policyDecision = policyEngine.evaluate(
       callerId: identity.pluginId,
-      targetCapability: capabilityId,
-    );
+      targetCapability: capabilityId);
 
     if (!policyDecision.allowed) {
       _recordViolation(
         SandboxViolationType.policyDenied,
-        'Policy denied: ${policyDecision.matchedRuleId}',
-      );
+        'Policy denied: ${policyDecision.matchedRuleId}');
       return CapabilityAccessResult.denied(
-        'Policy denied: ${policyDecision.matchedRuleId}',
-      );
+        'Policy denied: ${policyDecision.matchedRuleId}');
     }
 
     if (!securityManager.isCapabilityInvocationAllowed(
       capabilityId,
       identity.runtimeIdentity,
-      identity.trustLevel,
-    )) {
+      identity.trustLevel)) {
       _recordViolation(
         SandboxViolationType.trustInsufficient,
-        'Trust level insufficient for: $capabilityId',
-      );
+        'Trust level insufficient for: $capabilityId');
       return CapabilityAccessResult.denied('Trust level insufficient');
     }
 
@@ -334,8 +312,7 @@ class SandboxIsolate {
     if (elapsed > resources.maxExecutionTime.inMilliseconds) {
       _recordViolation(
         SandboxViolationType.executionTimeExceeded,
-        'Execution time exceeded',
-      );
+        'Execution time exceeded');
       terminate('execution_time_exceeded');
       return false;
     }
@@ -348,9 +325,7 @@ class SandboxIsolate {
         type: type,
         message: message,
         timestamp: clock.tick().physicalTime,
-        sandboxId: identity.sandboxId,
-      ),
-    );
+        sandboxId: identity.sandboxId));
   }
 
   void _audit(String action, Map<String, dynamic> data) {
@@ -448,8 +423,7 @@ class ExecutionGovernor {
       pluginId: pluginId,
       trustLevel: trustLevel,
       createdBy: createdBy,
-      createdAt: _clock.tick().physicalTime,
-    );
+      createdAt: _clock.tick().physicalTime);
 
     final sandbox = SandboxIsolate(
       identity: identity,
@@ -457,8 +431,7 @@ class ExecutionGovernor {
       clock: HybridLogicalClock(nodeId: sandboxId),
       policyEngine: PolicyEngine.defaultPolicy(),
       securityManager: _securityManager,
-      constitutionalGuard: _constitutionalGuard,
-    );
+      constitutionalGuard: _constitutionalGuard);
 
     _sandboxes[sandboxId] = sandbox;
     _securityManager.audit(
@@ -468,8 +441,7 @@ class ExecutionGovernor {
         'sandboxId': sandboxId,
         'type': type.name,
         'trustLevel': trustLevel.name,
-      },
-    );
+      });
 
     return sandbox;
   }
@@ -482,8 +454,7 @@ class ExecutionGovernor {
     _securityManager.audit(
       'sandbox.terminate',
       sandbox.identity.createdBy,
-      context: {'sandboxId': sandboxId, 'reason': reason},
-    );
+      context: {'sandboxId': sandboxId, 'reason': reason});
 
     return true;
   }
@@ -496,22 +467,19 @@ class ExecutionGovernor {
             sandbox.resources.budget.maxTokens) {
           sandbox._recordViolation(
             SandboxViolationType.budgetExceeded,
-            'Token budget exceeded during law enforcement',
-          );
+            'Token budget exceeded during law enforcement');
         }
         if (sandbox.resources.usage.activeTasks >
             sandbox.resources.maxConcurrentTasks) {
           sandbox._recordViolation(
             SandboxViolationType.taskLimitExceeded,
-            'Task limit exceeded during law enforcement',
-          );
+            'Task limit exceeded during law enforcement');
         }
         if (sandbox.resources.usage.activeStreams >
             sandbox.resources.budget.maxStreams) {
           sandbox._recordViolation(
             SandboxViolationType.streamLimitExceeded,
-            'Stream limit exceeded during law enforcement',
-          );
+            'Stream limit exceeded during law enforcement');
         }
       }
     }

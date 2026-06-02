@@ -1,4 +1,4 @@
-import 'app_logger.dart';
+﻿import 'app_logger.dart';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -56,14 +56,12 @@ class DatabaseService {
     final key = _aesKey;
     if (key == null) {
       throw StateError(
-        'Encryption key not set. Call setEncryptionKey() before storing encrypted data.',
-      );
+        'Encryption key not set. Call setEncryptionKey() before storing encrypted data.');
     }
     try {
       final iv = encrypt.IV.fromSecureRandom(16);
       final encrypter = encrypt.Encrypter(
-        encrypt.AES(key, mode: encrypt.AESMode.cbc),
-      );
+        encrypt.AES(key, mode: encrypt.AESMode.cbc));
       final encrypted = encrypter.encrypt(plainText, iv: iv);
       final combined = Uint8List(iv.bytes.length + encrypted.bytes.length);
       combined.setRange(0, iv.bytes.length, iv.bytes);
@@ -73,11 +71,9 @@ class DatabaseService {
       AppLogger.instance.error(
         'AES encryption failed',
         error: e,
-        stackTrace: stackTrace,
-      );
+        stackTrace: stackTrace);
       throw StateError(
-        'Encryption failed. Data will not be stored in plaintext.',
-      );
+        'Encryption failed. Data will not be stored in plaintext.');
     }
   }
 
@@ -93,12 +89,10 @@ class DatabaseService {
       final encryptedBytes = combined.sublist(16);
       final iv = encrypt.IV(Uint8List.fromList(ivBytes));
       final encrypter = encrypt.Encrypter(
-        encrypt.AES(key, mode: encrypt.AESMode.cbc),
-      );
+        encrypt.AES(key, mode: encrypt.AESMode.cbc));
       final decrypted = encrypter.decrypt(
         encrypt.Encrypted(Uint8List.fromList(encryptedBytes)),
-        iv: iv,
-      );
+        iv: iv);
       return decrypted;
     } catch (e) {
       AppLogger.instance.warning('AES decryption failed', error: e);
@@ -122,8 +116,7 @@ class DatabaseService {
       AppLogger.instance.warning(
         'Encrypted data parse failed',
         error: e,
-        stackTrace: stackTrace,
-      );
+        stackTrace: stackTrace);
       return null;
     }
   }
@@ -156,8 +149,7 @@ class DatabaseService {
             AppLogger.instance.warning(
               'App error',
               error: e,
-              stackTrace: stackTrace,
-            );
+              stackTrace: stackTrace);
             return <String, dynamic>{};
           }
         })
@@ -193,8 +185,7 @@ class DatabaseService {
             AppLogger.instance.warning(
               'App error',
               error: e,
-              stackTrace: stackTrace,
-            );
+              stackTrace: stackTrace);
             return <String, dynamic>{};
           }
         })
@@ -214,6 +205,10 @@ class DatabaseService {
         await _cache.delete(k);
       }
     }
+  }
+
+  Future<void> putCacheBatch(Map<String, String> entries) async {
+    await _cache.putAll(entries);
   }
 
   String? getCache(String key) => _cache.get(key);
@@ -242,8 +237,7 @@ class DatabaseService {
   }
 
   List<Map<String, dynamic>> queryData(
-    bool Function(Map<String, dynamic>) predicate,
-  ) {
+    bool Function(Map<String, dynamic>) predicate) {
     return _data.values
         .map((raw) {
           try {
@@ -266,7 +260,7 @@ class DatabaseService {
     final raw = prefs.getString('omnivium_sessions');
     if (raw != null) {
       try {
-        final list = jsonDecode(raw) as List;
+        final list = jsonDecode(raw) as List<dynamic>;
         for (final item in list) {
           final map = item as Map<String, dynamic>;
           final id = map['id'] as String?;
@@ -282,7 +276,7 @@ class DatabaseService {
     final memRaw = prefs.getString('omnivium_memories');
     if (memRaw != null) {
       try {
-        final list = jsonDecode(memRaw) as List;
+        final list = jsonDecode(memRaw) as List<dynamic>;
         for (final item in list) {
           final map = item as Map<String, dynamic>;
           final id = map['id'] as String?;

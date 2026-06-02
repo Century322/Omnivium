@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../theme/app_colors.dart';
-import '../theme/locale_provider.dart';
+import '../theme/locale_cubit.dart';
 import 'incognito_icon.dart';
 
 class HomeHeader extends StatelessWidget {
@@ -56,11 +56,7 @@ class HomeHeader extends StatelessWidget {
               }
 
               return _buildIdleHeader(context, progress);
-            },
-          ),
-        ),
-      ),
-    );
+            }))));
   }
 
   Widget _buildActiveHeader(BuildContext context) {
@@ -76,16 +72,11 @@ class HomeHeader extends StatelessWidget {
               height: 32,
               decoration: BoxDecoration(
                 color: AppColors.sfAlt(context),
-                borderRadius: BorderRadius.circular(16),
-              ),
+                borderRadius: BorderRadius.circular(16)),
               child: Icon(
                 LucideIcons.x,
                 size: 18,
-                color: AppColors.sec(context),
-              ),
-            ),
-          ),
-        ),
+                color: AppColors.sec(context))))),
         const Spacer(),
         GestureDetector(
           behavior: HitTestBehavior.opaque,
@@ -95,17 +86,12 @@ class HomeHeader extends StatelessWidget {
             height: 32,
             decoration: BoxDecoration(
               color: AppColors.sfAlt(context),
-              borderRadius: BorderRadius.circular(16),
-            ),
+              borderRadius: BorderRadius.circular(16)),
             child: Icon(
               LucideIcons.moreVertical,
               size: 18,
-              color: AppColors.sec(context),
-            ),
-          ),
-        ),
-      ],
-    );
+              color: AppColors.sec(context)))),
+      ]);
   }
 
   Widget _buildIdleHeader(BuildContext context, double progress) {
@@ -121,26 +107,19 @@ class HomeHeader extends StatelessWidget {
               height: 30,
               decoration: BoxDecoration(
                 color: AppColors.sfAlt(context),
-                borderRadius: BorderRadius.circular(15),
-              ),
+                borderRadius: BorderRadius.circular(15)),
               child: isLibraryMode
                   ? Center(
                       child: Icon(
                         LucideIcons.users,
                         size: 16,
-                        color: AppColors.sec(context),
-                      ),
-                    )
+                        color: AppColors.sec(context)))
                   : isIncognito
                   ? Center(
                       child: IncognitoIcon(
                         size: 18,
-                        color: AppColors.textPrimary(context),
-                      ),
-                    )
-                  : userAvatar,
-            ),
-          ),
+                        color: AppColors.textPrimary(context)))
+                  : userAvatar)),
           Expanded(child: Center(child: _buildTabSwitcher(context))),
           GestureDetector(
             behavior: HitTestBehavior.opaque,
@@ -151,14 +130,11 @@ class HomeHeader extends StatelessWidget {
                     height: 30,
                     decoration: BoxDecoration(
                       color: AppColors.sfAlt(context),
-                      borderRadius: BorderRadius.circular(15),
-                    ),
+                      borderRadius: BorderRadius.circular(15)),
                     child: Icon(
                       LucideIcons.search,
                       size: 16,
-                      color: AppColors.sec(context),
-                    ),
-                  )
+                      color: AppColors.sec(context)))
                 : Transform.rotate(
                     angle: 0.17,
                     child: Container(
@@ -166,19 +142,12 @@ class HomeHeader extends StatelessWidget {
                       height: 30,
                       decoration: BoxDecoration(
                         color: AppColors.acc(context).withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+                        borderRadius: BorderRadius.circular(8)),
                       child: Icon(
                         LucideIcons.flame,
                         size: 16,
-                        color: AppColors.acc(context),
-                      ),
-                    ),
-                  ),
-          ),
-        ],
-      ),
-    );
+                        color: AppColors.acc(context))))),
+        ]));
   }
 
   Widget _buildTabSwitcher(BuildContext context) {
@@ -187,8 +156,7 @@ class HomeHeader extends StatelessWidget {
       width: 140,
       decoration: BoxDecoration(
         color: AppColors.tab(context),
-        borderRadius: BorderRadius.circular(21),
-      ),
+        borderRadius: BorderRadius.circular(21)),
       padding: const EdgeInsets.all(4),
       child: AnimatedBuilder(
         animation: tabSwitch,
@@ -204,10 +172,7 @@ class HomeHeader extends StatelessWidget {
                   width: 66,
                   decoration: BoxDecoration(
                     color: AppColors.sfActive(context),
-                    borderRadius: BorderRadius.circular(19),
-                  ),
-                ),
-              ),
+                    borderRadius: BorderRadius.circular(19)))),
               Row(
                 children: [
                   Expanded(
@@ -220,11 +185,7 @@ class HomeHeader extends StatelessWidget {
                           size: 18,
                           color: t < 0.5
                               ? AppColors.textPrimary(context)
-                              : AppColors.tabIn(context),
-                        ),
-                      ),
-                    ),
-                  ),
+                              : AppColors.tabIn(context))))),
                   Expanded(
                     child: GestureDetector(
                       behavior: HitTestBehavior.opaque,
@@ -235,17 +196,9 @@ class HomeHeader extends StatelessWidget {
                           size: 18,
                           color: t >= 0.5
                               ? AppColors.textPrimary(context)
-                              : AppColors.tabIn(context),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          );
-        },
-      ),
-    );
+                              : AppColors.tabIn(context))))),
+                ]),
+            ]);
+        }));
   }
 }

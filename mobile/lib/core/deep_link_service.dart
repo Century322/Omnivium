@@ -21,16 +21,14 @@ class DeepLinkService {
       _initialLink = initial;
       if (initial != null && !_isValidDeepLink(initial)) {
         AppLogger.instance.warning(
-          'Blocked invalid initial deep link: $_initialLink',
-        );
+          'Blocked invalid initial deep link: $_initialLink');
         _initialLink = null;
       }
     } catch (e, stackTrace) {
       AppLogger.instance.error(
         'Deep link init failed',
         error: e,
-        stackTrace: stackTrace,
-      );
+        stackTrace: stackTrace);
     }
 
     _linkSubscription = _appLinks.uriLinkStream.listen(
@@ -41,10 +39,9 @@ class DeepLinkService {
           AppLogger.instance.warning('Blocked invalid deep link: $uri');
         }
       },
-      onError: (err) {
+      onError: (Object err) {
         AppLogger.instance.info('Deep link error: $err');
-      },
-    );
+      });
   }
 
   void dispose() {

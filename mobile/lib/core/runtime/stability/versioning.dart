@@ -25,8 +25,7 @@ class SemanticVersion implements Comparable<SemanticVersion> {
       minor: versionParts.length > 1 ? int.parse(versionParts[1]) : 0,
       patch: versionParts.length > 2 ? int.parse(versionParts[2]) : 0,
       preRelease: preRelease,
-      buildMetadata: buildMeta,
-    );
+      buildMetadata: buildMeta);
   }
 
   bool get isPreRelease => preRelease != null;
@@ -166,8 +165,7 @@ class RuntimeVersionRegistry {
 
   static RuntimeVersionRegistry current() => RuntimeVersionRegistry(
     runtimeVersion: const SemanticVersion(major: 0, minor: 8, patch: 0),
-    protocolVersion: const ProtocolVersion(major: 1, minor: 0),
-  );
+    protocolVersion: const ProtocolVersion(major: 1, minor: 0));
 
   void registerCapability(CapabilityVersion cap) {
     _capabilityVersions[cap.capabilityId] = cap;
@@ -201,8 +199,7 @@ class RuntimeVersionRegistry {
 
   bool isCapabilityCompatible(
     String capabilityId,
-    SemanticVersion targetVersion,
-  ) {
+    SemanticVersion targetVersion) {
     final cap = _capabilityVersions[capabilityId];
     if (cap == null) return false;
     return cap.version.isBackwardCompatibleWith(targetVersion);
@@ -210,8 +207,7 @@ class RuntimeVersionRegistry {
 
   List<MigrationStep> migrationsBetween(
     SemanticVersion from,
-    SemanticVersion to,
-  ) {
+    SemanticVersion to) {
     return _migrations.where((m) {
       final mFrom = SemanticVersion.parse(m.fromVersion);
       final mTo = SemanticVersion.parse(m.toVersion);
@@ -228,9 +224,7 @@ class RuntimeVersionRegistry {
           type: CompatibilityType.runtimeVersion,
           message:
               'Runtime major version mismatch: $runtimeVersion vs ${other.runtimeVersion}',
-          isBreaking: true,
-        ),
-      );
+          isBreaking: true));
     }
 
     if (!protocolVersion.isCompatibleWith(other.protocolVersion)) {
@@ -239,9 +233,7 @@ class RuntimeVersionRegistry {
           type: CompatibilityType.protocolVersion,
           message:
               'Protocol major version mismatch: $protocolVersion vs ${other.protocolVersion}',
-          isBreaking: true,
-        ),
-      );
+          isBreaking: true));
     }
 
     for (final cap in _capabilityVersions.values) {
@@ -251,25 +243,20 @@ class RuntimeVersionRegistry {
           CompatibilityIssue(
             type: CompatibilityType.missingCapability,
             message: 'Capability ${cap.capabilityId} not found in remote',
-            isBreaking: false,
-          ),
-        );
+            isBreaking: false));
       } else if (!cap.version.isBackwardCompatibleWith(otherCap.version)) {
         issues.add(
           CompatibilityIssue(
             type: CompatibilityType.capabilityVersion,
             message:
                 'Capability ${cap.capabilityId} version incompatible: ${cap.version} vs ${otherCap.version}',
-            isBreaking: true,
-          ),
-        );
+            isBreaking: true));
       }
     }
 
     return CompatibilityResult(
       isCompatible: !issues.any((i) => i.isBreaking),
-      issues: issues,
-    );
+      issues: issues);
   }
 }
 

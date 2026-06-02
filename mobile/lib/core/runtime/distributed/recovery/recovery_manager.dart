@@ -133,8 +133,7 @@ class RecoveryManager {
       sourceNodeId: sourceNodeId,
       detectedAt: now.physicalTime,
       hlcTime: now.physicalTime,
-      context: context,
-    );
+      context: context);
 
     _failureLog.add(event);
     return event;
@@ -146,8 +145,7 @@ class RecoveryManager {
         return RecoveryDecision(
           action: RecoveryAction.markNodeDead,
           targetId: failure.sourceNodeId,
-          reason: 'Node partition detected, marking as dead',
-        );
+          reason: 'Node partition detected, marking as dead');
 
       case FailureType.halfOpenSession:
         final sessionId = failure.context['sessionId'] as String?;
@@ -155,14 +153,12 @@ class RecoveryManager {
           return const RecoveryDecision(
             action: RecoveryAction.noAction,
             targetId: '',
-            reason: 'No session ID in context',
-          );
+            reason: 'No session ID in context');
         }
         return RecoveryDecision(
           action: RecoveryAction.reclaimLease,
           targetId: sessionId,
-          reason: 'Half-open session detected, reclaiming lease',
-        );
+          reason: 'Half-open session detected, reclaiming lease');
 
       case FailureType.leaseOrphan:
         final sessionId = failure.context['sessionId'] as String?;
@@ -170,14 +166,12 @@ class RecoveryManager {
           return const RecoveryDecision(
             action: RecoveryAction.noAction,
             targetId: '',
-            reason: 'No session ID in context',
-          );
+            reason: 'No session ID in context');
         }
         return RecoveryDecision(
           action: RecoveryAction.reclaimLease,
           targetId: sessionId,
-          reason: 'Orphaned lease detected, reclaiming',
-        );
+          reason: 'Orphaned lease detected, reclaiming');
 
       case FailureType.replayDuplication:
         final entryId = failure.context['entryId'] as String?;
@@ -185,29 +179,25 @@ class RecoveryManager {
           return const RecoveryDecision(
             action: RecoveryAction.noAction,
             targetId: '',
-            reason: 'No entry ID for deduplication',
-          );
+            reason: 'No entry ID for deduplication');
         }
         return RecoveryDecision(
           action: RecoveryAction.noAction,
           targetId: entryId,
-          reason: 'Duplicate replay entry, skipping',
-        );
+          reason: 'Duplicate replay entry, skipping');
 
       case FailureType.splitBrain:
         return RecoveryDecision(
           action: RecoveryAction.splitBrainResolve,
           targetId: failure.sourceNodeId,
           reason: 'Split brain detected, resolving by incarnation',
-          params: failure.context,
-        );
+          params: failure.context);
 
       case FailureType.nodeCrash:
         return RecoveryDecision(
           action: RecoveryAction.reconcileCapability,
           targetId: failure.sourceNodeId,
-          reason: 'Node crash, reconciling capabilities',
-        );
+          reason: 'Node crash, reconciling capabilities');
     }
   }
 
@@ -221,8 +211,7 @@ class RecoveryManager {
           action: decision.action,
           targetId: decision.targetId,
           success: reclaimed,
-          recoveredAt: now,
-        );
+          recoveredAt: now);
         _recoveryLog.add(result);
         return result;
 
@@ -231,8 +220,7 @@ class RecoveryManager {
           action: decision.action,
           targetId: decision.targetId,
           success: true,
-          recoveredAt: now,
-        );
+          recoveredAt: now);
         _recoveryLog.add(result);
         return result;
 
@@ -241,8 +229,7 @@ class RecoveryManager {
           action: decision.action,
           targetId: decision.targetId,
           success: true,
-          recoveredAt: now,
-        );
+          recoveredAt: now);
         _recoveryLog.add(result);
         return result;
 
@@ -252,8 +239,7 @@ class RecoveryManager {
           action: decision.action,
           targetId: decision.targetId,
           success: resolution != null,
-          recoveredAt: now,
-        );
+          recoveredAt: now);
         _recoveryLog.add(result);
         return result;
 
@@ -262,16 +248,14 @@ class RecoveryManager {
           action: decision.action,
           targetId: decision.targetId,
           success: true,
-          recoveredAt: now,
-        );
+          recoveredAt: now);
 
       case RecoveryAction.replayJournal:
         return RecoveryResult(
           action: decision.action,
           targetId: decision.targetId,
           success: true,
-          recoveredAt: now,
-        );
+          recoveredAt: now);
     }
   }
 
@@ -294,8 +278,7 @@ class RecoveryManager {
       loserNodeId: loser,
       winnerIncarnation: winnerInc,
       loserIncarnation: loserInc,
-      resolvedAt: _clock.tick().physicalTime,
-    );
+      resolvedAt: _clock.tick().physicalTime);
 
     _splitBrainResolutions.add(resolution);
     return resolution;

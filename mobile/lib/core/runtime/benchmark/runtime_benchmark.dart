@@ -63,8 +63,7 @@ class RuntimeBenchmark {
         source: RuntimeRoute(capability: 'benchmark', pluginId: 'bench'),
         priority: TaskPriority.normal,
         budget: const TaskBudget(maxDurationMs: 5000, maxRetries: 0),
-        createdAt: start,
-      );
+        createdAt: start);
 
       await _container.scheduler.schedule(task, (token) async {
         return 'done';
@@ -94,8 +93,7 @@ class RuntimeBenchmark {
       _container.eventBus.publish(
         'bench.event',
         null,
-        source: RuntimeIdentity.forPlugin('benchmark'),
-      );
+        source: RuntimeIdentity.forPlugin('benchmark'));
     }
 
     await completer.future.timeout(const Duration(seconds: 30));
@@ -117,8 +115,7 @@ class RuntimeBenchmark {
         name: 'Bench Plugin $i',
         version: '1.0.0',
         description: 'Benchmark plugin',
-        lifecycle: const LifecycleConfig(autoActivate: true),
-      );
+        lifecycle: const LifecycleConfig(autoActivate: true));
       final handler = FakeAgentPlugin();
       await _container.registerPlugin(descriptor, handler);
 
@@ -140,8 +137,7 @@ class RuntimeBenchmark {
     final clock = _container.clock;
     final latencies = <int>[];
     const perm = RuntimePermission(
-      capabilities: ['storage.write', 'storage.read'],
-    );
+      capabilities: ['storage.write', 'storage.read']);
 
     for (var i = 0; i < iterations; i++) {
       final start = clock.now();
@@ -150,8 +146,7 @@ class RuntimeBenchmark {
         i.isEven ? 'storage.write' : 'storage.read',
         i.isEven ? {'key': 'bench_$i', 'value': 'v_$i'} : 'bench_$i',
         caller: RuntimeIdentity.forPlugin('benchmark'),
-        callerPermission: perm,
-      );
+        callerPermission: perm);
 
       latencies.add(clock.now() - start);
     }
@@ -175,8 +170,7 @@ class RuntimeBenchmark {
         source: RuntimeRoute(capability: 'benchmark', pluginId: 'bench'),
         priority: TaskPriority.normal,
         budget: const TaskBudget(maxDurationMs: 5000, maxRetries: 0),
-        createdAt: scheduledAt,
-      );
+        createdAt: scheduledAt);
 
       await _container.scheduler.schedule(task, (token) async {
         latencies.add(clock.now() - scheduledAt);
@@ -190,8 +184,7 @@ class RuntimeBenchmark {
   BenchmarkResult _buildResult(
     String name,
     int iterations,
-    List<int> latencies,
-  ) {
+    List<int> latencies) {
     if (latencies.isEmpty) {
       return BenchmarkResult(
         name: name,
@@ -200,8 +193,7 @@ class RuntimeBenchmark {
         avgMs: 0,
         minMs: 0,
         maxMs: 0,
-        opsPerSec: 0,
-      );
+        opsPerSec: 0);
     }
 
     final totalMs = latencies.reduce((a, b) => a + b);
@@ -217,7 +209,6 @@ class RuntimeBenchmark {
       avgMs: avgMs,
       minMs: minMs,
       maxMs: maxMs,
-      opsPerSec: opsPerSec,
-    );
+      opsPerSec: opsPerSec);
   }
 }

@@ -3,6 +3,7 @@ import '../plugin/plugin_handler.dart';
 import '../vocabulary/runtime_message.dart';
 import '../vocabulary/runtime_event.dart';
 import '../vocabulary/capability_context.dart';
+import '../vocabulary/capability_params.dart';
 
 class NotificationPlugin implements PluginHandler {
   final List<Map<String, dynamic>> _notifications = [];
@@ -10,16 +11,14 @@ class NotificationPlugin implements PluginHandler {
   @override
   Future<HandlerResult> handleMessage(
     RuntimeMessage message,
-    CapabilityContext context,
-  ) async {
+    CapabilityContext context) async {
     return HandlerResult.ok();
   }
 
   @override
   Future<HandlerResult> handleEvent(
     RuntimeEvent event,
-    CapabilityContext context,
-  ) async {
+    CapabilityContext context) async {
     if (event.type == 'notification.push') {
       _notifications.add({
         'payload': event.payload,
@@ -32,9 +31,8 @@ class NotificationPlugin implements PluginHandler {
   @override
   Future<CapabilityResult> invokeCapability(
     String capabilityId,
-    dynamic params,
-    CapabilityContext context,
-  ) async {
+    CapabilityParams params,
+    CapabilityContext context) async {
     switch (capabilityId) {
       case 'notification.push':
         _notifications.add({
@@ -52,9 +50,7 @@ class NotificationPlugin implements PluginHandler {
         return CapabilityResult.fail(
           RuntimeError(
             code: 'UNKNOWN_CAPABILITY',
-            message: 'Unknown capability: $capabilityId',
-          ),
-        );
+            message: 'Unknown capability: $capabilityId'));
     }
   }
 
@@ -68,14 +64,11 @@ class NotificationPlugin implements PluginHandler {
         id: 'notification.push',
         name: 'Push',
         description: 'Push a notification',
-        permission: 'auto',
-      ),
+        permission: 'auto'),
       CapabilityDeclaration(
         id: 'notification.local',
         name: 'Local',
         description: 'Get local notifications',
-        permission: 'auto',
-      ),
-    ],
-  );
+        permission: 'auto'),
+    ]);
 }

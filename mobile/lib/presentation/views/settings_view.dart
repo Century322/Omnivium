@@ -1,7 +1,7 @@
+﻿
+import '../../core/di/app_di.dart';
 import '../../core/app_logger.dart';
 import '../../core/app_navigator.dart';
-import 'dart:convert';
-import 'package:crypto/crypto.dart';
 import 'dart:io' if (dart.library.html) '';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -11,9 +11,9 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../theme/app_colors.dart';
 import '../theme/wallpaper_presets.dart';
-import '../theme/locale_provider.dart';
+import '../theme/locale_cubit.dart';
 import '../../main.dart';
-import '../../core/app_provider.dart';
+
 import '../../core/analytics_service.dart';
 import '../../core/remote_ui_engine.dart';
 import '../../core/remote_config_service.dart';
@@ -24,17 +24,17 @@ import '../../core/app_lock_service.dart';
 import '../widgets/section_header.dart';
 import '../widgets/setting_item.dart';
 import '../widgets/animated_toggle.dart';
-import 'matrix_login_view.dart';
+import '../../features/auth/presentation/pages/unified_login_page.dart';
 import 'faq_view.dart';
 import 'privacy_policy_view.dart';
 import 'terms_of_service_view.dart';
 import '../../core/secure_storage_service.dart';
 import '../../core/voice_service.dart';
 import '../../core/push_notification_service.dart';
+import '../../core/matrix/matrix_cubit.dart';
+import '../../core/navigation_cubit.dart';
 
-class SettingsView extends StatefulWidget {
-  final AppProvider provider;
-  const SettingsView({super.key, required this.provider});
+class SettingsView extends StatefulWidget { const SettingsView({super.key, required this.provider});
 
   @override
   State<SettingsView> createState() => _SettingsViewState();
@@ -55,7 +55,7 @@ class _SettingsViewState extends State<SettingsView>
   String _sttEngine = 'system';
   String _ttsVoice = 'Kyrin';
   String _voiceMode = 'hands_free';
-  final _secure = SecureStorageService.instance;
+  final _secure = getIt<SecureStorageService>();
 
   @override
   void initState() {
@@ -64,12 +64,10 @@ class _SettingsViewState extends State<SettingsView>
     _loadAppVersion();
     _slideController = AnimationController(
       duration: const Duration(milliseconds: 400),
-      vsync: this,
-    );
+      vsync: this);
     _slideAnimation = Tween<Offset>(begin: const Offset(1, 0), end: Offset.zero)
         .animate(
-          CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
-        );
+          CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic));
     _slideController.forward();
   }
 
@@ -105,7 +103,7 @@ class _SettingsViewState extends State<SettingsView>
     }
   }
 
-  Future<void> _savePref(String key, dynamic value) async {
+  Future<void> _savePref(String key, Object value) async {
     final prefs = await SharedPreferences.getInstance();
     if (value is bool) await prefs.setBool(key, value);
     if (value is String) await prefs.setString(key, value);
@@ -129,7 +127,7 @@ class _SettingsViewState extends State<SettingsView>
             onHorizontalDragEnd: (details) {
               final velocity = details.primaryVelocity;
               if (velocity != null && velocity > 500) {
-                widget.provider.navigation.closeSettingsAndReturnToDrawer();
+                getIt<NavigationCubit>().closeSettingsAndReturnToDrawer();
               }
             },
             child: SafeArea(
@@ -139,9 +137,7 @@ class _SettingsViewState extends State<SettingsView>
                     height: 56,
                     decoration: BoxDecoration(
                       border: Border(
-                        bottom: BorderSide(color: AppColors.divider(context)),
-                      ),
-                    ),
+                        bottom: BorderSide(color: AppColors.divider(context)))),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Row(
@@ -150,27 +146,19 @@ class _SettingsViewState extends State<SettingsView>
                             label: localeProvider.t('go_back'),
                             child: GestureDetector(
                               behavior: HitTestBehavior.opaque,
-                              onTap: () => widget.provider.navigation
+                              onTap: () => getIt<NavigationCubit>()
                                   .closeSettingsAndReturnToDrawer(),
                               child: Icon(
                                 LucideIcons.arrowLeft,
                                 color: AppColors.textPrimary(context),
-                                size: 24,
-                              ),
-                            ),
-                          ),
+                                size: 24))),
                           const SizedBox(width: 16),
                           Text(
                             t('settings'),
                             style: TextStyle(
                               fontSize: 18,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                              fontWeight: FontWeight.w500)),
+                        ]))),
                   Expanded(
                     child: ListView(
                       padding: const EdgeInsets.only(bottom: 48),
@@ -178,68 +166,53 @@ class _SettingsViewState extends State<SettingsView>
                         SectionHeader(title: t('account')),
                         Builder(
                           builder: (context) {
-                            final auth = AuthService.instance;
+                            final auth = getIt<AuthService>();
                             if (auth.isAuthenticated) {
                               return SettingItem(
                                 title: localeProvider.t('omnivium_cloud'),
                                 subtitle:
-                                    '${auth.currentUser?.email ?? localeProvider.t('connected')} · ${localeProvider.t('synced')}',
-                              );
+                                    '${auth.currentUser?.email ?? localeProvider.t('connected')} · ${localeProvider.t('synced')}');
                             }
                             return const SizedBox.shrink();
-                          },
-                        ),
-                        ListenableBuilder(
-                          listenable: widget.provider.matrix,
+                          }),
+                        StreamBuilder<MatrixState>(
+                          stream: getIt<MatrixCubit>().stream,
+                          initialData: getIt<MatrixCubit>().state,
                           builder: (context, _) {
-                            final matrix = widget.provider.matrix;
+                            final matrix = getIt<MatrixCubit>();
                             if (matrix.isLoggedIn) {
                               return Column(
                                 children: [
                                   SettingItem(
                                     title: 'Matrix ${t('account')}',
-                                    subtitle: matrix.userId ?? t('login'),
-                                  ),
+                                    subtitle: matrix.userId ?? t('login')),
                                   SettingItem(
                                     title: t('logout'),
                                     subtitle: t('logout'),
                                     textColor: AppColors.dng(context),
-                                    onTap: () => matrix.logout(),
-                                  ),
-                                ],
-                              );
+                                    onTap: () => matrix.logout()),
+                                ]);
                             }
                             return SettingItem(
                               title: '${t('login')} Matrix',
                               subtitle: t('login_matrix_desc'),
                               onTap: () async {
-                                await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => MatrixLoginView(
-                                      provider: widget.provider,
-                                    ),
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                        ),
-                        ListenableBuilder(
-                          listenable: widget.provider.navigation,
+                                await AppNavigator.push<void>(context, '/login');
+                              });
+                          }),
+                        StreamBuilder<NavigationState>(
+                          stream: getIt<NavigationCubit>().stream,
+                          initialData: getIt<NavigationCubit>().state,
                           builder: (context, _) {
                             return SettingItem(
                               title: t('incognito'),
                               subtitle: t('incognito_desc'),
                               rightContent: AnimatedToggle(
                                 semanticLabel: t('incognito'),
-                                enabled: widget.provider.navigation.isIncognito,
+                                enabled: getIt<NavigationCubit>().isIncognito,
                                 onChanged:
-                                    widget.provider.navigation.setIsIncognito,
-                              ),
-                            );
-                          },
-                        ),
+                                    getIt<NavigationCubit>().setIsIncognito));
+                          }),
                         SettingItem(
                           title: t('notifications'),
                           subtitle: t('notifications_desc'),
@@ -250,17 +223,14 @@ class _SettingsViewState extends State<SettingsView>
                               setState(() => _notifications = v);
                               _savePref('omnivium_notifications', v);
                               try {
-                                PushNotificationService.instance
+                                getIt<PushNotificationService>()
                                     .requestPermissions();
                               } catch (e) {
                                 AppLogger.instance.warning(
                                   'Push permission failed',
-                                  error: e,
-                                );
+                                  error: e);
                               }
-                            },
-                          ),
-                        ),
+                            })),
                         SettingItem(
                           title: t('data_retention'),
                           subtitle: t('data_retention_desc'),
@@ -270,16 +240,13 @@ class _SettingsViewState extends State<SettingsView>
                             onChanged: (v) {
                               setState(() => _dataRetention = v);
                               _savePref('omnivium_data_retention', v);
-                            },
-                          ),
-                        ),
+                            })),
                         SectionHeader(title: t('security')),
                         SettingItem(
                           title: t('clear_history'),
                           subtitle: t('clear_history_desc'),
                           textColor: AppColors.dng(context),
-                          onTap: _showClearHistoryDialog,
-                        ),
+                          onTap: _showClearHistoryDialog),
                         SectionHeader(title: t('assistant')),
                         SettingItem(
                           title: t('enable_assistant'),
@@ -290,202 +257,148 @@ class _SettingsViewState extends State<SettingsView>
                             onChanged: (v) {
                               setState(() => _agentEnabled = v);
                               _savePref('omnivium_agent_enabled', v);
-                              widget.provider.orchestrator.setEnabled(v);
-                            },
-                          ),
-                        ),
+                              getIt<AgentOrchestrator>().setEnabled(v);
+                            })),
                         SettingItem(
                           title: t('permissions'),
                           subtitle: t('ai_permission_management_desc'),
                           onTap: () {
-                            AppNavigator.go(context, '/permissions');
-                          },
-                        ),
+                            AppNavigator.go<void>(context, '/permissions');
+                          }),
                         SettingItem(
                           title: t('assistant_language'),
                           subtitle: _assistantLangLabel,
-                          onTap: _showLanguageDialog,
-                        ),
+                          onTap: _showLanguageDialog),
                         SettingItem(
                           title: t('lock_screen'),
                           subtitle: t('lock_screen_desc'),
-                          onTap: _showLockScreenDialog,
-                        ),
+                          onTap: _showLockScreenDialog),
                         SettingItem(
                           title: t('quick_commands'),
                           subtitle:
-                              '${widget.provider.quickCommands.commands.length} ${t('quick_commands')}',
+                              '${getIt<QuickCommandCubit>().commands.length} ${t('quick_commands')}',
                           onTap: () {
-                            AppNavigator.go(context, '/commands');
-                          },
-                        ),
+                            AppNavigator.go<void>(context, '/commands');
+                          }),
                         SettingItem(
                           title: t('ai_workbench'),
                           subtitle: t('ai_workbench_desc'),
                           onTap: () {
-                            AppNavigator.go(context, '/workbench');
-                          },
-                        ),
+                            AppNavigator.go<void>(context, '/workbench');
+                          }),
                         SettingItem(
                           title: t('productivity'),
                           subtitle: t('productivity_desc'),
                           onTap: () {
-                            AppNavigator.go(context, '/productivity');
-                          },
-                        ),
+                            AppNavigator.go<void>(context, '/productivity');
+                          }),
                         SettingItem(
                           title: t('agent_replay'),
                           subtitle: t('agent_replay_desc'),
                           onTap: () {
-                            AppNavigator.go(context, '/replay');
-                          },
-                        ),
+                            AppNavigator.go<void>(context, '/replay');
+                          }),
                         SettingItem(
                           title: t('ai_operation_log'),
                           subtitle: t('ai_operation_log_desc'),
                           onTap: () {
-                            AppNavigator.go(context, '/operation-log');
-                          },
-                        ),
+                            AppNavigator.go<void>(context, '/operation-log');
+                          }),
                         SectionHeader(title: t('profile')),
                         SettingItem(
                           title: t('image_model'),
                           subtitle: _imageModel == 'default_model'
                               ? t('default_model')
                               : _imageModel,
-                          onTap: _showImageModelDialog,
-                        ),
+                          onTap: _showImageModelDialog),
                         SectionHeader(title: t('personalization')),
                         SettingItem(
                           title: t('voice_recognition'),
                           subtitle: _sttEngineLabel,
-                          onTap: _showSttDialog,
-                        ),
+                          onTap: _showSttDialog),
                         SettingItem(
                           title: t('narration'),
                           subtitle: _ttsVoice,
-                          onTap: _showTtsDialog,
-                        ),
+                          onTap: _showTtsDialog),
                         SettingItem(
                           title: t('voice_mode'),
                           subtitle: _voiceModeLabel,
-                          onTap: _showVoiceModeDialog,
-                        ),
+                          onTap: _showVoiceModeDialog),
                         SectionHeader(title: t('help_center')),
                         SettingItem(
                           title: t('help_faq'),
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const FaqView(),
-                              ),
-                            );
-                          },
-                        ),
+                            AppNavigator.push<void>(context, '/faq');
+                          }),
                         SectionHeader(title: t('appearance')),
                         SettingItem(
                           title: t('language'),
                           subtitle: localeProvider.currentLabel,
-                          onTap: _showLanguageSettingDialog,
-                        ),
+                          onTap: _showLanguageSettingDialog),
                         SettingItem(
                           title: t('theme'),
-                          subtitle: themeProvider.currentLabel,
-                          onTap: _showThemeDialog,
-                        ),
+                          subtitle: getIt<ThemeCubit>().state.currentLabel,
+                          onTap: _showThemeDialog),
                         SettingItem(
                           title: t('accent_color'),
-                          onTap: _showAccentDialog,
-                        ),
+                          onTap: _showAccentDialog),
                         SectionHeader(title: t('more')),
                         SettingItem(
                           title: t('storage'),
                           subtitle: t('storage_desc'),
                           onTap: () {
-                            AppNavigator.go(context, '/storage');
-                          },
-                        ),
+                            AppNavigator.go<void>(context, '/storage');
+                          }),
                         SettingItem(
                           title: t('privacy_policy'),
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const PrivacyPolicyView(),
-                              ),
-                            );
-                          },
-                        ),
+                            AppNavigator.push<void>(context, '/privacy-policy');
+                          }),
                         SettingItem(
                           title: t('terms_of_service'),
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const TermsOfServiceView(),
-                              ),
-                            );
-                          },
-                        ),
+                            AppNavigator.push<void>(context, '/terms-of-service');
+                          }),
                         SettingItem(
                           title: t('chat_wallpaper'),
                           subtitle: t('chat_wallpaper_desc'),
                           onTap: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(
+                              MaterialPageRoute<void>(
                                 builder: (_) =>
-                                    _WallpaperView(provider: widget.provider),
-                              ),
-                            );
-                          },
-                        ),
+                                    _WallpaperView(provider: widget.provider)));
+                          }),
                         SettingItem(
                           title: t('labs'),
                           subtitle: t('labs_desc'),
                           onTap: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(
+                              MaterialPageRoute<void>(
                                 builder: (_) =>
-                                    _LabsView(provider: widget.provider),
-                              ),
-                            );
-                          },
-                        ),
+                                    _LabsView(provider: widget.provider)));
+                          }),
                         SettingItem(
                           title: t('about'),
                           subtitle: 'v${_SettingsViewState._appVersion}',
                           onTap: () {
-                            AppNavigator.go(context, '/about');
-                          },
-                        ),
+                            AppNavigator.go<void>(context, '/about');
+                          }),
                         SettingItem(
                           title: t('delete_account'),
                           subtitle: t('delete_account_desc'),
                           textColor: AppColors.dng(context),
-                          onTap: _showDeleteAccountDialog,
-                        ),
-                      ],
-                    ),
-                  ),
+                          onTap: _showDeleteAccountDialog),
+                      ])),
                   Builder(
                     builder: (context) {
-                      final schema = widget.provider.remoteConfig.getUISchema(
-                        'settings',
-                      );
+                      final schema = getIt<RemoteConfigService>().getUISchema(
+                        'settings');
                       if (schema == null) return const SizedBox.shrink();
                       return RemoteUIEngine.render(schema, context);
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
+                    }),
+                ]))))));
   }
 
   String get _assistantLangLabel {
@@ -532,43 +445,34 @@ class _SettingsViewState extends State<SettingsView>
   }
 
   void _showClearHistoryDialog() {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: AppColors.sf(context),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           t('clear_history'),
-          style: TextStyle(color: AppColors.textPrimary(context)),
-        ),
+          style: TextStyle(color: AppColors.textPrimary(context))),
         content: Text(
           t('clear_history_confirm'),
           style: TextStyle(
             color: AppColors.textSecondary(context),
-            fontSize: 14,
-          ),
-        ),
+            fontSize: 14)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
               t('cancel'),
-              style: TextStyle(color: AppColors.sec(context)),
-            ),
-          ),
+              style: TextStyle(color: AppColors.sec(context)))),
           TextButton(
             onPressed: () {
-              widget.provider.session.clearAllSessions();
+              getIt<SessionCubit>().clearAllSessions();
               Navigator.pop(context);
             },
             child: Text(
               t('clear'),
-              style: TextStyle(color: AppColors.dng(context)),
-            ),
-          ),
-        ],
-      ),
-    );
+              style: TextStyle(color: AppColors.dng(context)))),
+        ]));
   }
 
   void _showLanguageDialog() {
@@ -579,15 +483,14 @@ class _SettingsViewState extends State<SettingsView>
       ('ja', '日本語'),
       ('ko', '한국어'),
     ];
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: AppColors.sf(context),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           t('assistant_language'),
-          style: TextStyle(color: AppColors.textPrimary(context)),
-        ),
+          style: TextStyle(color: AppColors.textPrimary(context))),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: langs.map((item) {
@@ -599,29 +502,21 @@ class _SettingsViewState extends State<SettingsView>
                   color: _assistantLang == value
                       ? AppColors.acc(context)
                       : AppColors.textPrimary(context),
-                  fontSize: 14,
-                ),
-              ),
+                  fontSize: 14)),
               trailing: _assistantLang == value
                   ? Icon(
                       LucideIcons.check,
                       color: AppColors.acc(context),
-                      size: 18,
-                    )
+                      size: 18)
                   : null,
               onTap: () {
                 setState(() => _assistantLang = value);
                 _savePref('omnivium_assistant_lang', value);
-                widget.provider.orchestrator.setAgentLanguage(
-                  value == 'auto' ? '' : value,
-                );
+                getIt<AgentOrchestrator>().setAgentLanguage(
+                  value == 'auto' ? '' : value);
                 Navigator.pop(context);
-              },
-            );
-          }).toList(),
-        ),
-      ),
-    );
+              });
+          }).toList())));
   }
 
   void _showThemeDialog() {
@@ -630,20 +525,19 @@ class _SettingsViewState extends State<SettingsView>
       ('light', t('light')),
       ('system', t('system')),
     ];
-    final currentKey = themeProvider.mode == ThemeMode.dark
+    final currentKey = getIt<ThemeCubit>().state.mode == ThemeMode.dark
         ? 'dark'
-        : themeProvider.mode == ThemeMode.light
+        : getIt<ThemeCubit>().state.mode == ThemeMode.light
         ? 'light'
         : 'system';
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: AppColors.sf(context),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           t('theme'),
-          style: TextStyle(color: AppColors.textPrimary(context)),
-        ),
+          style: TextStyle(color: AppColors.textPrimary(context))),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: themes.map((item) {
@@ -655,39 +549,31 @@ class _SettingsViewState extends State<SettingsView>
                   color: currentKey == key
                       ? AppColors.acc(context)
                       : AppColors.textPrimary(context),
-                  fontSize: 14,
-                ),
-              ),
+                  fontSize: 14)),
               trailing: currentKey == key
                   ? Icon(
                       LucideIcons.check,
                       color: AppColors.acc(context),
-                      size: 18,
-                    )
+                      size: 18)
                   : null,
               onTap: () {
-                themeProvider.setModeFromString(key);
+                getIt<ThemeCubit>().setModeFromString(key);
                 setState(() {});
                 Navigator.pop(context);
-              },
-            );
-          }).toList(),
-        ),
-      ),
-    );
+              });
+          }).toList())));
   }
 
   void _showAccentDialog() {
-    final currentKey = themeProvider.accentPreset.key;
-    showDialog(
+    final currentKey = getIt<ThemeCubit>().state.accentPreset.key;
+    showDialog<void>(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: AppColors.sf(context),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           t('accent_color'),
-          style: TextStyle(color: AppColors.textPrimary(context)),
-        ),
+          style: TextStyle(color: AppColors.textPrimary(context))),
         content: Wrap(
           spacing: 16,
           runSpacing: 16,
@@ -698,7 +584,7 @@ class _SettingsViewState extends State<SettingsView>
                 : preset.darkAccent;
             return GestureDetector(
               onTap: () {
-                themeProvider.setAccent(preset.key);
+                getIt<ThemeCubit>().setAccent(preset.key);
                 setState(() {});
                 Navigator.pop(context);
               },
@@ -714,18 +600,14 @@ class _SettingsViewState extends State<SettingsView>
                       border: isSelected
                           ? Border.all(
                               color: AppColors.textPrimary(context),
-                              width: 3,
-                            )
-                          : null,
-                    ),
+                              width: 3)
+                          : null),
                     child: isSelected
                         ? Icon(
                             Icons.check,
                             color: AppColors.bg(context),
-                            size: 22,
-                          )
-                        : null,
-                  ),
+                            size: 22)
+                        : null),
                   const SizedBox(height: 4),
                   Text(
                     t('accent_${preset.key}'),
@@ -733,82 +615,63 @@ class _SettingsViewState extends State<SettingsView>
                       color: isSelected
                           ? AppColors.acc(context)
                           : AppColors.textSecondary(context),
-                      fontSize: 11,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }).toList(),
-        ),
-      ),
-    );
+                      fontSize: 11)),
+                ]));
+          }).toList())));
   }
 
   void _showDeleteAccountDialog() {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: AppColors.sf(context),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           t('delete_account'),
-          style: TextStyle(color: AppColors.dng(context)),
-        ),
+          style: TextStyle(color: AppColors.dng(context))),
         content: Text(
           t('confirm_delete_account'),
           style: TextStyle(
             color: AppColors.textSecondary(context),
-            fontSize: 14,
-          ),
-        ),
+            fontSize: 14)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
               t('cancel'),
-              style: TextStyle(color: AppColors.sec(context)),
-            ),
-          ),
+              style: TextStyle(color: AppColors.sec(context)))),
           TextButton(
             onPressed: () async {
               Navigator.pop(context);
               try {
-                await widget.provider.matrix.client?.deactivateAccount();
-                await widget.provider.matrix.logout();
+                await getIt<MatrixCubit>().client?.deactivateAccount();
+                await getIt<MatrixCubit>().logout();
               } catch (e, stackTrace) {
                 AppLogger.instance.error(
                   'App error',
                   error: e,
-                  stackTrace: stackTrace,
-                );
+                  stackTrace: stackTrace);
               }
             },
             child: Text(
               t('permanent_delete'),
-              style: TextStyle(color: AppColors.dng(context)),
-            ),
-          ),
-        ],
-      ),
-    );
+              style: TextStyle(color: AppColors.dng(context)))),
+        ]));
   }
 
   void _showLockScreenDialog() {
     final pinCtrl = TextEditingController();
     bool isSetting = !_lockEnabled;
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
           backgroundColor: AppColors.sf(context),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
+            borderRadius: BorderRadius.circular(16)),
           title: Text(
             t('lock_screen'),
-            style: TextStyle(color: AppColors.textPrimary(context)),
-          ),
+            style: TextStyle(color: AppColors.textPrimary(context))),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -817,9 +680,7 @@ class _SettingsViewState extends State<SettingsView>
                   t('set_pin_desc'),
                   style: TextStyle(
                     color: AppColors.textSecondary(context),
-                    fontSize: 14,
-                  ),
-                ),
+                    fontSize: 14)),
                 const SizedBox(height: 12),
                 TextField(
                   controller: pinCtrl,
@@ -829,36 +690,29 @@ class _SettingsViewState extends State<SettingsView>
                   style: TextStyle(
                     color: AppColors.textPrimary(context),
                     fontSize: 18,
-                    letterSpacing: 8,
-                  ),
+                    letterSpacing: 8),
                   decoration: InputDecoration(
                     labelText: t('enter_pin'),
                     hintStyle: TextStyle(
-                      color: AppColors.textDisabled(context),
-                    ),
+                      color: AppColors.textDisabled(context)),
                     counterText: '',
                     filled: true,
                     fillColor: AppColors.sfAlt(context),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                ),
+                      borderSide: BorderSide.none))),
               ] else ...[
                 Text(
                   t('lock_screen_desc'),
                   style: TextStyle(
                     color: AppColors.textSecondary(context),
-                    fontSize: 14,
-                  ),
-                ),
+                    fontSize: 14)),
                 const SizedBox(height: 12),
                 SwitchListTile(
                   value: _lockEnabled,
                   onChanged: (v) async {
                     if (!v) {
-                      await AppLockService.instance.removePasscode();
+                      await getIt<AppLockService>().removePasscode();
                     }
                     setDialogState(() {
                       _lockEnabled = v;
@@ -867,13 +721,10 @@ class _SettingsViewState extends State<SettingsView>
                   },
                   title: Text(
                     t('enable_lock'),
-                    style: TextStyle(color: AppColors.textPrimary(context)),
-                  ),
-                  activeThumbColor: AppColors.acc(context),
-                ),
+                    style: TextStyle(color: AppColors.textPrimary(context))),
+                  activeThumbColor: AppColors.acc(context)),
               ],
-            ],
-          ),
+            ]),
           actions: [
             TextButton(
               onPressed: () {
@@ -882,17 +733,14 @@ class _SettingsViewState extends State<SettingsView>
               },
               child: Text(
                 t('cancel'),
-                style: TextStyle(color: AppColors.sec(context)),
-              ),
-            ),
+                style: TextStyle(color: AppColors.sec(context)))),
             if (isSetting)
               TextButton(
                 onPressed: () async {
                   if (pinCtrl.text.length < 4) return;
-                  await AppLockService.instance.setPasscode(
+                  await getIt<AppLockService>().setPasscode(
                     pinCtrl.text,
-                    PasscodeType.pin,
-                  );
+                    PasscodeType.pin);
                   if (!mounted) return;
                   setState(() {
                     _lockEnabled = true;
@@ -903,13 +751,8 @@ class _SettingsViewState extends State<SettingsView>
                 },
                 child: Text(
                   t('confirm'),
-                  style: TextStyle(color: AppColors.acc(context)),
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
+                  style: TextStyle(color: AppColors.acc(context)))),
+          ])));
   }
 
   void _showImageModelDialog() {
@@ -930,8 +773,7 @@ class _SettingsViewState extends State<SettingsView>
         final key = modelKeys[modelLabels.indexOf(v)];
         setState(() => _imageModel = key);
         _savePref('omnivium_image_model', key);
-      },
-    );
+      });
   }
 
   void _showSttDialog() {
@@ -940,15 +782,14 @@ class _SettingsViewState extends State<SettingsView>
       ('whisper', 'OpenAI Whisper'),
       ('google', 'Google Speech-to-Text'),
     ];
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: AppColors.sf(context),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           t('voice_recognition'),
-          style: TextStyle(color: AppColors.textPrimary(context)),
-        ),
+          style: TextStyle(color: AppColors.textPrimary(context))),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: engines.map((item) {
@@ -960,31 +801,24 @@ class _SettingsViewState extends State<SettingsView>
                   color: _sttEngine == key
                       ? AppColors.acc(context)
                       : AppColors.textPrimary(context),
-                  fontSize: 14,
-                ),
-              ),
+                  fontSize: 14)),
               trailing: _sttEngine == key
                   ? Icon(
                       LucideIcons.check,
                       color: AppColors.acc(context),
-                      size: 18,
-                    )
+                      size: 18)
                   : null,
               onTap: () {
                 setState(() => _sttEngine = key);
                 _savePref('omnivium_stt_engine', key);
                 try {
-                  VoiceService.instance.setSttEngine(key);
+                  getIt<VoiceService>().setSttEngine(key);
                 } catch (e) {
                   AppLogger.instance.warning('Set STT engine failed', error: e);
                 }
                 Navigator.pop(context);
-              },
-            );
-          }).toList(),
-        ),
-      ),
-    );
+              });
+          }).toList())));
   }
 
   void _showTtsDialog() {
@@ -1001,12 +835,10 @@ class _SettingsViewState extends State<SettingsView>
       setState(() => _ttsVoice = v);
       _savePref('omnivium_tts_voice', v);
       try {
-        VoiceService.instance.setTTSVoice(
+        getIt<VoiceService>().setTTSVoice(
           TTSVoice.values.firstWhere(
             (e) => e.name == v,
-            orElse: () => TTSVoice.alloy,
-          ),
-        );
+            orElse: () => TTSVoice.alloy));
       } catch (e) {
         AppLogger.instance.warning('Set TTS voice failed', error: e);
       }
@@ -1019,15 +851,14 @@ class _SettingsViewState extends State<SettingsView>
       ('push_to_talk', t('push_to_talk')),
       ('off', t('close')),
     ];
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: AppColors.sf(context),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           t('voice_mode'),
-          style: TextStyle(color: AppColors.textPrimary(context)),
-        ),
+          style: TextStyle(color: AppColors.textPrimary(context))),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: modes.map((item) {
@@ -1039,48 +870,39 @@ class _SettingsViewState extends State<SettingsView>
                   color: _voiceMode == key
                       ? AppColors.acc(context)
                       : AppColors.textPrimary(context),
-                  fontSize: 14,
-                ),
-              ),
+                  fontSize: 14)),
               trailing: _voiceMode == key
                   ? Icon(
                       LucideIcons.check,
                       color: AppColors.acc(context),
-                      size: 18,
-                    )
+                      size: 18)
                   : null,
               onTap: () {
                 setState(() => _voiceMode = key);
                 _savePref('omnivium_voice_mode', key);
                 try {
-                  VoiceService.instance.setVoiceModeByName(key);
+                  getIt<VoiceService>().setVoiceModeByName(key);
                 } catch (e) {
                   AppLogger.instance.warning('Set voice mode failed', error: e);
                 }
                 Navigator.pop(context);
-              },
-            );
-          }).toList(),
-        ),
-      ),
-    );
+              });
+          }).toList())));
   }
 
   void _showChoiceDialog(
     String title,
     List<String> options,
     String current,
-    ValueChanged<String> onSelect,
-  ) {
-    showDialog(
+    ValueChanged<String> onSelect) {
+    showDialog<void>(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: AppColors.sf(context),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           title,
-          style: TextStyle(color: AppColors.textPrimary(context)),
-        ),
+          style: TextStyle(color: AppColors.textPrimary(context))),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: options
@@ -1092,26 +914,18 @@ class _SettingsViewState extends State<SettingsView>
                       color: current == opt
                           ? AppColors.acc(context)
                           : AppColors.textPrimary(context),
-                      fontSize: 14,
-                    ),
-                  ),
+                      fontSize: 14)),
                   trailing: current == opt
                       ? Icon(
                           LucideIcons.check,
                           color: AppColors.acc(context),
-                          size: 18,
-                        )
+                          size: 18)
                       : null,
                   onTap: () {
                     onSelect(opt);
                     Navigator.pop(context);
-                  },
-                ),
-              )
-              .toList(),
-        ),
-      ),
-    );
+                  }))
+              .toList())));
   }
 
   void _showLanguageSettingDialog() {
@@ -1121,15 +935,14 @@ class _SettingsViewState extends State<SettingsView>
       ('ja', '日本語'),
       ('ko', '한국어'),
     ];
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: AppColors.sf(context),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           t('language'),
-          style: TextStyle(color: AppColors.textPrimary(context)),
-        ),
+          style: TextStyle(color: AppColors.textPrimary(context))),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: langs.map((item) {
@@ -1141,33 +954,24 @@ class _SettingsViewState extends State<SettingsView>
                   color: localeProvider.locale.languageCode == code
                       ? AppColors.acc(context)
                       : AppColors.textPrimary(context),
-                  fontSize: 14,
-                ),
-              ),
+                  fontSize: 14)),
               trailing: localeProvider.locale.languageCode == code
                   ? Icon(
                       LucideIcons.check,
                       color: AppColors.acc(context),
-                      size: 18,
-                    )
+                      size: 18)
                   : null,
               onTap: () {
                 localeProvider.setLocaleFromLabel(code);
-                AnalyticsService.instance.logChangeLanguage(language: code);
+                getIt<AnalyticsService>().logChangeLanguage(language: code);
                 setState(() {});
                 Navigator.pop(context);
-              },
-            );
-          }).toList(),
-        ),
-      ),
-    );
+              });
+          }).toList())));
   }
 }
 
-class _WallpaperView extends StatefulWidget {
-  final AppProvider provider;
-  const _WallpaperView({required this.provider});
+class _WallpaperView extends StatefulWidget { const _WallpaperView({required this.provider});
 
   @override
   State<_WallpaperView> createState() => _WallpaperViewState();
@@ -1193,7 +997,7 @@ class _WallpaperViewState extends State<_WallpaperView> {
   }
 
   void _loadWallpaper() {
-    final db = DatabaseService.instance;
+    final db = getIt<DatabaseService>();
     final data = db.getData('chat_wallpaper');
     if (data != null) {
       setState(() => _currentWallpaper = data['id'] as String?);
@@ -1201,7 +1005,7 @@ class _WallpaperViewState extends State<_WallpaperView> {
   }
 
   void _setWallpaper(String id) {
-    final db = DatabaseService.instance;
+    final db = getIt<DatabaseService>();
     if (id == 'none') {
       db.deleteData('chat_wallpaper');
       setState(() => _currentWallpaper = null);
@@ -1217,8 +1021,7 @@ class _WallpaperViewState extends State<_WallpaperView> {
       source: ImageSource.gallery,
       maxWidth: 1080,
       maxHeight: 1920,
-      imageQuality: 80,
-    );
+      imageQuality: 80);
     if (xfile == null) return;
     try {
       final appDir = await getApplicationDocumentsDirectory();
@@ -1229,7 +1032,7 @@ class _WallpaperViewState extends State<_WallpaperView> {
       final ext = xfile.path.split('.').lastOrNull ?? 'jpg';
       final savedPath = '${wallpaperDir.path}/custom_wallpaper.$ext';
       await File(xfile.path).copy(savedPath);
-      final db = DatabaseService.instance;
+      final db = getIt<DatabaseService>();
       db.putData('chat_wallpaper', {'id': 'custom', 'path': savedPath});
       if (!mounted) return;
       setState(() => _currentWallpaper = 'custom');
@@ -1237,9 +1040,8 @@ class _WallpaperViewState extends State<_WallpaperView> {
       AppLogger.instance.error(
         'Save wallpaper failed',
         error: e,
-        stackTrace: stackTrace,
-      );
-      final db = DatabaseService.instance;
+        stackTrace: stackTrace);
+      final db = getIt<DatabaseService>();
       db.putData('chat_wallpaper', {'id': 'custom', 'path': xfile.path});
       if (!mounted) return;
       setState(() => _currentWallpaper = 'custom');
@@ -1253,41 +1055,31 @@ class _WallpaperViewState extends State<_WallpaperView> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: WallpaperPresets.warm,
-          ),
-        );
+            colors: WallpaperPresets.warm));
       case 'gradient_ocean':
         return BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: WallpaperPresets.ocean,
-          ),
-        );
+            colors: WallpaperPresets.ocean));
       case 'gradient_forest':
         return BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: WallpaperPresets.forest,
-          ),
-        );
+            colors: WallpaperPresets.forest));
       case 'gradient_night':
         return BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: WallpaperPresets.dark,
-          ),
-        );
+            colors: WallpaperPresets.dark));
       case 'gradient_rose':
         return BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: WallpaperPresets.pink,
-          ),
-        );
+            colors: WallpaperPresets.pink));
       case 'solid_dark':
         return const BoxDecoration(color: WallpaperPresets.darkBg);
       case 'solid_midnight':
@@ -1305,17 +1097,13 @@ class _WallpaperViewState extends State<_WallpaperView> {
         elevation: 0,
         leading: IconButton(
           icon: Icon(LucideIcons.arrowLeft, color: AppColors.sec(context)),
-          onPressed: () => Navigator.pop(context),
-        ),
+          onPressed: () => Navigator.pop(context)),
         title: Text(
           t('chat_wallpaper'),
           style: TextStyle(
             color: AppColors.textPrimary(context),
             fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
+            fontWeight: FontWeight.w600))),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -1338,8 +1126,7 @@ class _WallpaperViewState extends State<_WallpaperView> {
                     borderRadius: BorderRadius.circular(12),
                     border: isSelected
                         ? Border.all(color: AppColors.acc(context), width: 3)
-                        : null,
-                  ),
+                        : null),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(10),
                     child: Container(
@@ -1347,25 +1134,16 @@ class _WallpaperViewState extends State<_WallpaperView> {
                           ? BoxDecoration(
                               color: AppColors.bg(context),
                               border: Border.all(
-                                color: AppColors.divider(context),
-                              ),
-                            )
+                                color: AppColors.divider(context)))
                           : _buildPresetDecoration(id),
                       child: id == 'none'
                           ? Center(
                               child: Icon(
                                 LucideIcons.x,
                                 size: 20,
-                                color: AppColors.textDisabled(context),
-                              ),
-                            )
-                          : null,
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
+                                color: AppColors.textDisabled(context)))
+                          : null))));
+            }).toList()),
           const SizedBox(height: 24),
           SectionHeader(title: t('custom_wallpaper')),
           const SizedBox(height: 8),
@@ -1378,8 +1156,7 @@ class _WallpaperViewState extends State<_WallpaperView> {
                 borderRadius: BorderRadius.circular(12),
                 border: _currentWallpaper == 'custom'
                     ? Border.all(color: AppColors.acc(context), width: 3)
-                    : Border.all(color: AppColors.divider(context)),
-              ),
+                    : Border.all(color: AppColors.divider(context))),
               child: Center(
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -1387,32 +1164,21 @@ class _WallpaperViewState extends State<_WallpaperView> {
                     Icon(
                       LucideIcons.imagePlus,
                       size: 20,
-                      color: AppColors.sec(context),
-                    ),
+                      color: AppColors.sec(context)),
                     const SizedBox(width: 8),
                     Text(
                       t('choose_from_gallery'),
                       style: TextStyle(
                         color: AppColors.sec(context),
                         fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+                        fontWeight: FontWeight.w500)),
+                  ])))),
           const SizedBox(height: 40),
-        ],
-      ),
-    );
+        ]));
   }
 }
 
-class _LabsView extends StatefulWidget {
-  final AppProvider provider;
-  const _LabsView({required this.provider});
+class _LabsView extends StatefulWidget { const _LabsView({required this.provider});
 
   @override
   State<_LabsView> createState() => _LabsViewState();
@@ -1430,7 +1196,7 @@ class _LabsViewState extends State<_LabsView> {
   }
 
   Future<void> _loadConfig() async {
-    final svc = RemoteConfigService.instance;
+    final svc = getIt<RemoteConfigService>();
     await svc.fetch();
     if (mounted) {
       setState(() {
@@ -1449,21 +1215,16 @@ class _LabsViewState extends State<_LabsView> {
         elevation: 0,
         leading: IconButton(
           icon: Icon(LucideIcons.arrowLeft, color: AppColors.sec(context)),
-          onPressed: () => Navigator.pop(context),
-        ),
+          onPressed: () => Navigator.pop(context)),
         title: Text(
           t('labs'),
           style: TextStyle(
             color: AppColors.textPrimary(context),
             fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
+            fontWeight: FontWeight.w600))),
       body: _loading
           ? Center(
-              child: CircularProgressIndicator(color: AppColors.acc(context)),
-            )
+              child: CircularProgressIndicator(color: AppColors.acc(context)))
           : RefreshIndicator(
               onRefresh: _loadConfig,
               child: ListView(
@@ -1483,10 +1244,7 @@ class _LabsViewState extends State<_LabsView> {
                     ..._buildUISchemas(),
                   ],
                   const SizedBox(height: 40),
-                ],
-              ),
-            ),
-    );
+                ])));
   }
 
   List<Widget> _buildFeatureFlags() {
@@ -1499,10 +1257,7 @@ class _LabsViewState extends State<_LabsView> {
             localeProvider.t('no_feature_flags'),
             style: TextStyle(
               color: AppColors.textTertiary(context),
-              fontSize: 14,
-            ),
-          ),
-        ),
+              fontSize: 14))),
       ];
     }
     return features.entries.map((entry) {
@@ -1512,8 +1267,7 @@ class _LabsViewState extends State<_LabsView> {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
           color: AppColors.sf(context),
-          borderRadius: BorderRadius.circular(12),
-        ),
+          borderRadius: BorderRadius.circular(12)),
         child: Row(
           children: [
             Expanded(
@@ -1522,18 +1276,14 @@ class _LabsViewState extends State<_LabsView> {
                 style: TextStyle(
                   color: AppColors.textPrimary(context),
                   fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
+                  fontWeight: FontWeight.w500))),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
                 color: enabled
                     ? AppColors.ok(context).withValues(alpha: 0.15)
                     : AppColors.textDisabled(context).withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(6),
-              ),
+                borderRadius: BorderRadius.circular(6)),
               child: Text(
                 enabled
                     ? localeProvider.t('enabled')
@@ -1543,13 +1293,8 @@ class _LabsViewState extends State<_LabsView> {
                       ? AppColors.ok(context)
                       : AppColors.textDisabled(context),
                   fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
+                  fontWeight: FontWeight.w600))),
+          ]));
     }).toList();
   }
 
@@ -1564,10 +1309,7 @@ class _LabsViewState extends State<_LabsView> {
             localeProvider.t('no_remote_config'),
             style: TextStyle(
               color: AppColors.textTertiary(context),
-              fontSize: 14,
-            ),
-          ),
-        ),
+              fontSize: 14))),
       ];
     }
     return displayConfig.entries.map((entry) {
@@ -1576,8 +1318,7 @@ class _LabsViewState extends State<_LabsView> {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
           color: AppColors.sf(context),
-          borderRadius: BorderRadius.circular(10),
-        ),
+          borderRadius: BorderRadius.circular(10)),
         child: Row(
           children: [
             Expanded(
@@ -1585,21 +1326,14 @@ class _LabsViewState extends State<_LabsView> {
                 entry.key,
                 style: TextStyle(
                   color: AppColors.textSecondary(context),
-                  fontSize: 13,
-                ),
-              ),
-            ),
+                  fontSize: 13))),
             Text(
               '${entry.value}',
               style: TextStyle(
                 color: AppColors.textPrimary(context),
                 fontSize: 13,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-      );
+                fontWeight: FontWeight.w500)),
+          ]));
     }).toList();
   }
 
@@ -1610,8 +1344,7 @@ class _LabsViewState extends State<_LabsView> {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
           color: AppColors.sf(context),
-          borderRadius: BorderRadius.circular(10),
-        ),
+          borderRadius: BorderRadius.circular(10)),
         child: Row(
           children: [
             Icon(LucideIcons.layout, size: 16, color: AppColors.acc(context)),
@@ -1622,21 +1355,14 @@ class _LabsViewState extends State<_LabsView> {
                 style: TextStyle(
                   color: AppColors.textPrimary(context),
                   fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
+                  fontWeight: FontWeight.w500))),
             GestureDetector(
               onTap: () => _previewSchema(screenId),
               child: Icon(
                 LucideIcons.eye,
                 size: 16,
-                color: AppColors.sec(context),
-              ),
-            ),
-          ],
-        ),
-      );
+                color: AppColors.sec(context))),
+          ]));
     }).toList();
   }
 
@@ -1644,13 +1370,12 @@ class _LabsViewState extends State<_LabsView> {
     final schema = _uiSchemas[screenId];
     if (schema == null) return;
     final widget = RemoteUIEngine.render(schema, context);
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: AppColors.bg(context),
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (_) => DraggableScrollableSheet(
         initialChildSize: 0.6,
         minChildSize: 0.3,
@@ -1659,9 +1384,6 @@ class _LabsViewState extends State<_LabsView> {
         builder: (_, controller) => SingleChildScrollView(
           controller: controller,
           padding: const EdgeInsets.all(16),
-          child: widget,
-        ),
-      ),
-    );
+          child: widget)));
   }
 }

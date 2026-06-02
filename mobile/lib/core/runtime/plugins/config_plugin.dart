@@ -4,6 +4,7 @@ import '../vocabulary/runtime_message.dart';
 import '../vocabulary/runtime_event.dart';
 import '../vocabulary/capability_context.dart';
 import 'persistence_backend.dart';
+import '../vocabulary/capability_params.dart';
 
 class ConfigPlugin implements PluginHandler {
   final Map<String, dynamic> _config = {};
@@ -29,46 +30,43 @@ class ConfigPlugin implements PluginHandler {
   @override
   Future<HandlerResult> handleMessage(
     RuntimeMessage message,
-    CapabilityContext context,
-  ) async {
+    CapabilityContext context) async {
     return HandlerResult.ok();
   }
 
   @override
   Future<HandlerResult> handleEvent(
     RuntimeEvent event,
-    CapabilityContext context,
-  ) async {
+    CapabilityContext context) async {
     return HandlerResult.ok();
   }
 
   @override
   Future<CapabilityResult> invokeCapability(
     String capabilityId,
-    dynamic params,
-    CapabilityContext context,
-  ) async {
+    CapabilityParams params,
+    CapabilityContext context) async {
     if (!_loaded) await loadFromPersistence();
     switch (capabilityId) {
       case 'config.get':
-        final key = params is Map ? params['key'] as String : params as String;
+        final key = params.string('') ?? params.string('value') ?? '';
         return CapabilityResult.ok(_config[key]);
       case 'config.set':
-        if (params is Map) {
-          final key = params['key'] as String;
-          final value = params['value'];
+        if (params.isNotEmpty) {
+          final key = params.string('')!;
+          final value = params.raw['value'];
           _config[key] = value;
           if (_persistence != null) {
             await _persistence.write('cfg_$key', {'value': value});
           }
-          for (final watcher in _watchers[key] ?? []) {
+          for (final watcher in _watchers[key] ?? <void Function(String, dynamic)>[]) {
             watcher(key, value);
           }
         }
         return CapabilityResult.ok(true);
       case 'config.watch':
-        if (params is Map) {
-          final key = params['key'] as String;
+        if (params.isNotEmpty) {
+          final key = params.string('')!;
           _watchers.putIfAbsent(key, () => []);
         }
         return CapabilityResult.ok(true);
@@ -76,9 +74,7 @@ class ConfigPlugin implements PluginHandler {
         return CapabilityResult.fail(
           RuntimeError(
             code: 'UNKNOWN_CAPABILITY',
-            message: 'Unknown capability: $capabilityId',
-          ),
-        );
+            message: 'Unknown capability: $capabilityId'));
     }
   }
 
@@ -92,20 +88,16 @@ class ConfigPlugin implements PluginHandler {
         id: 'config.get',
         name: 'Get Config',
         description: 'Get a config value',
-        permission: 'auto',
-      ),
+        permission: 'auto'),
       CapabilityDeclaration(
         id: 'config.set',
         name: 'Set Config',
         description: 'Set a config value',
-        permission: 'confirm',
-      ),
+        permission: 'confirm'),
       CapabilityDeclaration(
         id: 'config.watch',
         name: 'Watch Config',
         description: 'Watch a config key for changes',
-        permission: 'auto',
-      ),
-    ],
-  );
+        permission: 'auto'),
+    ]);
 }

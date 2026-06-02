@@ -39,7 +39,7 @@ void main() {
     });
 
     test('validateSchema returns non-null for valid container', () {
-      final schema = {'type': 'container', 'children': []};
+      final schema = <String, dynamic>{'type': 'container', 'children': <Map<String, dynamic>>[]};
       final result = RemoteUIEngine.validateSchema(schema);
       expect(result, isNotNull);
     });
@@ -57,7 +57,7 @@ void main() {
     });
 
     test('validateSchema returns null for missing type', () {
-      final schema = {'children': []};
+      final schema = <String, dynamic>{'children': <Map<String, dynamic>>[]};
       final result = RemoteUIEngine.validateSchema(schema);
       expect(result, isNull);
     });

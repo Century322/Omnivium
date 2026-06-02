@@ -39,8 +39,7 @@ class CardState {
     lifecycle: lifecycle ?? this.lifecycle,
     data: data ?? this.data,
     createdAt: createdAt,
-    ttl: ttl ?? this.ttl,
-  );
+    ttl: ttl ?? this.ttl);
 }
 
 class CardRuntime {
@@ -80,8 +79,7 @@ class CardRuntime {
       type: type,
       data: data,
       createdAt: DateTime.now(),
-      ttl: ttl ?? const Duration(hours: 24),
-    );
+      ttl: ttl ?? const Duration(hours: 24));
     _cards[id] = card;
     return card;
   }

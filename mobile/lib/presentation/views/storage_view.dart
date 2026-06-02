@@ -1,16 +1,16 @@
+﻿
+import '../../core/di/app_di.dart';
 import '../../core/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../theme/app_colors.dart';
-import '../theme/locale_provider.dart';
+import '../theme/locale_cubit.dart';
 import '../widgets/skeleton_loader.dart';
-import '../../core/app_provider.dart';
+
 import '../../core/app_navigator.dart';
 import '../../core/database_service.dart';
 
-class StorageView extends StatefulWidget {
-  final AppProvider provider;
-  const StorageView({super.key, required this.provider});
+class StorageView extends StatefulWidget { const StorageView({super.key});
 
   @override
   State<StorageView> createState() => _StorageViewState();
@@ -34,7 +34,7 @@ class _StorageViewState extends State<StorageView> {
     double cache = 0;
 
     try {
-      final db = DatabaseService.instance;
+      final db = getIt<DatabaseService>();
       if (db.isInitialized) {
         for (final key in db.sessions.keys) {
           final value = db.sessions.get(key);
@@ -85,24 +85,18 @@ class _StorageViewState extends State<StorageView> {
         leading: IconButton(
           tooltip: localeProvider.t('back'),
           icon: Icon(LucideIcons.arrowLeft, color: AppColors.sec(context)),
-          onPressed: () => Navigator.pop(context),
-        ),
+          onPressed: () => Navigator.pop(context)),
         title: Text(
           t('storage'),
           style: TextStyle(
             color: AppColors.textPrimary(context),
             fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
+            fontWeight: FontWeight.w600))),
       body: _loading
           ? SingleChildScrollView(
               padding: const EdgeInsets.all(20),
               child: Column(
-                children: List.generate(6, (_) => const CardSkeleton()),
-              ),
-            )
+                children: List.generate(6, (_) => const CardSkeleton())))
           : SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
@@ -119,8 +113,7 @@ class _StorageViewState extends State<StorageView> {
                       t('chat_messages_desc'),
                       _formatSize(_chatDataSize * 0.6),
                       onTap: () =>
-                          AppNavigator.go(context, '/files', args: {'tab': 2}),
-                    ),
+                          AppNavigator.go<void>(context, '/files', args: {'tab': 2})),
                     _buildStorageItem(
                       context,
                       LucideIcons.image,
@@ -128,8 +121,7 @@ class _StorageViewState extends State<StorageView> {
                       t('images_desc'),
                       _formatSize(_chatDataSize * 0.25),
                       onTap: () =>
-                          AppNavigator.go(context, '/files', args: {'tab': 0}),
-                    ),
+                          AppNavigator.go<void>(context, '/files', args: {'tab': 0})),
                     _buildStorageItem(
                       context,
                       LucideIcons.file,
@@ -137,8 +129,7 @@ class _StorageViewState extends State<StorageView> {
                       t('files_desc'),
                       _formatSize(_chatDataSize * 0.15),
                       onTap: () =>
-                          AppNavigator.go(context, '/files', args: {'tab': 2}),
-                    ),
+                          AppNavigator.go<void>(context, '/files', args: {'tab': 2})),
                     _buildStorageItem(
                       context,
                       LucideIcons.video,
@@ -146,8 +137,7 @@ class _StorageViewState extends State<StorageView> {
                       t('videos_desc'),
                       localeProvider.t('size_zero_mb'),
                       onTap: () =>
-                          AppNavigator.go(context, '/files', args: {'tab': 1}),
-                    ),
+                          AppNavigator.go<void>(context, '/files', args: {'tab': 1})),
                   ]),
                   const SizedBox(height: 20),
                   _buildSection(context, t('ai_data'), [
@@ -156,15 +146,13 @@ class _StorageViewState extends State<StorageView> {
                       LucideIcons.bot,
                       t('ai_conversations'),
                       t('ai_conversations_desc'),
-                      _formatSize(_aiDataSize * 0.8),
-                    ),
+                      _formatSize(_aiDataSize * 0.8)),
                     _buildStorageItem(
                       context,
                       LucideIcons.image,
                       t('ai_generated_images'),
                       t('ai_generated_images_desc'),
-                      _formatSize(_aiDataSize * 0.2),
-                    ),
+                      _formatSize(_aiDataSize * 0.2)),
                   ]),
                   const SizedBox(height: 20),
                   _buildSection(context, t('cache'), [
@@ -173,15 +161,13 @@ class _StorageViewState extends State<StorageView> {
                       LucideIcons.database,
                       t('matrix_cache'),
                       t('matrix_cache_desc'),
-                      _formatSize(_cacheSize * 0.7),
-                    ),
+                      _formatSize(_cacheSize * 0.7)),
                     _buildStorageItem(
                       context,
                       LucideIcons.globe,
                       t('web_cache'),
                       t('web_cache_desc'),
-                      _formatSize(_cacheSize * 0.3),
-                    ),
+                      _formatSize(_cacheSize * 0.3)),
                   ]),
                   const SizedBox(height: 24),
                   SizedBox(
@@ -189,30 +175,20 @@ class _StorageViewState extends State<StorageView> {
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.dng(
-                          context,
-                        ).withValues(alpha: 0.15),
+                          context).withValues(alpha: 0.15),
                         foregroundColor: AppColors.dng(context),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        elevation: 0,
-                      ),
+                          borderRadius: BorderRadius.circular(14)),
+                        elevation: 0),
                       onPressed: () => _showClearCacheDialog(context, t),
                       child: Text(
                         t('clear_cache'),
                         style: TextStyle(
                           fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
+                          fontWeight: FontWeight.w600)))),
                   const SizedBox(height: 40),
-                ],
-              ),
-            ),
-    );
+                ])));
   }
 
   Widget _buildOverview(BuildContext context, String Function(String) t) {
@@ -223,23 +199,19 @@ class _StorageViewState extends State<StorageView> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.sf(context),
-        borderRadius: BorderRadius.circular(16),
-      ),
+        borderRadius: BorderRadius.circular(16)),
       child: Column(
         children: [
           Text(
             t('storage_used'),
-            style: TextStyle(color: AppColors.textHint(context), fontSize: 13),
-          ),
+            style: TextStyle(color: AppColors.textHint(context), fontSize: 13)),
           const SizedBox(height: 8),
           Text(
             _formatSize(totalMB),
             style: TextStyle(
               color: AppColors.textPrimary(context),
               fontSize: 32,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
+              fontWeight: FontWeight.w700)),
           const SizedBox(height: 12),
           ClipRRect(
             borderRadius: BorderRadius.circular(4),
@@ -247,24 +219,18 @@ class _StorageViewState extends State<StorageView> {
               value: progress,
               backgroundColor: AppColors.sfAlt(context),
               valueColor: AlwaysStoppedAnimation<Color>(AppColors.acc(context)),
-              minHeight: 8,
-            ),
-          ),
+              minHeight: 8)),
           const SizedBox(height: 8),
           Text(
             '${t('total_used')} / ${_formatSize(maxMB)}',
-            style: TextStyle(color: AppColors.iconGray(context), fontSize: 12),
-          ),
-        ],
-      ),
-    );
+            style: TextStyle(color: AppColors.iconGray(context), fontSize: 12)),
+        ]));
   }
 
   Widget _buildSection(
     BuildContext context,
     String title,
-    List<Widget> children,
-  ) {
+    List<Widget> children) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -275,19 +241,13 @@ class _StorageViewState extends State<StorageView> {
             style: TextStyle(
               color: AppColors.iconGray(context),
               fontSize: 13,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
+              fontWeight: FontWeight.w600))),
         Container(
           decoration: BoxDecoration(
             color: AppColors.sf(context),
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: Column(children: children),
-        ),
-      ],
-    );
+            borderRadius: BorderRadius.circular(14)),
+          child: Column(children: children)),
+      ]);
   }
 
   Widget _buildStorageItem(
@@ -310,10 +270,8 @@ class _StorageViewState extends State<StorageView> {
               height: 36,
               decoration: BoxDecoration(
                 color: AppColors.sfAlt(context),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(icon, size: 18, color: AppColors.sec(context)),
-            ),
+                borderRadius: BorderRadius.circular(10)),
+              child: Icon(icon, size: 18, color: AppColors.sec(context))),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -324,71 +282,54 @@ class _StorageViewState extends State<StorageView> {
                     style: TextStyle(
                       color: AppColors.textPrimary(context),
                       fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
+                      fontWeight: FontWeight.w500)),
                   Text(
                     subtitle,
                     style: TextStyle(
                       color: AppColors.iconGray(context),
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+                      fontSize: 12)),
+                ])),
             Text(
               size,
               style: TextStyle(
                 color: AppColors.textHint(context),
                 fontSize: 13,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+                fontWeight: FontWeight.w500)),
             if (onTap != null) ...[
               const SizedBox(width: 8),
               Icon(
                 LucideIcons.chevronRight,
                 size: 16,
-                color: AppColors.iconGray(context),
-              ),
+                color: AppColors.iconGray(context)),
             ],
-          ],
-        ),
-      ),
-    );
+          ])));
   }
 
   void _showClearCacheDialog(BuildContext context, String Function(String) t) {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: AppColors.sf(context),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           t('clear_cache'),
-          style: TextStyle(color: AppColors.textPrimary(context)),
-        ),
+          style: TextStyle(color: AppColors.textPrimary(context))),
         content: Text(
           t('clear_cache_confirm'),
           style: TextStyle(
             color: AppColors.textSecondary(context),
-            fontSize: 14,
-          ),
-        ),
+            fontSize: 14)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
               t('cancel'),
-              style: TextStyle(color: AppColors.sec(context)),
-            ),
-          ),
+              style: TextStyle(color: AppColors.sec(context)))),
           TextButton(
             onPressed: () async {
               Navigator.pop(context);
               try {
-                final db = DatabaseService.instance;
+                final db = getIt<DatabaseService>();
                 if (db.isInitialized) {
                   await db.cache.clear();
                 }
@@ -396,8 +337,7 @@ class _StorageViewState extends State<StorageView> {
                 AppLogger.instance.error(
                   'App error',
                   error: e,
-                  stackTrace: stackTrace,
-                );
+                  stackTrace: stackTrace);
               }
               if (mounted) {
                 await _calculateSizes();
@@ -406,19 +346,13 @@ class _StorageViewState extends State<StorageView> {
                     SnackBar(
                       content: Text(t('cache_cleared')),
                       backgroundColor: AppColors.acc(context),
-                      duration: const Duration(seconds: 2),
-                    ),
-                  );
+                      duration: const Duration(seconds: 2)));
                 }
               }
             },
             child: Text(
               t('clear'),
-              style: TextStyle(color: AppColors.dng(context)),
-            ),
-          ),
-        ],
-      ),
-    );
+              style: TextStyle(color: AppColors.dng(context)))),
+        ]));
   }
 }

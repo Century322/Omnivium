@@ -6,16 +6,13 @@ class SecureStorageService {
   SecureStorageService._();
 
   static const _androidOptions = AndroidOptions(
-    encryptedSharedPreferences: true,
-  );
+    encryptedSharedPreferences: true);
   static const _iosOptions = IOSOptions(
-    accessibility: KeychainAccessibility.first_unlock,
-  );
+    accessibility: KeychainAccessibility.first_unlock);
 
   FlutterSecureStorage _storage = const FlutterSecureStorage(
     aOptions: _androidOptions,
-    iOptions: _iosOptions,
-  );
+    iOptions: _iosOptions);
 
   bool _initialized = false;
 
@@ -24,8 +21,7 @@ class SecureStorageService {
   Future<void> init() async {
     _storage = const FlutterSecureStorage(
       aOptions: _androidOptions,
-      iOptions: _iosOptions,
-    );
+      iOptions: _iosOptions);
     _initialized = true;
   }
 

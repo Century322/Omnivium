@@ -51,8 +51,7 @@ class CapabilityContext {
       session: session,
       route: route,
       deadline: deadline,
-      cancellationToken: CancellationToken(deadline),
-    );
+      cancellationToken: CancellationToken(deadline));
   }
 
   bool get shouldAbort => cancellationToken.shouldAbort;

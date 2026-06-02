@@ -95,14 +95,11 @@ class SnapshotService {
               userId: s.userId,
               state: s.state.name,
               createdAt: s.createdAt,
-              lastActiveAt: s.lastActiveAt,
-            ),
-          )
+              lastActiveAt: s.lastActiveAt))
           .toList(),
       capabilityCache: capabilityCache,
       resourceUsage: resourceUsage,
-      extra: extra,
-    );
+      extra: extra);
 
     _snapshots.add(snapshot);
     _persistSnapshot(snapshot);
@@ -123,8 +120,7 @@ class SnapshotService {
   List<RuntimeSnapshot> snapshotsInRange(int fromTimestamp, int toTimestamp) {
     return _snapshots
         .where(
-          (s) => s.timestamp >= fromTimestamp && s.timestamp <= toTimestamp,
-        )
+          (s) => s.timestamp >= fromTimestamp && s.timestamp <= toTimestamp)
         .toList();
   }
 

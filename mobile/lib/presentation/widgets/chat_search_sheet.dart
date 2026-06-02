@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../theme/app_colors.dart';
-import '../theme/locale_provider.dart';
+import '../theme/locale_cubit.dart';
 import '../widgets/home_components.dart';
 
 class ChatSearchSheet extends StatelessWidget {
@@ -12,17 +12,16 @@ class ChatSearchSheet extends StatelessWidget {
 
   void show(BuildContext context) {
     final searchCtrl = TextEditingController();
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (ctx) {
         return StatefulBuilder(
           builder: (ctx, setModalState) {
             final query = searchCtrl.text.toLowerCase();
-            List<dynamic> results = [];
+            List<Map<String, dynamic>> results = [];
             if (query.isNotEmpty) {
               for (var i = 0; i < messages.length; i++) {
                 if (messages[i].content.toLowerCase().contains(query)) {
@@ -36,8 +35,7 @@ class ChatSearchSheet extends StatelessWidget {
             }
             return Padding(
               padding: EdgeInsets.only(
-                bottom: MediaQuery.of(ctx).viewInsets.bottom,
-              ),
+                bottom: MediaQuery.of(ctx).viewInsets.bottom),
               child: SafeArea(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -53,50 +51,36 @@ class ChatSearchSheet extends StatelessWidget {
                               autofocus: true,
                               style: TextStyle(
                                 color: AppColors.textPrimary(context),
-                                fontSize: 15,
-                              ),
+                                fontSize: 15),
                               decoration: InputDecoration(
                                 labelText: t('search_messages'),
                                 hintStyle: TextStyle(
-                                  color: AppColors.textDisabled(context),
-                                ),
+                                  color: AppColors.textDisabled(context)),
                                 prefixIcon: Icon(
                                   LucideIcons.search,
                                   color: AppColors.textHint(context),
-                                  size: 18,
-                                ),
+                                  size: 18),
                                 filled: true,
                                 fillColor: AppColors.sf(context),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide.none,
-                                ),
+                                  borderSide: BorderSide.none),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide.none,
-                                ),
+                                  borderSide: BorderSide.none),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide.none,
-                                ),
+                                  borderSide: BorderSide.none),
                                 contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 10,
-                                ),
-                              ),
-                              onChanged: (_) => setModalState(() {}),
-                            ),
-                          ),
+                                  vertical: 10)),
+                              onChanged: (_) => setModalState(() {}))),
                           const SizedBox(width: 8),
                           TextButton(
                             onPressed: () => Navigator.pop(ctx),
                             child: Text(
                               t('cancel'),
-                              style: TextStyle(color: AppColors.sec(context)),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                              style: TextStyle(color: AppColors.sec(context)))),
+                        ])),
                     if (query.isNotEmpty && results.isEmpty)
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 32),
@@ -104,15 +88,11 @@ class ChatSearchSheet extends StatelessWidget {
                           t('no_match_msg'),
                           style: TextStyle(
                             color: AppColors.textDisabled(context),
-                            fontSize: 14,
-                          ),
-                        ),
-                      ),
+                            fontSize: 14))),
                     if (results.isNotEmpty)
                       ConstrainedBox(
                         constraints: BoxConstraints(
-                          maxHeight: MediaQuery.of(ctx).size.height * 0.4,
-                        ),
+                          maxHeight: MediaQuery.of(ctx).size.height * 0.4),
                         child: ListView.builder(
                           shrinkWrap: true,
                           itemCount: results.length,
@@ -128,44 +108,31 @@ class ChatSearchSheet extends StatelessWidget {
                                 context,
                                 content,
                                 highlightStart,
-                                query.length,
-                              ),
+                                query.length),
                               subtitle: Text(
                                 r['role'] == 'user'
                                     ? localeProvider.t('me')
                                     : localeProvider.t('ai'),
                                 style: TextStyle(
                                   color: AppColors.textDisabled(context),
-                                  fontSize: 11,
-                                ),
-                              ),
-                              onTap: () => Navigator.pop(ctx),
-                            );
-                          },
-                        ),
-                      ),
+                                  fontSize: 11)),
+                              onTap: () => Navigator.pop(ctx));
+                          })),
                     const SizedBox(height: 16),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
+                  ])));
+          });
+      });
   }
 
   Widget _buildHighlightedText(
     BuildContext context,
     String text,
     int start,
-    int length,
-  ) {
+    int length) {
     if (start < 0) {
       return Text(
         text,
-        style: TextStyle(color: AppColors.textSecondary(context), fontSize: 14),
-      );
+        style: TextStyle(color: AppColors.textSecondary(context), fontSize: 14));
     }
     final before = text.substring(0, start);
     final match = text.substring(start, start + length);
@@ -181,13 +148,9 @@ class ChatSearchSheet extends StatelessWidget {
             text: match,
             style: TextStyle(
               color: AppColors.acc(context),
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+              fontWeight: FontWeight.w600)),
           TextSpan(text: after),
-        ],
-      ),
-    );
+        ]));
   }
 
   @override

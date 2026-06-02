@@ -64,19 +64,16 @@ class PluginRegistry {
 
   Future<bool> register(
     PluginDescriptor descriptor,
-    PluginHandler handler,
-  ) async {
+    PluginHandler handler) async {
     if (_plugins.containsKey(descriptor.id)) {
       AppLogger.instance.warning(
-        'Plugin "${descriptor.id}" already registered, unloading previous',
-      );
+        'Plugin "${descriptor.id}" already registered, unloading previous');
       await unload(descriptor.id);
     }
 
     if (_plugins.length >= _maxPlugins) {
       AppLogger.instance.error(
-        'Plugin limit reached ($_maxPlugins), cannot register "${descriptor.id}"',
-      );
+        'Plugin limit reached ($_maxPlugins), cannot register "${descriptor.id}"');
       return false;
     }
 
@@ -86,13 +83,11 @@ class PluginRegistry {
       handler: handler,
       lifecycle: PluginLifecycle(),
       transport: transport,
-      registeredAt: _clock.now(),
-    );
+      registeredAt: _clock.now());
 
     if (!entry.lifecycle.transitionTo(
       PluginState.loaded,
-      reason: 'registered',
-    )) {
+      reason: 'registered')) {
       return false;
     }
 
@@ -103,8 +98,7 @@ class PluginRegistry {
     }
 
     AppLogger.instance.info(
-      'Plugin "${descriptor.id}" registered with ${descriptor.capabilities.length} capabilities',
-    );
+      'Plugin "${descriptor.id}" registered with ${descriptor.capabilities.length} capabilities');
 
     if (descriptor.lifecycle.autoActivate) {
       await activate(descriptor.id);
@@ -119,8 +113,7 @@ class PluginRegistry {
 
     if (!entry.lifecycle.canTransitionTo(PluginState.active)) {
       AppLogger.instance.warning(
-        'Plugin "$pluginId" cannot activate from ${entry.lifecycle.state}',
-      );
+        'Plugin "$pluginId" cannot activate from ${entry.lifecycle.state}');
       return false;
     }
 
@@ -131,8 +124,7 @@ class PluginRegistry {
     } catch (e) {
       entry.lifecycle.transitionTo(
         PluginState.failed,
-        reason: 'activate error: $e',
-      );
+        reason: 'activate error: $e');
       AppLogger.instance.error('Plugin "$pluginId" activation failed: $e');
       return false;
     }
@@ -144,8 +136,7 @@ class PluginRegistry {
 
     if (!entry.lifecycle.transitionTo(
       PluginState.suspended,
-      reason: 'suspended',
-    )) {
+      reason: 'suspended')) {
       return false;
     }
 
@@ -177,8 +168,7 @@ class PluginRegistry {
 
     if (!_config.enableHotReload) {
       AppLogger.instance.warning(
-        'Hot reload disabled, cannot reload "$pluginId"',
-      );
+        'Hot reload disabled, cannot reload "$pluginId"');
       return false;
     }
 

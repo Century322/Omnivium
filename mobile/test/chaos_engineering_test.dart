@@ -60,7 +60,7 @@ void main() {
         container.eventBus.publish('storm.event', {'index': i}, source: source);
       }
 
-      await Future.delayed(const Duration(milliseconds: 500));
+      await Future<void>.delayed(const Duration(milliseconds: 500));
 
       final elapsed = container.clock.now() - start;
       final qps = (received.length / elapsed) * 1000;
@@ -173,11 +173,11 @@ void main() {
       );
 
       final future = container.scheduler.schedule(task, (token) async {
-        await Future.delayed(const Duration(seconds: 30));
+        await Future<void>.delayed(const Duration(seconds: 30));
         return 'should not reach';
       });
 
-      await Future.delayed(const Duration(milliseconds: 20));
+      await Future<void>.delayed(const Duration(milliseconds: 20));
       final cancelled = container.scheduler.cancel('cancel-prop-test');
       expect(cancelled, isTrue);
 

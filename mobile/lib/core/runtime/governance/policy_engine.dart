@@ -50,20 +50,17 @@ class PolicyDecision {
   factory PolicyDecision.allow(String ruleId) => PolicyDecision(
     allowed: true,
     matchedRuleId: ruleId,
-    reason: 'Allowed by rule: $ruleId',
-  );
+    reason: 'Allowed by rule: $ruleId');
 
   factory PolicyDecision.deny(String ruleId) => PolicyDecision(
     allowed: false,
     matchedRuleId: ruleId,
-    reason: 'Denied by rule: $ruleId',
-  );
+    reason: 'Denied by rule: $ruleId');
 
   factory PolicyDecision.implicitDeny(String caller, String target) =>
       PolicyDecision(
         allowed: false,
-        reason: 'No matching policy for $caller -> $target',
-      );
+        reason: 'No matching policy for $caller -> $target');
 }
 
 class PolicyEngine {
@@ -117,8 +114,7 @@ class PolicyEngine {
     return evaluate(
       callerId: callerId,
       targetCapability: targetCapability,
-      scope: scope,
-    ).allowed;
+      scope: scope).allowed;
   }
 
   static PolicyEngine defaultPolicy() {
@@ -131,9 +127,7 @@ class PolicyEngine {
         effect: PolicyEffect.deny,
         callerPattern: 'agent.*',
         targetPattern: 'storage.delete',
-        priority: 100,
-      ),
-    );
+        priority: 100));
 
     engine.addRule(
       const PolicyRule(
@@ -142,9 +136,7 @@ class PolicyEngine {
         effect: PolicyEffect.deny,
         callerPattern: 'background.*',
         targetPattern: 'network.*',
-        priority: 100,
-      ),
-    );
+        priority: 100));
 
     engine.addRule(
       const PolicyRule(
@@ -153,9 +145,7 @@ class PolicyEngine {
         effect: PolicyEffect.deny,
         callerPattern: 'sandbox.*',
         targetPattern: 'runtime.*',
-        priority: 100,
-      ),
-    );
+        priority: 100));
 
     engine.addRule(
       const PolicyRule(
@@ -165,9 +155,7 @@ class PolicyEngine {
         callerPattern: 'chaos-agent',
         targetPattern: '*',
         priority: 200,
-        conditions: {'environment': 'production'},
-      ),
-    );
+        conditions: {'environment': 'production'}));
 
     engine.addRule(
       const PolicyRule(
@@ -176,9 +164,7 @@ class PolicyEngine {
         effect: PolicyEffect.allow,
         callerPattern: '*',
         targetPattern: '*',
-        priority: 0,
-      ),
-    );
+        priority: 0));
 
     return engine;
   }

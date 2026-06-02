@@ -1,3 +1,5 @@
+﻿
+import 'di/app_di.dart';
 import 'app_logger.dart';
 import 'app_config.dart';
 import 'dart:async';
@@ -80,13 +82,12 @@ class ApiProxyService {
   final _circuitBreaker = _CircuitBreaker(
     failureThreshold: 5,
     recoveryTimeout: const Duration(seconds: 30),
-    halfOpenMaxRequests: 2,
-  );
+    halfOpenMaxRequests: 2);
   final _responseCache = _ResponseCache(defaultTtl: const Duration(minutes: 5));
 
   bool get isConfigured {
-    final matrix = MatrixService.instance;
-    return matrix.isLoggedIn;
+    final url = backendUrl;
+    return url.isNotEmpty && Uri.tryParse(url)?.hasScheme == true;
   }
 
   Map<String, dynamic>? get remoteConfig => _remoteConfig;
@@ -115,14 +116,14 @@ class ApiProxyService {
 
   Map<String, String> buildAuthHeaders({String? body}) {
     final headers = <String, String>{};
-    final matrix = MatrixService.instance;
+    final matrix = getIt<MatrixService>();
     final token = matrix.client?.accessToken;
     if (matrix.isLoggedIn && token != null) {
       headers['Authorization'] = 'Bearer $token';
       headers['X-Auth-Source'] = 'matrix';
       headers['X-User-Id'] = matrix.userId ?? '';
     }
-    headers.addAll(IdentityBridge.instance.authHeaders());
+    headers.addAll(getIt<IdentityBridge>().authHeaders());
     final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
     headers['X-Timestamp'] = timestamp;
     if (body != null && body.isNotEmpty && token != null) {
@@ -145,8 +146,7 @@ class ApiProxyService {
   http.Client get secureClient {
     return _BreadcrumbClient(
       NetworkSecurityService.instance.client,
-      _circuitBreaker,
-    );
+      _circuitBreaker);
   }
 
   Future<bool> checkBackendHealth() async {
@@ -187,8 +187,7 @@ class ApiProxyService {
       AppLogger.instance.warning(
         'checkAppStatus failed',
         error: e,
-        stackTrace: stackTrace,
-      );
+        stackTrace: stackTrace);
       return {};
     }
   }
@@ -208,8 +207,7 @@ class ApiProxyService {
       AppLogger.instance.error(
         'fetchRemoteConfig failed',
         error: e,
-        stackTrace: stackTrace,
-      );
+        stackTrace: stackTrace);
     }
 
     try {
@@ -222,16 +220,14 @@ class ApiProxyService {
         final raw = body['models'] as Map<String, dynamic>?;
         if (raw != null) {
           _availableModels = raw.map(
-            (k, v) => MapEntry(k, List<String>.from(v)),
-          );
+            (k, v) => MapEntry(k, List<String>.from(v)));
         }
       }
     } catch (e, stackTrace) {
       AppLogger.instance.error(
         'fetchModels failed',
         error: e,
-        stackTrace: stackTrace,
-      );
+        stackTrace: stackTrace);
     }
   }
 
@@ -254,16 +250,14 @@ class ApiProxyService {
               'fcm_token': fcmToken,
               'app_version': appVersion,
               'user_id': userId,
-            }),
-          )
+            }))
           .timeout(_mediumTimeout);
       return response.statusCode == 200;
     } catch (e, stackTrace) {
       AppLogger.instance.warning(
         'registerDevice failed',
         error: e,
-        stackTrace: stackTrace,
-      );
+        stackTrace: stackTrace);
       return false;
     }
   }
@@ -275,7 +269,7 @@ class ApiProxyService {
   }) async {
     final uri = Uri.parse('$backendUrl$path');
     final encodedBody = jsonEncode(body);
-    final enc = EncryptionService.instance;
+    final enc = getIt<EncryptionService>();
     final payload = enc.isReady ? enc.encrypt(encodedBody) : encodedBody;
     final headers = <String, String>{
       'Content-Type': 'application/json',
@@ -300,8 +294,7 @@ class ApiProxyService {
       final resetTime = _rateLimitResetTime;
       if (resetTime != null && DateTime.now().isBefore(resetTime)) {
         throw ApiProxyException.rateLimited(
-          retryAfter: resetTime.difference(DateTime.now()),
-        );
+          retryAfter: resetTime.difference(DateTime.now()));
       }
 
       http.Response response;
@@ -332,8 +325,7 @@ class ApiProxyService {
       } catch (e) {
         throw ApiProxyException.networkError(
           uri: uri.toString(),
-          originalError: e,
-        );
+          originalError: e);
       }
 
       if (response.statusCode == 429) {
@@ -341,8 +333,7 @@ class ApiProxyService {
         final seconds = int.tryParse(retryAfter ?? '') ?? 60;
         _rateLimitResetTime = DateTime.now().add(Duration(seconds: seconds));
         throw ApiProxyException.rateLimited(
-          retryAfter: Duration(seconds: seconds),
-        );
+          retryAfter: Duration(seconds: seconds));
       }
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
@@ -358,19 +349,16 @@ class ApiProxyService {
         if (response.statusCode == 401 || response.statusCode == 403) {
           throw ApiProxyException.authentication(
             statusCode: response.statusCode,
-            body: response.body,
-          );
+            body: response.body);
         }
         if (response.statusCode >= 500) {
           throw ApiProxyException.serverError(
             statusCode: response.statusCode,
-            body: response.body,
-          );
+            body: response.body);
         }
         throw ApiProxyException.clientError(
           statusCode: response.statusCode,
-          body: response.body,
-        );
+          body: response.body);
       }
     } catch (e) {
       if (!completer.isCompleted) completer.completeError(e);
@@ -479,8 +467,7 @@ class _ResponseCache {
   void put(String key, Map<String, dynamic> data, {Duration? ttl}) {
     _cache[key] = _CacheEntry(
       data: data,
-      expiry: DateTime.now().add(ttl ?? defaultTtl),
-    );
+      expiry: DateTime.now().add(ttl ?? defaultTtl));
     if (_cache.length > 100) {
       _evictExpired();
     }
@@ -528,7 +515,7 @@ class _BreadcrumbClient extends http.BaseClient {
         if (attempt > 0) {
           final delay = _baseDelay * pow(2, attempt - 1);
           final jitter = Duration(milliseconds: Random().nextInt(200));
-          await Future.delayed(delay + jitter);
+          await Future<void>.delayed(delay + jitter);
           AppLogger.instance.info('Retry attempt $attempt for ${request.url}');
         }
 
@@ -550,9 +537,7 @@ class _BreadcrumbClient extends http.BaseClient {
             },
             level: response.statusCode < 400
                 ? SentryLevel.info
-                : SentryLevel.warning,
-          ),
-        );
+                : SentryLevel.warning));
 
         if (response.statusCode >= 500) {
           _circuit.recordFailure();
@@ -582,9 +567,7 @@ class _BreadcrumbClient extends http.BaseClient {
                 'duration_ms': sw.elapsedMilliseconds,
                 'attempt': attempt,
               },
-              level: SentryLevel.error,
-            ),
-          );
+              level: SentryLevel.error));
           rethrow;
         }
       }
@@ -630,16 +613,14 @@ class ApiProxyException implements Exception {
   }) {
     return ApiProxyException(
       message: 'Network error',
-      originalError: originalError,
-    );
+      originalError: originalError);
   }
 
   factory ApiProxyException.rateLimited({required Duration retryAfter}) {
     return ApiProxyException(
       message: 'Rate limited',
       statusCode: 429,
-      retryAfter: retryAfter,
-    );
+      retryAfter: retryAfter);
   }
 
   factory ApiProxyException.authentication({
@@ -649,8 +630,7 @@ class ApiProxyException implements Exception {
     return ApiProxyException(
       message: 'Authentication failed',
       statusCode: statusCode,
-      body: body,
-    );
+      body: body);
   }
 
   factory ApiProxyException.serverError({
@@ -660,8 +640,7 @@ class ApiProxyException implements Exception {
     return ApiProxyException(
       message: 'Server error',
       statusCode: statusCode,
-      body: body,
-    );
+      body: body);
   }
 
   factory ApiProxyException.clientError({
@@ -671,8 +650,7 @@ class ApiProxyException implements Exception {
     return ApiProxyException(
       message: 'Client error',
       statusCode: statusCode,
-      body: body,
-    );
+      body: body);
   }
 
   bool get isTimeout => statusCode == 408;

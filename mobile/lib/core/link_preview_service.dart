@@ -1,3 +1,5 @@
+
+import 'di/app_di.dart';
 import 'app_logger.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'api_proxy_service.dart';
@@ -74,7 +76,7 @@ class LinkPreviewService {
 
     try {
       final uri = Uri.parse(url);
-      final response = await ApiProxyService.instance.secureClient
+      final response = await getIt<ApiProxyService>().secureClient
           .get(uri)
           .timeout(const Duration(seconds: 5));
       if (response.statusCode != 200) return null;
@@ -110,8 +112,7 @@ class LinkPreviewService {
           AppLogger.instance.warning(
             'Image URL resolve failed',
             error: e,
-            stackTrace: stackTrace,
-          );
+            stackTrace: stackTrace);
           imageUrl = null;
         }
       }
@@ -123,8 +124,7 @@ class LinkPreviewService {
         description: description?.trim(),
         imageUrl: imageUrl,
         siteName: siteName?.trim(),
-        url: url,
-      );
+        url: url);
 
       if (_cache.length >= _maxCacheSize) {
         _cache.remove(_cache.keys.first);

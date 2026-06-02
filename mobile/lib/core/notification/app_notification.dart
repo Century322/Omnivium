@@ -1,47 +1,33 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'app_notification.freezed.dart';
+
 enum NotificationType { message, invite, system, mention }
 
-class AppNotification {
-  final String id;
-  final String title;
-  final String body;
-  final NotificationType type;
-  final String? roomId;
-  final String? senderId;
-  final DateTime timestamp;
-  final bool read;
+NotificationType _parseType(dynamic value) {
+  if (value is String) {
+    return NotificationType.values
+            .where((e) => e.name == value)
+            .firstOrNull ??
+        NotificationType.system;
+  }
+  return NotificationType.system;
+}
 
-  AppNotification({
-    required this.id,
-    required this.title,
-    required this.body,
-    required this.type,
-    this.roomId,
-    this.senderId,
-    required this.timestamp,
-    this.read = false,
-  });
+@freezed
+class AppNotification with _$AppNotification {
+  const AppNotification._();
 
-  AppNotification copyWith({
-    String? id,
-    String? title,
-    String? body,
-    NotificationType? type,
+  const factory AppNotification({
+    required String id,
+    required String title,
+    required String body,
+    required NotificationType type,
     String? roomId,
     String? senderId,
-    DateTime? timestamp,
-    bool? read,
-  }) {
-    return AppNotification(
-      id: id ?? this.id,
-      title: title ?? this.title,
-      body: body ?? this.body,
-      type: type ?? this.type,
-      roomId: roomId ?? this.roomId,
-      senderId: senderId ?? this.senderId,
-      timestamp: timestamp ?? this.timestamp,
-      read: read ?? this.read,
-    );
-  }
+    required DateTime timestamp,
+    @Default(false) bool read,
+  }) = _AppNotification;
 
   Map<String, dynamic> toJson() => {
     'id': id,
@@ -65,16 +51,5 @@ class AppNotification {
         timestamp: json['timestamp'] != null
             ? DateTime.parse(json['timestamp'] as String)
             : DateTime.now(),
-        read: json['read'] as bool? ?? false,
-      );
-
-  static NotificationType _parseType(dynamic value) {
-    if (value is String) {
-      return NotificationType.values
-              .where((e) => e.name == value)
-              .firstOrNull ??
-          NotificationType.system;
-    }
-    return NotificationType.system;
-  }
+        read: json['read'] as bool? ?? false);
 }

@@ -1,35 +1,42 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+import '../di/app_di.dart';
 import 'dart:convert';
 import '../agent/agent_state.dart';
 import '../api_proxy_service.dart';
 import '../app_logger.dart';
 
-class SkillResult {
-  final bool success;
-  final dynamic data;
-  final String? error;
+part 'skill.freezed.dart';
+part 'skill.g.dart';
 
-  const SkillResult({required this.success, this.data, this.error});
+@freezed
+class SkillResult with _$SkillResult {
+  const SkillResult._();
+  const factory SkillResult({
+    required bool success,
+    Object? data,
+    String? error,
+  }) = _SkillResult;
 
-  factory SkillResult.ok(dynamic data) =>
-      SkillResult(success: true, data: data);
-  factory SkillResult.fail(String error) =>
-      SkillResult(success: false, error: error);
+  factory SkillResult.ok(Object? data) => SkillResult(success: true, data: data);
+  factory SkillResult.fail(String error) => SkillResult(success: false, error: error);
 }
 
-class SkillVersion {
-  final int major;
-  final int minor;
-  final int patch;
+@freezed
+class SkillVersion with _$SkillVersion {
+  const SkillVersion._();
 
-  const SkillVersion({required this.major, this.minor = 0, this.patch = 0});
+  const factory SkillVersion({
+    required int major,
+    @Default(0) int minor,
+    @Default(0) int patch,
+  }) = _SkillVersion;
 
   factory SkillVersion.parse(String version) {
     final parts = version.split('.').map((p) => int.tryParse(p) ?? 0).toList();
     return SkillVersion(
       major: parts.isNotEmpty ? parts[0] : 1,
       minor: parts.length > 1 ? parts[1] : 0,
-      patch: parts.length > 2 ? parts[2] : 0,
-    );
+      patch: parts.length > 2 ? parts[2] : 0);
   }
 
   bool isCompatibleWith(SkillVersion required) {
@@ -37,20 +44,6 @@ class SkillVersion {
     if (minor < required.minor) return false;
     return true;
   }
-
-  @override
-  String toString() => '$major.$minor.$patch';
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is SkillVersion &&
-          major == other.major &&
-          minor == other.minor &&
-          patch == other.patch;
-
-  @override
-  int get hashCode => Object.hash(major, minor, patch);
 }
 
 abstract class Skill {
@@ -106,7 +99,7 @@ class RemoteSkill extends Skill {
   @override
   Future<SkillResult> execute(Map<String, dynamic> params) async {
     try {
-      final proxy = ApiProxyService.instance;
+      final proxy = getIt<ApiProxyService>();
       if (!proxy.isConfigured)
         return SkillResult.fail('API proxy not configured');
       final uri = Uri.parse('${proxy.backendUrl}$endpoint');
@@ -118,8 +111,7 @@ class RemoteSkill extends Skill {
               ...proxy.buildDeviceHeaders(),
               'Content-Type': 'application/json',
             },
-            body: jsonEncode(params),
-          )
+            body: jsonEncode(params))
           .timeout(Duration(milliseconds: timeoutMs));
       if (response.statusCode == 200) {
         return SkillResult.ok(response.body);
@@ -129,8 +121,7 @@ class RemoteSkill extends Skill {
       AppLogger.instance.error(
         'Remote skill execute failed',
         error: e,
-        stackTrace: stackTrace,
-      );
+        stackTrace: stackTrace);
       return SkillResult.fail(e.toString());
     }
   }

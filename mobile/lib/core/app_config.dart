@@ -34,18 +34,15 @@ class AppConfig {
       case AppEnvironment.production:
         return const String.fromEnvironment(
           'API_BASE_URL',
-          defaultValue: 'https://api.omnivium.app',
-        );
+          defaultValue: 'https://api.omnivium.app');
       case AppEnvironment.staging:
         return const String.fromEnvironment(
           'API_BASE_URL',
-          defaultValue: 'https://staging-api.omnivium.app',
-        );
+          defaultValue: 'https://staging-api.omnivium.app');
       case AppEnvironment.dev:
         return const String.fromEnvironment(
           'API_BASE_URL',
-          defaultValue: 'http://10.0.2.2:8787',
-        );
+          defaultValue: 'http://10.0.2.2:8787');
     }
   }
 

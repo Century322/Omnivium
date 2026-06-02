@@ -1,3 +1,5 @@
+
+import '../di/app_di.dart';
 import '../remote_config_service.dart';
 
 int estimateTokens(String text) {
@@ -48,15 +50,14 @@ class ContextBudget {
   });
 
   factory ContextBudget.fromRemote() {
-    final rc = RemoteConfigService.instance;
+    final rc = getIt<RemoteConfigService>();
     return ContextBudget(
       maxTokens: rc.getValue<int>('context_max_tokens') ?? 128000,
       reservedForResponse:
           rc.getValue<int>('context_reserved_response') ?? 4096,
       reservedForTools: rc.getValue<int>('context_reserved_tools') ?? 2048,
       reservedForMemory: rc.getValue<int>('context_reserved_memory') ?? 4096,
-      reservedForSystem: rc.getValue<int>('context_reserved_system') ?? 1024,
-    );
+      reservedForSystem: rc.getValue<int>('context_reserved_system') ?? 1024);
   }
 
   int get availableForHistory {

@@ -43,8 +43,7 @@ class ClusterEvent {
     sourceNodeId: sourceNodeId ?? this.sourceNodeId,
     timestamp: timestamp ?? this.timestamp,
     hlcTime: hlcTime ?? this.hlcTime,
-    payload: payload ?? this.payload,
-  );
+    payload: payload ?? this.payload);
 
   Map<String, dynamic> toJson() => {
     'id': id,
@@ -59,11 +58,9 @@ class ClusterEvent {
     id: json['id'] as String,
     type: ClusterEventType.values.firstWhere(
       (t) => t.name == json['type'],
-      orElse: () => ClusterEventType.nodeJoined,
-    ),
+      orElse: () => ClusterEventType.nodeJoined),
     sourceNodeId: json['sourceNodeId'] as String,
     timestamp: json['timestamp'] as int,
     hlcTime: json['hlcTime'] as int? ?? 0,
-    payload: json['payload'] as Map<String, dynamic>? ?? {},
-  );
+    payload: json['payload'] as Map<String, dynamic>? ?? {});
 }

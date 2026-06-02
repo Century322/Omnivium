@@ -14,6 +14,7 @@ import '../plugins/metrics_plugin.dart';
 import '../plugins/notification_plugin.dart';
 import '../plugins/memory_plugin.dart';
 import '../plugins/persistence_backend.dart';
+import '../vocabulary/capability_params.dart';
 
 class OmniviumSDK {
   static OmniviumSDK? _instance;
@@ -70,8 +71,7 @@ class OmniviumSDK {
   }
 
   static Future<OmniviumSDK> initDistributed(
-    DistributedRuntimeConfig config,
-  ) async {
+    DistributedRuntimeConfig config) async {
     final sdk = OmniviumSDK.instance;
     sdk._container = await RuntimeContainer.boot();
     final distributed = DistributedRuntime(config);
@@ -98,7 +98,7 @@ class OmniviumSDK {
 
   Future<CapabilityResult> invokeCapability(
     String capabilityId, {
-    dynamic params,
+    CapabilityParams params,
     int timeoutMs = 30000,
   }) async {
     final container = this.container;
@@ -107,69 +107,57 @@ class OmniviumSDK {
 
     final decision = container.policyEngine.evaluate(
       callerId: identity.identity,
-      targetCapability: capabilityId,
-    );
+      targetCapability: capabilityId);
 
     if (!decision.allowed) {
       return CapabilityResult.fail(
         RuntimeError.permissionDenied(
-          message: 'Policy denied: ${decision.matchedRuleId}',
-        ),
-      );
+          message: 'Policy denied: ${decision.matchedRuleId}'));
     }
 
     if (!container.resourceController.tryAcquireTokens(1)) {
       return CapabilityResult.fail(
-        RuntimeError.unavailable(message: 'Token budget exceeded'),
-      );
+        RuntimeError.unavailable(message: 'Token budget exceeded'));
     }
 
     return container.capabilityRouter.invoke(
       capabilityId,
       params,
       caller: identity,
-      callerPermission: permission,
-    );
+      callerPermission: permission);
   }
 
   Future<CapabilityResult> invokeRemote(
     String capabilityId, {
-    dynamic params,
+    CapabilityParams params,
     int timeoutMs = 30000,
   }) async {
     final dist = _distributed;
     if (dist == null) {
       return CapabilityResult.fail(
         RuntimeError.unavailable(
-          message: 'Distributed runtime not initialized',
-        ),
-      );
+          message: 'Distributed runtime not initialized'));
     }
 
     final route = dist.capabilityRouter.route(capabilityId);
     if (!route.isAvailable) {
       return CapabilityResult.fail(
         RuntimeError.notFound(
-          message: 'Capability not available: $capabilityId (${route.reason})',
-        ),
-      );
+          message: 'Capability not available: $capabilityId (${route.reason})'));
     }
 
     if (route.isLocal) {
       return invokeCapability(
         capabilityId,
         params: params,
-        timeoutMs: timeoutMs,
-      );
+        timeoutMs: timeoutMs);
     }
 
     final lease = dist.leaseManager.tryAcquire('remote_$capabilityId');
     if (lease == null) {
       return CapabilityResult.fail(
         RuntimeError.unavailable(
-          message: 'Could not acquire lease for $capabilityId',
-        ),
-      );
+          message: 'Could not acquire lease for $capabilityId'));
     }
 
     try {
@@ -181,8 +169,7 @@ class OmniviumSDK {
         capabilityId: capabilityId,
         targetNodeId: targetNode,
         params: params,
-        timeout: Duration(milliseconds: timeoutMs),
-      );
+        timeout: Duration(milliseconds: timeoutMs));
       return result;
     } finally {
       dist.leaseManager.release(lease.sessionId);
@@ -195,8 +182,7 @@ class OmniviumSDK {
       id: 'sdk_session_${container.clock.now()}',
       userId: userId ?? 'sdk-user',
       createdAt: container.clock.now(),
-      lastActiveAt: container.clock.now(),
-    );
+      lastActiveAt: container.clock.now());
   }
 
   RuntimeStateSnapshot inspect() => container.stateSnapshot;
@@ -227,8 +213,7 @@ class OmniviumSDK {
             'capabilities': d.capabilityIds,
             'state':
                 container.pluginRegistry.pluginStates[d.id]?.name ?? 'unknown',
-          },
-        )
+          })
         .toList();
   }
 
@@ -261,8 +246,7 @@ class OmniviumSDK {
             'type': e.type,
             'timestamp': e.timestamp,
             'data': e.data,
-          },
-        )
+          })
         .toList();
   }
 
@@ -276,8 +260,7 @@ class OmniviumSDK {
             'createdAt': t.createdAt,
             'spanCount': t.spans.length,
             'totalDurationMs': t.totalDurationMs,
-          },
-        )
+          })
         .toList();
   }
 
@@ -293,8 +276,7 @@ class OmniviumSDK {
             'role': n.role.name,
             'state': n.state.name,
             'incarnation': n.incarnation,
-          },
-        )
+          })
         .toList();
   }
 }
@@ -355,8 +337,7 @@ class PluginBuilder {
     author: _author,
     capabilities: _capabilities,
     permissions: _permissions,
-    isolation: _isolation,
-  );
+    isolation: _isolation);
 
   Future<bool> register(PluginHandler handler) async {
     final descriptor = build();
@@ -419,6 +400,5 @@ class CapabilityBuilder {
     permission: _permission,
     isDestructive: _isDestructive,
     timeoutMs: _timeoutMs,
-    maxRetries: _maxRetries,
-  );
+    maxRetries: _maxRetries);
 }

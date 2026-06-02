@@ -1,3 +1,5 @@
+
+import 'di/app_di.dart';
 import 'app_logger.dart';
 import 'dart:async';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
@@ -22,6 +24,7 @@ class VoiceService {
   bool _sttInitialized = false;
   bool _ttsInitialized = false;
   bool _isListening = false;
+  bool _isRestarting = false;
   bool _isSpeaking = false;
 
   bool get isListening => _isListening;
@@ -59,13 +62,12 @@ class VoiceService {
       _sttInitialized = await _stt.initialize(
         onError: (error) => AppLogger.instance.info('STT Error: $error'),
         onStatus: (status) {
-          if (status == stt.SpeechToText.notListeningStatus) {
+          if (status == stt.SpeechToText.notListeningStatus && !_isRestarting) {
             _isListening = false;
             _onListeningStateChanged.add(false);
           }
         },
-        debugLogging: false,
-      );
+        debugLogging: false);
     } catch (e) {
       AppLogger.instance.info('STT init failed: $e');
       _sttInitialized = false;
@@ -152,10 +154,14 @@ class VoiceService {
   }
 
   Future<bool> startListening() async {
-    if (!_sttInitialized || _isListening) return false;
     if (_voiceMode == VoiceMode.off) return false;
 
-    final granted = await PermissionService.instance.requestMicrophone();
+    if (!_sttInitialized) {
+      await _initSTT();
+    }
+    if (!_sttInitialized || _isListening) return false;
+
+    final granted = await getIt<PermissionService>().requestMicrophone();
     if (!granted) return false;
 
     try {
@@ -165,22 +171,46 @@ class VoiceService {
         onResult: (result) {
           _onSpeechResult.add(result.recognizedWords);
           if (result.finalResult) {
-            _isListening = false;
-            _onListeningStateChanged.add(false);
             _onFinalResult.add(result.recognizedWords);
+            _restartListening();
           }
         },
-        listenFor: const Duration(seconds: 30),
-        pauseFor: const Duration(seconds: 3),
+        listenFor: const Duration(seconds: 60),
+        pauseFor: const Duration(seconds: 10),
         listenOptions: stt.SpeechListenOptions(partialResults: true),
-        localeId: 'zh_CN',
-      );
+        localeId: 'zh_CN');
       return true;
     } catch (e) {
       AppLogger.instance.info('Start listening failed: $e');
       _isListening = false;
       _onListeningStateChanged.add(false);
       return false;
+    }
+  }
+
+  Future<void> _restartListening() async {
+    if (!_isListening) return;
+    _isRestarting = true;
+    try {
+      await _stt.stop();
+      await _stt.listen(
+        onResult: (result) {
+          _onSpeechResult.add(result.recognizedWords);
+          if (result.finalResult) {
+            _onFinalResult.add(result.recognizedWords);
+            _restartListening();
+          }
+        },
+        listenFor: const Duration(seconds: 60),
+        pauseFor: const Duration(seconds: 10),
+        listenOptions: stt.SpeechListenOptions(partialResults: true),
+        localeId: 'zh_CN');
+      _isRestarting = false;
+    } catch (e) {
+      AppLogger.instance.info('Restart listening failed: $e');
+      _isRestarting = false;
+      _isListening = false;
+      _onListeningStateChanged.add(false);
     }
   }
 

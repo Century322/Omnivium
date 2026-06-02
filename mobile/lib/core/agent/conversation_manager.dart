@@ -1,33 +1,30 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import '../memory/context_budget.dart';
 import 'agent_state.dart';
 import '../providers/ai_provider.dart';
 
-class ConversationMessage {
-  final String role;
-  final String content;
-  final DateTime timestamp;
-  final bool isStreaming;
-  final List<ThoughtStep> thoughts;
+part 'conversation_manager.freezed.dart';
 
-  const ConversationMessage({
-    required this.role,
-    required this.content,
-    required this.timestamp,
-    this.isStreaming = false,
-    this.thoughts = const [],
-  });
+@freezed
+class ConversationMessage with _$ConversationMessage {
+  const ConversationMessage._();
 
-  ConversationMessage copyWith({
+  const factory ConversationMessage({
+    required String role,
+    required String content,
+    required DateTime timestamp,
+    @Default(false) bool isStreaming,
+    @Default(<ThoughtStep>[]) List<ThoughtStep> thoughts,
+  }) = _ConversationMessage;
+
+  ConversationMessage copyWithFields({
     String? content,
     bool? isStreaming,
     List<ThoughtStep>? thoughts,
-  }) => ConversationMessage(
-    role: role,
+  }) => copyWith(
     content: content ?? this.content,
-    timestamp: timestamp,
     isStreaming: isStreaming ?? this.isStreaming,
-    thoughts: thoughts ?? this.thoughts,
-  );
+    thoughts: thoughts ?? this.thoughts);
 }
 
 class ConversationManager {
@@ -46,9 +43,7 @@ class ConversationManager {
       ConversationMessage(
         role: 'user',
         content: content,
-        timestamp: DateTime.now(),
-      ),
-    );
+        timestamp: DateTime.now()));
     _chatHistory.add(ChatMessage(role: 'user', content: content));
   }
 
@@ -58,9 +53,7 @@ class ConversationManager {
         role: 'assistant',
         content: '',
         timestamp: DateTime.now(),
-        isStreaming: true,
-      ),
-    );
+        isStreaming: true));
     return _messages.length - 1;
   }
 
@@ -74,8 +67,7 @@ class ConversationManager {
     if (index < _messages.length) {
       _messages[index] = _messages[index].copyWith(
         content: fullContent,
-        isStreaming: false,
-      );
+        isStreaming: false);
     }
     _chatHistory.add(ChatMessage(role: 'assistant', content: fullContent));
   }
@@ -85,9 +77,7 @@ class ConversationManager {
       ConversationMessage(
         role: 'assistant',
         content: content,
-        timestamp: DateTime.now(),
-      ),
-    );
+        timestamp: DateTime.now()));
     _chatHistory.add(ChatMessage(role: 'assistant', content: content));
   }
 
@@ -97,13 +87,11 @@ class ConversationManager {
     _messages.removeAt(assistantIndex);
     _messages.removeAt(assistantIndex - 1);
     _chatHistory.removeWhere(
-      (m) => m.role == 'user' && m.content == userContent,
-    );
+      (m) => m.role == 'user' && m.content == userContent);
     _chatHistory.removeWhere(
       (m) =>
           m.role == 'assistant' &&
-          _messages.every((cm) => cm.content != m.content),
-    );
+          _messages.every((cm) => cm.content != m.content));
   }
 
   void addThought(
@@ -116,9 +104,7 @@ class ConversationManager {
         type: type,
         content: content,
         timestamp: DateTime.now(),
-        metadata: metadata,
-      ),
-    );
+        metadata: metadata));
   }
 
   void clearThoughts() {

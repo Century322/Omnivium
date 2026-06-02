@@ -7,6 +7,7 @@ import '../vocabulary/runtime_stream.dart';
 import '../vocabulary/runtime_route.dart';
 import '../vocabulary/runtime_metadata.dart';
 import '../vocabulary/capability_context.dart';
+import '../vocabulary/capability_params.dart';
 
 class FakeAgentPlugin implements PluginHandler {
   int _chatCount = 0;
@@ -17,25 +18,22 @@ class FakeAgentPlugin implements PluginHandler {
   @override
   Future<HandlerResult> handleMessage(
     RuntimeMessage message,
-    CapabilityContext context,
-  ) async {
+    CapabilityContext context) async {
     return HandlerResult.ok();
   }
 
   @override
   Future<HandlerResult> handleEvent(
     RuntimeEvent event,
-    CapabilityContext context,
-  ) async {
+    CapabilityContext context) async {
     return HandlerResult.ok();
   }
 
   @override
   Future<CapabilityResult> invokeCapability(
     String capabilityId,
-    dynamic params,
-    CapabilityContext context,
-  ) async {
+    CapabilityParams params,
+    CapabilityContext context) async {
     switch (capabilityId) {
       case 'agent.chat':
         return _handleChat(params, context);
@@ -49,31 +47,26 @@ class FakeAgentPlugin implements PluginHandler {
         return CapabilityResult.fail(
           RuntimeError(
             code: 'UNKNOWN_CAPABILITY',
-            message: 'Unknown capability: $capabilityId',
-          ),
-        );
+            message: 'Unknown capability: $capabilityId'));
     }
   }
 
   Future<CapabilityResult> _handleChat(
-    dynamic params,
-    CapabilityContext context,
-  ) async {
+    CapabilityParams params,
+    CapabilityContext context) async {
     _chatCount++;
-    final message = params is Map
-        ? params['message'] as String?
+    final message = params.isNotEmpty
+        ? params.string('')
         : params?.toString() ?? '';
 
-    await Future.delayed(const Duration(milliseconds: 100));
+    await Future<void>.delayed(const Duration(milliseconds: 100));
 
     if (context.shouldAbort) {
       return CapabilityResult.fail(
         const RuntimeError(
           code: 'CANCELLED',
           message: 'Chat cancelled',
-          recoverable: false,
-        ),
-      );
+          recoverable: false));
     }
 
     return CapabilityResult.ok({
@@ -83,23 +76,21 @@ class FakeAgentPlugin implements PluginHandler {
     });
   }
 
-  CapabilityResult _handleStream(dynamic params, CapabilityContext context) {
+  CapabilityResult _handleStream(CapabilityParams params, CapabilityContext context) {
     _streamCount++;
-    final message = params is Map
-        ? params['message'] as String?
+    final message = params.isNotEmpty
+        ? params.string('')
         : params?.toString() ?? '';
     final words = 'Streaming fake response to: $message'.split(' ');
     final meta = RuntimeMetadata(
       traceId: 'fake',
-      spanId: 'stream_$_streamCount',
-    );
+      spanId: 'stream_$_streamCount');
 
     final (stream, controller) = RuntimeStream.create(
       id: 'stream_$_streamCount',
       type: 'agent.stream',
       source: RuntimeRoute(capability: 'agent.stream', pluginId: 'fake-agent'),
-      backpressure: BackpressureStrategy.buffer,
-    );
+      backpressure: BackpressureStrategy.buffer);
 
     () async {
       for (var i = 0; i < words.length; i++) {
@@ -109,9 +100,7 @@ class FakeAgentPlugin implements PluginHandler {
               index: i,
               data: '[CANCELLED]',
               metadata: meta,
-              isFinal: true,
-            ),
-          );
+              isFinal: true));
           await controller.close();
           return;
         }
@@ -120,10 +109,8 @@ class FakeAgentPlugin implements PluginHandler {
             index: i,
             data: '${words[i]} ',
             metadata: meta,
-            isFinal: i == words.length - 1,
-          ),
-        );
-        await Future.delayed(const Duration(milliseconds: 50));
+            isFinal: i == words.length - 1));
+        await Future<void>.delayed(const Duration(milliseconds: 50));
       }
       await controller.close();
     }();
@@ -132,9 +119,8 @@ class FakeAgentPlugin implements PluginHandler {
   }
 
   Future<CapabilityResult> _handleCancel(
-    dynamic params,
-    CapabilityContext context,
-  ) async {
+    CapabilityParams params,
+    CapabilityContext context) async {
     _cancelCount++;
     return CapabilityResult.ok({
       'cancelled': true,
@@ -143,23 +129,20 @@ class FakeAgentPlugin implements PluginHandler {
   }
 
   Future<CapabilityResult> _handleExecute(
-    dynamic params,
-    CapabilityContext context,
-  ) async {
+    CapabilityParams params,
+    CapabilityContext context) async {
     _executeCount++;
-    final toolName = params is Map ? params['tool'] as String? : 'unknown';
-    final toolParams = params is Map ? params['params'] : null;
+    final toolName = params.string('tool') ?? 'unknown';
+    final toolParams = params.isNotEmpty ? params.raw['params'] : null;
 
-    await Future.delayed(const Duration(milliseconds: 50));
+    await Future<void>.delayed(const Duration(milliseconds: 50));
 
     if (context.shouldAbort) {
       return CapabilityResult.fail(
         const RuntimeError(
           code: 'CANCELLED',
           message: 'Execute cancelled',
-          recoverable: false,
-        ),
-      );
+          recoverable: false));
     }
 
     if (toolName == 'fail') {
@@ -167,21 +150,19 @@ class FakeAgentPlugin implements PluginHandler {
         const RuntimeError(
           code: 'TOOL_FAILED',
           message: 'Tool execution failed',
-          recoverable: true,
-        ),
-      );
+          recoverable: true));
     }
 
     if (toolName == 'timeout') {
-      await Future.delayed(const Duration(seconds: 30));
+      await Future<void>.delayed(const Duration(seconds: 30));
       return CapabilityResult.ok({'result': 'should not reach'});
     }
 
     if (toolName == 'parallel') {
       final results = await Future.wait([
-        Future.delayed(const Duration(milliseconds: 100)).then((_) => 'task1'),
-        Future.delayed(const Duration(milliseconds: 150)).then((_) => 'task2'),
-        Future.delayed(const Duration(milliseconds: 50)).then((_) => 'task3'),
+        Future<void>.delayed(const Duration(milliseconds: 100)).then((_) => 'task1'),
+        Future<void>.delayed(const Duration(milliseconds: 150)).then((_) => 'task2'),
+        Future<void>.delayed(const Duration(milliseconds: 50)).then((_) => 'task3'),
       ]);
       return CapabilityResult.ok({
         'results': results,
@@ -209,21 +190,18 @@ class FakeAgentPlugin implements PluginHandler {
         name: 'Chat',
         description: 'Simulate agent chat',
         permission: 'auto',
-        timeoutMs: 5000,
-      ),
+        timeoutMs: 5000),
       CapabilityDeclaration(
         id: 'agent.stream',
         name: 'Stream',
         description: 'Simulate streaming response',
         permission: 'auto',
-        timeoutMs: 10000,
-      ),
+        timeoutMs: 10000),
       CapabilityDeclaration(
         id: 'agent.cancel',
         name: 'Cancel',
         description: 'Cancel ongoing operation',
-        permission: 'auto',
-      ),
+        permission: 'auto'),
       CapabilityDeclaration(
         id: 'agent.execute',
         name: 'Execute',
@@ -231,8 +209,6 @@ class FakeAgentPlugin implements PluginHandler {
             'Simulate tool execution (use tool=fail/timeout/parallel for testing)',
         permission: 'confirm',
         timeoutMs: 5000,
-        maxRetries: 2,
-      ),
-    ],
-  );
+        maxRetries: 2),
+    ]);
 }

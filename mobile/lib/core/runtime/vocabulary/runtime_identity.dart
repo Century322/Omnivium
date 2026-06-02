@@ -1,13 +1,16 @@
-class RuntimeIdentity {
-  final String identity;
-  final String instance;
-  final String node;
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  const RuntimeIdentity({
-    required this.identity,
-    this.instance = 'default',
-    this.node = 'local',
-  });
+part 'runtime_identity.freezed.dart';
+
+@freezed
+class RuntimeIdentity with _$RuntimeIdentity {
+  const RuntimeIdentity._();
+
+  const factory RuntimeIdentity({
+    required String identity,
+    @Default('default') String instance,
+    @Default('local') String node,
+  }) = _RuntimeIdentity;
 
   static RuntimeIdentity forPlugin(
     String pluginId, {
@@ -19,17 +22,5 @@ class RuntimeIdentity {
       RuntimeIdentity(identity: 'runtime', instance: 'kernel', node: nodeId);
 
   bool get isLocal => node == 'local';
-
   String get address => '$node/$identity/$instance';
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is RuntimeIdentity &&
-          identity == other.identity &&
-          instance == other.instance &&
-          node == other.node;
-
-  @override
-  int get hashCode => Object.hash(identity, instance, node);
 }

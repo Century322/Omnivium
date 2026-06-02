@@ -58,8 +58,7 @@ class DistributedSpan {
   };
 
   factory DistributedSpan.fromJson(
-    Map<String, dynamic> json,
-  ) => DistributedSpan(
+    Map<String, dynamic> json) => DistributedSpan(
     spanId: json['spanId'] as String,
     parentSpanId: json['parentSpanId'] as String?,
     traceId: json['traceId'] as String,
@@ -72,8 +71,7 @@ class DistributedSpan {
     status: json['status'] as String? ?? 'ok',
     tags: (json['tags'] as Map<String, dynamic>?)?.cast<String, String>() ?? {},
     remoteParentSpanId: json['remoteParentSpanId'] as String?,
-    remoteNodeId: json['remoteNodeId'] as String?,
-  );
+    remoteNodeId: json['remoteNodeId'] as String?);
 }
 
 class DistributedTrace {
@@ -147,9 +145,7 @@ class TracePropagationContext {
         baggage: Map.fromEntries(
           headers.entries
               .where((e) => e.key.startsWith('x-baggage-'))
-              .map((e) => MapEntry(e.key.substring(10), e.value)),
-        ),
-      );
+              .map((e) => MapEntry(e.key.substring(10), e.value))));
 }
 
 class DistributedTraceService {
@@ -176,8 +172,7 @@ class DistributedTraceService {
       traceId: id,
       rootNodeId: _localNodeId,
       createdAt: now.physicalTime,
-      tags: tags,
-    );
+      tags: tags);
     _traces[id] = trace;
     return trace;
   }
@@ -204,8 +199,7 @@ class DistributedTraceService {
       startTimeHlc: now.physicalTime,
       tags: tags,
       remoteParentSpanId: remoteParentSpanId,
-      remoteNodeId: remoteNodeId,
-    );
+      remoteNodeId: remoteNodeId);
 
     final trace = _traces[traceId];
     if (trace != null) {
@@ -230,8 +224,7 @@ class DistributedTraceService {
       status: status ?? span.status,
       tags: span.tags,
       remoteParentSpanId: span.remoteParentSpanId,
-      remoteNodeId: span.remoteNodeId,
-    );
+      remoteNodeId: span.remoteNodeId);
 
     final trace = _traces[span.traceId];
     if (trace != null) {
@@ -251,8 +244,7 @@ class DistributedTraceService {
       remoteParentSpanId: context.parentSpanId,
       remoteNodeId: context.originNodeId,
       operation: operation,
-      tags: {'propagated': 'true'},
-    );
+      tags: {'propagated': 'true'});
   }
 
   TracePropagationContext propagateContext(DistributedSpan span) {
@@ -260,8 +252,7 @@ class DistributedTraceService {
       traceId: span.traceId,
       parentSpanId: span.spanId,
       originNodeId: _localNodeId,
-      hlcTime: _clock.now.physicalTime,
-    );
+      hlcTime: _clock.now.physicalTime);
   }
 
   DistributedTrace? getTrace(String traceId) => _traces[traceId];
@@ -278,8 +269,7 @@ class DistributedTraceService {
       trace = DistributedTrace(
         traceId: traceId,
         rootNodeId: remoteSpans.firstOrNull?.nodeId ?? 'unknown',
-        createdAt: _clock.tick().physicalTime,
-      );
+        createdAt: _clock.tick().physicalTime);
       _traces[traceId] = trace;
     }
 

@@ -1,3 +1,5 @@
+
+import 'di/app_di.dart';
 import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
@@ -18,7 +20,7 @@ class TotpService {
   bool get isEnabled => _enabled;
 
   Future<void> init() async {
-    final storage = SecureStorageService.instance;
+    final storage = getIt<SecureStorageService>();
     _secret = await storage.read(_secretKey);
     final enabledStr = await storage.read(_enabledKey);
     _enabled = enabledStr == 'true';
@@ -29,7 +31,7 @@ class TotpService {
     final keyBytes = List<int>.generate(20, (_) => random.nextInt(256));
     final secret = base64Encode(keyBytes);
     _secret = secret;
-    final storage = SecureStorageService.instance;
+    final storage = getIt<SecureStorageService>();
     await storage.write(_secretKey, secret);
     return secret;
   }
@@ -37,13 +39,13 @@ class TotpService {
   Future<void> enable() async {
     if (_secret == null) await generateSecret();
     _enabled = true;
-    final storage = SecureStorageService.instance;
+    final storage = getIt<SecureStorageService>();
     await storage.write(_enabledKey, 'true');
   }
 
   Future<void> disable() async {
     _enabled = false;
-    final storage = SecureStorageService.instance;
+    final storage = getIt<SecureStorageService>();
     await storage.write(_enabledKey, 'false');
   }
 
@@ -66,8 +68,7 @@ class TotpService {
     timeBytes.setInt64(0, timeStep);
     final hmacBytes = Hmac(
       sha1,
-      key,
-    ).convert(timeBytes.buffer.asUint8List()).bytes;
+      key).convert(timeBytes.buffer.asUint8List()).bytes;
     final offset = hmacBytes[hmacBytes.length - 1] & 0x0f;
     final binary =
         ((hmacBytes[offset] & 0x7f) << 24) |

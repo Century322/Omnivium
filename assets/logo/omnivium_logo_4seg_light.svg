@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" fill="#FFFFFF"/>
+  <g transform="translate(256.0, 256.0)">
+
+    <!-- THICK -->
+    <path d="M 87.50,-151.55 A 175.00,175.00 0 0,1 166.43,54.08"
+          fill="none" stroke="#000000" stroke-width="13.00" stroke-linecap="round"/>
+
+    <!-- normal -->
+    <path d="M 151.55,87.50 A 175.00,175.00 0 0,1 -54.08,166.43"
+          fill="none" stroke="#000000" stroke-width="10.00" stroke-linecap="round"/>
+
+    <!-- THICK -->
+    <path d="M -87.50,151.55 A 175.00,175.00 0 0,1 -166.43,-54.08"
+          fill="none" stroke="#000000" stroke-width="13.00" stroke-linecap="round"/>
+
+    <!-- normal -->
+    <path d="M -151.55,-87.50 A 175.00,175.00 0 0,1 54.08,-166.43"
+          fill="none" stroke="#000000" stroke-width="10.00" stroke-linecap="round"/>
+  </g>
+</svg>

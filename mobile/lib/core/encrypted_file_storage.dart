@@ -1,8 +1,9 @@
+﻿
+import 'di/app_di.dart';
 import 'dart:convert';
 import 'dart:io' if (dart.library.html) '';
 import 'dart:math';
 import 'dart:typed_data';
-import 'package:collection/collection.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:crypto/crypto.dart';
 import 'package:path_provider/path_provider.dart';
@@ -25,7 +26,7 @@ class EncryptedFileStorage {
   }
 
   Future<void> init() async {
-    final storage = SecureStorageService.instance;
+    final storage = getIt<SecureStorageService>();
     var keyBase64 = await storage.read(_masterKeyStorageKey);
     if (keyBase64 == null) {
       final random = Random.secure();
@@ -84,7 +85,7 @@ class EncryptedFileStorage {
 
     final hmacKey = Hmac(sha256, key.bytes);
     final computedMac = hmacKey.convert([...ivBytes, ...data]);
-    if (!ListEquality().equals(macBytes, computedMac.bytes)) {
+    if (!_listEquals(macBytes, computedMac.bytes)) {
       throw Exception('HMAC verification failed: data may be tampered');
     }
 
@@ -92,8 +93,7 @@ class EncryptedFileStorage {
     final encrypter = Encrypter(AES(key, mode: AESMode.cbc));
     final decrypted = encrypter.decryptBytes(
       Encrypted(Uint8List.fromList(data)),
-      iv: iv,
-    );
+      iv: iv);
     return Uint8List.fromList(decrypted);
   }
 
@@ -131,7 +131,7 @@ class EncryptedFileStorage {
     final data = raw.sublist(16, raw.length - hmacLen);
     final hmacKey = Hmac(sha256, key.bytes);
     final computedMac = hmacKey.convert([...ivBytes, ...data]);
-    if (!ListEquality().equals(macBytes, computedMac.bytes)) {
+    if (!_listEquals(macBytes, computedMac.bytes)) {
       throw Exception('HMAC verification failed: data may be tampered');
     }
     final iv = IV(ivBytes);
@@ -173,5 +173,13 @@ class EncryptedFileStorage {
     } catch (e) {
       AppLogger.instance.info('File migration failed: $e');
     }
+  }
+
+  static bool _listEquals(List<int> a, List<int> b) {
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
   }
 }

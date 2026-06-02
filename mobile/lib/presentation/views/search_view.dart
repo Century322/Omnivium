@@ -1,17 +1,18 @@
-import '../../core/app_logger.dart';
+﻿import '../../core/app_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:matrix/matrix.dart';
 import '../widgets/skeleton_loader.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../theme/app_colors.dart';
-import '../theme/locale_provider.dart';
-import '../../core/app_provider.dart';
-import '../../core/navigation_provider.dart';
+import '../theme/locale_cubit.dart';
 
-class SearchView extends StatefulWidget {
-  final AppProvider provider;
-  const SearchView({super.key, required this.provider});
+import '../../core/navigation_cubit.dart';
+import '../../core/di/app_di.dart';
+import '../../core/matrix/matrix_cubit.dart';
+import '../../core/matrix/matrix_dtos.dart';
+import '../../core/session_cubit.dart';
+
+class SearchView extends StatefulWidget { const SearchView({super.key});
 
   @override
   State<SearchView> createState() => _SearchViewState();
@@ -64,36 +65,20 @@ class _SearchViewState extends State<SearchView> {
     await _saveHistory(query.trim());
 
     final results = <_SearchResult>[];
-    final matrix = widget.provider.matrix;
+    final matrix = getIt<MatrixCubit>();
     bool messageSearchFailed = false;
     bool userSearchFailed = false;
-    if (matrix.isLoggedIn && matrix.client != null) {
+    if (matrix.isLoggedIn) {
       try {
-        final rooms = matrix.rooms;
-        final roomsToSearch = rooms.length > 10 ? rooms.sublist(0, 10) : rooms;
-        for (final room in roomsToSearch) {
-          Timeline? timeline;
-          try {
-            timeline = await room.getTimeline();
-            var count = 0;
-            for (final event in timeline.events) {
-              if (count >= 20) break;
-              if (event.body.toLowerCase().contains(query.toLowerCase())) {
-                results.add(
-                  _SearchResult(
-                    type: _SearchResultType.message,
-                    title: room.getLocalizedDisplayname(),
-                    subtitle: event.body,
-                    roomId: room.id,
-                    eventId: event.eventId,
-                  ),
-                );
-                count++;
-              }
-            }
-          } finally {
-            timeline = null;
-          }
+        final messageResults = await matrix.searchMessages(query);
+        for (final msg in messageResults) {
+          results.add(
+            _SearchResult(
+              type: _SearchResultType.message,
+              title: msg.roomName,
+              subtitle: msg.body,
+              roomId: msg.roomId,
+              eventId: msg.eventId));
         }
       } catch (e, stackTrace) {
         messageSearchFailed = true;
@@ -109,9 +94,7 @@ class _SearchViewState extends State<SearchView> {
                   user.displayName ??
                   user.userId.split(':').first.replaceFirst('@', ''),
               subtitle: user.userId,
-              userId: user.userId,
-            ),
-          );
+              userId: user.userId));
         }
       } catch (e, stackTrace) {
         userSearchFailed = true;
@@ -119,7 +102,7 @@ class _SearchViewState extends State<SearchView> {
       }
     }
 
-    for (final session in widget.provider.session.sessions.take(20)) {
+    for (final session in getIt<SessionCubit>().sessions.take(20)) {
       if (session.title.toLowerCase().contains(query.toLowerCase())) {
         results.add(
           _SearchResult(
@@ -127,9 +110,7 @@ class _SearchViewState extends State<SearchView> {
             title: session.title,
             subtitle:
                 '${session.messages.length} ${localeProvider.t('messages')}',
-            sessionId: session.id,
-          ),
-        );
+            sessionId: session.id));
       }
     }
 
@@ -162,9 +143,7 @@ class _SearchViewState extends State<SearchView> {
                   ? SingleChildScrollView(
                       padding: const EdgeInsets.all(20),
                       child: Column(
-                        children: List.generate(4, (_) => const CardSkeleton()),
-                      ),
-                    )
+                        children: List.generate(4, (_) => const CardSkeleton())))
                   : _searchError
                   ? Center(
                       child: Column(
@@ -173,36 +152,25 @@ class _SearchViewState extends State<SearchView> {
                           Icon(
                             LucideIcons.searchX,
                             size: 48,
-                            color: AppColors.mut(context),
-                          ),
+                            color: AppColors.mut(context)),
                           const SizedBox(height: 12),
                           Text(
                             localeProvider.t('search_error'),
                             style: TextStyle(
                               color: AppColors.textSecondary(context),
-                              fontSize: 15,
-                            ),
-                          ),
+                              fontSize: 15)),
                           const SizedBox(height: 16),
                           FilledButton(
                             style: FilledButton.styleFrom(
                               backgroundColor: AppColors.acc(context),
-                              foregroundColor: AppColors.bg(context),
-                            ),
+                              foregroundColor: AppColors.bg(context)),
                             onPressed: () => _doSearch(_query),
-                            child: Text(localeProvider.t('retry')),
-                          ),
-                        ],
-                      ),
-                    )
+                            child: Text(localeProvider.t('retry'))),
+                        ]))
                   : _query.isEmpty
                   ? _buildHistorySection(context)
-                  : _buildResults(context),
-            ),
-          ],
-        ),
-      ),
-    );
+                  : _buildResults(context)),
+          ])));
   }
 
   Widget _buildSearchBar(BuildContext context) {
@@ -215,33 +183,27 @@ class _SearchViewState extends State<SearchView> {
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () =>
-                  widget.provider.navigation.setCurrentView(ViewState.home),
+                  getIt<NavigationCubit>().setCurrentView(ViewState.home),
               child: Padding(
                 padding: const EdgeInsets.all(8),
                 child: Icon(
                   LucideIcons.arrowLeft,
                   color: AppColors.textTertiary(context),
-                  size: 20,
-                ),
-              ),
-            ),
-          ),
+                  size: 20)))),
           const SizedBox(width: 4),
           Expanded(
             child: Container(
               height: 44,
               decoration: BoxDecoration(
                 color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: BorderRadius.circular(22),
-              ),
+                borderRadius: BorderRadius.circular(22)),
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 children: [
                   Icon(
                     LucideIcons.search,
                     size: 18,
-                    color: AppColors.textHint(context),
-                  ),
+                    color: AppColors.textHint(context)),
                   const SizedBox(width: 12),
                   Expanded(
                     child: TextField(
@@ -251,21 +213,16 @@ class _SearchViewState extends State<SearchView> {
                       style: TextStyle(
                         color: AppColors.textPrimary(context),
                         fontSize: 15,
-                        fontWeight: FontWeight.w500,
-                      ),
+                        fontWeight: FontWeight.w500),
                       decoration: InputDecoration(
                         labelText: localeProvider.t('search_posts'),
                         hintStyle: TextStyle(
                           color: AppColors.textDisabled(context),
-                          fontWeight: FontWeight.w500,
-                        ),
+                          fontWeight: FontWeight.w500),
                         border: InputBorder.none,
                         focusedBorder: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                      ),
-                      onSubmitted: _doSearch,
-                    ),
-                  ),
+                        enabledBorder: InputBorder.none),
+                      onSubmitted: _doSearch)),
                   if (_searchController.text.isNotEmpty)
                     Semantics(
                       label: localeProvider.t('clear_search'),
@@ -282,17 +239,9 @@ class _SearchViewState extends State<SearchView> {
                         child: Icon(
                           LucideIcons.x,
                           size: 16,
-                          color: AppColors.textHint(context),
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+                          color: AppColors.textHint(context)))),
+                ]))),
+        ]));
   }
 
   Widget _buildHistorySection(BuildContext context) {
@@ -307,33 +256,24 @@ class _SearchViewState extends State<SearchView> {
               decoration: BoxDecoration(
                 color: AppColors.divider(context),
                 borderRadius: BorderRadius.circular(32),
-                border: Border.all(color: AppColors.divider(context)),
-              ),
+                border: Border.all(color: AppColors.divider(context))),
               child: Icon(
                 LucideIcons.search,
                 color: AppColors.textDisabled(context),
-                size: 28,
-              ),
-            ),
+                size: 28)),
             const SizedBox(height: 16),
             Text(
               localeProvider.t('no_search_history'),
               style: TextStyle(
                 fontWeight: FontWeight.w500,
-                color: AppColors.textHint(context),
-              ),
-            ),
+                color: AppColors.textHint(context))),
             const SizedBox(height: 4),
             Text(
               localeProvider.t('search_history_desc'),
               style: TextStyle(
                 fontSize: 12,
-                color: AppColors.textDisabled(context),
-              ),
-            ),
-          ],
-        ),
-      );
+                color: AppColors.textDisabled(context))),
+          ]));
     }
 
     return ListView(
@@ -348,9 +288,7 @@ class _SearchViewState extends State<SearchView> {
                 style: TextStyle(
                   color: AppColors.mut(context),
                   fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+                  fontWeight: FontWeight.w600)),
               Semantics(
                 label: localeProvider.t('clear_search_history'),
                 button: true,
@@ -361,41 +299,28 @@ class _SearchViewState extends State<SearchView> {
                     localeProvider.t('clear'),
                     style: TextStyle(
                       color: AppColors.acc(context),
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+                      fontSize: 12)))),
+            ])),
         ..._searchHistory.map(
           (h) => ListTile(
             leading: Icon(
               LucideIcons.clock,
               size: 18,
-              color: AppColors.textDisabled(context),
-            ),
+              color: AppColors.textDisabled(context)),
             title: Text(
               h,
               style: TextStyle(
                 color: AppColors.textPrimary(context),
-                fontSize: 14,
-              ),
-            ),
+                fontSize: 14)),
             trailing: Icon(
               LucideIcons.arrowUpRight,
               size: 16,
-              color: AppColors.textDisabled(context),
-            ),
+              color: AppColors.textDisabled(context)),
             onTap: () {
               _searchController.text = h;
               _doSearch(h);
-            },
-          ),
-        ),
-      ],
-    );
+            })),
+      ]);
   }
 
   Widget _buildResults(BuildContext context) {
@@ -407,19 +332,14 @@ class _SearchViewState extends State<SearchView> {
             Icon(
               LucideIcons.searchX,
               size: 48,
-              color: AppColors.textDisabled(context),
-            ),
+              color: AppColors.textDisabled(context)),
             const SizedBox(height: 12),
             Text(
               localeProvider.t('no_search_results'),
               style: TextStyle(
                 color: AppColors.textHint(context),
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-      );
+                fontWeight: FontWeight.w500)),
+          ]));
     }
 
     final messages = _results
@@ -441,9 +361,7 @@ class _SearchViewState extends State<SearchView> {
       return Center(
         child: Text(
           localeProvider.t('no_results'),
-          style: TextStyle(color: AppColors.textTertiary(context)),
-        ),
-      );
+          style: TextStyle(color: AppColors.textTertiary(context))));
     }
     return ListView.builder(
       itemCount: items.length,
@@ -454,31 +372,24 @@ class _SearchViewState extends State<SearchView> {
             child: _buildSectionHeader(
               context,
               localeProvider.t('conversations'),
-              conversations.length,
-            ),
-          );
+              conversations.length));
         }
         if (item == '_header_msg') {
           return RepaintBoundary(
             child: _buildSectionHeader(
               context,
               localeProvider.t('messages'),
-              messages.length,
-            ),
-          );
+              messages.length));
         }
         if (item == '_header_user') {
           return RepaintBoundary(
             child: _buildSectionHeader(
               context,
               localeProvider.t('contacts'),
-              users.length,
-            ),
-          );
+              users.length));
         }
         return _buildResultTile(context, item as _SearchResult);
-      },
-    );
+      });
   }
 
   Widget _buildSectionHeader(BuildContext context, String title, int count) {
@@ -489,10 +400,7 @@ class _SearchViewState extends State<SearchView> {
         style: TextStyle(
           color: AppColors.mut(context),
           fontSize: 12,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
+          fontWeight: FontWeight.w600)));
   }
 
   Widget _buildResultTile(BuildContext context, _SearchResult result) {
@@ -512,24 +420,19 @@ class _SearchViewState extends State<SearchView> {
     return ListTile(
       leading: CircleAvatar(
         backgroundColor: AppColors.accBg(context),
-        child: Icon(icon, size: 18, color: AppColors.acc(context)),
-      ),
+        child: Icon(icon, size: 18, color: AppColors.acc(context))),
       title: Text(
         result.title,
         style: TextStyle(
           color: AppColors.textPrimary(context),
           fontWeight: FontWeight.w500,
-          fontSize: 14,
-        ),
-      ),
+          fontSize: 14)),
       subtitle: Text(
         result.subtitle,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: TextStyle(color: AppColors.mut(context), fontSize: 12),
-      ),
-      onTap: () => _handleResultTap(result),
-    );
+        style: TextStyle(color: AppColors.mut(context), fontSize: 12)),
+      onTap: () => _handleResultTap(result));
   }
 
   void _handleResultTap(_SearchResult result) {
@@ -537,24 +440,24 @@ class _SearchViewState extends State<SearchView> {
       case _SearchResultType.message:
         final roomId = result.roomId;
         if (roomId != null) {
-          widget.provider.matrix.setActiveRoom(roomId);
-          widget.provider.navigation.setCurrentView(ViewState.home);
+          getIt<MatrixCubit>().setActiveRoom(roomId);
+          getIt<NavigationCubit>().setCurrentView(ViewState.home);
         }
         break;
       case _SearchResultType.user:
         final userId = result.userId;
         if (userId != null) {
-          widget.provider.matrix.createDirectChat(userId).then((roomId) {
-            widget.provider.matrix.setActiveRoom(roomId);
-            widget.provider.navigation.setCurrentView(ViewState.home);
+          getIt<MatrixCubit>().createDirectChat(userId).then((roomId) {
+            getIt<MatrixCubit>().setActiveRoom(roomId);
+            getIt<NavigationCubit>().setCurrentView(ViewState.home);
           });
         }
         break;
       case _SearchResultType.conversation:
         final sessionId = result.sessionId;
         if (sessionId != null) {
-          widget.provider.session.switchSession(sessionId);
-          widget.provider.navigation.setCurrentView(ViewState.home);
+          getIt<SessionCubit>().switchSession(sessionId);
+          getIt<NavigationCubit>().setCurrentView(ViewState.home);
         }
         break;
     }

@@ -94,8 +94,7 @@ class ProtocolHandler {
       authMethod: _config.authMethod,
       authToken: _config.authToken,
       supportedCompression: _config.compression,
-      maxFrameSize: _config.maxFrameSize,
-    );
+      maxFrameSize: _config.maxFrameSize);
   }
 
   HandshakeAckFrame handleHandshake(HandshakeFrame handshake) {
@@ -114,8 +113,7 @@ class ProtocolHandler {
       accepted: true,
       negotiatedCompression: negotiatedCompression,
       negotiatedMaxFrameSize: negotiatedMaxFrameSize,
-      hlcTime: _clock.tick().physicalTime,
-    );
+      hlcTime: _clock.tick().physicalTime);
   }
 
   void completeHandshake(HandshakeAckFrame ack) {
@@ -133,8 +131,7 @@ class ProtocolHandler {
   WireFrame createDataFrame(
     String targetNodeId,
     String messageType,
-    List<int> payload,
-  ) {
+    List<int> payload) {
     final now = _clock.tick();
     final frame = WireFrame(
       frameId: _frameSeq++,
@@ -144,8 +141,7 @@ class ProtocolHandler {
       hlcTime: now.physicalTime,
       sequence: _frameSeq,
       headers: {'messageType': messageType},
-      payload: payload,
-    );
+      payload: payload);
     return frame;
   }
 
@@ -158,17 +154,14 @@ class ProtocolHandler {
           sourceNodeId: _localNodeId,
           success: false,
           errorCode: 'ACK_QUEUE_FULL',
-          hlcTime: _clock.tick().physicalTime,
-        ),
-      );
+          hlcTime: _clock.tick().physicalTime));
     }
 
     final completer = Completer<AckFrame>();
     _pendingAcks[frame.frameId] = PendingAck(
       frame: frame,
       completer: completer,
-      sentAt: _clock.tick().physicalTime,
-    );
+      sentAt: _clock.tick().physicalTime);
 
     _outgoingController.add(frame);
     return completer.future.timeout(
@@ -181,10 +174,8 @@ class ProtocolHandler {
           sourceNodeId: _localNodeId,
           success: false,
           errorCode: 'ACK_TIMEOUT',
-          hlcTime: _clock.tick().physicalTime,
-        );
-      },
-    );
+          hlcTime: _clock.tick().physicalTime);
+      });
   }
 
   AckFrame createAck(
@@ -198,8 +189,7 @@ class ProtocolHandler {
       sourceNodeId: _localNodeId,
       success: success,
       errorCode: errorCode,
-      hlcTime: _clock.tick().physicalTime,
-    );
+      hlcTime: _clock.tick().physicalTime);
   }
 
   void handleAck(AckFrame ack) {
@@ -212,14 +202,12 @@ class ProtocolHandler {
   HeartbeatFrame createHeartbeat() {
     return HeartbeatFrame(
       sourceNodeId: _localNodeId,
-      hlcTime: _clock.tick().physicalTime,
-    );
+      hlcTime: _clock.tick().physicalTime);
   }
 
   void handleHeartbeat(HeartbeatFrame hb) {
     _clock.receive(
-      HybridTimestamp(physicalTime: hb.hlcTime, nodeId: hb.sourceNodeId),
-    );
+      HybridTimestamp(physicalTime: hb.hlcTime, nodeId: hb.sourceNodeId));
   }
 
   List<WireEnvelope> chunkEnvelope(WireEnvelope envelope) {
@@ -245,9 +233,7 @@ class ProtocolHandler {
           totalChunks: totalChunks,
           chunkIndex: i,
           payload: envelope.payload.sublist(start, end),
-          metadata: i == 0 ? envelope.metadata : {},
-        ),
-      );
+          metadata: i == 0 ? envelope.metadata : {}));
     }
 
     return chunks;
@@ -266,8 +252,7 @@ class ProtocolHandler {
       assembly = ChunkAssembly(
         correlationId: envelope.correlationId,
         totalChunks: envelope.totalChunks,
-        startedAt: _clock.tick().physicalTime,
-      );
+        startedAt: _clock.tick().physicalTime);
       _chunkAssemblies[envelope.correlationId] = assembly;
     }
 
@@ -286,8 +271,7 @@ class ProtocolHandler {
         hlcTime: envelope.hlcTime,
         compression: envelope.compression,
         payload: assembledPayload,
-        metadata: assembly.receivedChunks[0]?.metadata ?? {},
-      );
+        metadata: assembly.receivedChunks[0]?.metadata ?? {});
 
       if (!_incomingEnvelopeController.isClosed) {
         _incomingEnvelopeController.add(fullEnvelope);
@@ -311,8 +295,7 @@ class ProtocolHandler {
       hlcTime: now.physicalTime,
       compression: _negotiatedCompression,
       payload: payload,
-      metadata: metadata,
-    );
+      metadata: metadata);
   }
 
   void _startHeartbeat() {
@@ -327,9 +310,7 @@ class ProtocolHandler {
             sourceNodeId: _localNodeId,
             targetNodeId: _remoteNodeId ?? '',
             hlcTime: hb.hlcTime,
-            headers: {'incarnation': hb.incarnation.toString()},
-          ),
-        );
+            headers: {'incarnation': hb.incarnation.toString()}));
       }
     });
   }
@@ -360,9 +341,7 @@ class ProtocolHandler {
                 sourceNodeId: _localNodeId,
                 success: false,
                 errorCode: 'RETRY_EXHAUSTED',
-                hlcTime: now,
-              ),
-            );
+                hlcTime: now));
           }
         }
       }
@@ -383,9 +362,7 @@ class ProtocolHandler {
             sourceNodeId: _localNodeId,
             success: false,
             errorCode: 'CONNECTION_CLOSED',
-            hlcTime: _clock.tick().physicalTime,
-          ),
-        );
+            hlcTime: _clock.tick().physicalTime));
       }
     }
     _pendingAcks.clear();

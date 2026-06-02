@@ -1,23 +1,17 @@
-class HybridTimestamp {
-  final int physicalTime;
-  final int logicalTime;
-  final String nodeId;
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  const HybridTimestamp({
-    required this.physicalTime,
-    this.logicalTime = 0,
-    this.nodeId = 'local',
-  });
+part 'hybrid_logical_clock.freezed.dart';
+part 'hybrid_logical_clock.g.dart';
 
-  HybridTimestamp copyWith({
-    int? physicalTime,
-    int? logicalTime,
-    String? nodeId,
-  }) => HybridTimestamp(
-    physicalTime: physicalTime ?? this.physicalTime,
-    logicalTime: logicalTime ?? this.logicalTime,
-    nodeId: nodeId ?? this.nodeId,
-  );
+@freezed
+class HybridTimestamp with _$HybridTimestamp {
+  const HybridTimestamp._();
+
+  const factory HybridTimestamp({
+    @JsonKey(name: 'pt') required int physicalTime,
+    @JsonKey(name: 'lt') @Default(0) int logicalTime,
+    @JsonKey(name: 'node') @Default('local') String nodeId,
+  }) = _HybridTimestamp;
 
   int compareTo(HybridTimestamp other) {
     final ptCmp = physicalTime.compareTo(other.physicalTime);
@@ -28,38 +22,12 @@ class HybridTimestamp {
   bool isAfter(HybridTimestamp other) => compareTo(other) > 0;
   bool isBefore(HybridTimestamp other) => compareTo(other) < 0;
   bool isSameTimeAs(HybridTimestamp other) => compareTo(other) == 0;
-
   bool happensBefore(HybridTimestamp other) => isBefore(other);
-
   bool isConcurrentWith(HybridTimestamp other) =>
       !isBefore(other) && !isAfter(other) && nodeId != other.nodeId;
 
-  Map<String, dynamic> toJson() => {
-    'pt': physicalTime,
-    'lt': logicalTime,
-    'node': nodeId,
-  };
-
   factory HybridTimestamp.fromJson(Map<String, dynamic> json) =>
-      HybridTimestamp(
-        physicalTime: json['pt'] as int,
-        logicalTime: json['lt'] as int? ?? 0,
-        nodeId: json['node'] as String? ?? 'local',
-      );
-
-  @override
-  String toString() => 'HLC($physicalTime,$logicalTime,$nodeId)';
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is HybridTimestamp &&
-          physicalTime == other.physicalTime &&
-          logicalTime == other.logicalTime &&
-          nodeId == other.nodeId;
-
-  @override
-  int get hashCode => Object.hash(physicalTime, logicalTime, nodeId);
+      _$HybridTimestampFromJson(json);
 }
 
 class HybridLogicalClock {
@@ -79,8 +47,7 @@ class HybridLogicalClock {
   HybridTimestamp get now => HybridTimestamp(
     physicalTime: _physicalTime,
     logicalTime: _logicalTime,
-    nodeId: _nodeId,
-  );
+    nodeId: _nodeId);
 
   HybridTimestamp tick() {
     final wallTime = DateTime.now().millisecondsSinceEpoch;
@@ -95,8 +62,7 @@ class HybridLogicalClock {
     return HybridTimestamp(
       physicalTime: _physicalTime,
       logicalTime: _logicalTime,
-      nodeId: _nodeId,
-    );
+      nodeId: _nodeId);
   }
 
   HybridTimestamp receive(HybridTimestamp remote) {
@@ -120,8 +86,7 @@ class HybridLogicalClock {
     return HybridTimestamp(
       physicalTime: _physicalTime,
       logicalTime: _logicalTime,
-      nodeId: _nodeId,
-    );
+      nodeId: _nodeId);
   }
 
   void reset({int? initialTime}) {

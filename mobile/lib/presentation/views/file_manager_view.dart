@@ -1,19 +1,18 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:matrix/matrix.dart';
 import '../widgets/skeleton_loader.dart';
 import '../theme/app_colors.dart';
-import '../theme/locale_provider.dart';
-import '../../core/app_provider.dart';
+import '../theme/locale_cubit.dart';
+import '../../core/di/app_di.dart';
+import '../../core/matrix/matrix_cubit.dart';
+import '../../core/matrix/matrix_dtos.dart';
+
 import '../widgets/image_viewer.dart';
 
-class FileManagerView extends StatefulWidget {
-  final AppProvider provider;
-  final int initialTab;
+class FileManagerView extends StatefulWidget { final int initialTab;
   const FileManagerView({
     super.key,
-    required this.provider,
     this.initialTab = 0,
   });
 
@@ -33,54 +32,32 @@ class _FileManagerViewState extends State<FileManagerView>
     _tabController = TabController(
       length: 3,
       vsync: this,
-      initialIndex: widget.initialTab,
-    );
+      initialIndex: widget.initialTab);
     _loadFiles();
   }
 
   Future<void> _loadFiles() async {
-    final client = widget.provider.matrix.client;
-    if (client == null) {
-      if (mounted) setState(() => _loading = false);
-      return;
-    }
+    final matrix = getIt<MatrixCubit>();
     try {
+      final fileEvents = await matrix.getAllFileEvents();
       final files = <_FileInfo>[];
-      for (final room in client.rooms) {
-        final timeline = await room.getTimeline();
-        for (final event in timeline.events) {
-          if (event.type == EventTypes.Message) {
-            final content = event.content as Map<String, dynamic>?;
-            final msgType = content?['msgtype'] as String?;
-            if (msgType == 'm.image' ||
-                msgType == 'm.video' ||
-                msgType == 'm.file') {
-              final mxcUrl = content?['url'] as String?;
-              if (mxcUrl != null) {
-                final info = content?['info'] as Map<String, dynamic>?;
-                final thumbnailUrl = info?['thumbnail_url'] as String?;
-                files.add(
-                  _FileInfo(
-                    name: event.body,
-                    senderId: event.senderId,
-                    roomId: room.id,
-                    roomName: room.getLocalizedDisplayname(),
-                    timestamp: event.originServerTs,
-                    type: msgType == 'm.image'
-                        ? FileType.image
-                        : msgType == 'm.video'
-                        ? FileType.video
-                        : FileType.file,
-                    mxcUrl: mxcUrl,
-                    thumbnailMxcUrl: thumbnailUrl,
-                    size: info?['size'] as int?,
-                    mimeType: info?['mimetype'] as String?,
-                  ),
-                );
-              }
-            }
-          }
-        }
+      for (final fe in fileEvents) {
+        files.add(
+          _FileInfo(
+            name: fe.name,
+            senderId: fe.senderId,
+            roomId: fe.roomId,
+            roomName: fe.roomName,
+            timestamp: fe.timestamp,
+            type: fe.msgType == 'm.image'
+                ? FileType.image
+                : fe.msgType == 'm.video'
+                ? FileType.video
+                : FileType.file,
+            mxcUrl: fe.mxcUrl,
+            thumbnailMxcUrl: fe.thumbnailMxcUrl,
+            size: fe.size,
+            mimeType: fe.mimeType));
       }
       files.sort((a, b) => b.timestamp.compareTo(a.timestamp));
       if (mounted)
@@ -88,7 +65,7 @@ class _FileManagerViewState extends State<FileManagerView>
           _files = files;
           _loading = false;
         });
-    } catch (e) {
+    } catch (_) {
       if (mounted) setState(() => _loading = false);
     }
   }
@@ -116,16 +93,13 @@ class _FileManagerViewState extends State<FileManagerView>
         leading: IconButton(
           tooltip: localeProvider.t('back'),
           icon: Icon(LucideIcons.arrowLeft, color: AppColors.sec(context)),
-          onPressed: () => Navigator.pop(context),
-        ),
+          onPressed: () => Navigator.pop(context)),
         title: Text(
           t('file_manager'),
           style: TextStyle(
             color: AppColors.textPrimary(context),
             fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+            fontWeight: FontWeight.w600)),
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: AppColors.acc(context),
@@ -135,25 +109,19 @@ class _FileManagerViewState extends State<FileManagerView>
             Tab(text: t('images')),
             Tab(text: t('videos')),
             Tab(text: t('files')),
-          ],
-        ),
-      ),
+          ])),
       body: _loading
           ? SingleChildScrollView(
               padding: const EdgeInsets.all(20),
               child: Column(
-                children: List.generate(8, (_) => const CardSkeleton()),
-              ),
-            )
+                children: List.generate(8, (_) => const CardSkeleton())))
           : TabBarView(
               controller: _tabController,
               children: [
                 _buildGrid(_filterByType(FileType.image)),
                 _buildGrid(_filterByType(FileType.video)),
                 _buildList(_filterByType(FileType.file)),
-              ],
-            ),
-    );
+              ]));
   }
 
   Widget _buildGrid(List<_FileInfo> files) {
@@ -163,53 +131,42 @@ class _FileManagerViewState extends State<FileManagerView>
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
         mainAxisSpacing: 8,
-        crossAxisSpacing: 8,
-      ),
+        crossAxisSpacing: 8),
       itemCount: files.length,
       itemBuilder: (_, i) {
         final file = files[i];
-        final client = widget.provider.matrix.client;
+        final matrix = getIt<MatrixCubit>();
         final thumbnailMxc = file.thumbnailMxcUrl;
-        final thumbnailUrl = thumbnailMxc != null && client != null
-            ? Uri.parse(
-                thumbnailMxc,
-              ).getThumbnailUri(client, width: 200, height: 200).toString()
+        final thumbnailUrl = thumbnailMxc != null
+            ? matrix.getThumbnailUrl(thumbnailMxc, width: 200, height: 200)
             : null;
         return GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: () {
-            if (file.type == FileType.image && client != null) {
-              final httpUrl = Uri.parse(
-                file.mxcUrl,
-              ).getThumbnailUri(client, width: 2000, height: 2000).toString();
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) =>
-                      ImageViewer(imageUrl: httpUrl, title: file.name),
-                ),
-              );
+            if (file.type == FileType.image) {
+              final httpUrl = matrix.getThumbnailUrl(file.mxcUrl, width: 2000, height: 2000);
+              if (httpUrl != null) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) =>
+                        ImageViewer(imageUrl: httpUrl, title: file.name)));
+              }
             }
           },
           child: Container(
             decoration: BoxDecoration(
               color: AppColors.sf(context),
-              borderRadius: BorderRadius.circular(12),
-            ),
+              borderRadius: BorderRadius.circular(12)),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: thumbnailUrl != null
                   ? CachedNetworkImage(
                       imageUrl: thumbnailUrl,
                       fit: BoxFit.cover,
-                      errorWidget: (_, _, _) => _buildFilePlaceholder(file),
-                    )
-                  : _buildFilePlaceholder(file),
-            ),
-          ),
-        );
-      },
-    );
+                      errorWidget: (_, _, _) => _buildFilePlaceholder(file))
+                  : _buildFilePlaceholder(file))));
+      });
   }
 
   Widget _buildFilePlaceholder(_FileInfo file) {
@@ -224,8 +181,7 @@ class _FileManagerViewState extends State<FileManagerView>
                   ? LucideIcons.image
                   : LucideIcons.video,
               size: 28,
-              color: AppColors.iconGray(context),
-            ),
+              color: AppColors.iconGray(context)),
             const SizedBox(height: 4),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 6),
@@ -233,16 +189,10 @@ class _FileManagerViewState extends State<FileManagerView>
                 file.name,
                 style: TextStyle(
                   color: AppColors.textTertiary(context),
-                  fontSize: 10,
-                ),
+                  fontSize: 10),
                 maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+                overflow: TextOverflow.ellipsis)),
+          ])));
   }
 
   Widget _buildList(List<_FileInfo> files) {
@@ -257,8 +207,7 @@ class _FileManagerViewState extends State<FileManagerView>
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: AppColors.sf(context),
-            borderRadius: BorderRadius.circular(12),
-          ),
+            borderRadius: BorderRadius.circular(12)),
           child: Row(
             children: [
               Container(
@@ -266,14 +215,11 @@ class _FileManagerViewState extends State<FileManagerView>
                 height: 40,
                 decoration: BoxDecoration(
                   color: AppColors.sfAlt(context),
-                  borderRadius: BorderRadius.circular(10),
-                ),
+                  borderRadius: BorderRadius.circular(10)),
                 child: Icon(
                   LucideIcons.file,
                   size: 20,
-                  color: AppColors.iconGray(context),
-                ),
-              ),
+                  color: AppColors.iconGray(context))),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -284,35 +230,24 @@ class _FileManagerViewState extends State<FileManagerView>
                       style: TextStyle(
                         color: AppColors.textPrimary(context),
                         fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
+                        fontWeight: FontWeight.w500),
                       maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                      overflow: TextOverflow.ellipsis),
                     const SizedBox(height: 2),
                     Text(
                       '${file.roomName} · ${_formatTime(file.timestamp)}',
                       style: TextStyle(
                         color: AppColors.textTertiary(context),
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+                        fontSize: 12)),
+                  ])),
               if (file.size case final fileSize?)
                 Text(
                   _formatSize(fileSize),
                   style: TextStyle(
                     color: AppColors.iconGray(context),
-                    fontSize: 12,
-                  ),
-                ),
-            ],
-          ),
-        );
-      },
-    );
+                    fontSize: 12)),
+            ]));
+      });
   }
 
   Widget _buildEmpty() {
@@ -323,16 +258,12 @@ class _FileManagerViewState extends State<FileManagerView>
           Icon(
             LucideIcons.folderOpen,
             size: 48,
-            color: AppColors.iconGray(context),
-          ),
+            color: AppColors.iconGray(context)),
           const SizedBox(height: 12),
           Text(
             localeProvider.t('no_files'),
-            style: TextStyle(color: AppColors.iconGray(context), fontSize: 15),
-          ),
-        ],
-      ),
-    );
+            style: TextStyle(color: AppColors.iconGray(context), fontSize: 15)),
+        ]));
   }
 
   String _formatTime(DateTime dt) =>

@@ -1479,6 +1479,105 @@ function getDefaultDiscoverItem(category) {
   };
 }
 
+async function handleMatrixAutoProvision(request, env, origin) {
+  const authHeader = request.headers.get('Authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return jsonResponse({ error: 'Missing Supabase access token' }, 401, {}, origin);
+  }
+  const supabaseToken = authHeader.substring(7);
+
+  const supabaseUrl = env.SUPABASE_URL;
+  const supabaseServiceKey = env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl || !supabaseServiceKey) {
+    return jsonResponse({ error: 'Server not configured for auto-provisioning' }, 500, {}, origin);
+  }
+
+  try {
+    const userResp = await fetch(`${supabaseUrl}/auth/v1/user`, {
+      headers: {
+        'Authorization': `Bearer ${supabaseToken}`,
+        'apikey': supabaseServiceKey,
+      },
+    });
+    if (!userResp.ok) {
+      return jsonResponse({ error: 'Invalid Supabase token' }, 401, {}, origin);
+    }
+    const userData = await userResp.json();
+    const supabaseUserId = userData.id;
+    const email = userData.email || '';
+    const displayName = userData.user_metadata?.display_name || userData.user_metadata?.full_name || email.split('@')[0];
+
+    const existingMatrixId = userData.user_metadata?.matrix_user_id;
+    if (existingMatrixId) {
+      return jsonResponse({ matrix_user_id: existingMatrixId, created: false }, 200, {}, origin);
+    }
+
+    const homeserver = env.MATRIX_HOMESERVER || 'https://matrix.omnivium.app';
+    const synapseAdminToken = env.SYNAPSE_ADMIN_TOKEN;
+    if (!synapseAdminToken) {
+      return jsonResponse({ error: 'Matrix admin not configured' }, 500, {}, origin);
+    }
+
+    const matrixUsername = `omni_${supabaseUserId.substring(0, 12)}`;
+    const matrixPassword = crypto.randomUUID();
+
+    const registerResp = await fetch(`${homeserver}/_synapse/api/v1/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${synapseAdminToken}` },
+      body: JSON.stringify({
+        username: matrixUsername,
+        password: matrixPassword,
+        displayname: displayName,
+        admin: false,
+      }),
+    });
+
+    if (!registerResp.ok) {
+      const errText = await registerResp.text();
+      if (errText.includes('is already in use')) {
+        const matrixUserId = `@${matrixUsername}:${new URL(homeserver).hostname}`;
+        await updateSupabaseUserMetadata(supabaseUrl, supabaseServiceKey, supabaseUserId, {
+          matrix_user_id: matrixUserId,
+        });
+        return jsonResponse({ matrix_user_id: matrixUserId, created: false }, 200, {}, origin);
+      }
+      return jsonResponse({ error: 'Matrix registration failed', details: errText }, 500, {}, origin);
+    }
+
+    const registerData = await registerResp.json();
+    const matrixUserId = registerData.user_id;
+
+    await updateSupabaseUserMetadata(supabaseUrl, supabaseServiceKey, supabaseUserId, {
+      matrix_user_id: matrixUserId,
+    });
+
+    const provisionKey = `matrix_provision:${supabaseUserId}`;
+    await env.KV?.put(provisionKey, JSON.stringify({
+      matrix_user_id: matrixUserId,
+      matrix_username: matrixUsername,
+      provisioned_at: new Date().toISOString(),
+    }), { expirationTtl: 86400 * 365 });
+
+    return jsonResponse({ matrix_user_id: matrixUserId, created: true }, 200, {}, origin);
+  } catch (e) {
+    return jsonResponse({ error: 'Auto-provisioning failed', details: e.message }, 500, {}, origin);
+  }
+}
+
+async function updateSupabaseUserMetadata(supabaseUrl, serviceKey, userId, metadata) {
+  await fetch(`${supabaseUrl}/auth/v1/admin/users/${userId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': serviceKey,
+      'Authorization': `Bearer ${serviceKey}`,
+    },
+    body: JSON.stringify({
+      user_metadata: metadata,
+    }),
+  });
+}
+
 export default {
   async fetch(request, env) {
     const origin = request.headers.get('Origin') || '';
@@ -1504,13 +1603,13 @@ export default {
     }
 
     if (path === '/config/init' && request.method === 'GET') {
-      const user = await authenticate(request, env);
-      if (!user) return jsonResponse({ error: 'Unauthorized' }, 401, {}, origin);
       return jsonResponse({
         supabase_url: env.SUPABASE_URL || null,
         supabase_anon_key: env.SUPABASE_ANON_KEY || null,
         backend_url: `https://${request.headers.get('host')}`,
-      }, 200, {}, origin);
+      }, 200, {
+        'Cache-Control': 'public, max-age=300',
+      }, origin);
     }
 
     if (path === '/config/ssl-pins' && request.method === 'GET') {
@@ -1532,6 +1631,10 @@ export default {
       } catch (e) {
         return jsonResponse({ error: 'Invalid body' }, 400, {}, origin);
       }
+    }
+
+    if (path === '/auth/matrix-auto-provision' && request.method === 'POST') {
+      return handleMatrixAutoProvision(request, env, origin);
     }
 
     if (path === '/auth/srp-login' && request.method === 'POST') {
@@ -1685,6 +1788,186 @@ export default {
       return handleContentDiscover(request, env, url, origin);
     }
 
+    if (path === '/api/reminders/due' && request.method === 'GET') {
+      return handleRemindersDue(request, env, origin);
+    }
+
+    if (path === '/api/reminders' && request.method === 'POST') {
+      const user = await authenticate(request, env);
+      if (!user) return jsonResponse({ error: 'Unauthorized' }, 401, {}, origin);
+      return handleReminderCreate(request, env, origin);
+    }
+
+    if (path === '/api/reminders' && request.method === 'GET') {
+      const user = await authenticate(request, env);
+      if (!user) return jsonResponse({ error: 'Unauthorized' }, 401, {}, origin);
+      return handleReminderList(request, env, origin);
+    }
+
+    if (path.startsWith('/api/reminders/') && request.method === 'DELETE') {
+      const user = await authenticate(request, env);
+      if (!user) return jsonResponse({ error: 'Unauthorized' }, 401, {}, origin);
+      return handleReminderDelete(path, env, origin);
+    }
+
     return jsonResponse({ error: 'Not found' }, 404);
   },
+
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(processDueReminders(env));
+  },
 };
+
+async function processDueReminders(env) {
+  try {
+    const now = new Date().toISOString();
+    const list = await env.KV.list({ prefix: 'reminder:' });
+    const due = [];
+
+    for (const key of list.keys) {
+      const data = await env.KV.get(key.name, { type: 'json' });
+      if (!data) continue;
+
+      if (data.status !== 'active') continue;
+      if (!data.nextTriggerAt) continue;
+
+      const triggerTime = new Date(data.nextTriggerAt);
+      if (triggerTime <= new Date()) {
+        due.push({ key: key.name, ...data });
+      }
+    }
+
+    for (const reminder of due) {
+      try {
+        await triggerReminder(reminder, env);
+        if (reminder.isRecurring && reminder.frequency) {
+          const nextTime = calculateNextTrigger(reminder.frequency);
+          await env.KV.put(reminder.key, JSON.stringify({
+            ...reminder,
+            nextTriggerAt: nextTime.toISOString(),
+            lastTriggeredAt: new Date().toISOString(),
+            triggerCount: (reminder.triggerCount || 0) + 1,
+          }));
+        } else {
+          await env.KV.put(reminder.key, JSON.stringify({
+            ...reminder,
+            status: 'completed',
+            completedAt: new Date().toISOString(),
+          }));
+        }
+      } catch (e) {
+        console.error(`Failed to trigger reminder ${reminder.key}:`, e);
+      }
+    }
+
+    console.log(`Processed ${due.length} due reminders`);
+  } catch (e) {
+    console.error('processDueReminders error:', e);
+  }
+}
+
+async function triggerReminder(reminder, env) {
+  if (reminder.userId) {
+    try {
+      const pushKey = `push:${reminder.userId}`;
+      const pushData = await env.KV.get(pushKey, { type: 'json' });
+      if (pushData && pushData.endpoint) {
+        await fetch(pushData.endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'reminder',
+            title: reminder.title || 'Reminder',
+            body: reminder.description || '',
+            reminderId: reminder.id,
+          }),
+        });
+      }
+    } catch (e) {
+      console.error('Push notification failed:', e);
+    }
+  }
+}
+
+function calculateNextTrigger(frequency) {
+  const now = new Date();
+  if (typeof frequency === 'number') {
+    return new Date(now.getTime() + frequency);
+  }
+  if (typeof frequency === 'string') {
+    const match = frequency.match(/^(\d+)(min|h|d|w)$/);
+    if (match) {
+      const value = parseInt(match[1]);
+      const unit = match[2];
+      switch (unit) {
+        case 'min': return new Date(now.getTime() + value * 60000);
+        case 'h': return new Date(now.getTime() + value * 3600000);
+        case 'd': return new Date(now.getTime() + value * 86400000);
+        case 'w': return new Date(now.getTime() + value * 604800000);
+      }
+    }
+  }
+  return new Date(now.getTime() + 3600000);
+}
+
+async function handleRemindersDue(request, env, origin) {
+  const now = new Date().toISOString();
+  const list = await env.KV.list({ prefix: 'reminder:' });
+  const due = [];
+
+  for (const key of list.keys) {
+    const data = await env.KV.get(key.name, { type: 'json' });
+    if (!data || data.status !== 'active') continue;
+    if (data.nextTriggerAt && new Date(data.nextTriggerAt) <= new Date()) {
+      due.push(data);
+    }
+  }
+
+  return jsonResponse({ due, count: due.length, checkedAt: now }, 200, {}, origin);
+}
+
+async function handleReminderCreate(request, env, origin) {
+  const body = await request.json();
+  const id = `rem_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
+  const reminder = {
+    id,
+    title: body.title || 'Reminder',
+    description: body.description || '',
+    type: body.type || 'scheduled',
+    status: 'active',
+    nextTriggerAt: body.nextTriggerAt || body.triggerAt,
+    isRecurring: body.isRecurring || false,
+    frequency: body.frequency || null,
+    userId: body.userId || null,
+    createdAt: new Date().toISOString(),
+    triggerCount: 0,
+  };
+
+  await env.KV.put(`reminder:${id}`, JSON.stringify(reminder));
+  return jsonResponse(reminder, 201, {}, origin);
+}
+
+async function handleReminderList(request, env, origin) {
+  const list = await env.KV.list({ prefix: 'reminder:' });
+  const reminders = [];
+
+  for (const key of list.keys) {
+    const data = await env.KV.get(key.name, { type: 'json' });
+    if (data) reminders.push(data);
+  }
+
+  return jsonResponse({ reminders, count: reminders.length }, 200, {}, origin);
+}
+
+async function handleReminderDelete(path, env, origin) {
+  const id = path.replace('/api/reminders/', '');
+  const key = `reminder:${id}`;
+  const data = await env.KV.get(key, { type: 'json' });
+
+  if (!data) {
+    return jsonResponse({ error: 'Not found' }, 404, {}, origin);
+  }
+
+  await env.KV.put(key, JSON.stringify({ ...data, status: 'cancelled', cancelledAt: new Date().toISOString() }));
+  return jsonResponse({ cancelled: true, id }, 200, {}, origin);
+}

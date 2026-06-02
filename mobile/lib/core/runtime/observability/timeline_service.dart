@@ -46,9 +46,7 @@ class TimelineService {
         timestamp: _clock.now(),
         type: type,
         source: source,
-        data: data,
-      ),
-    );
+        data: data));
   }
 
   void recordEvent(RuntimeEvent event) {
@@ -60,8 +58,7 @@ class TimelineService {
         'phase': event.phase.name,
         'scope': event.scope.name,
         'permission': event.permission.name,
-      },
-    );
+      });
   }
 
   void recordPluginLifecycle(
@@ -73,8 +70,7 @@ class TimelineService {
     record(
       TimelineEntryType.pluginLifecycle,
       pluginId,
-      data: {'transition': transition, 'from': from, 'to': to},
-    );
+      data: {'transition': transition, 'from': from, 'to': to});
   }
 
   void recordCapabilityInvoke(
@@ -85,16 +81,14 @@ class TimelineService {
     record(
       TimelineEntryType.capabilityInvoke,
       pluginId,
-      data: {'capabilityId': capabilityId, 'status': status},
-    );
+      data: {'capabilityId': capabilityId, 'status': status});
   }
 
   void recordTask(String taskId, {String status = 'scheduled'}) {
     record(
       TimelineEntryType.taskSchedule,
       'scheduler',
-      data: {'taskId': taskId, 'status': status},
-    );
+      data: {'taskId': taskId, 'status': status});
   }
 
   List<TimelineEntry> replay({

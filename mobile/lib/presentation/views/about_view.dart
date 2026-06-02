@@ -1,13 +1,11 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import '../theme/app_colors.dart';
-import '../theme/locale_provider.dart';
-import '../../core/app_provider.dart';
+import '../theme/locale_cubit.dart';
 
-class AboutView extends StatefulWidget {
-  final AppProvider provider;
-  const AboutView({super.key, required this.provider});
+
+class AboutView extends StatefulWidget { const AboutView({super.key});
 
   @override
   State<AboutView> createState() => _AboutViewState();
@@ -42,17 +40,13 @@ class _AboutViewState extends State<AboutView> {
         leading: IconButton(
           tooltip: localeProvider.t('back'),
           icon: Icon(LucideIcons.arrowLeft, color: AppColors.sec(context)),
-          onPressed: () => Navigator.pop(context),
-        ),
+          onPressed: () => Navigator.pop(context)),
         title: Text(
           t('about'),
           style: TextStyle(
             color: AppColors.textPrimary(context),
             fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
+            fontWeight: FontWeight.w600))),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24),
         child: Column(
@@ -66,49 +60,37 @@ class _AboutViewState extends State<AboutView> {
                   gradient: LinearGradient(
                     colors: [AppColors.acc(context), AppColors.accentPurple],
                     begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                    end: Alignment.bottomRight),
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
                       color: AppColors.acc(context).withValues(alpha: 0.3),
                       blurRadius: 24,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
-                ),
+                      offset: const Offset(0, 8)),
+                  ]),
                 child: Icon(
                   LucideIcons.messageCircle,
                   size: 40,
-                  color: AppColors.textPrimary(context),
-                ),
-              ),
-            ),
+                  color: AppColors.textPrimary(context)))),
             const SizedBox(height: 16),
             Text(
               'Omnivium',
               style: TextStyle(
                 color: AppColors.textPrimary(context),
                 fontSize: 24,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
+                fontWeight: FontWeight.w800)),
             const SizedBox(height: 4),
             Text(
               t('about_subtitle'),
               style: TextStyle(
                 color: AppColors.textHint(context),
-                fontSize: 14,
-              ),
-            ),
+                fontSize: 14)),
             const SizedBox(height: 4),
             Text(
               'v$_version',
               style: TextStyle(
                 color: AppColors.iconGray(context),
-                fontSize: 13,
-              ),
-            ),
+                fontSize: 13)),
             const SizedBox(height: 32),
             _buildInfoCard(context, [
               _infoRow(context, t('project'), 'Omnivium'),
@@ -133,14 +115,9 @@ class _AboutViewState extends State<AboutView> {
               '© 2025 Omnivium Team',
               style: TextStyle(
                 color: AppColors.textDisabled(context),
-                fontSize: 12,
-              ),
-            ),
+                fontSize: 12)),
             const SizedBox(height: 40),
-          ],
-        ),
-      ),
-    );
+          ])));
   }
 
   Widget _buildInfoCard(BuildContext context, List<Widget> children) {
@@ -153,19 +130,15 @@ class _AboutViewState extends State<AboutView> {
             height: 1,
             color: AppColors.divider(context),
             indent: 16,
-            endIndent: 16,
-          ),
-        );
+            endIndent: 16));
       }
     }
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
         color: AppColors.sf(context),
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Column(children: rows),
-    );
+        borderRadius: BorderRadius.circular(14)),
+      child: Column(children: rows));
   }
 
   Widget _infoRow(BuildContext context, String label, String value) {
@@ -176,18 +149,13 @@ class _AboutViewState extends State<AboutView> {
         children: [
           Text(
             label,
-            style: TextStyle(color: AppColors.textHint(context), fontSize: 14),
-          ),
+            style: TextStyle(color: AppColors.textHint(context), fontSize: 14)),
           Text(
             value,
             style: TextStyle(
               color: AppColors.textPrimary(context),
               fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
+              fontWeight: FontWeight.w500)),
+        ]));
   }
 }

@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
-import '../../core/app_provider.dart';
+
 import '../theme/app_colors.dart';
-import '../theme/locale_provider.dart';
+import '../theme/locale_cubit.dart';
+import '../../core/di/app_di.dart';
+import '../../core/agent/agent_orchestrator.dart';
+import '../../core/model_cubit.dart';
 
 class OptionsContent extends StatelessWidget {
-  final VoidCallback onClose;
-  final AppProvider provider;
-  const OptionsContent({
+  final VoidCallback onClose; const OptionsContent({
     super.key,
     required this.onClose,
-    required this.provider,
   });
 
   @override
@@ -27,9 +27,7 @@ class OptionsContent extends StatelessWidget {
             height: 4,
             decoration: BoxDecoration(
               color: AppColors.textDisabled(context),
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
+              borderRadius: BorderRadius.circular(2))),
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -39,11 +37,8 @@ class OptionsContent extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w500,
-                  color: AppColors.textPrimary(context),
-                ),
-              ),
-            ],
-          ),
+                  color: AppColors.textPrimary(context))),
+            ]),
           const SizedBox(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -52,35 +47,30 @@ class OptionsContent extends StatelessWidget {
                 context,
                 LucideIcons.image,
                 localeProvider.t('image'),
-                onTap: () => _pickImage(context),
-              ),
+                onTap: () => _pickImage(context)),
               _optItem(
                 context,
                 LucideIcons.camera,
                 localeProvider.t('camera'),
-                onTap: () => _takePhoto(context),
-              ),
+                onTap: () => _takePhoto(context)),
               _optItem(
                 context,
                 LucideIcons.fileText,
                 localeProvider.t('file'),
-                onTap: () => _pickFile(context),
-              ),
+                onTap: () => _pickFile(context)),
               _optItem(
                 context,
                 LucideIcons.plug,
                 localeProvider.t('source_info'),
                 onTap: () {
-                  final logs = provider.orchestrator.executionLogs;
+                  final logs = getIt<AgentOrchestrator>().executionLogs;
                   if (logs.isEmpty) return;
-                  showModalBottomSheet(
+                  showModalBottomSheet<void>(
                     context: context,
                     backgroundColor: AppColors.sf(context),
                     shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(20),
-                      ),
-                    ),
+                        top: Radius.circular(20))),
                     builder: (_) => SafeArea(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
@@ -91,9 +81,7 @@ class OptionsContent extends StatelessWidget {
                             height: 4,
                             decoration: BoxDecoration(
                               color: AppColors.textDisabled(context),
-                              borderRadius: BorderRadius.circular(2),
-                            ),
-                          ),
+                              borderRadius: BorderRadius.circular(2))),
                           const SizedBox(height: 12),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -104,11 +92,7 @@ class OptionsContent extends StatelessWidget {
                                 style: TextStyle(
                                   color: AppColors.textPrimary(context),
                                   fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ),
+                                  fontWeight: FontWeight.w600)))),
                           const SizedBox(height: 8),
                           for (final log in logs) ...[
                             ListTile(
@@ -119,33 +103,22 @@ class OptionsContent extends StatelessWidget {
                                 size: 18,
                                 color: log.success == true
                                     ? AppColors.ok(context)
-                                    : AppColors.dng(context),
-                              ),
+                                    : AppColors.dng(context)),
                               title: Text(
                                 log.skillName,
                                 style: TextStyle(
                                   color: AppColors.textPrimary(context),
-                                  fontSize: 14,
-                                ),
-                              ),
+                                  fontSize: 14)),
                               subtitle: Text(
                                 '${log.duration.inMilliseconds}ms',
                                 style: TextStyle(
                                   color: AppColors.textTertiary(context),
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
+                                  fontSize: 12))),
                           ],
                           const SizedBox(height: 8),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
+                        ])));
+                }),
+            ]),
           Divider(color: AppColors.divider(context), height: 32),
           ListTile(
             leading: Icon(LucideIcons.search, color: AppColors.sec(context)),
@@ -153,40 +126,28 @@ class OptionsContent extends StatelessWidget {
               localeProvider.t('search'),
               style: TextStyle(
                 color: AppColors.textPrimary(context),
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+                fontWeight: FontWeight.w500)),
             trailing: Icon(
               LucideIcons.check,
               color: AppColors.acc(context),
-              size: 20,
-            ),
-          ),
+              size: 20)),
           ListTile(
             leading: Icon(LucideIcons.radar, color: AppColors.sec(context)),
             title: Text(
               localeProvider.t('deep_research'),
               style: TextStyle(
                 color: AppColors.textSecondary(context),
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+                fontWeight: FontWeight.w500)),
             subtitle: Text(
               localeProvider.t('deep_research_desc'),
               style: TextStyle(
                 fontSize: 12,
-                color: AppColors.textHint(context),
-              ),
-            ),
+                color: AppColors.textHint(context))),
             trailing: Icon(
               LucideIcons.chevronRight,
               color: AppColors.textDisabled(context),
-              size: 16,
-            ),
-          ),
-        ],
-      ),
-    );
+              size: 16)),
+        ]));
   }
 
   Future<void> _pickImage(BuildContext context) async {
@@ -217,7 +178,7 @@ class OptionsContent extends StatelessWidget {
   }
 
   void _send(String content) {
-    final orchestrator = provider.orchestrator;
+    final orchestrator = getIt<AgentOrchestrator>();
     if (orchestrator.isIdle) {
       orchestrator.sendMessage(content);
     }
@@ -238,38 +199,29 @@ class OptionsContent extends StatelessWidget {
             height: 64,
             decoration: BoxDecoration(
               color: AppColors.sf(context),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Icon(icon, color: AppColors.textSecondary(context)),
-          ),
+              borderRadius: BorderRadius.circular(16)),
+            child: Icon(icon, color: AppColors.textSecondary(context))),
           const SizedBox(height: 8),
           Text(
             label,
             style: TextStyle(
               fontSize: 12,
               color: AppColors.textTertiary(context),
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
+              fontWeight: FontWeight.w500)),
+        ]));
   }
 }
 
 class ModelsContent extends StatelessWidget {
-  final VoidCallback onClose;
-  final AppProvider provider;
-  const ModelsContent({
+  final VoidCallback onClose; const ModelsContent({
     super.key,
     required this.onClose,
-    required this.provider,
   });
 
   @override
   Widget build(BuildContext context) {
-    final models = provider.model.models;
-    final activeId = provider.model.activeModelId;
+    final models = getIt<ModelCubit>().models;
+    final activeId = getIt<ModelCubit>().activeModelId;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
       child: Column(
@@ -280,9 +232,7 @@ class ModelsContent extends StatelessWidget {
             height: 4,
             decoration: BoxDecoration(
               color: AppColors.textDisabled(context),
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
+              borderRadius: BorderRadius.circular(2))),
           const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -292,11 +242,8 @@ class ModelsContent extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w500,
-                  color: AppColors.textPrimary(context),
-                ),
-              ),
-            ],
-          ),
+                  color: AppColors.textPrimary(context))),
+            ]),
           const SizedBox(height: 20),
           if (models.isEmpty)
             Padding(
@@ -309,29 +256,21 @@ class ModelsContent extends StatelessWidget {
                       localeProvider.t('no_models'),
                       style: TextStyle(
                         color: AppColors.textDisabled(context),
-                        fontSize: 14,
-                      ),
-                    ),
-                    if (provider.model.lastError case final lastError?) ...[
+                        fontSize: 14)),
+                    if (getIt<ModelCubit>().lastError case final lastError?) ...[
                       const SizedBox(height: 8),
                       Text(
                         lastError,
                         style: TextStyle(
                           color: AppColors.warn(context),
-                          fontSize: 12,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
+                          fontSize: 12),
+                        textAlign: TextAlign.center),
                     ],
-                  ],
-                ),
-              ),
-            ),
+                  ]))),
           if (models.isNotEmpty)
             ConstrainedBox(
               constraints: BoxConstraints(
-                maxHeight: MediaQuery.of(context).size.height * 0.4,
-              ),
+                maxHeight: MediaQuery.of(context).size.height * 0.4),
               child: ListView.builder(
                 shrinkWrap: true,
                 itemCount: models.length,
@@ -344,8 +283,7 @@ class ModelsContent extends StatelessWidget {
                       size: 18,
                       color: isActive
                           ? AppColors.acc(context)
-                          : AppColors.textDisabled(context),
-                    ),
+                          : AppColors.textDisabled(context)),
                     title: Text(
                       m.name,
                       style: TextStyle(
@@ -353,26 +291,17 @@ class ModelsContent extends StatelessWidget {
                             ? AppColors.textPrimary(context)
                             : AppColors.textSecondary(context),
                         fontWeight: FontWeight.w500,
-                        fontSize: 15,
-                      ),
-                    ),
+                        fontSize: 15)),
                     subtitle: Text(
                       m.provider,
                       style: TextStyle(
                         fontSize: 11,
-                        color: AppColors.textDisabled(context),
-                      ),
-                    ),
+                        color: AppColors.textDisabled(context))),
                     onTap: () {
-                      provider.model.switchModel(m.id);
+                      getIt<ModelCubit>().switchModel(m.id);
                       Navigator.pop(context);
-                    },
-                  );
-                },
-              ),
-            ),
-        ],
-      ),
-    );
+                    });
+                })),
+        ]));
   }
 }

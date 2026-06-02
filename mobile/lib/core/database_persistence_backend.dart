@@ -1,3 +1,5 @@
+
+import 'di/app_di.dart';
 import 'dart:convert';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'app_logger.dart';
@@ -13,15 +15,15 @@ class DatabasePersistenceBackend implements PersistenceBackend {
   Box<String> get _box {
     switch (_boxName) {
       case 'omnivium_sessions':
-        return DatabaseService.instance.sessions;
+        return getIt<DatabaseService>().sessions;
       case 'omnivium_memory':
-        return DatabaseService.instance.memory;
+        return getIt<DatabaseService>().memory;
       case 'omnivium_cache':
-        return DatabaseService.instance.cache;
+        return getIt<DatabaseService>().cache;
       case 'omnivium_encrypted':
-        return DatabaseService.instance.encrypted;
+        return getIt<DatabaseService>().encrypted;
       default:
-        return DatabaseService.instance.data;
+        return getIt<DatabaseService>().data;
     }
   }
 

@@ -1,10 +1,11 @@
+﻿import 'di/app_di.dart';
 import 'app_logger.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'secure_storage_service.dart';
 import 'api_proxy_service.dart';
-import 'matrix/matrix_service.dart';
+import 'notification_center.dart';
 import 'identity_bridge.dart';
 
 class AuthService {
@@ -21,7 +22,6 @@ class AuthService {
   User? _currentUser;
   String? _jwtToken;
   StreamSubscription<AuthState>? _authSubscription;
-  Timer? _refreshTimer;
   bool _supabaseInitialized = false;
 
   User? get currentUser => _currentUser;
@@ -48,24 +48,31 @@ class AuthService {
   }
 
   Future<void> initFromBackend() async {
-    final storage = SecureStorageService.instance;
+    final storage = getIt<SecureStorageService>();
     String? cachedUrl = await storage.read(_supabaseUrlKey);
     String? cachedKey = await storage.read(_supabaseAnonKeyKey);
 
     if (cachedUrl == null || cachedKey == null) {
       final envUrl = _getEnv(_supabaseUrlEnvKey);
       final envKey = _getEnv(_supabaseAnonKeyEnvKey);
-      if (envUrl == null ||
-          envUrl.isEmpty ||
-          envKey == null ||
-          envKey.isEmpty) {
-        AppLogger.instance.warning(
-          'Supabase credentials not configured. Set SUPABASE_URL and SUPABASE_ANON_KEY via --dart-define or backend config.',
-        );
-        return;
+      if (envUrl != null && envUrl.isNotEmpty && envKey != null && envKey.isNotEmpty) {
+        cachedUrl = envUrl;
+        cachedKey = envKey;
       }
-      cachedUrl = envUrl;
-      cachedKey = envKey;
+    }
+
+    if (cachedUrl == null || cachedKey == null) {
+      final remote = await _fetchPublicConfig();
+      if (remote != null) {
+        cachedUrl = remote['supabase_url'] as String?;
+        cachedKey = remote['supabase_anon_key'] as String?;
+      }
+    }
+
+    if (cachedUrl == null || cachedKey == null || cachedUrl.isEmpty || cachedKey.isEmpty) {
+      AppLogger.instance.warning(
+        'Supabase credentials not configured. Set SUPABASE_URL and SUPABASE_ANON_KEY via --dart-define or backend config.');
+      return;
     }
 
     await storage.write(_supabaseUrlKey, cachedUrl);
@@ -73,16 +80,12 @@ class AuthService {
     await _initSupabase(cachedUrl, cachedKey);
 
     try {
-      final proxy = ApiProxyService.instance;
+      final proxy = getIt<ApiProxyService>();
       if (proxy.isConfigured) {
-        final uri = Uri.parse('${proxy.backendUrl}/config/init');
-        final response = await proxy.secureClient
-            .get(uri, headers: proxy.buildDeviceHeaders())
-            .timeout(const Duration(seconds: 5));
-        if (response.statusCode == 200) {
-          final body = jsonDecode(response.body) as Map<String, dynamic>;
-          final url = body['supabase_url'] as String?;
-          final anonKey = body['supabase_anon_key'] as String?;
+        final remote = await _fetchPublicConfig();
+        if (remote != null) {
+          final url = remote['supabase_url'] as String?;
+          final anonKey = remote['supabase_anon_key'] as String?;
           if (url != null &&
               anonKey != null &&
               (url != cachedUrl || anonKey != cachedKey)) {
@@ -96,7 +99,25 @@ class AuthService {
       AppLogger.instance.info('Failed to fetch config from backend: $e');
     }
 
-    _tryAutoSignInWithMatrix();
+    NotificationCenter.observe(Event.loginSuccess, _onLoginEvent);
+    NotificationCenter.observe(Event.logout, (_) => onMatrixLogout());
+  }
+
+  Future<Map<String, dynamic>?> _fetchPublicConfig() async {
+    try {
+      final proxy = getIt<ApiProxyService>();
+      if (!proxy.isConfigured) return null;
+      final uri = Uri.parse('${proxy.backendUrl}/config/init');
+      final response = await proxy.secureClient
+          .get(uri, headers: proxy.buildDeviceHeaders())
+          .timeout(const Duration(seconds: 5));
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body) as Map<String, dynamic>;
+      }
+    } catch (e) {
+      AppLogger.instance.info('Failed to fetch public config: $e');
+    }
+    return null;
   }
 
   Future<void> _initSupabase(String url, String anonKey) async {
@@ -106,7 +127,6 @@ class AuthService {
       _client = Supabase.instance.client;
       _supabaseInitialized = true;
       _setupAuthListener();
-      _startTokenRefreshTimer();
     } catch (e) {
       AppLogger.instance.warning('Supabase init failed', error: e);
     }
@@ -118,8 +138,7 @@ class AuthService {
       return;
     }
     AppLogger.instance.info(
-      'Supabase config updated from backend, will apply on next app restart',
-    );
+      'Supabase config updated from backend, will apply on next app restart');
   }
 
   void _setupAuthListener() {
@@ -130,6 +149,15 @@ class AuthService {
       _currentUser = event.session?.user;
       _jwtToken = event.session?.accessToken;
       _authStateController.add(event);
+
+      if (event.event == AuthChangeEvent.signedIn && _currentUser != null) {
+        getIt<IdentityBridge>().onUserAuthenticated(
+          _currentUser!.id,
+          matrixId: _currentUser!.userMetadata?['matrix_user_id'] as String?,
+        );
+      } else if (event.event == AuthChangeEvent.signedOut) {
+        getIt<IdentityBridge>().onLogout();
+      }
     });
 
     final session = client.auth.currentSession;
@@ -139,24 +167,11 @@ class AuthService {
     }
   }
 
-  void _startTokenRefreshTimer() {
-    _refreshTimer?.cancel();
-    _refreshTimer = Timer.periodic(const Duration(minutes: 5), (_) {
-      if (isAuthenticated) {
-        refreshSession();
-      }
-    });
-  }
-
-  void _tryAutoSignInWithMatrix() async {
-    final matrix = MatrixService.instance;
-    if (!matrix.isLoggedIn || _client == null) return;
-    if (isAuthenticated) return;
-
-    final userId = matrix.userId;
-    if (userId == null) return;
-
-    await _linkMatrixAccount(userId);
+  void _onLoginEvent(Map<String, dynamic>? data) {
+    final userId = data?['matrix_user_id'] as String?;
+    if (userId != null) {
+      _linkMatrixAccount(userId);
+    }
   }
 
   Future<void> _linkMatrixAccount(String matrixUserId) async {
@@ -171,28 +186,19 @@ class AuthService {
       _currentUser = response.user;
       _jwtToken = response.session?.accessToken;
       await client.auth.updateUser(
-        UserAttributes(data: {'matrix_user_id': matrixUserId}),
-      );
+        UserAttributes(data: {'matrix_user_id': matrixUserId}));
       final user = _currentUser;
       if (user != null) {
-        await IdentityBridge.instance.onUserAuthenticated(
+        await getIt<IdentityBridge>().onUserAuthenticated(
           user.id,
-          matrixId: matrixUserId,
-        );
+          matrixId: matrixUserId);
       }
     } catch (e) {
       AppLogger.instance.info('Auto sign-in with Matrix failed: $e');
     }
   }
 
-  void onMatrixLogin() {
-    final userId = MatrixService.instance.userId;
-    if (userId != null) {
-      _linkMatrixAccount(userId);
-    } else {
-      _tryAutoSignInWithMatrix();
-    }
-  }
+  void onMatrixLogin() {}
 
   void onMatrixLogout() {
     if (_client == null) return;
@@ -205,14 +211,9 @@ class AuthService {
     try {
       final response = await client.auth.signInWithPassword(
         email: email,
-        password: password,
-      );
+        password: password);
       _currentUser = response.user;
       _jwtToken = response.session?.accessToken;
-      final user = _currentUser;
-      if (user != null) {
-        await IdentityBridge.instance.onUserAuthenticated(user.id);
-      }
       return _currentUser != null;
     } catch (e) {
       AppLogger.instance.warning('Sign in failed', error: e);
@@ -223,8 +224,6 @@ class AuthService {
   Future<void> signOut() async {
     final client = _client;
     if (client == null) return;
-    _refreshTimer?.cancel();
-    _refreshTimer = null;
     await _authSubscription?.cancel();
     _authSubscription = null;
     try {
@@ -234,7 +233,6 @@ class AuthService {
     }
     _currentUser = null;
     _jwtToken = null;
-    await IdentityBridge.instance.onLogout();
   }
 
   Future<bool> refreshSession() async {
@@ -252,7 +250,6 @@ class AuthService {
   }
 
   void dispose() {
-    _refreshTimer?.cancel();
     _authSubscription?.cancel();
     _authStateController.close();
   }

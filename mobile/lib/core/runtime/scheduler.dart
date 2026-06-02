@@ -77,8 +77,7 @@ class Scheduler {
 
   Future<dynamic> schedule(
     RuntimeTask task,
-    Future<dynamic> Function(CancellationToken token) executor,
-  ) async {
+    Future<dynamic> Function(CancellationToken token) executor) async {
     if (_tasks.containsKey(task.id)) {
       throw StateError('Task "${task.id}" already scheduled');
     }
@@ -103,8 +102,7 @@ class Scheduler {
     _cancelledCount++;
     if (!scheduled._completer.isCompleted) {
       scheduled._completer.completeError(
-        StateError('Task "$taskId" cancelled'),
-      );
+        StateError('Task "$taskId" cancelled'));
     }
     return true;
   }
@@ -156,9 +154,8 @@ class Scheduler {
         scheduled._state = TaskState.retrying;
 
         final delay = scheduled.task.failurePolicy.retry.delayForAttempt(
-          scheduled._retryCount,
-        );
-        await Future.delayed(delay);
+          scheduled._retryCount);
+        await Future<void>.delayed(delay);
 
         if (!token.isCancelled) {
           _runningCount--;

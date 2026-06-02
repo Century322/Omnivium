@@ -1,12 +1,14 @@
+﻿
+import '../../core/di/app_di.dart';
 import 'dart:ui';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../theme/app_colors.dart';
-import '../theme/locale_provider.dart';
-import '../../core/app_provider.dart';
-import '../../core/navigation_provider.dart';
+import '../theme/locale_cubit.dart';
+
+import '../../core/navigation_cubit.dart';
 import '../../core/api_proxy_service.dart';
 import '../../core/app_logger.dart';
 import '../../core/remote_config_service.dart';
@@ -14,9 +16,7 @@ import '../../core/lite_mode.dart';
 import '../widgets/skeleton_loader.dart';
 import '../utils/responsive.dart';
 
-class DiscoverView extends StatefulWidget {
-  final AppProvider provider;
-  const DiscoverView({super.key, required this.provider});
+class DiscoverView extends StatefulWidget { const DiscoverView({super.key});
 
   @override
   State<DiscoverView> createState() => _DiscoverViewState();
@@ -53,21 +53,19 @@ class _DiscoverViewState extends State<DiscoverView> {
         _hasError = false;
       });
     try {
-      final proxy = ApiProxyService.instance;
+      final proxy = getIt<ApiProxyService>();
       if (proxy.isConfigured) {
         final categories = ['all', 'news', 'tech', 'business', 'art'];
         final category = categories[_activeTab];
         final uri = Uri.parse(
-          '${proxy.backendUrl}/content/discover?category=$category',
-        );
+          '${proxy.backendUrl}/content/discover?category=$category');
         final response = await proxy.secureClient
             .get(
               uri,
               headers: {
                 ...proxy.buildAuthHeaders(),
                 ...proxy.buildDeviceHeaders(),
-              },
-            )
+              })
             .timeout(const Duration(seconds: 5));
 
         if (response.statusCode == 200) {
@@ -88,8 +86,7 @@ class _DiscoverViewState extends State<DiscoverView> {
                         AppColors.acc(context),
                     bgColor:
                         _parseColor(m['bg_color'] as String?) ??
-                        AppColors.sf(context),
-                  );
+                        AppColors.sf(context));
                 }).toList();
                 _isLoading = false;
               });
@@ -102,11 +99,10 @@ class _DiscoverViewState extends State<DiscoverView> {
       AppLogger.instance.warning(
         'Discover content fetch failed, using fallback',
         error: e,
-        stackTrace: stackTrace,
-      );
+        stackTrace: stackTrace);
     }
 
-    final schema = RemoteConfigService.instance.getUISchema('discover');
+    final schema = getIt<RemoteConfigService>().getUISchema('discover');
     if (schema != null && schema['items'] != null) {
       final items = schema['items'] as List<dynamic>;
       if (items.isNotEmpty && mounted) {
@@ -123,8 +119,7 @@ class _DiscoverViewState extends State<DiscoverView> {
                   AppColors.acc(context),
               bgColor:
                   _parseColor(m['bg_color'] as String?) ??
-                  AppColors.sf(context),
-            );
+                  AppColors.sf(context));
           }).toList();
           _isLoading = false;
         });
@@ -144,9 +139,7 @@ class _DiscoverViewState extends State<DiscoverView> {
                   imgSrc: m['img']!,
                   avatarColor:
                       _parseColor(m['avatar']) ?? AppColors.acc(context),
-                  bgColor: _parseColor(m['bg']) ?? AppColors.sf(context),
-                ),
-              )
+                  bgColor: _parseColor(m['bg']) ?? AppColors.sf(context)))
               .toList();
           _isLoading = false;
         });
@@ -186,7 +179,7 @@ class _DiscoverViewState extends State<DiscoverView> {
           onHorizontalDragEnd: (d) {
             final velocity = d.primaryVelocity;
             if (velocity != null && velocity > 500) {
-              widget.provider.navigation.setCurrentView(ViewState.home);
+              getIt<NavigationCubit>().setCurrentView(ViewState.home);
             }
           },
           child: Stack(
@@ -200,10 +193,7 @@ class _DiscoverViewState extends State<DiscoverView> {
                             mainAxisSize: MainAxisSize.min,
                             children: List.generate(
                               2,
-                              (_) => const CardSkeleton(),
-                            ),
-                          ),
-                        )
+                              (_) => const CardSkeleton())))
                       : _hasError
                       ? Center(
                           child: Column(
@@ -212,49 +202,38 @@ class _DiscoverViewState extends State<DiscoverView> {
                               Icon(
                                 LucideIcons.wifiOff,
                                 size: 48,
-                                color: AppColors.mut(context),
-                              ),
+                                color: AppColors.mut(context)),
                               const SizedBox(height: 16),
                               Text(
                                 localeProvider.t('discover_load_error'),
                                 style: TextStyle(
                                   color: AppColors.textSecondary(context),
-                                  fontSize: 15,
-                                ),
-                              ),
+                                  fontSize: 15)),
                               const SizedBox(height: 16),
                               FilledButton(
                                 style: FilledButton.styleFrom(
                                   backgroundColor: AppColors.acc(context),
-                                  foregroundColor: AppColors.bg(context),
-                                ),
+                                  foregroundColor: AppColors.bg(context)),
                                 onPressed: _loadContent,
-                                child: Text(localeProvider.t('retry')),
-                              ),
-                            ],
-                          ),
-                        )
+                                child: Text(localeProvider.t('retry'))),
+                            ]))
                       : PageView.builder(
                           scrollDirection: Axis.vertical,
                           itemCount: _items.length,
                           itemBuilder: (context, index) {
                             return _buildCard(context, _items[index]);
-                          },
-                        ),
-                ),
-              ),
+                          }))),
               Positioned(
                 top: 0,
                 left: 0,
                 right: 0,
                 child: ClipRect(
-                  child: LiteMode.instance.blurEffectsEnabled
+                  child: getIt<LiteMode>().blurEffectsEnabled
                       ? BackdropFilter(
                           filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
                           child: Container(
                             color: Theme.of(
-                              context,
-                            ).scaffoldBackgroundColor.withValues(alpha: 0.8),
+                              context).scaffoldBackgroundColor.withValues(alpha: 0.8),
                             child: SafeArea(
                               bottom: false,
                               child: Column(
@@ -264,44 +243,34 @@ class _DiscoverViewState extends State<DiscoverView> {
                                       16,
                                       16,
                                       16,
-                                      12,
-                                    ),
+                                      12),
                                     child: Row(
                                       children: [
                                         Semantics(
                                           label: localeProvider.t('go_back'),
                                           child: GestureDetector(
                                             behavior: HitTestBehavior.opaque,
-                                            onTap: () => widget
-                                                .provider
-                                                .navigation
-                                                .setCurrentView(ViewState.home),
+                                            onTap: () =>
+                                                getIt<NavigationCubit>()
+                                                    .setCurrentView(ViewState.home),
                                             child: Icon(
                                               LucideIcons.arrowLeft,
                                               color: AppColors.textSecondary(
-                                                context,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
+                                                context)))),
                                         const SizedBox(width: 16),
                                         Text(
                                           localeProvider.t('discover'),
                                           style: TextStyle(
                                             fontSize: 20,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
+                                            fontWeight: FontWeight.w500)),
                                         const Spacer(),
                                         Stack(
                                           children: [
                                             Icon(
                                               LucideIcons.heart,
                                               color: AppColors.textSecondary(
-                                                context,
-                                              ),
-                                              size: 24,
-                                            ),
+                                                context),
+                                              size: 24),
                                             Positioned(
                                               top: 2,
                                               right: -2,
@@ -310,17 +279,13 @@ class _DiscoverViewState extends State<DiscoverView> {
                                                 height: 12,
                                                 decoration: BoxDecoration(
                                                   color: AppColors.textPrimary(
-                                                    context,
-                                                  ),
+                                                    context),
                                                   borderRadius:
                                                       BorderRadius.circular(6),
                                                   border: Border.all(
                                                     color: Theme.of(
-                                                      context,
-                                                    ).scaffoldBackgroundColor,
-                                                    width: 2,
-                                                  ),
-                                                ),
+                                                      context).scaffoldBackgroundColor,
+                                                    width: 2)),
                                                 child: Center(
                                                   child: Text(
                                                     '+',
@@ -330,64 +295,42 @@ class _DiscoverViewState extends State<DiscoverView> {
                                                           FontWeight.bold,
                                                       color:
                                                           AppColors.textPrimary(
-                                                            context,
-                                                          ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+                                                            context)))))),
+                                          ]),
+                                      ])),
                                   SizedBox(
                                     height: 40,
                                     child: ListView(
                                       scrollDirection: Axis.horizontal,
                                       padding: const EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                      ),
+                                        horizontal: 16),
                                       children: [
                                         _tab(
                                           context,
                                           localeProvider.t('for_you'),
-                                          index: 0,
-                                        ),
+                                          index: 0),
                                         _tab(
                                           context,
                                           localeProvider.t('headline_news'),
-                                          index: 1,
-                                        ),
+                                          index: 1),
                                         _tab(
                                           context,
                                           localeProvider.t('science_tech'),
-                                          index: 2,
-                                        ),
+                                          index: 2),
                                         _tab(
                                           context,
                                           localeProvider.t('business'),
-                                          index: 3,
-                                        ),
+                                          index: 3),
                                         _tab(
                                           context,
                                           localeProvider.t('art_culture'),
-                                          index: 4,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+                                          index: 4),
+                                      ])),
                                   const SizedBox(height: 12),
-                                ],
-                              ),
-                            ),
-                          ),
-                        )
+                                ]))))
                       : Container(
                           color: Theme.of(
-                            context,
-                          ).scaffoldBackgroundColor.withValues(alpha: 0.95),
+                            context).scaffoldBackgroundColor.withValues(alpha: 0.95),
                           child: SafeArea(
                             bottom: false,
                             child: Column(
@@ -397,44 +340,34 @@ class _DiscoverViewState extends State<DiscoverView> {
                                     16,
                                     16,
                                     16,
-                                    12,
-                                  ),
+                                    12),
                                   child: Row(
                                     children: [
                                       Semantics(
                                         label: localeProvider.t('go_back'),
                                         child: GestureDetector(
                                           behavior: HitTestBehavior.opaque,
-                                          onTap: () => widget
-                                              .provider
-                                              .navigation
-                                              .setCurrentView(ViewState.home),
+                                          onTap: () =>
+                                              getIt<NavigationCubit>()
+                                                  .setCurrentView(ViewState.home),
                                           child: Icon(
                                             LucideIcons.arrowLeft,
                                             color: AppColors.textSecondary(
-                                              context,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
+                                              context)))),
                                       const SizedBox(width: 16),
                                       Text(
                                         localeProvider.t('discover'),
                                         style: TextStyle(
                                           fontSize: 20,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
+                                          fontWeight: FontWeight.w500)),
                                       const Spacer(),
                                       Stack(
                                         children: [
                                           Icon(
                                             LucideIcons.heart,
                                             color: AppColors.textSecondary(
-                                              context,
-                                            ),
-                                            size: 24,
-                                          ),
+                                              context),
+                                            size: 24),
                                           Positioned(
                                             top: 2,
                                             right: -2,
@@ -443,17 +376,13 @@ class _DiscoverViewState extends State<DiscoverView> {
                                               height: 12,
                                               decoration: BoxDecoration(
                                                 color: AppColors.textPrimary(
-                                                  context,
-                                                ),
+                                                  context),
                                                 borderRadius:
                                                     BorderRadius.circular(6),
                                                 border: Border.all(
                                                   color: Theme.of(
-                                                    context,
-                                                  ).scaffoldBackgroundColor,
-                                                  width: 2,
-                                                ),
-                                              ),
+                                                    context).scaffoldBackgroundColor,
+                                                  width: 2)),
                                               child: Center(
                                                 child: Text(
                                                   '+',
@@ -462,66 +391,40 @@ class _DiscoverViewState extends State<DiscoverView> {
                                                     fontWeight: FontWeight.bold,
                                                     color:
                                                         AppColors.textPrimary(
-                                                          context,
-                                                        ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                                                          context)))))),
+                                        ]),
+                                    ])),
                                 SizedBox(
                                   height: 40,
                                   child: ListView(
                                     scrollDirection: Axis.horizontal,
                                     padding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                    ),
+                                      horizontal: 16),
                                     children: [
                                       _tab(
                                         context,
                                         localeProvider.t('for_you'),
-                                        index: 0,
-                                      ),
+                                        index: 0),
                                       _tab(
                                         context,
                                         localeProvider.t('headline_news'),
-                                        index: 1,
-                                      ),
+                                        index: 1),
                                       _tab(
                                         context,
                                         localeProvider.t('science_tech'),
-                                        index: 2,
-                                      ),
+                                        index: 2),
                                       _tab(
                                         context,
                                         localeProvider.t('business'),
-                                        index: 3,
-                                      ),
+                                        index: 3),
                                       _tab(
                                         context,
                                         localeProvider.t('art_culture'),
-                                        index: 4,
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                                        index: 4),
+                                    ])),
                                 const SizedBox(height: 12),
-                              ],
-                            ),
-                          ),
-                        ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+                              ]))))),
+            ]))));
   }
 
   Widget _buildCard(BuildContext context, _Item item) {
@@ -530,8 +433,7 @@ class _DiscoverViewState extends State<DiscoverView> {
       child: Container(
         decoration: BoxDecoration(
           color: item.bgColor,
-          borderRadius: BorderRadius.circular(24),
-        ),
+          borderRadius: BorderRadius.circular(24)),
         clipBehavior: Clip.antiAlias,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -550,21 +452,13 @@ class _DiscoverViewState extends State<DiscoverView> {
                         height: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: AppColors.acc(context),
-                        ),
-                      ),
-                    ),
-                  ),
+                          color: AppColors.acc(context))))),
                   errorWidget: (_, _, _) => Container(
                     color: AppColors.sf(context),
                     child: Icon(
                       LucideIcons.image,
                       color: AppColors.textDisabled(context),
-                      size: 48,
-                    ),
-                  ),
-                ),
-              )
+                      size: 48))))
             else
               Expanded(
                 flex: 55,
@@ -574,11 +468,7 @@ class _DiscoverViewState extends State<DiscoverView> {
                     child: Icon(
                       LucideIcons.sparkles,
                       color: AppColors.acc(context),
-                      size: 48,
-                    ),
-                  ),
-                ),
-              ),
+                      size: 48)))),
             Expanded(
               flex: 45,
               child: Padding(
@@ -592,11 +482,9 @@ class _DiscoverViewState extends State<DiscoverView> {
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
                         color: AppColors.textPrimary(context),
-                        height: 1.3,
-                      ),
+                        height: 1.3),
                       maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                      overflow: TextOverflow.ellipsis),
                     const SizedBox(height: 16),
                     Expanded(
                       child: Text(
@@ -604,12 +492,9 @@ class _DiscoverViewState extends State<DiscoverView> {
                         style: TextStyle(
                           fontSize: 14.5,
                           color: AppColors.textSecondary(context),
-                          height: 1.5,
-                        ),
+                          height: 1.5),
                         maxLines: 4,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
+                        overflow: TextOverflow.ellipsis)),
                     Row(
                       children: [
                         CircleAvatar(
@@ -625,16 +510,11 @@ class _DiscoverViewState extends State<DiscoverView> {
                                     errorWidget: (_, _, _) => Icon(
                                       LucideIcons.user,
                                       size: 14,
-                                      color: AppColors.textPrimary(context),
-                                    ),
-                                  )
+                                      color: AppColors.textPrimary(context)))
                                 : Icon(
                                     LucideIcons.user,
                                     size: 14,
-                                    color: AppColors.textPrimary(context),
-                                  ),
-                          ),
-                        ),
+                                    color: AppColors.textPrimary(context)))),
                         const SizedBox(width: 8),
                         Flexible(
                           child: Text(
@@ -643,10 +523,7 @@ class _DiscoverViewState extends State<DiscoverView> {
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 13,
-                              color: AppColors.textTertiary(context),
-                            ),
-                          ),
-                        ),
+                              color: AppColors.textTertiary(context)))),
                         const Spacer(),
                         GestureDetector(
                           onTap: () => setState(() {
@@ -664,19 +541,10 @@ class _DiscoverViewState extends State<DiscoverView> {
                             color: _likedItems.contains(item.title.hashCode)
                                 ? AppColors.acc(context)
                                 : AppColors.textTertiary(context),
-                            size: 20,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+                            size: 20)),
+                      ]),
+                  ]))),
+          ])));
   }
 
   Widget _tab(BuildContext context, String label, {required int index}) {
@@ -691,20 +559,14 @@ class _DiscoverViewState extends State<DiscoverView> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         decoration: BoxDecoration(
           color: active ? AppColors.accBg(context) : AppColors.sf(context),
-          borderRadius: BorderRadius.circular(20),
-        ),
+          borderRadius: BorderRadius.circular(20)),
         child: Center(
           child: Text(
             label,
             style: TextStyle(
               color: active ? AppColors.accentLight : AppColors.sec(context),
               fontSize: 14.5,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
-      ),
-    );
+              fontWeight: FontWeight.w500)))));
   }
 }
 

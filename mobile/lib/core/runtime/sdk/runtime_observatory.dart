@@ -133,8 +133,7 @@ class RuntimeObservatory {
   void notifyCapabilityInvoke(
     String capabilityId,
     String pluginId,
-    String status,
-  ) {
+    String status) {
     _emit(ObservatoryEventType.capabilityInvoke, {
       'capabilityId': capabilityId,
       'pluginId': pluginId,
@@ -145,8 +144,7 @@ class RuntimeObservatory {
   void notifyPolicyDecision(
     String callerId,
     String targetCapability,
-    bool allowed,
-  ) {
+    bool allowed) {
     _emit(ObservatoryEventType.policyDecision, {
       'callerId': callerId,
       'targetCapability': targetCapability,
@@ -162,8 +160,7 @@ class RuntimeObservatory {
     final event = ObservatoryEvent(
       type: type,
       timestamp: _container.clock.now(),
-      data: data,
-    );
+      data: data);
 
     _eventBuffer.add(event);
     if (_eventBuffer.length > _bufferSize) {
@@ -252,8 +249,7 @@ class RuntimeObservatory {
               'type': e.type,
               'ts': e.timestamp,
               'data': e.data,
-            },
-          )
+            })
           .toList(),
     };
   }
@@ -276,11 +272,9 @@ class RuntimeObservatory {
                       'startTimeMs': s.startTimeMs,
                       'durationMs': s.durationMs,
                       'status': s.status,
-                    },
-                  )
+                    })
                   .toList(),
-            },
-          )
+            })
           .toList(),
     };
   }
@@ -302,8 +296,7 @@ class RuntimeObservatory {
               'address': n.addressKey,
               'role': n.role.name,
               'state': n.state.name,
-            },
-          )
+            })
           .toList(),
       'remoteCapabilities': bindings
           .map(
@@ -311,8 +304,7 @@ class RuntimeObservatory {
               'capabilityId': b.capabilityId,
               'providerNodeId': b.providerNodeId,
               'state': b.state.name,
-            },
-          )
+            })
           .toList(),
     };
   }

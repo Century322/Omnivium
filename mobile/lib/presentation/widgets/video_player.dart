@@ -4,7 +4,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import '../theme/app_colors.dart';
-import '../theme/locale_provider.dart';
+import '../theme/locale_cubit.dart';
 
 class VideoPlayerView extends StatefulWidget {
   final String url;
@@ -33,23 +33,19 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
     _subs.add(
       _player.stream.playing.listen((playing) {
         if (mounted) setState(() => _isPlaying = playing);
-      }),
-    );
+      }));
     _subs.add(
       _player.stream.buffering.listen((buffering) {
         if (mounted) setState(() => _isBuffering = buffering);
-      }),
-    );
+      }));
     _subs.add(
       _player.stream.position.listen((pos) {
         if (mounted) setState(() => _position = pos);
-      }),
-    );
+      }));
     _subs.add(
       _player.stream.duration.listen((dur) {
         if (mounted) setState(() => _duration = dur);
-      }),
-    );
+      }));
   }
 
   @override
@@ -80,11 +76,8 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
                 widget.title!,
                 style: TextStyle(
                   color: AppColors.textPrimary(context),
-                  fontSize: 16,
-                ),
-              )
-            : null,
-      ),
+                  fontSize: 16))
+            : null),
       body: Column(
         children: [
           Expanded(
@@ -108,25 +101,14 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
                             height: 64,
                             decoration: BoxDecoration(
                               color: AppColors.textTertiary(context),
-                              borderRadius: BorderRadius.circular(32),
-                            ),
+                              borderRadius: BorderRadius.circular(32)),
                             child: Icon(
                               LucideIcons.play,
                               color: AppColors.textPrimary(context),
-                              size: 32,
-                            ),
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+                              size: 32)))),
+                  ])))),
           _buildControls(),
-        ],
-      ),
-    );
+        ]));
   }
 
   Widget _buildControls() {
@@ -142,21 +124,17 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
                 _formatDuration(_position),
                 style: TextStyle(
                   color: AppColors.textSecondary(context),
-                  fontSize: 12,
-                ),
-              ),
+                  fontSize: 12)),
               const SizedBox(width: 8),
               Expanded(
                 child: SliderTheme(
                   data: SliderThemeData(
                     trackHeight: 3,
                     thumbShape: const RoundSliderThumbShape(
-                      enabledThumbRadius: 6,
-                    ),
+                      enabledThumbRadius: 6),
                     activeTrackColor: AppColors.acc(context),
                     inactiveTrackColor: AppColors.textDisabled(context),
-                    thumbColor: AppColors.acc(context),
-                  ),
+                    thumbColor: AppColors.acc(context)),
                   child: Slider(
                     value: _duration.inMilliseconds > 0
                         ? _position.inMilliseconds / _duration.inMilliseconds
@@ -164,23 +142,15 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
                     onChanged: (v) {
                       _player.seek(
                         Duration(
-                          milliseconds: (v * _duration.inMilliseconds).round(),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ),
+                          milliseconds: (v * _duration.inMilliseconds).round()));
+                    }))),
               const SizedBox(width: 8),
               Text(
                 _formatDuration(_duration),
                 style: TextStyle(
                   color: AppColors.textSecondary(context),
-                  fontSize: 12,
-                ),
-              ),
-            ],
-          ),
+                  fontSize: 12)),
+            ]),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -189,49 +159,38 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
                 icon: Icon(
                   LucideIcons.skipBack,
                   color: AppColors.textSecondary(context),
-                  size: 20,
-                ),
+                  size: 20),
                 onPressed: () {
                   final newPos = _position - const Duration(seconds: 10);
                   _player.seek(newPos.isNegative ? Duration.zero : newPos);
-                },
-              ),
+                }),
               const SizedBox(width: 16),
               Container(
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
                   color: AppColors.acc(context),
-                  borderRadius: BorderRadius.circular(24),
-                ),
+                  borderRadius: BorderRadius.circular(24)),
                 child: IconButton(
                   tooltip: localeProvider.t('play'),
                   icon: Icon(
                     _isPlaying ? LucideIcons.pause : LucideIcons.play,
                     color: AppColors.bg(context),
-                    size: 24,
-                  ),
+                    size: 24),
                   onPressed: () =>
-                      _isPlaying ? _player.pause() : _player.play(),
-                ),
-              ),
+                      _isPlaying ? _player.pause() : _player.play())),
               const SizedBox(width: 16),
               IconButton(
                 tooltip: localeProvider.t('forward'),
                 icon: Icon(
                   LucideIcons.skipForward,
                   color: AppColors.textSecondary(context),
-                  size: 20,
-                ),
+                  size: 20),
                 onPressed: () {
                   final newPos = _position + const Duration(seconds: 10);
                   _player.seek(newPos > _duration ? _duration : newPos);
-                },
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
+                }),
+            ]),
+        ]));
   }
 }

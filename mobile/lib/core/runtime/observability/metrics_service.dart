@@ -95,17 +95,14 @@ class MetricsService {
     String name,
     MetricType type,
     Map<String, String> labels,
-    num value,
-  ) {
+    num value) {
     _timeline.add(
       MetricPoint(
         name: name,
         type: type,
         labels: labels,
         value: value,
-        timestamp: DateTime.now().millisecondsSinceEpoch,
-      ),
-    );
+        timestamp: DateTime.now().millisecondsSinceEpoch));
   }
 
   String _metricKey(String name, Map<String, String> labels) {

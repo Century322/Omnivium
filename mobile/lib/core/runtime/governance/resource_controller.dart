@@ -105,8 +105,7 @@ class ResourceController {
         ResourceLimitType.tokens,
         _usage.tokensUsed + count,
         _budget.maxTokens,
-        'Token budget exceeded',
-      );
+        'Token budget exceeded');
       return false;
     }
     _usage.tokensUsed += count;
@@ -123,8 +122,7 @@ class ResourceController {
         ResourceLimitType.streams,
         _usage.activeStreams,
         _budget.maxStreams,
-        'Stream budget exceeded',
-      );
+        'Stream budget exceeded');
       return false;
     }
     _usage.activeStreams++;
@@ -149,8 +147,7 @@ class ResourceController {
         ResourceLimitType.tasks,
         _usage.activeTasks,
         _budget.maxTasks,
-        'Task budget exceeded',
-      );
+        'Task budget exceeded');
       return false;
     }
     _usage.activeTasks++;
@@ -180,8 +177,7 @@ class ResourceController {
         ResourceLimitType.retries,
         _usage.totalRetries,
         _budget.maxRetries,
-        'Retry budget exceeded',
-      );
+        'Retry budget exceeded');
       return false;
     }
 
@@ -190,8 +186,7 @@ class ResourceController {
         ResourceLimitType.retryAmplification,
         _usage.retryAmplification.toInt(),
         _budget.maxRetryAmplification.toInt(),
-        'Retry amplification exceeded',
-      );
+        'Retry amplification exceeded');
       return false;
     }
 
@@ -213,8 +208,7 @@ class ResourceController {
         ResourceLimitType.eventsPerSec,
         count,
         _budget.maxEventsPerSec,
-        'Events per second exceeded',
-      );
+        'Events per second exceeded');
       return false;
     }
 
@@ -223,8 +217,7 @@ class ResourceController {
         ResourceLimitType.eventAmplification,
         _usage.eventAmplification.toInt(),
         _budget.maxEventAmplification.toInt(),
-        'Event amplification exceeded',
-      );
+        'Event amplification exceeded');
       return false;
     }
 
@@ -245,8 +238,7 @@ class ResourceController {
         ResourceLimitType.memory,
         _usage.memoryUsedMb + additionalMb,
         _budget.maxMemoryMb,
-        'Memory budget exceeded',
-      );
+        'Memory budget exceeded');
       return false;
     }
     return true;
@@ -269,15 +261,12 @@ class ResourceController {
     ResourceLimitType type,
     int current,
     int limit,
-    String message,
-  ) {
+    String message) {
     _violations.add(
       ResourceLimitExceeded(
         type: type,
         current: current,
         limit: limit,
-        message: message,
-      ),
-    );
+        message: message));
   }
 }

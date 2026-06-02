@@ -75,8 +75,7 @@ class NoScrollbarBehavior extends ScrollBehavior {
   Widget buildScrollbar(
     BuildContext context,
     Widget child,
-    ScrollableDetails details,
-  ) {
+    ScrollableDetails details) {
     return child;
   }
 }
@@ -99,8 +98,7 @@ class _SlidingSheetState extends State<SlidingSheet>
     super.initState();
     _ctrl = AnimationController(
       duration: const Duration(milliseconds: 400),
-      vsync: this,
-    );
+      vsync: this);
     _anim = CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic);
     _ctrl.forward();
   }
@@ -119,19 +117,14 @@ class _SlidingSheetState extends State<SlidingSheet>
         return Transform.translate(
           offset: Offset(
             0,
-            MediaQuery.of(context).size.height * (1 - _anim.value),
-          ),
-          child: child,
-        );
+            MediaQuery.of(context).size.height * (1 - _anim.value)),
+          child: child);
       },
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.bg(context),
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: widget.child,
-      ),
-    );
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24))),
+        child: widget.child));
   }
 }
 
@@ -151,8 +144,7 @@ class _VoiceBarsIconState extends State<VoiceBarsIcon>
     super.initState();
     _ctrl = AnimationController(
       duration: const Duration(milliseconds: 1200),
-      vsync: this,
-    )..repeat();
+      vsync: this)..repeat();
   }
 
   @override
@@ -177,12 +169,8 @@ class _VoiceBarsIconState extends State<VoiceBarsIcon>
               margin: const EdgeInsets.symmetric(horizontal: 1),
               decoration: BoxDecoration(
                 color: AppColors.acc(context),
-                borderRadius: BorderRadius.circular(1.5),
-              ),
-            );
-          }),
-        );
-      },
-    );
+                borderRadius: BorderRadius.circular(1.5)));
+          }));
+      });
   }
 }

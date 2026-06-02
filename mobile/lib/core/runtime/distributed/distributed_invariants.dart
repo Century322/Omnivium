@@ -65,8 +65,7 @@ class DistributedInvariants {
       decision: 'Per-Session Ordering',
       rationale:
           'AI Runtime does not require global strong consistency. '
-          'Per-session ordering is sufficient and much cheaper.',
-    ),
+          'Per-session ordering is sufficient and much cheaper.'),
     const DistributedInvariant(
       id: DistributedInvariantId.deliverySemantics,
       name: 'Delivery Semantics',
@@ -78,8 +77,7 @@ class DistributedInvariants {
       rationale:
           'Capability invocations must not duplicate side effects. '
           'Events can be deduplicated by consumers. '
-          'Journal entries must be exactly-once for replay correctness.',
-    ),
+          'Journal entries must be exactly-once for replay correctness.'),
     const DistributedInvariant(
       id: DistributedInvariantId.sessionOwnership,
       name: 'Session Ownership',
@@ -89,8 +87,7 @@ class DistributedInvariants {
       decision: 'Single Writer Principle',
       rationale:
           'Concurrent writes to the same session create merge conflicts. '
-          'Single writer eliminates an entire class of consistency bugs.',
-    ),
+          'Single writer eliminates an entire class of consistency bugs.'),
     const DistributedInvariant(
       id: DistributedInvariantId.capabilityConsistency,
       name: 'Capability Consistency',
@@ -100,8 +97,7 @@ class DistributedInvariants {
       decision: 'Eventually Consistent',
       rationale:
           'Global synchronous capability registry is too expensive. '
-          'Gossip-based propagation converges within seconds, which is acceptable.',
-    ),
+          'Gossip-based propagation converges within seconds, which is acceptable.'),
     const DistributedInvariant(
       id: DistributedInvariantId.timeAuthority,
       name: 'Time Authority',
@@ -113,8 +109,7 @@ class DistributedInvariants {
       rationale:
           'Physical clocks drift across nodes. '
           'HLC captures causality while staying close to physical time. '
-          'Essential for correct distributed replay and trace correlation.',
-    ),
+          'Essential for correct distributed replay and trace correlation.'),
     const DistributedInvariant(
       id: DistributedInvariantId.failureDomain,
       name: 'Failure Domain',
@@ -126,8 +121,7 @@ class DistributedInvariants {
       decision: 'Node Isolation',
       rationale:
           'Cascading failures are the #1 killer of distributed systems. '
-          'Isolation boundaries prevent a single node from taking down the cluster.',
-    ),
+          'Isolation boundaries prevent a single node from taking down the cluster.'),
     const DistributedInvariant(
       id: DistributedInvariantId.networkHostile,
       name: 'Network Is Hostile',
@@ -139,7 +133,6 @@ class DistributedInvariants {
       rationale:
           'Any system that assumes reliable network will fail in production. '
           'All distributed operations must have timeouts, retries, idempotency, '
-          'and partition recovery.',
-    ),
+          'and partition recovery.'),
   ];
 }

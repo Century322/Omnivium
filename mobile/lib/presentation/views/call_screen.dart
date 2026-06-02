@@ -1,3 +1,5 @@
+
+import '../../core/di/app_di.dart';
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
@@ -5,7 +7,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import '../../core/app_logger.dart';
 import '../../core/call_service.dart';
 import '../theme/app_colors.dart';
-import '../theme/locale_provider.dart';
+import '../theme/locale_cubit.dart';
 
 class CallScreen extends StatefulWidget {
   const CallScreen({super.key});
@@ -32,15 +34,12 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     super.initState();
     _pulseController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 2),
-    )..repeat(reverse: true);
+      duration: const Duration(seconds: 2))..repeat(reverse: true);
     _pulseAnimation = Tween<double>(begin: 0.8, end: 1.2).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
-    );
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut));
 
-    _callStateSubscription = CallService.instance.callStateStream.listen((
-      call,
-    ) {
+    _callStateSubscription = getIt<CallService>().callStateStream.listen((
+      call) {
       if (!mounted) return;
       setState(() {});
       if (call.state == CallState.connected) {
@@ -58,7 +57,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
   void _startTimer() {
     _callTimer?.cancel();
     _callTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (mounted && CallService.instance.isInCall) {
+      if (mounted && getIt<CallService>().isInCall) {
         setState(() => _callDuration += const Duration(seconds: 1));
       } else {
         _callTimer?.cancel();
@@ -77,7 +76,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
 
   Future<void> _initRenderers() async {
     if (_renderersInitialized) return;
-    final call = CallService.instance.currentCall;
+    final call = getIt<CallService>().currentCall;
     if (call == null) return;
 
     _localRenderer = RTCVideoRenderer();
@@ -133,7 +132,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final call = CallService.instance.currentCall;
+    final call = getIt<CallService>().currentCall;
     if (call == null) return const SizedBox.shrink();
 
     final isRinging = call.state == CallState.ringing;
@@ -144,7 +143,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, _) {
-        if (!didPop) CallService.instance.hangup();
+        if (!didPop) getIt<CallService>().hangup();
       },
       child: Scaffold(
         backgroundColor: AppColors.bg(context),
@@ -161,9 +160,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary(context),
-                      ),
-                    ),
+                        color: AppColors.textPrimary(context))),
                     const SizedBox(height: 8),
                     Text(
                       _getStateText(call.state),
@@ -171,9 +168,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                         fontSize: 16,
                         color: isConnected
                             ? AppColors.ok(context)
-                            : AppColors.textSecondary(context),
-                      ),
-                    ),
+                            : AppColors.textSecondary(context))),
                     const Spacer(flex: 3),
                     if (isConnected) _buildInCallControls(context),
                     if (isRinging) _buildIncomingCallControls(),
@@ -181,14 +176,8 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                     SizedBox(
                       height: max(
                         48,
-                        MediaQuery.of(context).padding.bottom + 16,
-                      ),
-                    ),
-                  ],
-                ),
-        ),
-      ),
-    );
+                        MediaQuery.of(context).padding.bottom + 16)),
+                  ]))));
   }
 
   Widget _buildAvatar(bool isConnected) {
@@ -210,8 +199,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
           onTap: () {
             setState(() => _isMuted = !_isMuted);
             _toggleMute(_isMuted);
-          },
-        ),
+          }),
         _buildControlButton(
           icon: _isSpeakerOn ? Icons.volume_up : Icons.volume_off,
           label: _isSpeakerOn
@@ -223,21 +211,18 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
           onTap: () {
             setState(() => _isSpeakerOn = !_isSpeakerOn);
             _toggleSpeaker(_isSpeakerOn);
-          },
-        ),
+          }),
         _buildControlButton(
           icon: Icons.call_end,
           label: localeProvider.t('hang_up'),
           color: AppColors.dng(context),
-          onTap: () => CallService.instance.hangup(),
-          isLarge: true,
-        ),
-      ],
-    );
+          onTap: () => getIt<CallService>().hangup(),
+          isLarge: true),
+      ]);
   }
 
   void _toggleMute(bool muted) {
-    final call = CallService.instance.currentCall;
+    final call = getIt<CallService>().currentCall;
     if (call == null) return;
     final localStream = call.localStream;
     if (localStream == null) return;
@@ -247,7 +232,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
   }
 
   void _toggleSpeaker(bool speakerOn) {
-    final call = CallService.instance.currentCall;
+    final call = getIt<CallService>().currentCall;
     if (call == null) return;
     final localStream = call.localStream;
     if (localStream == null) return;
@@ -261,7 +246,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
   }
 
   void _toggleCamera() {
-    final call = CallService.instance.currentCall;
+    final call = getIt<CallService>().currentCall;
     if (call == null) return;
     final localStream = call.localStream;
     if (localStream == null) return;
@@ -272,7 +257,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
   }
 
   void _switchCamera() {
-    final call = CallService.instance.currentCall;
+    final call = getIt<CallService>().currentCall;
     if (call == null) return;
     final localStream = call.localStream;
     if (localStream == null) return;
@@ -292,9 +277,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
           Positioned.fill(
             child: RTCVideoView(
               _remoteRenderer!,
-              objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-            ),
-          ),
+              objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover)),
         if (_localRenderer != null && call.localStream != null && !_isCameraOff)
           Positioned(
             top: 60,
@@ -304,16 +287,12 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
               height: 180,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.acc(context), width: 2),
-              ),
+                border: Border.all(color: AppColors.acc(context), width: 2)),
               clipBehavior: Clip.antiAlias,
               child: RTCVideoView(
                 _localRenderer!,
                 mirror: true,
-                objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-              ),
-            ),
-          ),
+                objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover))),
         Positioned(
           bottom: 0,
           left: 0,
@@ -326,9 +305,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                 colors: [
                   Colors.transparent,
                   AppColors.bg(context).withValues(alpha: 0.7),
-                ],
-              ),
-            ),
+                ])),
             padding: const EdgeInsets.fromLTRB(24, 48, 24, 48),
             child: Column(
               children: [
@@ -337,19 +314,14 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textOnAccent(context),
-                  ),
-                ),
+                    color: AppColors.textOnAccent(context))),
                 const SizedBox(height: 4),
                 Text(
                   _formatDuration(_callDuration),
                   style: TextStyle(
                     fontSize: 14,
                     color: AppColors.textOnAccent(
-                      context,
-                    ).withValues(alpha: 0.8),
-                  ),
-                ),
+                      context).withValues(alpha: 0.8))),
                 const SizedBox(height: 24),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -365,8 +337,7 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                       onTap: () {
                         setState(() => _isMuted = !_isMuted);
                         _toggleMute(_isMuted);
-                      },
-                    ),
+                      }),
                     _buildControlButton(
                       icon: _isCameraOff ? Icons.videocam_off : Icons.videocam,
                       label: _isCameraOff
@@ -378,29 +349,21 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
                       onTap: () {
                         setState(() => _isCameraOff = !_isCameraOff);
                         _toggleCamera();
-                      },
-                    ),
+                      }),
                     _buildControlButton(
                       icon: Icons.flip_camera_ios,
                       label: localeProvider.t('flip_camera'),
                       color: AppColors.textOnAccent(context),
-                      onTap: _switchCamera,
-                    ),
+                      onTap: _switchCamera),
                     _buildControlButton(
                       icon: Icons.call_end,
                       label: localeProvider.t('hang_up'),
                       color: AppColors.dng(context),
-                      onTap: () => CallService.instance.hangup(),
-                      isLarge: true,
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
+                      onTap: () => getIt<CallService>().hangup(),
+                      isLarge: true),
+                  ]),
+              ]))),
+      ]);
   }
 
   Widget _buildIncomingCallControls() {
@@ -411,18 +374,15 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
           icon: Icons.call_end,
           label: localeProvider.t('decline'),
           color: AppColors.dng(context),
-          onTap: () => CallService.instance.rejectCall(),
-          isLarge: true,
-        ),
+          onTap: () => getIt<CallService>().rejectCall(),
+          isLarge: true),
         _buildControlButton(
           icon: Icons.phone,
           label: localeProvider.t('answer'),
           color: AppColors.ok(context),
-          onTap: () => CallService.instance.answerCall(),
-          isLarge: true,
-        ),
-      ],
-    );
+          onTap: () => getIt<CallService>().answerCall(),
+          isLarge: true),
+      ]);
   }
 
   Widget _buildConnectingControls() {
@@ -430,9 +390,8 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
       icon: Icons.call_end,
       label: localeProvider.t('cancel'),
       color: AppColors.dng(context),
-      onTap: () => CallService.instance.hangup(),
-      isLarge: true,
-    );
+      onTap: () => getIt<CallService>().hangup(),
+      isLarge: true);
   }
 
   Widget _buildControlButton({
@@ -453,15 +412,11 @@ class _CallScreenState extends State<CallScreen> with TickerProviderStateMixin {
             height: size,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: color.withValues(alpha: 0.15),
-            ),
-            child: Icon(icon, color: color, size: isLarge ? 32 : 24),
-          ),
-        ),
+              color: color.withValues(alpha: 0.15)),
+            child: Icon(icon, color: color, size: isLarge ? 32 : 24))),
         const SizedBox(height: 8),
         Text(label, style: TextStyle(fontSize: 12, color: color)),
-      ],
-    );
+      ]);
   }
 }
 
@@ -487,15 +442,10 @@ class _PulseAvatar extends StatelessWidget {
           color: AppColors.acc(context).withValues(alpha: 0.2),
           border: Border.all(
             color: isConnected ? AppColors.ok(context) : AppColors.acc(context),
-            width: 3,
-          ),
-        ),
+            width: 3)),
         child: Icon(
           isConnected ? Icons.phone_in_talk : Icons.phone,
           size: 48,
-          color: isConnected ? AppColors.ok(context) : AppColors.acc(context),
-        ),
-      ),
-    );
+          color: isConnected ? AppColors.ok(context) : AppColors.acc(context))));
   }
 }

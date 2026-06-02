@@ -24,18 +24,13 @@ class UserAvatar extends StatelessWidget {
       height: size,
       decoration: BoxDecoration(
         color: AppColors.acc(context).withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(radius),
-      ),
+        borderRadius: BorderRadius.circular(radius)),
       child: Center(
         child: Text(
           letter,
           style: TextStyle(
             color: AppColors.acc(context),
             fontSize: size * 0.45,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ),
-    );
+            fontWeight: FontWeight.w700))));
   }
 }

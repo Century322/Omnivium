@@ -52,9 +52,7 @@ class PluginLifecycle {
         from: _state,
         to: target,
         timestamp: now,
-        reason: reason,
-      ),
-    );
+        reason: reason));
     _state = target;
     return true;
   }

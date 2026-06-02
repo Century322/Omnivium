@@ -1,4 +1,4 @@
-import '../theme/locale_provider.dart';
+import '../theme/locale_cubit.dart';
 
 String formatRelativeTime(DateTime dt) {
   final now = DateTime.now();

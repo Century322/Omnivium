@@ -1,3 +1,5 @@
+﻿
+import '../di/app_di.dart';
 import '../app_logger.dart';
 import 'dart:collection';
 import 'dart:convert';
@@ -12,10 +14,12 @@ class EmbeddingService {
   EmbeddingService._();
 
   static const _cacheKey = 'embedding_cache';
+  static const _eventIdMapKey = 'embedding_event_map';
   static const _maxCacheSize = 1000;
 
   final LinkedHashMap<String, List<double>> _cache = LinkedHashMap();
   final Map<String, String> _keyToHash = {};
+  final Map<String, String> _cacheKeyToEventId = {};
   final Set<String> _dirtyKeys = {};
   bool _initialized = false;
 
@@ -26,7 +30,7 @@ class EmbeddingService {
 
   Future<void> init() async {
     if (_initialized) return;
-    final db = DatabaseService.instance;
+    final db = getIt<DatabaseService>();
     final indexRaw = db.getCache(_cacheKey);
     if (indexRaw != null) {
       try {
@@ -36,7 +40,7 @@ class EmbeddingService {
           for (final key in keys) {
             final entryRaw = db.getCache('$_cacheKey::$key');
             if (entryRaw != null) {
-              final list = (jsonDecode(entryRaw) as List)
+              final list = (jsonDecode(entryRaw) as List<dynamic>)
                   .map((e) => (e as num).toDouble())
                   .toList();
               _cache[key] = list;
@@ -44,16 +48,21 @@ class EmbeddingService {
           }
         } else if (indexData is Map<String, dynamic>) {
           _cache.addAll(
-            indexData.map((k, v) => MapEntry(k, List<double>.from(v as List))),
-          );
+            indexData.map((k, v) => MapEntry(k, List<double>.from(v as List<dynamic>))));
         }
       } catch (e, stackTrace) {
         AppLogger.instance.error(
           'Embedding cache load failed',
           error: e,
-          stackTrace: stackTrace,
-        );
+          stackTrace: stackTrace);
       }
+    }
+    final eventIdMapRaw = db.getCache(_eventIdMapKey);
+    if (eventIdMapRaw != null) {
+      try {
+        final map = jsonDecode(eventIdMapRaw) as Map<String, dynamic>;
+        _cacheKeyToEventId.addAll(map.map((k, v) => MapEntry(k, v.toString())));
+      } catch (_) {}
     }
     _initialized = true;
   }
@@ -67,7 +76,7 @@ class EmbeddingService {
       return value;
     }
 
-    final proxy = ApiProxyService.instance;
+    final proxy = getIt<ApiProxyService>();
     if (!proxy.isConfigured) return null;
 
     try {
@@ -80,13 +89,12 @@ class EmbeddingService {
               ...proxy.buildDeviceHeaders(),
               'Content-Type': 'application/json',
             },
-            body: jsonEncode({'text': text}),
-          )
+            body: jsonEncode({'text': text}))
           .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body) as Map<String, dynamic>;
-        final embedding = (body['embedding'] as List?)?.cast<double>();
+        final embedding = (body['embedding'] as List<dynamic>?)?.cast<double>();
         if (embedding != null) {
           _cache[cacheKey] = embedding;
           _keyToHash[cacheKey] = text;
@@ -96,9 +104,8 @@ class EmbeddingService {
             _cache.remove(evictedKey);
             _keyToHash.remove(evictedKey);
             _dirtyKeys.remove(evictedKey);
-            await DatabaseService.instance.deleteCache(
-              '$_cacheKey::$evictedKey',
-            );
+            await getIt<DatabaseService>().deleteCache(
+              '$_cacheKey::$evictedKey');
           }
           await _saveDirtyEntries();
           return embedding;
@@ -108,8 +115,7 @@ class EmbeddingService {
       AppLogger.instance.error(
         'Embedding request failed',
         error: e,
-        stackTrace: stackTrace,
-      );
+        stackTrace: stackTrace);
     }
     return null;
   }
@@ -126,6 +132,13 @@ class EmbeddingService {
     return dotProduct / (sqrt(normA) * sqrt(normB));
   }
 
+  void associateEventId(String text, String eventId) {
+    final cacheKey = _computeCacheKey(text);
+    if (_cache.containsKey(cacheKey)) {
+      _cacheKeyToEventId[cacheKey] = eventId;
+    }
+  }
+
   Future<List<MapEntry<String, double>>> searchSimilar(
     String query, {
     int maxResults = 5,
@@ -138,7 +151,33 @@ class EmbeddingService {
     for (final entry in _cache.entries) {
       final similarity = cosineSimilarity(queryEmbedding, entry.value);
       if (similarity >= threshold) {
-        results.add(MapEntry(entry.key, similarity));
+        final eventId = _cacheKeyToEventId[entry.key] ?? entry.key;
+        results.add(MapEntry(eventId, similarity));
+      }
+    }
+
+    results.sort((a, b) => b.value.compareTo(a.value));
+    return results.take(maxResults).toList();
+  }
+
+  List<MapEntry<String, double>> cachedSearch(
+    String query, {
+    int maxResults = 5,
+    double threshold = 0.3,
+  }) {
+    final queryLower = query.toLowerCase();
+    final queryWords = queryLower.split(RegExp(r'\s+')).where((w) => w.length > 1).toList();
+
+    final results = <MapEntry<String, double>>[];
+    for (final entry in _cache.entries) {
+      final keyLower = entry.key.toLowerCase();
+      var score = 0.0;
+      for (final word in queryWords) {
+        if (keyLower.contains(word)) score += 0.3;
+      }
+      if (keyLower.contains(queryLower)) score += 0.5;
+      if (score >= threshold) {
+        results.add(MapEntry(entry.key, score));
       }
     }
 
@@ -148,7 +187,7 @@ class EmbeddingService {
 
   Future<void> _saveDirtyEntries() async {
     if (_dirtyKeys.isEmpty) return;
-    final db = DatabaseService.instance;
+    final db = getIt<DatabaseService>();
     for (final key in _dirtyKeys) {
       final value = _cache[key];
       if (value != null) {
@@ -156,6 +195,9 @@ class EmbeddingService {
       }
     }
     await db.putCache(_cacheKey, jsonEncode(_cache.keys.toList()));
+    if (_cacheKeyToEventId.isNotEmpty) {
+      await db.putCache(_eventIdMapKey, jsonEncode(_cacheKeyToEventId));
+    }
     _dirtyKeys.clear();
   }
 }

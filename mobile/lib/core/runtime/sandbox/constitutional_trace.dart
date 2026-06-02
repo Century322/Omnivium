@@ -132,8 +132,7 @@ class ConstitutionalTraceGraph {
       callerId: callerId,
       callerTrust: callerTrust,
       escalationBefore: escalationBefore,
-      escalationAfter: escalationAfter,
-    );
+      escalationAfter: escalationAfter);
     _decisions.add(record);
     return record;
   }
@@ -177,8 +176,7 @@ class ConstitutionalTraceGraph {
       totalDecisions: total,
       totalViolations: totalViolations,
       totalCompliant: totalCompliant,
-      complianceRate: rate,
-    );
+      complianceRate: rate);
   }
 
   EscalationPath escalationPathFor(String sandboxId) {
@@ -198,8 +196,7 @@ class ConstitutionalTraceGraph {
     return EscalationPath(
       sandboxId: sandboxId,
       decisions: sandboxDecisions,
-      levelTransitions: transitions,
-    );
+      levelTransitions: transitions);
   }
 
   List<LawDecisionRecord> violationsForLaw(RuntimeLawId lawId) =>
@@ -273,8 +270,7 @@ class ImmutableAuditLedger {
       entryType,
       sandboxId,
       data,
-      previousHash,
-    );
+      previousHash);
 
     final entry = LedgerEntry(
       seq: seq,
@@ -283,8 +279,7 @@ class ImmutableAuditLedger {
       sandboxId: sandboxId,
       data: data,
       hash: hash,
-      previousHash: previousHash,
-    );
+      previousHash: previousHash);
 
     _entries.add(entry);
     _lastHash = hash;
@@ -304,8 +299,7 @@ class ImmutableAuditLedger {
         entry.entryType,
         entry.sandboxId,
         entry.data,
-        entry.previousHash,
-      );
+        entry.previousHash);
       if (entry.hash != expectedHash) return false;
 
       expectedPrevHash = entry.hash;
@@ -326,8 +320,7 @@ class ImmutableAuditLedger {
       entry.entryType,
       entry.sandboxId,
       entry.data,
-      entry.previousHash,
-    );
+      entry.previousHash);
     return entry.hash == expectedHash;
   }
 
@@ -346,8 +339,7 @@ class ImmutableAuditLedger {
     String type,
     String sandboxId,
     Map<String, dynamic> data,
-    String? previousHash,
-  ) {
+    String? previousHash) {
     final input =
         '$seq|$timestamp|$type|$sandboxId|${jsonEncode(data)}|$previousHash';
     final bytes = utf8.encode(input);
@@ -429,6 +421,5 @@ class CapabilityProof {
     trustProof: trustVerified,
     schedulerProof: scheduledThroughScheduler,
     timestamp: timestamp,
-    sandboxId: sandboxId,
-  );
+    sandboxId: sandboxId);
 }

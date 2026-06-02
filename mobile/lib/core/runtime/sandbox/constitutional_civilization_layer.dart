@@ -50,11 +50,9 @@ class DiplomacyMessage {
     String senderId,
     String targetId,
     int timestamp,
-    Map<String, dynamic> payload,
-  ) {
+    Map<String, dynamic> payload) {
     final input = utf8.encode(
-      '$senderId|$targetId|$timestamp|${jsonEncode(payload)}',
-    );
+      '$senderId|$targetId|$timestamp|${jsonEncode(payload)}');
     final digest = sha256.convert(input);
     return 'diplo_${digest.toString().substring(0, 32)}';
   }
@@ -102,8 +100,7 @@ class CivilizationTransport {
       channelId: channelId,
       localNodeId: localNodeId,
       remoteNodeId: remoteNodeId,
-      channelType: type,
-    );
+      channelType: type);
     _channels[channelId] = channel;
     return channel;
   }
@@ -111,8 +108,7 @@ class CivilizationTransport {
   DiplomacyMessage sendConstitutionSync(
     String targetId,
     LawManifest manifest,
-    int timestamp,
-  ) {
+    int timestamp) {
     final msg = _createMessage(
       type: DiplomacyMessageType.constitutionSync,
       targetId: targetId,
@@ -121,8 +117,7 @@ class CivilizationTransport {
         'lawCount': manifest.lawVersions.length,
         'epoch': manifest.epoch,
       },
-      timestamp: timestamp,
-    );
+      timestamp: timestamp);
     _outbox.add(msg);
     return msg;
   }
@@ -130,8 +125,7 @@ class CivilizationTransport {
   DiplomacyMessage sendJudiciaryBroadcast(
     String targetId,
     Sanction sanction,
-    int timestamp,
-  ) {
+    int timestamp) {
     final msg = _createMessage(
       type: DiplomacyMessageType.judiciaryBroadcast,
       targetId: targetId,
@@ -140,8 +134,7 @@ class CivilizationTransport {
         'sandboxId': sanction.sandboxId,
         'type': sanction.type.name,
       },
-      timestamp: timestamp,
-    );
+      timestamp: timestamp);
     _outbox.add(msg);
     return msg;
   }
@@ -149,8 +142,7 @@ class CivilizationTransport {
   DiplomacyMessage sendReputationExchange(
     String targetId,
     TrustPassport passport,
-    int timestamp,
-  ) {
+    int timestamp) {
     final msg = _createMessage(
       type: DiplomacyMessageType.reputationExchange,
       targetId: targetId,
@@ -159,8 +151,7 @@ class CivilizationTransport {
         'entityId': passport.entityId,
         'score': passport.reputationScore,
       },
-      timestamp: timestamp,
-    );
+      timestamp: timestamp);
     _outbox.add(msg);
     return msg;
   }
@@ -168,8 +159,7 @@ class CivilizationTransport {
   DiplomacyMessage sendLegislativeGossip(
     String targetId,
     LegislativeProposal proposal,
-    int timestamp,
-  ) {
+    int timestamp) {
     final msg = _createMessage(
       type: DiplomacyMessageType.legislativeGossip,
       targetId: targetId,
@@ -179,8 +169,7 @@ class CivilizationTransport {
         'stage': proposal.stage.name,
         'targetLaw': proposal.targetLaw.name,
       },
-      timestamp: timestamp,
-    );
+      timestamp: timestamp);
     _outbox.add(msg);
     return msg;
   }
@@ -189,8 +178,7 @@ class CivilizationTransport {
     String targetId,
     LawFork fork,
     String proposedResolution,
-    int timestamp,
-  ) {
+    int timestamp) {
     final msg = _createMessage(
       type: DiplomacyMessageType.forkNegotiation,
       targetId: targetId,
@@ -200,8 +188,7 @@ class CivilizationTransport {
         'localResolution': fork.resolution.name,
         'proposedResolution': proposedResolution,
       },
-      timestamp: timestamp,
-    );
+      timestamp: timestamp);
     _outbox.add(msg);
     return msg;
   }
@@ -211,8 +198,7 @@ class CivilizationTransport {
       type: DiplomacyMessageType.heartbeat,
       targetId: targetId,
       payload: {'epoch': epoch, 'status': 'alive'},
-      timestamp: timestamp,
-    );
+      timestamp: timestamp);
     _outbox.add(msg);
     return msg;
   }
@@ -220,8 +206,7 @@ class CivilizationTransport {
   DiplomacyMessage sendIdentityAnnounce(
     String targetId,
     CivilizationIdentity identity,
-    int timestamp,
-  ) {
+    int timestamp) {
     final msg = _createMessage(
       type: DiplomacyMessageType.identityAnnounce,
       targetId: targetId,
@@ -232,8 +217,7 @@ class CivilizationTransport {
         'federationId': identity.federationId,
         'trustLevel': identity.trustLevel.name,
       },
-      timestamp: timestamp,
-    );
+      timestamp: timestamp);
     _outbox.add(msg);
     return msg;
   }
@@ -241,14 +225,12 @@ class CivilizationTransport {
   DiplomacyMessage sendFederationInvite(
     String targetId,
     String federationId,
-    int timestamp,
-  ) {
+    int timestamp) {
     final msg = _createMessage(
       type: DiplomacyMessageType.federationInvite,
       targetId: targetId,
       payload: {'federationId': federationId, 'inviter': localNodeId},
-      timestamp: timestamp,
-    );
+      timestamp: timestamp);
     _outbox.add(msg);
     return msg;
   }
@@ -256,14 +238,12 @@ class CivilizationTransport {
   DiplomacyMessage sendFederationAccept(
     String targetId,
     String federationId,
-    int timestamp,
-  ) {
+    int timestamp) {
     final msg = _createMessage(
       type: DiplomacyMessageType.federationAccept,
       targetId: targetId,
       payload: {'federationId': federationId, 'acceptor': localNodeId},
-      timestamp: timestamp,
-    );
+      timestamp: timestamp);
     _outbox.add(msg);
     return msg;
   }
@@ -291,8 +271,7 @@ class CivilizationTransport {
       localNodeId,
       targetId,
       timestamp,
-      payload,
-    );
+      payload);
     return DiplomacyMessage(
       type: type,
       senderId: localNodeId,
@@ -300,8 +279,7 @@ class CivilizationTransport {
       epoch: _messageSeq++,
       payload: payload,
       timestamp: timestamp,
-      signature: sig,
-    );
+      signature: sig);
   }
 }
 
@@ -345,8 +323,7 @@ class CivilizationIdentity {
     trustLevel: trustLevel,
     constitutionalAncestry: constitutionalAncestry,
     createdAt: createdAt,
-    signature: signature,
-  );
+    signature: signature);
 
   CivilizationIdentity joinFederation(String fedId) => CivilizationIdentity(
     nodeId: nodeId,
@@ -356,8 +333,7 @@ class CivilizationIdentity {
     trustLevel: trustLevel,
     constitutionalAncestry: constitutionalAncestry,
     createdAt: createdAt,
-    signature: signature,
-  );
+    signature: signature);
 
   CivilizationIdentity updateTrust(TrustLevel newLevel) => CivilizationIdentity(
     nodeId: nodeId,
@@ -367,8 +343,7 @@ class CivilizationIdentity {
     trustLevel: newLevel,
     constitutionalAncestry: constitutionalAncestry,
     createdAt: createdAt,
-    signature: signature,
-  );
+    signature: signature);
 
   static CivilizationIdentity generate(String nodeId, {String? federationId}) {
     final createdAt = DateTime.now().millisecondsSinceEpoch;
@@ -382,16 +357,14 @@ class CivilizationIdentity {
       trustLevel: TrustLevel.verified,
       constitutionalAncestry: ['genesis'],
       createdAt: createdAt,
-      signature: signature,
-    );
+      signature: signature);
   }
 
   static bool verify(CivilizationIdentity identity) {
     final expectedSig = _computeSignature(
       identity.nodeId,
       identity.publicKey,
-      identity.createdAt,
-    );
+      identity.createdAt);
     return identity.signature == expectedSig;
   }
 
@@ -404,8 +377,7 @@ class CivilizationIdentity {
   static String _computeSignature(
     String nodeId,
     String publicKey,
-    int createdAt,
-  ) {
+    int createdAt) {
     final input = utf8.encode('$nodeId|$publicKey|$createdAt');
     final digest = sha256.convert(input);
     return 'id_${digest.toString().substring(0, 32)}';
@@ -486,8 +458,7 @@ class FederationMembership {
         members: [...members, nodeId],
         founder: founder,
         createdAt: createdAt,
-        memberTrustLevels: {...memberTrustLevels, nodeId: trustLevel},
-      );
+        memberTrustLevels: {...memberTrustLevels, nodeId: trustLevel});
 
   FederationMembership removeMember(String nodeId) => FederationMembership(
     federationId: federationId,
@@ -495,9 +466,7 @@ class FederationMembership {
     founder: founder,
     createdAt: createdAt,
     memberTrustLevels: Map.fromEntries(
-      memberTrustLevels.entries.where((e) => e.key != nodeId),
-    ),
-  );
+      memberTrustLevels.entries.where((e) => e.key != nodeId)));
 
   bool isMember(String nodeId) => members.contains(nodeId);
   int get size => members.length;
@@ -516,8 +485,7 @@ class FederationMembership {
         members: [founder],
         founder: founder,
         createdAt: DateTime.now().millisecondsSinceEpoch,
-        memberTrustLevels: {founder: TrustLevel.system},
-      );
+        memberTrustLevels: {founder: TrustLevel.system});
 }
 
 class ExecutionCredits {
@@ -549,8 +517,7 @@ class ExecutionCredits {
     earnedTotal: earnedTotal ?? this.earnedTotal,
     spentTotal: spentTotal ?? this.spentTotal,
     taxPaid: taxPaid ?? this.taxPaid,
-    lastUpdated: lastUpdated ?? this.lastUpdated,
-  );
+    lastUpdated: lastUpdated ?? this.lastUpdated);
 
   Map<String, dynamic> toJson() => {
     'entity': entityId,
@@ -594,8 +561,7 @@ class FederationTreasury {
     String entityId,
     double amount,
     String reason,
-    int timestamp,
-  ) {
+    int timestamp) {
     if (amount > _balance) return _balance;
     _balance -= amount;
     _transactions.add({
@@ -612,8 +578,7 @@ class FederationTreasury {
     String entityId,
     double amount,
     String reason,
-    int timestamp,
-  ) {
+    int timestamp) {
     _balance += amount;
     _transactions.add({
       'type': 'penalty',
@@ -656,8 +621,7 @@ class ResourceEconomy {
         earnedTotal: 100.0,
         spentTotal: 0,
         taxPaid: 0,
-        lastUpdated: 0,
-      );
+        lastUpdated: 0);
 
   ExecutionCredits earn(String entityId, double amount, int timestamp) {
     final current = accountFor(entityId);
@@ -670,8 +634,7 @@ class ResourceEconomy {
       balance: current.balance + net,
       earnedTotal: current.earnedTotal + amount,
       taxPaid: current.taxPaid + tax,
-      lastUpdated: timestamp,
-    );
+      lastUpdated: timestamp);
     _accounts[entityId] = updated;
     return updated;
   }
@@ -683,8 +646,7 @@ class ResourceEconomy {
     final updated = current.copyWith(
       balance: current.balance - amount,
       spentTotal: current.spentTotal + amount,
-      lastUpdated: timestamp,
-    );
+      lastUpdated: timestamp);
     _accounts[entityId] = updated;
     return updated;
   }
@@ -705,8 +667,7 @@ class ResourceEconomy {
     int tokens,
     int tasks,
     int streams,
-    int timestamp,
-  ) {
+    int timestamp) {
     final cost = executionCost(tokens, tasks, streams);
     return spend(entityId, cost, timestamp);
   }
@@ -715,16 +676,14 @@ class ResourceEconomy {
     String entityId,
     double amount,
     String reason,
-    int timestamp,
-  ) {
+    int timestamp) {
     final current = accountFor(entityId);
     _treasury.imposePenalty(entityId, amount, reason, timestamp);
 
     final updated = current.copyWith(
       balance: (current.balance - amount).clamp(0, double.infinity),
       spentTotal: current.spentTotal + amount,
-      lastUpdated: timestamp,
-    );
+      lastUpdated: timestamp);
     _accounts[entityId] = updated;
   }
 }

@@ -1,4 +1,4 @@
-import 'agent_state.dart';
+﻿import 'agent_state.dart';
 
 class StateTransition {
   final AgentState from;
@@ -23,6 +23,7 @@ class AgentStateMachine {
     StateTransition(from: AgentState.planning, to: AgentState.executing),
     StateTransition(from: AgentState.planning, to: AgentState.failed),
     StateTransition(from: AgentState.executing, to: AgentState.waitingTool),
+    StateTransition(from: AgentState.executing, to: AgentState.reflecting),
     StateTransition(from: AgentState.executing, to: AgentState.failed),
     StateTransition(from: AgentState.executing, to: AgentState.completed),
     StateTransition(from: AgentState.waitingTool, to: AgentState.checking),
@@ -31,6 +32,9 @@ class AgentStateMachine {
     StateTransition(from: AgentState.checking, to: AgentState.recovering),
     StateTransition(from: AgentState.checking, to: AgentState.reflecting),
     StateTransition(from: AgentState.checking, to: AgentState.failed),
+    StateTransition(from: AgentState.completed, to: AgentState.reflecting),
+    StateTransition(from: AgentState.completed, to: AgentState.memorizing),
+    StateTransition(from: AgentState.completed, to: AgentState.idle),
     StateTransition(from: AgentState.reflecting, to: AgentState.thinking),
     StateTransition(from: AgentState.reflecting, to: AgentState.completed),
     StateTransition(from: AgentState.reflecting, to: AgentState.memorizing),
@@ -41,8 +45,6 @@ class AgentStateMachine {
     StateTransition(from: AgentState.interrupted, to: AgentState.idle),
     StateTransition(from: AgentState.memorizing, to: AgentState.completed),
     StateTransition(from: AgentState.memorizing, to: AgentState.failed),
-    StateTransition(from: AgentState.completed, to: AgentState.memorizing),
-    StateTransition(from: AgentState.completed, to: AgentState.idle),
     StateTransition(from: AgentState.failed, to: AgentState.recovering),
     StateTransition(from: AgentState.failed, to: AgentState.idle),
   ];
@@ -73,8 +75,7 @@ class AgentStateMachine {
   void _applyTransition(AgentState newState, String? condition) {
     final oldState = _state;
     _history.add(
-      StateTransition(from: oldState, to: newState, condition: condition),
-    );
+      StateTransition(from: oldState, to: newState, condition: condition));
     if (_history.length > _maxHistorySize) {
       _history.removeRange(0, _history.length - _maxHistorySize);
     }

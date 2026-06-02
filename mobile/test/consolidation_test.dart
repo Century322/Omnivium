@@ -692,7 +692,7 @@ void main() {
 
       manager.acquire(LeaseType.session, 'session-1');
 
-      Future.delayed(const Duration(milliseconds: 100), () {
+      Future<void>.delayed(const Duration(milliseconds: 100), () {
         manager.tickExpiry();
         expect(manager.canWrite('session-1'), isFalse);
       });
